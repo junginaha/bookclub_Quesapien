@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 20% 98%;
+    --foreground: 220 13% 13%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 13%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 13%;
+
+    --primary: 220 13% 13%;
+    --primary-foreground: 40 20% 98%;
+
+    --secondary: 40 15% 94%;
+    --secondary-foreground: 220 13% 13%;
+
+    --muted: 40 15% 94%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 40 15% 94%;
+    --accent-foreground: 220 13% 13%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 40 15% 91%;
+    --input: 40 15% 91%;
+    --ring: 220 13% 13%;
+
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3 {
+    @apply font-serif tracking-tight;
+  }
+}
+
+@layer components {
+  .container-base {
+    @apply mx-auto w-full max-w-screen-lg px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-padding {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  .card-base {
+    @apply bg-white rounded-2xl shadow-card border border-warm-100 overflow-hidden;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .card-base:hover {
+    @apply shadow-card-hover;
+    transform: translateY(-2px);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-warm-900 text-white
+           text-sm font-medium px-5 py-2.5 transition-all duration-200
+           hover:bg-warm-800 active:scale-95 focus-visible:outline-none
+           focus-visible:ring-2 focus-visible:ring-warm-900 focus-visible:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-warm-100 text-warm-900
+           text-sm font-medium px-5 py-2.5 transition-all duration-200
+           hover:bg-warm-200 active:scale-95 focus-visible:outline-none
+           focus-visible:ring-2 focus-visible:ring-warm-400 focus-visible:ring-offset-2;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-warm-700
+           text-sm font-medium px-4 py-2 transition-all duration-200
+           hover:bg-warm-100 active:scale-95;
+  }
+
+  .input-base {
+    @apply w-full rounded-xl border border-warm-200 bg-white px-4 py-3 text-sm
+           text-warm-900 placeholder-warm-400 outline-none transition-all duration-200
+           focus:border-warm-600 focus:ring-2 focus:ring-warm-200;
+  }
+
+  .tag-base {
+    @apply inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium;
+  }
+
+  .section-title {
+    @apply font-serif text-2xl sm:text-3xl font-bold text-warm-900 tracking-tight;
+  }
+
+  .section-subtitle {
+    @apply text-warm-500 text-sm mt-1.5 font-sans;
+  }
+
+  .live-dot {
+    @apply inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse;
+  }
+}
+
+/* ─── Magical CTA Button ─────────────────────────────────── */
+.cta-magical-wrapper {
+  background: linear-gradient(
+    270deg,
+    rgba(253, 164, 175, 0.95),
+    rgba(253, 186, 116, 0.85),
+    rgba(253, 224, 71,  0.75),
+    rgba(134, 239, 172, 0.75),
+    rgba(147, 197, 253, 0.85),
+    rgba(196, 181, 253, 0.95),
+    rgba(249, 168, 212, 0.95),
+    rgba(253, 164, 175, 0.95)
+  );
+  background-size: 500% 500%;
+  animation: rainbow-shift 6s ease infinite, glow-breathe 3.5s ease-in-out infinite;
+}
+
+@keyframes rainbow-shift {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+@keyframes glow-breathe {
+  0%, 100% {
+    box-shadow:
+      0 0 18px  rgba(253, 164, 175, 0.22),
+      0 0 36px  rgba(253, 186, 116, 0.14),
+      0 0 60px  rgba(196, 181, 253, 0.12);
+  }
+  50% {
+    box-shadow:
+      0 0 36px  rgba(253, 164, 175, 0.46),
+      0 0 72px  rgba(253, 186, 116, 0.30),
+      0 0 110px rgba(196, 181, 253, 0.22);
+  }
+}
+/* ──────────────────────────────────────────────────────────── */
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl;
+  }
+}
