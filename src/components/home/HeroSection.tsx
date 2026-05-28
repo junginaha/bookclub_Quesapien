@@ -1,109 +1,307 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+"use client";
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-white">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full bg-warm-100/60 blur-3xl -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-warm-200/30 blur-3xl translate-x-1/3 translate-y-1/3" />
+    <section
+      style={{
+        minHeight: "100vh",
+        paddingTop: "160px",
+        paddingBottom: "80px",
+        paddingLeft: "var(--gutter)",
+        paddingRight: "var(--gutter)",
+        position: "relative",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
+      {/* Floating paper particles - desktop only */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          right: "5%",
+          top: "20%",
+          pointerEvents: "none",
+        }}
+        className="hidden lg:block"
+      >
+        {/* Rectangles */}
+        {[
+          { w: 56, h: 72, delay: "0s", dur: "14s", top: "0px", right: "0px", rotate: "12deg" },
+          { w: 40, h: 56, delay: "3s", dur: "16s", top: "100px", right: "80px", rotate: "-8deg" },
+          { w: 32, h: 44, delay: "6s", dur: "12s", top: "220px", right: "20px", rotate: "5deg" },
+        ].map((p, i) => (
+          <div
+            key={`rect-${i}`}
+            style={{
+              position: "absolute",
+              width: `${p.w}px`,
+              height: `${p.h}px`,
+              top: p.top,
+              right: p.right,
+              transform: `rotate(${p.rotate})`,
+              background: "var(--bg-soft)",
+              border: "1px solid var(--line)",
+              borderRadius: "2px",
+              animation: `floaty ${p.dur} ease-in-out infinite`,
+              animationDelay: p.delay,
+            }}
+          />
+        ))}
+        {/* Dots */}
+        {[
+          { size: 8, delay: "2s", top: "180px", right: "140px" },
+          { size: 5, delay: "5s", top: "300px", right: "60px" },
+        ].map((d, i) => (
+          <div
+            key={`dot-${i}`}
+            style={{
+              position: "absolute",
+              width: `${d.size}px`,
+              height: `${d.size}px`,
+              top: d.top,
+              right: d.right,
+              borderRadius: "50%",
+              background: "var(--line)",
+              animation: `floaty 18s ease-in-out infinite`,
+              animationDelay: d.delay,
+            }}
+          />
+        ))}
       </div>
 
-      <div className="container-base relative py-20 sm:py-28 lg:py-36">
-        <p className="text-center text-[11px] text-warm-300 mb-6 italic tracking-wide">
-          대충 스크롤하다 들어온 당신, 잠깐만요.
-        </p>
+      {/* Scroll cue */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "48px",
+          left: "var(--gutter)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "10px",
+        }}
+        className="hidden md:flex"
+      >
+        <span
+          style={{
+            fontSize: "9px",
+            letterSpacing: "0.3em",
+            textTransform: "uppercase",
+            color: "var(--muted-2)",
+            fontFamily: "\"EB Garamond\", Georgia, serif",
+            fontStyle: "italic",
+            writingMode: "vertical-rl",
+            textOrientation: "mixed",
+          }}
+        >
+          SCROLL
+        </span>
+        <div
+          style={{
+            width: "1px",
+            height: "48px",
+            background: "var(--line)",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "40%",
+              background: "var(--muted)",
+              animation: "slideDown 2s ease-in-out infinite",
+            }}
+          />
+        </div>
+      </div>
 
-        <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-          <div className="flex items-center gap-2 mb-6">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-warm-200 bg-warm-50 px-3 py-1 text-xs font-medium text-warm-600">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              서초구 선정 프로젝트
-            </span>
-            <span className="inline-flex items-center rounded-full border border-warm-200 bg-warm-50 px-3 py-1 text-xs font-medium text-warm-600">
-              미래혁신형 북클럽
-            </span>
-          </div>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", width: "100%" }}>
+        {/* Eyebrow row */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "48px",
+          }}
+        >
+          <span className="eyebrow">서초구 선정 미래혁신형 북클럽</span>
+          <span className="eyebrow hidden sm:block">Vol. 04 · Seoul · Spring &apos;26</span>
+        </div>
 
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-warm-900 leading-[1.15] tracking-tight mb-6 text-balance">
-            질문하는
-            <br />
-            <span className="relative">
-              사람들
-              <svg
-                className="absolute -bottom-2 left-0 w-full"
-                viewBox="0 0 200 8"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+        {/* Main content grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr auto",
+            gap: "48px",
+            alignItems: "flex-end",
+          }}
+        >
+          {/* Left: headline + sub */}
+          <div>
+            <h1
+              style={{
+                fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                fontWeight: 300,
+                fontSize: "clamp(44px, 7.6vw, 108px)",
+                lineHeight: 1.1,
+                color: "var(--ink)",
+                letterSpacing: "-0.02em",
+                marginBottom: "32px",
+              }}
+            >
+              좋은{" "}
+              <em
+                style={{
+                  fontFamily: "\"EB Garamond\", var(--font-eb-garamond), Georgia, serif",
+                  fontStyle: "italic",
+                  color: "var(--accent)",
+                  position: "relative",
+                  display: "inline-block",
+                }}
               >
-                <path
-                  d="M2 6C40 2 80 2 100 2C120 2 160 2 198 6"
-                  stroke="#C5BEB0"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
+                질문
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: "-4px",
+                    left: 0,
+                    width: "100%",
+                    height: "1px",
+                    background:
+                      "linear-gradient(90deg, transparent 0%, var(--accent) 30%, var(--gold) 50%, var(--accent) 70%, transparent 100%)",
+                    backgroundSize: "200% auto",
+                    animation: "shimmer 3.2s linear infinite",
+                  }}
                 />
-              </svg>
-            </span>
-          </h1>
+              </em>
+              은
+              <br />
+              좋은 사람을 데려옵니다.
+            </h1>
 
-          <p className="font-serif text-xl sm:text-2xl text-warm-500 font-normal leading-relaxed mb-3 text-balance">
-            책으로 시작된 질문은 사람을 연결합니다.
-          </p>
-          <p className="text-sm text-warm-400 leading-relaxed max-w-md text-balance">
-            질문 중심 북클럽에서 나의 생각과 감정을 꺼내고,
-            <br className="hidden sm:block" />
-            새로운 사람들과 깊은 연결을 경험하세요.
-          </p>
-
-          <div className="flex items-center gap-2 mt-5 flex-wrap justify-center">
-            <span className="text-[11px] text-warm-300 border border-warm-100 rounded-full px-2.5 py-1">
-              생각 많은 사람 환영
-            </span>
-            <span className="text-[11px] text-warm-300 border border-warm-100 rounded-full px-2.5 py-1">
-              말이 통하는 사람들
-            </span>
-            <span className="text-[11px] text-warm-300 border border-warm-100 rounded-full px-2.5 py-1">
-              낯가림 허용
-            </span>
+            <p
+              style={{
+                fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                fontWeight: 300,
+                fontSize: "clamp(16px, 1.8vw, 22px)",
+                color: "var(--muted)",
+                lineHeight: 1.7,
+                maxWidth: "560px",
+              }}
+            >
+              <span className="kw">질문</span>으로 연결되는 미래혁신형 북클럽.{" "}
+              조용한 사람들이 가장 깊은 이야기를 시작합니다.
+            </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3 mt-8">
-            <Link href="/questions/create">
-              <Button size="xl" className="gap-2 w-full sm:w-auto shadow-sm">
-                지금 모임 참여하기
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/questions/create">
-              <Button size="xl" variant="outline" className="gap-2 w-full sm:w-auto">
-                <Sparkles className="h-4 w-4" />
-                AI 발제 생성하기
-              </Button>
-            </Link>
-          </div>
+          {/* Right: CTA block */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: "16px",
+              minWidth: "200px",
+            }}
+            className="hidden md:flex"
+          >
+            <a
+              href="#ask"
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.querySelector("#ask");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="btn-primary-dark"
+              style={{ fontSize: "15px", padding: "14px 28px" }}
+            >
+              지금 질문 참여하기
+            </a>
 
-          <p className="text-[11px] text-warm-300 mt-3 italic">
-            혼자 와도 괜찮아요 :) &nbsp;·&nbsp; 처음 오는 사람 많아요
-          </p>
+            <a
+              href="#books"
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.querySelector("#books");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              style={{
+                fontSize: "12px",
+                color: "var(--muted)",
+                textDecoration: "none",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                fontFamily: "\"EB Garamond\", Georgia, serif",
+                fontStyle: "italic",
+                transition: "color 0.2s",
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--ink)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}
+            >
+              SKIP →
+            </a>
 
-          <div className="flex items-center gap-8 mt-12 pt-8 border-t border-warm-100 w-full justify-center">
-            {[
-              { value: "1,200+", label: "누적 참여자" },
-              { value: "340+", label: "진행된 모임" },
-              { value: "87+", label: "등록된 질문" },
-            ].map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center">
-                <span className="font-serif text-2xl font-bold text-warm-900">
-                  {stat.value}
-                </span>
-                <span className="text-xs text-warm-400 mt-0.5">{stat.label}</span>
-              </div>
-            ))}
+            <p
+              style={{
+                fontSize: "13px",
+                color: "var(--muted-2)",
+                fontFamily: "\"EB Garamond\", Georgia, serif",
+                fontStyle: "italic",
+              }}
+            >
+              — 생각보다 따뜻합니다.
+            </p>
           </div>
-          <p className="text-[11px] text-warm-300 mt-3 italic">
-            오늘도 누군가는 친구가 됩니다
-          </p>
+        </div>
+
+        {/* Mobile CTA */}
+        <div
+          style={{
+            marginTop: "40px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+          }}
+          className="md:hidden"
+        >
+          <a
+            href="#ask"
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.querySelector("#ask");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="btn-primary-dark"
+          >
+            지금 질문 참여하기
+          </a>
+          <a
+            href="#books"
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.querySelector("#books");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}
+            style={{
+              textAlign: "center",
+              fontSize: "12px",
+              color: "var(--muted)",
+              textDecoration: "none",
+              fontFamily: "\"EB Garamond\", Georgia, serif",
+              fontStyle: "italic",
+            }}
+          >
+            — 생각보다 따뜻합니다.
+          </a>
         </div>
       </div>
     </section>

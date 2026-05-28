@@ -1,71 +1,104 @@
+"use client";
+
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
+
+const QUICK_LINKS = [
+  { href: "#today", label: "오늘의 질문" },
+  { href: "#books", label: "추천책" },
+  { href: "/archive", label: "후기" },
+  { href: "#seasons", label: "시즌" },
+];
 
 export default function Footer() {
   return (
-    <footer className="border-t border-warm-100 bg-warm-50">
-      <div className="container-base py-12">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
-          <div className="flex flex-col gap-3">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-warm-900">
-                <BookOpen className="h-3.5 w-3.5 text-white" />
-              </div>
-              <span className="font-serif font-bold text-warm-900 text-sm">
-                질문하는 사람들
-              </span>
-            </Link>
-            <p className="text-xs text-warm-400 leading-relaxed max-w-[280px]">
-              책으로 시작된 질문은 사람을 연결합니다.
-              <br />
-              서초구 선정 미래혁신형 북클럽 프로젝트
-            </p>
-            <p className="text-[11px] text-warm-300 italic">
-              사람 냄새 나는 플랫폼 실험중
+    <footer
+      style={{
+        background: "var(--bg-navy)",
+        borderTop: "1px solid rgba(255,255,255,0.1)",
+        paddingTop: "40px",
+        paddingBottom: "40px",
+        paddingLeft: "var(--gutter)",
+        paddingRight: "var(--gutter)",
+      }}
+    >
+      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr auto 1fr",
+            gap: "32px",
+            alignItems: "center",
+          }}
+          className="grid-cols-1 md:grid-cols-[1fr_auto_1fr]"
+        >
+          {/* Left */}
+          <div>
+            <p
+              style={{
+                fontFamily: "\"EB Garamond\", var(--font-eb-garamond), Georgia, serif",
+                fontStyle: "italic",
+                fontSize: "14px",
+                color: "var(--cream-on-dark)",
+                letterSpacing: "0.02em",
+              }}
+            >
+              — 질문하는 사람들 · 미래혁신형 북클럽
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-8 sm:gap-16">
-            <div className="flex flex-col gap-2">
-              <p className="text-xs font-semibold text-warm-700 uppercase tracking-widest mb-1">
-                둘러보기
-              </p>
-              <Link href="/" className="text-xs text-warm-500 hover:text-warm-800 transition-colors">
-                홈
-              </Link>
-              <Link href="/archive" className="text-xs text-warm-500 hover:text-warm-800 transition-colors">
-                후기 아카이브
-              </Link>
-              <Link href="/questions/create" className="text-xs text-warm-500 hover:text-warm-800 transition-colors">
-                발제 만들기
-              </Link>
-            </div>
-            <div className="flex flex-col gap-2">
-              <p className="text-xs font-semibold text-warm-700 uppercase tracking-widest mb-1">
-                계정
-              </p>
-              <Link href="/login" className="text-xs text-warm-500 hover:text-warm-800 transition-colors">
-                로그인
-              </Link>
-              <Link href="/signup" className="text-xs text-warm-500 hover:text-warm-800 transition-colors">
-                회원가입
-              </Link>
-              <Link href="/mypage" className="text-xs text-warm-500 hover:text-warm-800 transition-colors">
-                마이페이지
-              </Link>
-            </div>
-          </div>
-        </div>
+          {/* Center: quick links */}
+          <nav
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "24px",
+            }}
+          >
+            {QUICK_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={
+                  link.href.startsWith("#")
+                    ? (e) => {
+                        e.preventDefault();
+                        const el = document.querySelector(link.href);
+                        if (el) el.scrollIntoView({ behavior: "smooth" });
+                      }
+                    : undefined
+                }
+                style={{
+                  fontSize: "12px",
+                  color: "rgba(163,154,140,0.6)",
+                  textDecoration: "none",
+                  letterSpacing: "0.06em",
+                  transition: "color 0.2s",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "var(--cream-on-dark)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "rgba(163,154,140,0.6)";
+                }}
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
 
-        <div className="mt-10 pt-6 border-t border-warm-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-warm-400">
-            © 2026 질문하는 사람들. All rights reserved.
-          </p>
-          <div className="flex items-center gap-3 text-xs text-warm-300">
-            <span className="italic">당신 같은 사람 찾고 있었어요</span>
-            <span className="px-2 py-0.5 rounded-md bg-warm-100 text-warm-500 font-medium">
-              서초구 선정 프로젝트
-            </span>
+          {/* Right */}
+          <div style={{ textAlign: "right" }}>
+            <p
+              style={{
+                fontFamily: "\"EB Garamond\", Georgia, serif",
+                fontStyle: "italic",
+                fontSize: "12px",
+                color: "rgba(163,154,140,0.45)",
+              }}
+            >
+              © 2026 질문하는 사람들. All rights reserved.
+            </p>
           </div>
         </div>
       </div>
