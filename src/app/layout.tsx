@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
+import { Noto_Sans_KR, Noto_Serif_KR, EB_Garamond } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -15,6 +15,14 @@ const notoSerifKR = Noto_Serif_KR({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "900"],
   variable: "--font-noto-serif-kr",
+  display: "swap",
+});
+
+const ebGaramond = EB_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-eb-garamond",
   display: "swap",
 });
 
@@ -38,13 +46,16 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#FAFAF8",
+  themeColor: "#F4EFE5",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className={`${notoSansKR.variable} ${notoSerifKR.variable}`}>
-      <body className="min-h-screen bg-background antialiased">
+    <html
+      lang="ko"
+      className={`${notoSansKR.variable} ${notoSerifKR.variable} ${ebGaramond.variable}`}
+    >
+      <body className="min-h-screen antialiased">
         <AuthProvider>
           {children}
         </AuthProvider>
@@ -52,8 +63,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           position="bottom-center"
           toastOptions={{
             style: {
-              background: "#1C1C1E",
-              color: "#FFFFFF",
+              background: "#1C1F26",
+              color: "#ECE3CF",
               border: "none",
               borderRadius: "12px",
               fontFamily: "var(--font-noto-sans-kr)",
