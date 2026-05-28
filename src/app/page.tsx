@@ -1,18 +1,26 @@
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import HeroSection from "@/components/home/HeroSection";
+import BooksSection from "@/components/home/BooksSection";
+import TestimonialsSection from "@/components/home/TestimonialsSection";
+import SeasonsSection from "@/components/home/SeasonsSection";
+import LeadersSection from "@/components/home/LeadersSection";
+import TodaySection from "@/components/home/TodaySection";
+import AskSection from "@/components/home/AskSection";
 import CTASection from "@/components/home/CTASection";
-import HomeClient from "@/components/home/HomeClient";
-import LiveParticipation from "@/components/home/LiveParticipation";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen">
       <Header />
-      <main className="flex-1">
+      <main>
         <HeroSection />
-        <HomeClient />
-        <LiveParticipation />
+        <BooksSection />
+        <TestimonialsSection />
+        <SeasonsSection />
+        <LeadersSection />
+        <TodaySection />
+        <AskSection />
         <CTASection />
       </main>
       <Footer />
