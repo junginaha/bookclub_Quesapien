@@ -19,9 +19,12 @@ import type { Question } from "@/types";
 interface Props {
   questionId: string;
   seedQuestion: Question | null;
+  initialSessions?: unknown[];
+  initialReviews?: unknown[];
 }
 
-export default function QuestionDetailClient({ questionId, seedQuestion }: Props) {
+export default function QuestionDetailClient({ questionId, seedQuestion, initialSessions = [], initialReviews = [] }: Props) {
+  void initialSessions; void initialReviews;
   const storeQ    = useAppStore((s) => s.getQuestion(questionId));
   const storeSessions = useAppStore((s) => s.getSessionsByQuestion(questionId));
   const storeReviews  = useAppStore((s) => s.getReviewsByQuestion(questionId));

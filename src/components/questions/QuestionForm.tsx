@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, Clock, Users, Tag, Loader2 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
+import { createQuestionAction } from "@/lib/actions/questions";
 import type { QuestionCategory } from "@/types";
 
 const CATEGORIES: QuestionCategory[] = ["관계","자아","사회","감정","철학","일과삶","사랑","성장"];
@@ -21,8 +22,8 @@ export default function QuestionForm() {
   const [category, setCategory] = useState("");
 
   const currentUser    = useAppStore((s) => s.currentUser);
-  const createQuestion = useAppStore((s) => s.createQuestion);
-  const router         = useRouter();
+  void currentUser;
+  void useRouter();
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim()) {
@@ -35,34 +36,18 @@ export default function QuestionForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!currentUser) { toast.error("로그인이 필요합니다."); router.push("/login"); return; }
-
-    const form       = new FormData(e.currentTarget);
-    const title      = (form.get("title") as string).trim();
-    const description = (form.get("description") as string).trim();
-    const location   = (form.get("location") as string).trim();
-    const date       = form.get("date") as string;
-    const start_time = form.get("start_time") as string;
-    const end_time   = form.get("end_time") as string;
-    const maxP       = parseInt(form.get("max_participants") as string, 10);
+    if (!category) { toast.error("카테고리를 선택해주세요."); return; }
 
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
-
-    const result = createQuestion({
-      title, description, category, tags,
-      location, date, start_time, end_time,
-      max_participants: isNaN(maxP) ? 8 : maxP,
-    });
-
+    const fd = new FormData(e.currentTarget as HTMLFormElement);
+    fd.set("category", category);
+    fd.set("tags", tags.join(","));
+    const result = await createQuestionAction(fd);
     setLoading(false);
-
-    if (result.error) {
+    if (result?.error) {
       toast.error(result.error);
-    } else {
-      toast.success("발제가 등록되었습니다!");
-      router.push(`/questions/${result.questionId}`);
     }
+    // On success, createQuestionAction calls redirect() internally
   };
 
   return (

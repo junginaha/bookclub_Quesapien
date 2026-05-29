@@ -135,7 +135,7 @@ export default function LandingPage() {
               <span className="lp-kw">질문</span>으로{" "}
               <span className="lp-kw k2">연결</span>되는 미래혁신형{" "}
               <span className="lp-kw k3">북클럽</span>.<br />
-              조용한 사람들이 가장 깊은 이야기를 시작합니다.
+              사람들이 가장 깊은 이야기를 시작합니다.
             </p>
             <div className="lp-cta-stack">
               <div className="lp-cta-row">
@@ -175,8 +175,7 @@ export default function LandingPage() {
             </h2>
           </div>
           <p className="lp-lede">
-            우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다.
-            줄거리는 어디나 있습니다. 우리는 이 책이 한 사람을 어떻게 스며들었는가를 기록합니다.
+            우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다. 우리는 이 책이 한 사람에게 어떻게 스며들었는가를 기록합니다.
           </p>
         </div>
 
@@ -249,7 +248,7 @@ export default function LandingPage() {
       <section className="lp-section lp-testify" id="testify">
         <div className="lp-section-head">
           <div className="lp-left">
-            <div className="lp-eyebrow">ARCHIVING — 사람들이 남기고 간 변화</div>
+            <div className="lp-eyebrow">ARCHIVING — 사람, 변화, 성장, 기록</div>
             <h2 className="lp-h-section">
               한 시즌이 지나면<br /><em>한 사람이</em> 바뀝니다.
             </h2>

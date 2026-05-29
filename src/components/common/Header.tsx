@@ -8,11 +8,10 @@ import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
 
 const navItems = [
-  { href: "#today", label: "오늘의 질문" },
-  { href: "#books", label: "추천책" },
-  { href: "#ask", label: "질문 남기기" },
-  { href: "#seasons", label: "시즌" },
-  { href: "#leaders", label: "리더" },
+  { href: "/", label: "홈" },
+  { href: "/questions", label: "질문 목록" },
+  { href: "/questions/create", label: "발제 만들기" },
+  { href: "/archive", label: "후기 아카이브" },
 ];
 
 export default function Header() {
