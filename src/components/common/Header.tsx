@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X, LogOut, User } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
@@ -18,8 +18,20 @@ export default function Header() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [ctaOpen, setCtaOpen] = useState(false);
+  const ctaRef = useRef<HTMLDivElement>(null);
   const currentUser = useAppStore((s) => s.currentUser);
   const logout = useAppStore((s) => s.logout);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ctaRef.current && !ctaRef.current.contains(e.target as Node)) {
+        setCtaOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -154,36 +166,83 @@ export default function Header() {
 
           {/* Right Side */}
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            {/* 참여 신청 button - desktop */}
-            <a
-              href="#books"
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick("#books");
-              }}
-              className="hidden md:inline-flex"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "var(--ink)",
-                color: "var(--cream-on-dark)",
-                borderRadius: "9999px",
-                padding: "8px 20px",
-                fontSize: "13px",
-                fontWeight: 500,
-                textDecoration: "none",
-                letterSpacing: "0.02em",
-                position: "relative",
-                overflow: "hidden",
-                cursor: "pointer",
-                transition: "opacity 0.2s",
-              }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.85"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
-            >
-              참여 신청
-            </a>
+            {/* 참여 신청 button — two-option dropdown */}
+            <div ref={ctaRef} className="hidden md:block" style={{ position: "relative" }}>
+              <button
+                onClick={() => setCtaOpen((o) => !o)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  background: "var(--ink)",
+                  color: "var(--cream-on-dark)",
+                  borderRadius: "9999px",
+                  padding: "8px 20px",
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  letterSpacing: "0.02em",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "opacity 0.2s",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.85"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
+              >
+                참여 신청
+                <span style={{ fontSize: "9px", opacity: 0.7, marginLeft: "2px" }}>
+                  {ctaOpen ? "▲" : "▼"}
+                </span>
+              </button>
+              {ctaOpen && (
+                <div style={{
+                  position: "absolute",
+                  top: "calc(100% + 10px)",
+                  right: 0,
+                  minWidth: "210px",
+                  background: "rgba(244,239,229,0.97)",
+                  backdropFilter: "blur(16px)",
+                  border: "1px solid var(--line)",
+                  borderRadius: "12px",
+                  boxShadow: "0 20px 50px -20px rgba(40,30,20,.25)",
+                  overflow: "hidden",
+                  zIndex: 200,
+                }}>
+                  <Link
+                    href="/quiz"
+                    onClick={() => setCtaOpen(false)}
+                    style={{
+                      display: "block",
+                      padding: "16px 20px",
+                      borderBottom: "1px solid var(--line)",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <div style={{ fontSize: "13.5px", fontWeight: 500, color: "var(--ink)", marginBottom: "3px" }}>
+                      나에게 맞는 북토크 추천
+                    </div>
+                    <div style={{ fontSize: "12px", color: "var(--muted)" }}>
+                      북 MBTI로 성향 파악하기
+                    </div>
+                  </Link>
+                  <a
+                    href="/#books"
+                    onClick={() => setCtaOpen(false)}
+                    style={{
+                      display: "block",
+                      padding: "16px 20px",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <div style={{ fontSize: "13.5px", fontWeight: 500, color: "var(--ink)", marginBottom: "3px" }}>
+                      바로 참여 신청하기
+                    </div>
+                    <div style={{ fontSize: "12px", color: "var(--muted)" }}>
+                      진행 중인 북클럽 보기
+                    </div>
+                  </a>
+                </div>
+              )}
+            </div>
 
             {currentUser ? (
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>

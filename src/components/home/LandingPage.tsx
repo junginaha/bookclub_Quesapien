@@ -1,42 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import "./landing.css";
 
-const books = [
-  { color: "navy", genre: "NEW", title: "최신간 북토크, 핫한 문장들", author: "Quesapience", tag: "#신간 #트렌드", rec: "Q5가 건넵니다", reason: "새벽 세 시에 깨어 있는 사람만 아는 문장이 여기 있습니다. 잠들지 못한 누군가에게 이 책이 곁에 있다고 말해주고 싶었어요.", tags: ["#불면", "#회복", "#고요"] },
-  { color: "cream", genre: "ESSAY · 산문", title: "다정함의 발명", author: "허지영", tag: "#관계 · #사랑", rec: "지영이 건넵니다", reason: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 헤어진 친구에게 부치지 못한 편지처럼 읽었습니다.", tags: ["#다정함", "#일상", "#연결"] },
-  { color: "rust", genre: "PHILOSOPHY", title: "혼자라는 감각", author: "주성원", tag: "#외로움 · #인생전환", rec: "성원이 건넵니다", reason: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자 있는 것이 부끄럽지 않아진 첫 책이었어요.", tags: ["#고독", "#성장", "#사유"] },
-  { color: "olive", genre: "MEMOIR · 회고", title: "아무도 보지 않는 오후", author: "김범", tag: "#창업 · #번아웃", rec: "범이 건넵니다", reason: "실패한 사람이 아니라, 멈춰본 적 있는 사람의 문장. 무너졌던 시기에 이 책의 챕터 7이 저를 일으켰습니다.", tags: ["#회복", "#쉼", "#용기"] },
-  { color: "dusk", genre: "POETRY · 시", title: "오늘 저녁, 당신께", author: "박상현", tag: "#사랑 · #이별", rec: "상현이 건넵니다", reason: "시집은 빠르게 읽지 않는 것이라고 가르쳐준 책. 한 페이지에서 일주일을 머문 적이 있어요.", tags: ["#느림", "#이별", "#기억"] },
-  { color: "sage", genre: "NON-FICTION", title: "인간이라는 풍경", author: "한강", tag: "#인간 · #사유", rec: "한강이 건넵니다", reason: "인간을 풍경처럼 멀리서 바라보는 시선. 미워하던 사람을 다시 사람으로 보게 만드는 책입니다.", tags: ["#관계", "#용서", "#거리"] },
+// ─── Static data ──────────────────────────────────────────────
+const books: BookClub[] = [
+  { color: "navy", genre: "NEW", slug: "최신간-북토크", title: "최신간 북토크, 핫한 문장들", author: "Quesapience", tag: "#신간 #트렌드", recommender: "Q5", reason: "새벽 세 시에 깨어 있는 사람만 아는 문장이 여기 있습니다. 잠들지 못한 누군가에게 이 책이 곁에 있다고 말해주고 싶었어요.", emotionTags: ["#불면", "#회복", "#고요"] },
+  { color: "cream", genre: "ESSAY · 산문", slug: "다정함의-발명", title: "다정함의 발명", author: "허지영", tag: "#관계 · #사랑", recommender: "지영", reason: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 헤어진 친구에게 부치지 못한 편지처럼 읽었습니다.", emotionTags: ["#다정함", "#일상", "#연결"] },
+  { color: "rust", genre: "PHILOSOPHY", slug: "혼자라는-감각", title: "혼자라는 감각", author: "주성원", tag: "#외로움 · #인생전환", recommender: "성원", reason: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자 있는 것이 부끄럽지 않아진 첫 책이었어요.", emotionTags: ["#고독", "#성장", "#사유"] },
+  { color: "olive", genre: "MEMOIR · 회고", slug: "아무도-보지-않는-오후", title: "아무도 보지 않는 오후", author: "김범", tag: "#창업 · #번아웃", recommender: "범", reason: "실패한 사람이 아니라, 멈춰본 적 있는 사람의 문장. 무너졌던 시기에 이 책의 챕터 7이 저를 일으켰습니다.", emotionTags: ["#회복", "#쉼", "#용기"] },
+  { color: "dusk", genre: "POETRY · 시", slug: "오늘-저녁-당신께", title: "오늘 저녁, 당신께", author: "박상현", tag: "#사랑 · #이별", recommender: "상현", reason: "시집은 빠르게 읽지 않는 것이라고 가르쳐준 책. 한 페이지에서 일주일을 머문 적이 있어요.", emotionTags: ["#느림", "#이별", "#기억"] },
+  { color: "sage", genre: "NON-FICTION", slug: "인간이라는-풍경", title: "인간이라는 풍경", author: "한강", tag: "#인간 · #사유", recommender: "한강", reason: "인간을 풍경처럼 멀리서 바라보는 시선. 미워하던 사람을 다시 사람으로 보게 만드는 책입니다.", emotionTags: ["#관계", "#용서", "#거리"] },
 ];
 
-const miniBooks = [
-  { color: "terra", title: "제자리로 돌아오는 밤에", leader: "서연이 이끌어요", tag: "#귀환", members: 8 },
-  { color: "smoke", title: "느리게 읽는 일", leader: "진호가 이끌어요", tag: "#느림", members: 11 },
-  { color: "mauve", title: "어머니의 문장들", leader: "지우가 이끌어요", tag: "#가족", members: 9 },
-  { color: "fog", title: "흐린 날의 사유", leader: "민재가 이끌어요", tag: "#우울", members: 14 },
-  { color: "ochre", title: "아무것도 하지 않는 연습", leader: "은지가 이끌어요", tag: "#쉬이", members: 16 },
-  { color: "navy", title: "일을 사랑하면서 일에 지지 않는 법", leader: "태우가 이끌어요", tag: "#번아웃", members: 22 },
-  { color: "cream", title: "이름 없는 감정들에게", leader: "은재가 이끌어요", tag: "#감정", members: 10 },
-  { color: "olive", title: "수요일 저녁 낭독회", leader: "현우가 이끌어요", tag: "#시", members: 7 },
-  { color: "rust", title: "아버지라는 낯선 사람", leader: "도현이 이끌어요", tag: "#가족", members: 13 },
-  { color: "sage", title: "쓰이지 않는 시간이 있다", leader: "하은이 이끌어요", tag: "#시간", members: 9 },
-  { color: "dusk", title: "어둠 속의 밝은 한 줄", leader: "제이가 이끌어요", tag: "#시", members: 6 },
-  { color: "terra", title: "온전하지 않은 시절", leader: "안녕이 이끌어요", tag: "#청춘", members: 12 },
-  { color: "mauve", title: "헤어진 이들의 재회", leader: "다연이 이끌어요", tag: "#관계", members: 8 },
-  { color: "smoke", title: "도시의 올랜 해", leader: "우재가 이끌어요", tag: "#도시", members: 11 },
-  { color: "ink", title: "죽음을 읽는 일곱 가지 시선", leader: "혁이 이끌어요", tag: "#생경", members: 15 },
-  { color: "cream", title: "난 당신을 잘 모릅니다", leader: "재희가 이끌어요", tag: "#대화", members: 10 },
-  { color: "olive", title: "돈이 말해주지 않는 것들", leader: "지훈이 이끌어요", tag: "#삶", members: 17 },
-  { color: "fog", title: "높은 곳의 창가에서", leader: "세아가 이끌어요", tag: "#고독", members: 9 },
-  { color: "rust", title: "다시 걸을 수 있는 사람들", leader: "혜원이 이끌어요", tag: "#회복", members: 13 },
-  { color: "ochre", title: "외국어로 읽는 한국 소설", leader: "명희가 이끌어요", tag: "#언어", members: 6 },
-  { color: "mauve", title: "넘어진 자리에서 주워 든 것들", leader: "연우가 이끌어요", tag: "#실패", members: 11 },
-  { color: "dusk", title: "밤에만 편지를 씁니다", leader: "레이가 이끌어요", tag: "#서신", members: 8 },
-  { color: "sage", title: "자연을 읽는 일요일", leader: "소희가 이끌어요", tag: "#생태", members: 14 },
-  { color: "navy", title: "철학이 필요한 저녁", leader: "윤이 이끌어요", tag: "#사유", members: 18 },
+const miniBooks: BookClub[] = [
+  { color: "terra", slug: "제자리로-돌아오는-밤에", title: "제자리로 돌아오는 밤에", recommender: "서연", tag: "#귀환", currentParticipants: 8, isMini: true },
+  { color: "smoke", slug: "느리게-읽는-일", title: "느리게 읽는 일", recommender: "진호", tag: "#느림", currentParticipants: 11, isMini: true },
+  { color: "mauve", slug: "어머니의-문장들", title: "어머니의 문장들", recommender: "지우", tag: "#가족", currentParticipants: 9, isMini: true },
+  { color: "fog", slug: "흐린-날의-사유", title: "흐린 날의 사유", recommender: "민재", tag: "#우울", currentParticipants: 14, isMini: true },
+  { color: "ochre", slug: "아무것도-하지-않는-연습", title: "아무것도 하지 않는 연습", recommender: "은지", tag: "#쉬이", currentParticipants: 16, isMini: true },
+  { color: "navy", slug: "일을-사랑하면서", title: "일을 사랑하면서 일에 지지 않는 법", recommender: "태우", tag: "#번아웃", currentParticipants: 22, isMini: true },
+  { color: "cream", slug: "이름-없는-감정들에게", title: "이름 없는 감정들에게", recommender: "은재", tag: "#감정", currentParticipants: 10, isMini: true },
+  { color: "olive", slug: "수요일-저녁-낭독회", title: "수요일 저녁 낭독회", recommender: "현우", tag: "#시", currentParticipants: 7, isMini: true },
+  { color: "rust", slug: "아버지라는-낯선-사람", title: "아버지라는 낯선 사람", recommender: "도현", tag: "#가족", currentParticipants: 13, isMini: true },
+  { color: "sage", slug: "쓰이지-않는-시간이-있다", title: "쓰이지 않는 시간이 있다", recommender: "하은", tag: "#시간", currentParticipants: 9, isMini: true },
+  { color: "dusk", slug: "어둠-속의-밝은-한-줄", title: "어둠 속의 밝은 한 줄", recommender: "제이", tag: "#시", currentParticipants: 6, isMini: true },
+  { color: "terra", slug: "온전하지-않은-시절", title: "온전하지 않은 시절", recommender: "안녕", tag: "#청춘", currentParticipants: 12, isMini: true },
+  { color: "mauve", slug: "헤어진-이들의-재회", title: "헤어진 이들의 재회", recommender: "다연", tag: "#관계", currentParticipants: 8, isMini: true },
+  { color: "smoke", slug: "도시의-올랜-해", title: "도시의 올랜 해", recommender: "우재", tag: "#도시", currentParticipants: 11, isMini: true },
+  { color: "ink", slug: "죽음을-읽는-일곱-가지", title: "죽음을 읽는 일곱 가지 시선", recommender: "혁", tag: "#생경", currentParticipants: 15, isMini: true },
+  { color: "cream", slug: "난-당신을-잘-모릅니다", title: "난 당신을 잘 모릅니다", recommender: "재희", tag: "#대화", currentParticipants: 10, isMini: true },
+  { color: "olive", slug: "돈이-말해주지-않는", title: "돈이 말해주지 않는 것들", recommender: "지훈", tag: "#삶", currentParticipants: 17, isMini: true },
+  { color: "fog", slug: "높은-곳의-창가에서", title: "높은 곳의 창가에서", recommender: "세아", tag: "#고독", currentParticipants: 9, isMini: true },
+  { color: "rust", slug: "다시-걸을-수-있는-사람들", title: "다시 걸을 수 있는 사람들", recommender: "혜원", tag: "#회복", currentParticipants: 13, isMini: true },
+  { color: "ochre", slug: "외국어로-읽는-한국-소설", title: "외국어로 읽는 한국 소설", recommender: "명희", tag: "#언어", currentParticipants: 6, isMini: true },
+  { color: "mauve", slug: "넘어진-자리에서", title: "넘어진 자리에서 주워 든 것들", recommender: "연우", tag: "#실패", currentParticipants: 11, isMini: true },
+  { color: "dusk", slug: "밤에만-편지를-씁니다", title: "밤에만 편지를 씁니다", recommender: "레이", tag: "#서신", currentParticipants: 8, isMini: true },
+  { color: "sage", slug: "자연을-읽는-일요일", title: "자연을 읽는 일요일", recommender: "소희", tag: "#생태", currentParticipants: 14, isMini: true },
+  { color: "navy", slug: "철학이-필요한-저녁", title: "철학이 필요한 저녁", recommender: "윤", tag: "#사유", currentParticipants: 18, isMini: true },
 ];
 
 const testimonials = [
@@ -60,8 +62,46 @@ const leaders = [
   { initial: "Y", name: "유은재", role: "시즌 02 진행", philosophy: "대화는 답을 찾는 일이 아니라, 함께 머무는 일입니다.", q: "\"기계가 더 잘하는 시대에, 인간으로 남고 싶은 부분이 있나요?\"" },
 ];
 
+// Random float popup content pool
+const floatPopupPool = [
+  ...books.map((b) => ({ type: "book" as const, title: b.title, sub: b.genre ?? "", color: b.color, slug: b.slug })),
+  ...leaders.map((l) => ({ type: "leader" as const, title: l.name, sub: l.role, color: "ink", slug: "" })),
+];
+
+// ─── Float popup component ─────────────────────────────────────
+function FloatPopup({ color, title, sub, type, onOpen }: {
+  color: string; title: string; sub: string; type: "book" | "leader"; onOpen: () => void;
+}) {
+  return (
+    <div className="fp-popup">
+      <div className={`fp-visual ${color}`}>
+        {type === "book" ? "📖" : "💬"}
+      </div>
+      <div className="fp-body">
+        <div className="fp-title">{title}</div>
+        <div className="fp-sub">{sub}</div>
+        <button className="fp-link" onClick={onOpen}>
+          {type === "book" ? "자세히 보기" : "만나보기"} →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────
 export default function LandingPage() {
   const [booksOpen, setBooksOpen] = useState(false);
+  const [modalBook, setModalBook] = useState<BookClub | null>(null);
+  const [activeFloat, setActiveFloat] = useState<number | null>(null);
+  const [askContent, setAskContent] = useState("");
+  const [askAuthor, setAskAuthor] = useState("");
+  const [askStatus, setAskStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+
+  // Pick random popup items for each float element (stable per session)
+  const [floatItems] = useState(() =>
+    [0, 1, 2, 3, 4].map(() => floatPopupPool[Math.floor(Math.random() * floatPopupPool.length)])
+  );
 
   useEffect(() => {
     const nav = document.getElementById("lp-nav");
@@ -74,11 +114,9 @@ export default function LandingPage() {
 
   useEffect(() => {
     const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); }
-        });
-      },
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); }
+      }),
       { threshold: 0.1 }
     );
     document.querySelectorAll(".lp-reveal").forEach((el) => io.observe(el));
@@ -93,9 +131,47 @@ export default function LandingPage() {
     return () => ta.removeEventListener("input", grow);
   }, []);
 
+  const openFloat = useCallback((idx: number) => {
+    const t = floatTimeouts.current.get(idx);
+    if (t) clearTimeout(t);
+    setActiveFloat(idx);
+  }, []);
+
+  const closeFloat = useCallback((idx: number) => {
+    const t = setTimeout(() => setActiveFloat(null), 200);
+    floatTimeouts.current.set(idx, t);
+  }, []);
+
+  const handleFloatOpen = useCallback((idx: number) => {
+    const item = floatItems[idx];
+    if (item.type === "book") {
+      const book = books.find((b) => b.slug === item.slug);
+      if (book) setModalBook(book);
+    }
+  }, [floatItems]);
+
+  const handleAskSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!askContent.trim() || askContent.trim().length < 5) return;
+    setAskStatus("sending");
+    try {
+      const res = await fetch("/api/landing-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: askContent.trim(), author_name: askAuthor.trim() || "익명" }),
+      });
+      if (!res.ok) throw new Error("fail");
+      setAskStatus("sent");
+      setAskContent("");
+      setAskAuthor("");
+    } catch {
+      setAskStatus("error");
+    }
+    setTimeout(() => setAskStatus("idle"), 3000);
+  };
+
   return (
     <div className="lp">
-      {/* Grain overlays */}
       <div className="lp-grain" aria-hidden="true" />
       <div className="lp-grain-light" aria-hidden="true" />
 
@@ -135,7 +211,7 @@ export default function LandingPage() {
               <span className="lp-kw">질문</span>으로{" "}
               <span className="lp-kw k2">연결</span>되는 미래혁신형{" "}
               <span className="lp-kw k3">북클럽</span>.<br />
-              사람들이 가장 깊은 이야기를 시작합니다.
+              사람들이 가장 깊은 이야기를 합니다.
             </p>
             <div className="lp-cta-stack">
               <div className="lp-cta-row">
@@ -153,11 +229,29 @@ export default function LandingPage() {
               <span className="lp-cta-note">— 생각보다 따뜻합니다.</span>
             </div>
           </div>
-          <div className="lp-float p1" />
-          <div className="lp-float p2" />
-          <div className="lp-float p3" />
-          <div className="lp-float dot d1" />
-          <div className="lp-float dot d2" />
+
+          {/* Floating papers — secret hover links */}
+          {([
+            { cls: "p1", idx: 0 },
+            { cls: "p2", idx: 1 },
+            { cls: "p3", idx: 2 },
+            { cls: "dot d1", idx: 3 },
+            { cls: "dot d2", idx: 4 },
+          ] as const).map(({ cls, idx }) => (
+            <div
+              key={idx}
+              className={`lp-float ${cls} lp-float-secret`}
+              onMouseEnter={() => openFloat(idx)}
+              onMouseLeave={() => closeFloat(idx)}
+            >
+              {activeFloat === idx && (
+                <FloatPopup
+                  {...floatItems[idx]}
+                  onOpen={() => handleFloatOpen(idx)}
+                />
+              )}
+            </div>
+          ))}
         </div>
         <div className="lp-scroll-cue">
           <span>scroll</span>
@@ -181,7 +275,14 @@ export default function LandingPage() {
 
         <div className="lp-books-grid">
           {books.map((b) => (
-            <article key={b.title} className="lp-book lp-reveal">
+            <article
+              key={b.title}
+              className="lp-book lp-reveal"
+              onClick={() => setModalBook(b)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === "Enter" && setModalBook(b)}
+            >
               <div className={`lp-book-cover ${b.color}`}>
                 <span className="bc-spine" />
                 <div className="bc-top">
@@ -191,13 +292,14 @@ export default function LandingPage() {
                   <h3>{b.title}</h3>
                   <p className="bc-author">— {b.author}</p>
                 </div>
+                <div className="bc-hover-hint">클릭하여 자세히 보기</div>
               </div>
               <div className="lp-book-info">
                 <div className="bi-tag">{b.tag}</div>
-                <p className="bi-rec">— {b.rec}</p>
+                <p className="bi-rec">— {b.recommender}이 건넵니다</p>
                 <p className="bi-reason">{b.reason}</p>
                 <div className="lp-emotion-tags">
-                  {b.tags.map((t) => <span key={t}>{t}</span>)}
+                  {b.emotionTags?.map((t) => <span key={t}>{t}</span>)}
                 </div>
               </div>
             </article>
@@ -220,20 +322,27 @@ export default function LandingPage() {
             </button>
             <div className="bm-rule" />
           </div>
-          <p className="lp-books-more-help">— 지금 바로 참여할 수 있는 작은 모임들입니다.</p>
+          <p className="lp-books-more-help">— 지금 바로 참여할 수 있는 모임들입니다.</p>
 
           <div className={`lp-books-more-body${booksOpen ? " open" : ""}`}>
             <div className="lp-mini-grid">
               {miniBooks.map((b) => (
-                <div key={b.title} className="lp-mini-book">
+                <div
+                  key={b.title}
+                  className="lp-mini-book"
+                  onClick={() => setModalBook(b)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && setModalBook(b)}
+                >
                   <div className={`lp-mini-spine ${b.color}`} />
                   <div className="lp-mini-body">
                     <div className="lp-mini-title">{b.title}</div>
-                    <div className="lp-mini-rec">— {b.leader}</div>
+                    <div className="lp-mini-rec">— {b.recommender}이 이끌어요</div>
                     <div className="lp-mini-meta">
                       <span className="lp-mini-tag">{b.tag}</span>
                       <span className="lp-mini-members">
-                        <span className="mem-dot" />{b.members}명 참여 중
+                        <span className="mem-dot" />{b.currentParticipants}명 참여 중
                       </span>
                     </div>
                   </div>
@@ -279,8 +388,7 @@ export default function LandingPage() {
             </h2>
           </div>
           <p className="lp-lede">
-            매 시즌, 하나의 주제 위에서만 함께 머뭅니다.
-            너무 많은 것을 다루지 않습니다. 한 가지를 충분히 깊게 다루기 위해서.
+            매 시즌, 하나의 주제 위에서 함께 머뭅니다. 한 가지를 충분히 깊게 다룹니다.
           </p>
         </div>
 
@@ -314,12 +422,8 @@ export default function LandingPage() {
         </article>
 
         <div className="lp-section-head" style={{ marginBottom: 32 }}>
-          <div className="lp-left">
-            <div className="lp-eyebrow">Past &amp; Coming — 지난 시즌, 다음 시즌</div>
-          </div>
-          <p className="lp-lede">
-            한 번 지나간 시즌은 다시 열리지 않습니다. 그 시간은 그때 머문 사람의 것입니다.
-          </p>
+          <div className="lp-left"><div className="lp-eyebrow">Past &amp; Coming</div></div>
+          <p className="lp-lede">한 번 지나간 시즌은 다시 열리지 않습니다.</p>
         </div>
 
         <div className="lp-season-list">
@@ -330,8 +434,7 @@ export default function LandingPage() {
               <div className="sr-desc">{s.desc}</div>
               <div className="sr-when">{s.when}</div>
               <div className={`sr-status${s.live ? " live" : ""}`}>
-                {s.live && <span className="st-dot" />}
-                {s.status}
+                {s.live && <span className="st-dot" />}{s.status}
               </div>
             </div>
           ))}
@@ -348,8 +451,7 @@ export default function LandingPage() {
             </h2>
           </div>
           <p className="lp-lede">
-            &lsquo;질문을 잘 던지는 사람&rsquo;과 함께합니다.
-            듣고, 이해하고, 다시 묻습니다.
+            &lsquo;질문을 잘 던지는 사람&rsquo;과 함께합니다. 듣고, 이해하고, 다시 묻습니다.
           </p>
         </div>
         <div className="lp-leaders-grid">
@@ -439,7 +541,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ASK */}
+      {/* ASK — with real submission */}
       <section className="lp-section lp-ask" id="ask">
         <div className="lp-ask-inner">
           <div className="lp-eyebrow">A QUESTION — 질문 남기기</div>
@@ -450,25 +552,58 @@ export default function LandingPage() {
             정답을 모으는 곳이 아닙니다. 좋은 질문 하나는, 때로 한 사람을 살립니다.
             부끄러운 질문일수록 환영합니다.
           </p>
-          <div className="lp-ask-field">
-            <span className="af-pen">― 당신의 질문</span>
-            <textarea
-              placeholder="당신 마음 속에 오래 남아 있던 질문은 무엇인가요?"
-              rows={3}
-              spellCheck={false}
-              aria-label="질문 입력"
-            />
-            <span className="lp-sparkle s1" />
-            <span className="lp-sparkle s2" />
-            <span className="lp-sparkle s3" />
-          </div>
-          <div className="lp-ask-actions">
-            <span className="aa-hint">— 좋은 질문은 누군가를 살립니다.</span>
-            <button className="lp-btn-cream" type="button">
-              <span>질문 남기기</span>
-              <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
-            </button>
-          </div>
+
+          {askStatus === "sent" ? (
+            <div className="lp-ask-success">
+              <div className="lp-ask-success-icon">?</div>
+              <p>질문이 전달되었습니다.</p>
+              <span>누군가의 마음에 닿을 거예요.</span>
+            </div>
+          ) : (
+            <form onSubmit={handleAskSubmit}>
+              <div className="lp-ask-field" id="askField">
+                <span className="af-pen">― 당신의 질문</span>
+                <textarea
+                  placeholder="당신 마음 속에 오래 남아 있던 질문은 무엇인가요?"
+                  rows={3}
+                  spellCheck={false}
+                  aria-label="질문 입력"
+                  value={askContent}
+                  onChange={(e) => setAskContent(e.target.value)}
+                  required
+                  minLength={5}
+                />
+                <span className="lp-sparkle s1" />
+                <span className="lp-sparkle s2" />
+                <span className="lp-sparkle s3" />
+              </div>
+              <div className="lp-ask-name-row">
+                <input
+                  className="lp-ask-name"
+                  type="text"
+                  placeholder="이름 (선택 · 익명 가능)"
+                  value={askAuthor}
+                  onChange={(e) => setAskAuthor(e.target.value)}
+                  maxLength={20}
+                />
+              </div>
+              <div className="lp-ask-actions">
+                <span className="aa-hint">
+                  {askStatus === "error"
+                    ? "— 잠시 후 다시 시도해주세요."
+                    : "— 좋은 질문은 누군가를 살립니다."}
+                </span>
+                <button
+                  className="lp-btn-cream"
+                  type="submit"
+                  disabled={askStatus === "sending" || askContent.trim().length < 5}
+                >
+                  <span>{askStatus === "sending" ? "전송 중…" : "질문 남기기"}</span>
+                  <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </section>
 
@@ -502,6 +637,9 @@ export default function LandingPage() {
           <div className="lp-foot-copy">© 2026 — Quesapience.</div>
         </div>
       </footer>
+
+      {/* Book Detail Modal */}
+      <BookDetailModal book={modalBook} onClose={() => setModalBook(null)} />
     </div>
   );
 }
