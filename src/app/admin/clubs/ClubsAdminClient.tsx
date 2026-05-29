@@ -1,0 +1,315 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+
+const MAIN_SLUGS = [
+  "최신간-북토크", "다정함의-발명", "혼자라는-감각",
+  "아무도-보지-않는-오후", "오늘-저녁-당신께", "인간이라는-풍경",
+];
+
+const SEED_CLUBS = [
+  // main 6
+  { slug: "최신간-북토크", title: "최신간 북토크, 핫한 문장들", is_mini: false },
+  { slug: "다정함의-발명", title: "다정함의 발명", is_mini: false },
+  { slug: "혼자라는-감각", title: "혼자라는 감각", is_mini: false },
+  { slug: "아무도-보지-않는-오후", title: "아무도 보지 않는 오후", is_mini: false },
+  { slug: "오늘-저녁-당신께", title: "오늘 저녁, 당신께", is_mini: false },
+  { slug: "인간이라는-풍경", title: "인간이라는 풍경", is_mini: false },
+  // mini 24
+  { slug: "제자리로-돌아오는-밤에", title: "제자리로 돌아오는 밤에", is_mini: true },
+  { slug: "느리게-읽는-일", title: "느리게 읽는 일", is_mini: true },
+  { slug: "어머니의-문장들", title: "어머니의 문장들", is_mini: true },
+  { slug: "흐린-날의-사유", title: "흐린 날의 사유", is_mini: true },
+  { slug: "아무것도-하지-않는-연습", title: "아무것도 하지 않는 연습", is_mini: true },
+  { slug: "일을-사랑하면서", title: "일을 사랑하면서 일에 지지 않는 법", is_mini: true },
+  { slug: "이름-없는-감정들에게", title: "이름 없는 감정들에게", is_mini: true },
+  { slug: "수요일-저녁-낭독회", title: "수요일 저녁 낭독회", is_mini: true },
+  { slug: "아버지라는-낯선-사람", title: "아버지라는 낯선 사람", is_mini: true },
+  { slug: "쓰이지-않는-시간이-있다", title: "쓰이지 않는 시간이 있다", is_mini: true },
+  { slug: "어둠-속의-밝은-한-줄", title: "어둠 속의 밝은 한 줄", is_mini: true },
+  { slug: "온전하지-않은-시절", title: "온전하지 않은 시절", is_mini: true },
+  { slug: "헤어진-이들의-재회", title: "헤어진 이들의 재회", is_mini: true },
+  { slug: "도시의-올랜-해", title: "도시의 올랜 해", is_mini: true },
+  { slug: "죽음을-읽는-일곱-가지", title: "죽음을 읽는 일곱 가지 시선", is_mini: true },
+  { slug: "난-당신을-잘-모릅니다", title: "난 당신을 잘 모릅니다", is_mini: true },
+  { slug: "돈이-말해주지-않는", title: "돈이 말해주지 않는 것들", is_mini: true },
+  { slug: "높은-곳의-창가에서", title: "높은 곳의 창가에서", is_mini: true },
+  { slug: "다시-걸을-수-있는-사람들", title: "다시 걸을 수 있는 사람들", is_mini: true },
+  { slug: "외국어로-읽는-한국-소설", title: "외국어로 읽는 한국 소설", is_mini: true },
+  { slug: "넘어진-자리에서", title: "넘어진 자리에서 주워 든 것들", is_mini: true },
+  { slug: "밤에만-편지를-씁니다", title: "밤에만 편지를 씁니다", is_mini: true },
+  { slug: "자연을-읽는-일요일", title: "자연을 읽는 일요일", is_mini: true },
+  { slug: "철학이-필요한-저녁", title: "철학이 필요한 저녁", is_mini: true },
+];
+
+type ClubRow = typeof SEED_CLUBS[0] & {
+  schedule?: string;
+  location?: string;
+  location_url?: string;
+  join_url?: string;
+  description?: string;
+  host_name?: string;
+  host_intro?: string;
+  max_participants?: number;
+  current_participants?: number;
+  status?: string;
+};
+
+type EditForm = Omit<ClubRow, "slug" | "title" | "is_mini">;
+
+function emptyForm(club: ClubRow): EditForm {
+  return {
+    schedule: club.schedule ?? "",
+    location: club.location ?? "",
+    location_url: club.location_url ?? "",
+    join_url: club.join_url ?? "",
+    host_name: club.host_name ?? "",
+    host_intro: club.host_intro ?? "",
+    description: club.description ?? "",
+    max_participants: club.max_participants,
+    current_participants: club.current_participants,
+    status: club.status ?? "active",
+  };
+}
+
+export default function ClubsAdminClient() {
+  const [key, setKey] = useState("");
+  const [authed, setAuthed] = useState(false);
+  const [keyInput, setKeyInput] = useState("");
+  const [clubs, setClubs] = useState<ClubRow[]>(SEED_CLUBS);
+  const [loading, setLoading] = useState(false);
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [form, setForm] = useState<EditForm>({});
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState<Record<string, string>>({});
+  const [tab, setTab] = useState<"main" | "mini">("main");
+
+  const loadClubs = async (adminKey: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/clubs", {
+        headers: { "x-admin-key": adminKey },
+      });
+      if (res.ok) {
+        const data = await res.json() as { clubs: ClubRow[] };
+        if (data.clubs?.length) {
+          setClubs(data.clubs);
+        }
+      }
+    } catch { /* use seed list */ }
+    setLoading(false);
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await fetch("/api/admin/clubs", {
+      headers: { "x-admin-key": keyInput },
+    });
+    if (res.status !== 401) {
+      setKey(keyInput);
+      setAuthed(true);
+      await loadClubs(keyInput);
+    } else {
+      alert("관리자 키가 올바르지 않습니다.");
+    }
+  };
+
+  const startEdit = (club: ClubRow) => {
+    setExpanded(club.slug);
+    setForm(emptyForm(club));
+  };
+
+  const handleSave = async (slug: string) => {
+    setSaving(true);
+    const body = { slug, ...form };
+    try {
+      const res = await fetch("/api/admin/clubs", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "x-admin-key": key },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        const data = await res.json() as { club: ClubRow };
+        setClubs((prev) => prev.map((c) => c.slug === slug ? { ...c, ...data.club } : c));
+        setSaveMsg((m) => ({ ...m, [slug]: "저장됨 ✓" }));
+      } else {
+        // Fallback: update local state
+        setClubs((prev) => prev.map((c) => c.slug === slug ? { ...c, ...form } : c));
+        setSaveMsg((m) => ({ ...m, [slug]: "로컬 저장됨 (DB 미연결)" }));
+      }
+    } catch {
+      setClubs((prev) => prev.map((c) => c.slug === slug ? { ...c, ...form } : c));
+      setSaveMsg((m) => ({ ...m, [slug]: "로컬 저장됨 (DB 미연결)" }));
+    }
+    setSaving(false);
+    setTimeout(() => setSaveMsg((m) => { const n = { ...m }; delete n[slug]; return n; }), 3000);
+  };
+
+  const visibleClubs = clubs.filter((c) => tab === "main" ? !c.is_mini : c.is_mini);
+
+  if (!authed) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#F4EFE5", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <form onSubmit={handleLogin} style={{ background: "#fff", border: "1px solid #e0d9cc", borderRadius: "16px", padding: "40px", width: "360px", boxShadow: "0 8px 32px rgba(0,0,0,.08)" }}>
+          <div style={{ fontSize: "22px", fontWeight: 600, marginBottom: "8px", color: "#2a1f14" }}>북클럽 관리</div>
+          <div style={{ fontSize: "13px", color: "#8a7968", marginBottom: "24px" }}>관리자 키를 입력해주세요</div>
+          <input
+            type="password"
+            value={keyInput}
+            onChange={(e) => setKeyInput(e.target.value)}
+            placeholder="관리자 키"
+            autoFocus
+            style={{ width: "100%", padding: "10px 14px", border: "1px solid #d8d0c4", borderRadius: "8px", fontSize: "14px", outline: "none", marginBottom: "12px", boxSizing: "border-box" }}
+          />
+          <button type="submit" style={{ width: "100%", padding: "11px", background: "#5E4632", color: "#fff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: "pointer" }}>
+            입장
+          </button>
+          <div style={{ marginTop: "16px", fontSize: "12px", color: "#a09080", textAlign: "center" }}>
+            기본값: quesapience2024
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#F4EFE5", padding: "40px 20px" }}>
+      <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "32px" }}>
+          <Link href="/" style={{ color: "#5E4632", textDecoration: "none", fontSize: "13px" }}>← 홈</Link>
+          <div style={{ fontSize: "22px", fontWeight: 600, color: "#2a1f14" }}>북클럽 상세정보 관리</div>
+          {loading && <span style={{ fontSize: "12px", color: "#8a7968" }}>불러오는 중…</span>}
+        </div>
+
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
+          {(["main", "mini"] as const).map((t) => (
+            <button key={t} onClick={() => setTab(t)} style={{
+              padding: "8px 20px", borderRadius: "9999px", border: "1px solid #d8d0c4",
+              background: tab === t ? "#5E4632" : "#fff", color: tab === t ? "#fff" : "#5E4632",
+              fontSize: "13px", fontWeight: 500, cursor: "pointer",
+            }}>
+              {t === "main" ? `메인 북클럽 (${clubs.filter(c => !c.is_mini).length})` : `미니 북클럽 (${clubs.filter(c => c.is_mini).length})`}
+            </button>
+          ))}
+        </div>
+
+        {/* Club list */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          {visibleClubs.map((club) => {
+            const isOpen = expanded === club.slug;
+            const hasData = !!(club.schedule || club.host_name || club.description);
+            return (
+              <div key={club.slug} style={{ background: "#fff", border: "1px solid #e0d9cc", borderRadius: "12px", overflow: "hidden" }}>
+                {/* Club header row */}
+                <div
+                  onClick={() => { if (isOpen) setExpanded(null); else startEdit(club); }}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", cursor: "pointer" }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <div style={{
+                      width: "8px", height: "8px", borderRadius: "50%",
+                      background: hasData ? "#4CAF50" : "#d0c8bc",
+                    }} />
+                    <span style={{ fontSize: "15px", fontWeight: 500, color: "#2a1f14" }}>{club.title}</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    {saveMsg[club.slug] && (
+                      <span style={{ fontSize: "12px", color: "#4CAF50", fontWeight: 500 }}>{saveMsg[club.slug]}</span>
+                    )}
+                    {hasData && !isOpen && (
+                      <span style={{ fontSize: "12px", color: "#8a7968" }}>
+                        {[club.host_name, club.schedule, club.location].filter(Boolean).join(" · ")}
+                      </span>
+                    )}
+                    <span style={{ fontSize: "18px", color: "#8a7968", lineHeight: 1 }}>{isOpen ? "−" : "+"}</span>
+                  </div>
+                </div>
+
+                {/* Edit form */}
+                {isOpen && (
+                  <div style={{ padding: "0 20px 20px", borderTop: "1px solid #f0ebe3" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "16px" }}>
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <label style={labelStyle}>모임 진행자</label>
+                        <input style={inputStyle} value={form.host_name ?? ""} onChange={(e) => setForm((f) => ({ ...f, host_name: e.target.value }))} placeholder="이름" />
+                      </div>
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <label style={labelStyle}>진행자 소개</label>
+                        <textarea style={{ ...inputStyle, resize: "vertical" }} rows={2} value={form.host_intro ?? ""} onChange={(e) => setForm((f) => ({ ...f, host_intro: e.target.value }))} placeholder="진행자에 대한 짧은 소개" />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>모임 일정</label>
+                        <input style={inputStyle} value={form.schedule ?? ""} onChange={(e) => setForm((f) => ({ ...f, schedule: e.target.value }))} placeholder="예: 매월 첫째 토요일 오후 2시" />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>상태</label>
+                        <select style={inputStyle} value={form.status ?? "active"} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}>
+                          <option value="active">모집 중</option>
+                          <option value="upcoming">예정</option>
+                          <option value="closed">마감</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={labelStyle}>장소</label>
+                        <input style={inputStyle} value={form.location ?? ""} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} placeholder="서울 마포구 …" />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>지도 링크 (카카오맵 등)</label>
+                        <input style={inputStyle} type="url" value={form.location_url ?? ""} onChange={(e) => setForm((f) => ({ ...f, location_url: e.target.value }))} placeholder="https://map.kakao.com/..." />
+                      </div>
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <label style={labelStyle}>참여 신청 링크</label>
+                        <input style={inputStyle} type="url" value={form.join_url ?? ""} onChange={(e) => setForm((f) => ({ ...f, join_url: e.target.value }))} placeholder="https://forms.gle/..." />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>최대 인원</label>
+                        <input style={inputStyle} type="number" min={1} max={100} value={form.max_participants ?? ""} onChange={(e) => setForm((f) => ({ ...f, max_participants: parseInt(e.target.value) || undefined }))} placeholder="12" />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>현재 인원</label>
+                        <input style={inputStyle} type="number" min={0} max={100} value={form.current_participants ?? ""} onChange={(e) => setForm((f) => ({ ...f, current_participants: parseInt(e.target.value) || undefined }))} placeholder="0" />
+                      </div>
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <label style={labelStyle}>모임 소개</label>
+                        <textarea style={{ ...inputStyle, resize: "vertical" }} rows={4} value={form.description ?? ""} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="이 북클럽을 소개해주세요." />
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end", marginTop: "16px" }}>
+                      <button onClick={() => setExpanded(null)} style={{ padding: "9px 20px", border: "1px solid #d8d0c4", borderRadius: "8px", background: "none", fontSize: "13px", cursor: "pointer", color: "#5E4632" }}>
+                        취소
+                      </button>
+                      <button onClick={() => handleSave(club.slug)} disabled={saving} style={{ padding: "9px 24px", background: "#5E4632", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer", opacity: saving ? 0.7 : 1 }}>
+                        {saving ? "저장 중…" : "저장하기"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Info box */}
+        <div style={{ marginTop: "32px", padding: "16px 20px", background: "rgba(94,70,50,.06)", borderRadius: "10px", fontSize: "12px", color: "#8a7968", lineHeight: 1.7 }}>
+          <strong style={{ color: "#5E4632" }}>안내</strong><br />
+          • Supabase 스키마가 적용되면 데이터가 DB에 저장됩니다.<br />
+          • 스키마 미적용 시 데이터는 저장되지 않습니다. SQL Editor에서 schema.sql을 먼저 실행해주세요.<br />
+          • 초록 점 = 정보 입력됨 / 회색 점 = 미입력
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const labelStyle: React.CSSProperties = {
+  display: "block", fontSize: "12px", color: "#8a7968", marginBottom: "4px", fontWeight: 500,
+};
+
+const inputStyle: React.CSSProperties = {
+  width: "100%", padding: "9px 12px", border: "1px solid #d8d0c4", borderRadius: "8px",
+  fontSize: "13.5px", outline: "none", background: "#faf8f4", boxSizing: "border-box",
+  fontFamily: "inherit",
+};
