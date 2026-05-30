@@ -6,6 +6,9 @@ import {
   MapPin, Calendar, Users, Star, ArrowLeft,
   Clock, ChevronRight, CheckCircle, ExternalLink,
 } from "lucide-react";
+import AISummaryBlock from "@/components/seo/AISummaryBlock";
+import RelatedLinks from "@/components/seo/RelatedLinks";
+import type { RelatedItem } from "@/components/seo/RelatedLinks";
 
 const COLOR_MAP: Record<string, string> = {
   navy: "#1B2536", cream: "#8B7A5E", rust: "#9B4A2E",
@@ -451,6 +454,38 @@ export default function BookClubDetailClient({ club }: { club: any }) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ── Stage 5: Internal Related Links ── */}
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
+        <RelatedLinks
+          title="관련 콘텐츠"
+          items={[
+            ...(club.key_questions ?? []).slice(0, 3).map((q: string): RelatedItem => ({
+              label: q.length > 35 ? q.slice(0, 35) + "…" : q,
+              href: `/questions`,
+              type: "question",
+            })),
+            { label: "질문 아카이브", href: "/questions", type: "question" },
+            { label: "모든 북클럽 보기", href: "/bookclub", type: "booktalk" },
+            { label: "후기 아카이브", href: "/archive", type: "review" },
+          ]}
+        />
+      </div>
+
+      {/* ── Stage 3: AI Summary Block ── */}
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <AISummaryBlock
+          what={`${club.title ?? "이 북토크"}는 ${club.author ? `${club.author}의 ` : ""}${club.genre ?? "책"}을 중심으로 ${club.host_name ?? "리더"}가 진행하는 오프라인 북토크이다.`}
+          why={club.why_this_book ?? club.description ?? "책과 질문을 통해 사람과 사람이 연결되는 경험을 제공한다."}
+          who={(club.recommended_for ?? ["독서를 좋아하는 분", "새로운 사람을 만나고 싶은 분"]).join(", ")}
+          bullets={[
+            `리더: ${club.host_name ?? "—"}`,
+            `장소: ${club.location ?? "서울"}`,
+            `인원: 최대 ${club.max_participants ?? 8}명 소규모`,
+            `방식: ${club.session_format ?? "원형 대화 방식"}`,
+          ]}
+        />
       </div>
 
       {/* ── Floating CTA (Mobile) ── */}

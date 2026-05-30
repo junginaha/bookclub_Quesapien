@@ -3,7 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Send, Loader2, BookOpen, MessageSquare } from "lucide-react";
-import type { Giant } from "../GiantsClient";
+import type { Giant } from "@/data/giants";
+import AISummaryBlock from "@/components/seo/AISummaryBlock";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 interface Message {
   role: "user" | "assistant";
@@ -492,6 +494,36 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
           )}
         </div>
       </div>
+
+      {/* ── Stage 5: Internal Related Links ── */}
+      {activeTab === "about" && (
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
+          <RelatedLinks
+            title="관련 콘텐츠"
+            items={[
+              ...giant.related_questions.map((q) => ({
+                label: q.length > 40 ? q.slice(0, 40) + "…" : q,
+                href: "/questions",
+                type: "question" as const,
+              })),
+              { label: "모든 사유자 탐색", href: "/giants", type: "giant" as const },
+              { label: "북클럽 참여하기", href: "/bookclub", type: "booktalk" as const },
+            ]}
+          />
+        </div>
+      )}
+
+      {/* ── Stage 3: AI Summary Block ── */}
+      {activeTab === "about" && (
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+          <AISummaryBlock
+            what={`${giant.name}(${giant.name_en}, ${giant.birth_year}–${giant.death_year ?? "현재"})은 ${giant.nationality} 출신 ${giant.category}로, ${giant.tagline}`}
+            why={giant.core_idea}
+            who={`${giant.name}의 사상에 관심 있는 독자, 철학적 대화를 원하는 사람, ${giant.key_works[0]} 등의 저서 독자`}
+            bullets={giant.key_works.map((w) => `대표 저서: ${w}`)}
+          />
+        </div>
+      )}
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }

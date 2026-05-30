@@ -4,6 +4,9 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import BookClubDetailClient from "./BookClubDetailClient";
 import { createClient } from "@/lib/supabase/server";
+import { bookTalkEventSchema, bookSchema, reviewsSchema, breadcrumbSchema } from "@/lib/schema";
+import { buildMetadata } from "@/lib/metadata";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 // ─── Static fallback data ─────────────────────────────────────
 const STATIC_CLUBS: Record<string, object> = {
@@ -64,26 +67,28 @@ const STATIC_CLUBS: Record<string, object> = {
   },
 };
 
-interface Props {
-  params: Promise<{ slug: string }>;
-}
+interface Props { params: Promise<{ slug: string }>; }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const club = STATIC_CLUBS[slug] as { title?: string; description?: string } | undefined;
-  if (!club) return { title: "북클럽" };
-  return {
-    title: club.title ?? "북클럽",
-    description: club.description ?? "질문하는 사람들 북클럽",
-  };
+  const club = (STATIC_CLUBS[slug] ?? {}) as any;
+  const title = club.title ?? "북클럽";
+  const author = club.author ? ` — ${club.author}` : "";
+  return buildMetadata({
+    title: `${title}${author} 북토크`,
+    description: club.description ?? `${title} 북토크. 질문하는 사람들의 오프라인 독서 모임.`,
+    path: `/bookclub/${slug}`,
+    type: "event",
+    keywords: [title, club.genre, "북토크", "오프라인독서", club.host_name].filter(Boolean),
+    author: club.host_name,
+  });
 }
 
 export default async function BookClubDetailPage({ params }: Props) {
   const { slug } = await params;
+  let club: any = null;
 
-  let club: object | null = null;
-
-  // Try Supabase first
   try {
     const supabase = await createClient();
     const { data } = await supabase
@@ -92,22 +97,32 @@ export default async function BookClubDetailPage({ params }: Props) {
       .eq("slug", slug)
       .single();
     if (data) club = data;
-  } catch {
-    // fallback
-  }
+  } catch { /* fallback */ }
 
-  // Use static fallback
-  if (!club) {
-    club = STATIC_CLUBS[slug] ?? null;
-  }
-
+  if (!club) club = STATIC_CLUBS[slug] ?? null;
   if (!club) notFound();
+
+  const eventLd = bookTalkEventSchema(club);
+  const bookLd = bookSchema(club);
+  const reviewLd = reviewsSchema(slug, club.title ?? "", club.reviews ?? []);
+  const crumbLd = breadcrumbSchema([
+    { name: "홈", href: "/" },
+    { name: "북클럽", href: "/bookclub" },
+    { name: club.title ?? slug, href: `/bookclub/${slug}` },
+  ]);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
+      {/* Stage 1: Structured data */}
+      <JsonLd data={eventLd} />
+      <JsonLd data={bookLd} />
+      <JsonLd data={reviewLd} />
+      <JsonLd data={crumbLd} />
+
       <Header />
       <BookClubDetailClient club={club} />
       <Footer />
     </div>
   );
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
