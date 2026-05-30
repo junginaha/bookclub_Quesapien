@@ -19,7 +19,12 @@ const COLOR_MAP: Record<string, string> = {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default function BookClubDetailClient({ club }: { club: any }) {
-  const [joinStep, setJoinStep] = useState<"idle" | "confirm" | "done">("idle");
+  const [joinStep, setJoinStep] = useState<"idle" | "confirm" | "submitting" | "done" | "error">("idle");
+  const [applicantName, setApplicantName] = useState("");
+  const [applicantEmail, setApplicantEmail] = useState("");
+  const [applicantMsg, setApplicantMsg] = useState("");
+  const [joinError, setJoinError] = useState("");
+
   const bgColor = COLOR_MAP[club.color as string] ?? "#1B2536";
   const remaining = (club.max_participants ?? 8) - (club.current_participants ?? 0);
   const isClosed = club.status === "closed";
@@ -31,9 +36,37 @@ export default function BookClubDetailClient({ club }: { club: any }) {
     : 5;
 
   const handleJoin = () => {
-    if (club.join_url) {
+    if (club.join_url && club.join_url.startsWith("http")) {
       window.open(club.join_url, "_blank");
     } else {
+      setJoinStep("confirm");
+    }
+  };
+
+  const handleSubmitJoin = async () => {
+    if (!applicantName.trim() || !applicantEmail.trim()) {
+      setJoinError("이름과 이메일을 입력해주세요.");
+      return;
+    }
+    setJoinStep("submitting");
+    setJoinError("");
+    try {
+      const res = await fetch("/api/bookclub/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slug: club.slug,
+          applicantName: applicantName.trim(),
+          applicantEmail: applicantEmail.trim(),
+          message: applicantMsg.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.redirect) { window.open(data.redirect, "_blank"); setJoinStep("idle"); return; }
+      if (!res.ok) { setJoinError(data.error ?? "오류가 발생했습니다."); setJoinStep("confirm"); return; }
+      setJoinStep("done");
+    } catch {
+      setJoinError("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
       setJoinStep("confirm");
     }
   };
@@ -519,48 +552,72 @@ export default function BookClubDetailClient({ club }: { club: any }) {
       )}
 
       {/* ── Join Confirm Modal ── */}
-      {joinStep === "confirm" && (
+      {(joinStep === "confirm" || joinStep === "submitting") && (
         <div style={{
           position: "fixed", inset: 0, zIndex: 1000,
-          background: "rgba(28,31,38,0.7)", backdropFilter: "blur(4px)",
+          background: "rgba(28,31,38,0.75)", backdropFilter: "blur(6px)",
           display: "flex", alignItems: "center", justifyContent: "center",
           padding: 24,
-        }} onClick={() => setJoinStep("idle")}>
+        }} onClick={() => { if (joinStep !== "submitting") setJoinStep("idle"); }}>
           <div style={{
             background: "var(--bg)", borderRadius: 20, padding: 40,
-            maxWidth: 440, width: "100%",
+            maxWidth: 460, width: "100%",
             boxShadow: "0 40px 80px -20px rgba(28,31,38,0.4)",
           }} onClick={(e) => e.stopPropagation()}>
             <div style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 16 }}>
               참가 신청
             </div>
-            <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 22, fontWeight: 400, color: "var(--ink)", marginBottom: 12 }}>
+            <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 20, fontWeight: 400, color: "var(--ink)", marginBottom: 6 }}>
               {club.title}
             </h3>
-            <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.75, marginBottom: 24 }}>
-              {club.schedule}<br />
-              {club.location}
+            <p style={{ fontSize: 13.5, color: "var(--muted)", marginBottom: 28, lineHeight: 1.6 }}>
+              {club.schedule} · {club.location}
             </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
+              <input
+                value={applicantName}
+                onChange={(e) => setApplicantName(e.target.value)}
+                placeholder="이름 *"
+                disabled={joinStep === "submitting"}
+                style={{ padding: "12px 16px", borderRadius: 10, border: "1px solid var(--line)", fontSize: 14, outline: "none", background: "rgba(255,255,255,0.6)", boxSizing: "border-box", width: "100%" }}
+              />
+              <input
+                value={applicantEmail}
+                onChange={(e) => setApplicantEmail(e.target.value)}
+                placeholder="이메일 * (확인 메일 발송)"
+                type="email"
+                disabled={joinStep === "submitting"}
+                style={{ padding: "12px 16px", borderRadius: 10, border: "1px solid var(--line)", fontSize: 14, outline: "none", background: "rgba(255,255,255,0.6)", boxSizing: "border-box", width: "100%" }}
+              />
+              <textarea
+                value={applicantMsg}
+                onChange={(e) => setApplicantMsg(e.target.value)}
+                placeholder="간단한 자기소개 (선택)"
+                rows={2}
+                disabled={joinStep === "submitting"}
+                style={{ padding: "12px 16px", borderRadius: 10, border: "1px solid var(--line)", fontSize: 14, outline: "none", background: "rgba(255,255,255,0.6)", resize: "none", boxSizing: "border-box", width: "100%", fontFamily: "inherit" }}
+              />
+              {joinError && <p style={{ fontSize: 13, color: "#EF4444" }}>{joinError}</p>}
+            </div>
+
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <button
-                onClick={() => { setJoinStep("done"); }}
+                onClick={handleSubmitJoin}
+                disabled={joinStep === "submitting"}
                 style={{
                   padding: "14px 0", borderRadius: 10,
-                  background: bgColor, color: "white",
-                  fontSize: 15, fontWeight: 600, border: "none", cursor: "pointer",
-                  width: "100%",
+                  background: joinStep === "submitting" ? "var(--line-soft)" : bgColor,
+                  color: "white", fontSize: 15, fontWeight: 600, border: "none",
+                  cursor: joinStep === "submitting" ? "not-allowed" : "pointer", width: "100%",
                 }}
               >
-                신청 완료하기
+                {joinStep === "submitting" ? "신청 중…" : "신청 완료하기"}
               </button>
               <button
                 onClick={() => setJoinStep("idle")}
-                style={{
-                  padding: "12px 0", borderRadius: 10,
-                  background: "transparent", color: "var(--muted)",
-                  fontSize: 14, border: "1px solid var(--line)", cursor: "pointer",
-                  width: "100%",
-                }}
+                disabled={joinStep === "submitting"}
+                style={{ padding: "12px 0", borderRadius: 10, background: "transparent", color: "var(--muted)", fontSize: 14, border: "1px solid var(--line)", cursor: "pointer", width: "100%" }}
               >
                 취소
               </button>

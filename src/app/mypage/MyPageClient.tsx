@@ -6,6 +6,7 @@ import { LogOut, BookOpen, MessageSquare, Calendar, ChevronRight, Sparkles } fro
 import { formatDate } from "@/lib/utils";
 import { logoutAction } from "@/lib/actions/auth";
 import type { ProfileRow, ReviewRow, SessionRow } from "@/lib/supabase/types";
+import { computeDNA, DEFAULT_DNA } from "@/lib/question-dna";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type SessionWithQ = SessionRow & { question?: any };
@@ -41,11 +42,12 @@ interface Props {
   profile: ProfileRow;
   myReviews: ReviewRow[];
   mySessions: SessionWithQ[];
+  onboardingAnswers?: Record<string, string | string[]>;
 }
 
 type TabType = "overview" | "questions" | "reviews" | "bookclubs" | "membership";
 
-export default function MyPageClient({ profile, myReviews, mySessions }: Props) {
+export default function MyPageClient({ profile, myReviews, mySessions, onboardingAnswers }: Props) {
   const [activeTab, setActiveTab] = useState<TabType>("overview");
 
   const handleLogout = async () => {
@@ -53,6 +55,11 @@ export default function MyPageClient({ profile, myReviews, mySessions }: Props) 
   };
 
   const upcomingSessions = mySessions.filter((s) => s.status === "upcoming");
+
+  // Compute DNA from onboarding answers, fall back to default
+  const dna = onboardingAnswers && Object.keys(onboardingAnswers).length > 0
+    ? computeDNA(onboardingAnswers)
+    : DEFAULT_DNA;
 
   return (
     <div style={{ background: "var(--bg)", minHeight: "100vh", paddingTop: 64 }}>
@@ -174,26 +181,32 @@ export default function MyPageClient({ profile, myReviews, mySessions }: Props) 
                 <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 18, fontWeight: 400, color: "var(--cream-on-dark)", marginBottom: 24, position: "relative" }}>
                   {profile.name}님의 질문 유형 분석
                 </h3>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.65, marginBottom: 16, position: "relative" }}>
+                  주요 유형: <strong style={{ color: "var(--gold)" }}>{dna.label}</strong> — {dna.description}
+                </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 14, position: "relative" }}>
-                  {DNA_TYPES.map((d) => (
-                    <div key={d.key}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{d.label}</span>
-                        <span style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.9)" }}>{d.defaultPct}%</span>
+                  {DNA_TYPES.map((d) => {
+                    const pct = dna.scores[d.key as keyof typeof dna.scores] ?? d.defaultPct;
+                    return (
+                      <div key={d.key}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{d.label}</span>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.9)" }}>{pct}%</span>
+                        </div>
+                        <div style={{ height: 4, borderRadius: 9999, background: "rgba(255,255,255,0.1)" }}>
+                          <div style={{
+                            height: "100%", borderRadius: 9999,
+                            width: `${pct}%`,
+                            background: `linear-gradient(90deg, ${d.color}, ${d.color}99)`,
+                            transition: "width 0.8s ease",
+                          }} />
+                        </div>
                       </div>
-                      <div style={{ height: 4, borderRadius: 9999, background: "rgba(255,255,255,0.1)" }}>
-                        <div style={{
-                          height: "100%", borderRadius: 9999,
-                          width: `${d.defaultPct}%`,
-                          background: `linear-gradient(90deg, ${d.color}, ${d.color}99)`,
-                          transition: "width 0.6s ease",
-                        }} />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", marginTop: 20, position: "relative" }}>
-                  * 더 많은 질문을 남기면 분석이 정확해집니다
+                  {onboardingAnswers ? "온보딩 답변 기반 분석" : "더 많은 질문을 남기면 분석이 정확해집니다"}
                 </p>
               </div>
 

@@ -88,8 +88,23 @@ function FloatPopup({ color, title, sub, type, onOpen }: {
   );
 }
 
+// ─── Types ────────────────────────────────────────────────────
+export interface LandingQuestion {
+  id: string;
+  content: string;
+  author_name: string;
+  likes: number;
+  saves: number;
+  answers_count: number;
+}
+
+interface LandingPageProps {
+  todayQuestion?: LandingQuestion | null;
+  recentQuestions?: LandingQuestion[];
+}
+
 // ─── Main component ───────────────────────────────────────────
-export default function LandingPage() {
+export default function LandingPage({ todayQuestion, recentQuestions }: LandingPageProps) {
   const [booksOpen, setBooksOpen] = useState(false);
   const [modalBook, setModalBook] = useState<BookClub | null>(null);
   const [activeFloat, setActiveFloat] = useState<number | null>(null);
@@ -490,16 +505,15 @@ export default function LandingPage() {
         <div className="lp-q-grid">
           <article className="lp-q-feature lp-reveal">
             <div className="lp-q-marker">
-              <span className="qm-pulse" /> Today · 5월 22일
+              <span className="qm-pulse" /> Today
             </div>
             <p className="lp-q-text">
-              당신은 마지막으로 언제,<br />진심으로 울었나요?
+              {todayQuestion?.content ?? "당신은 마지막으로 언제,\n진심으로 울었나요?"}
             </p>
             <div className="lp-q-meta">
-              <span><strong>1,284</strong> 공감</span>
-              <span><strong>397</strong> 저장</span>
-              <span><strong>72</strong> 답변</span>
-              <span><strong>28분 전</strong> 마지막 댓글</span>
+              <span><strong>{todayQuestion?.likes?.toLocaleString() ?? "1,284"}</strong> 공감</span>
+              <span><strong>{todayQuestion?.saves?.toLocaleString() ?? "397"}</strong> 저장</span>
+              <span><strong>{todayQuestion?.answers_count ?? "72"}</strong> 답변</span>
             </div>
             <div className="lp-q-comments">
               <div className="qc-label">In the margins · 메모</div>
@@ -519,20 +533,22 @@ export default function LandingPage() {
           </article>
 
           <div className="lp-q-card-stack">
-            {[
-              { num: "No. 087", q: "인간은 왜 외로운가요?", sym: "842", ans: "56", when: "3시간 전" },
-              { num: "No. 086", q: "AI 시대에도 사랑은 여전히 중요할까요?", sym: "1,103", ans: "91", when: "어제" },
-              { num: "No. 085", q: "당신을 살게 만든 한 문장은 무엇인가요?", sym: "2,071", ans: "143", when: "2일 전" },
-            ].map((c) => (
-              <article key={c.num} className="lp-q-card lp-reveal">
-                <span className="qcard-num">{c.num}</span>
-                <p className="qcard-q">{c.q}</p>
+            {(recentQuestions && recentQuestions.length >= 3
+              ? recentQuestions.slice(0, 3)
+              : [
+                  { id: "s1", content: "인간은 왜 외로운가요?", likes: 842, answers_count: 56, author_name: "" },
+                  { id: "s2", content: "AI 시대에도 사랑은 여전히 중요할까요?", likes: 1103, answers_count: 91, author_name: "" },
+                  { id: "s3", content: "당신을 살게 만든 한 문장은 무엇인가요?", likes: 2071, answers_count: 143, author_name: "" },
+                ]
+            ).map((c, idx) => (
+              <article key={c.id ?? idx} className="lp-q-card lp-reveal">
+                <span className="qcard-num">No. {String(100 - idx).padStart(3, "0")}</span>
+                <p className="qcard-q">{c.content}</p>
                 <div className="qcard-foot">
                   <span className="qf-nums">
-                    <span><b>{c.sym}</b> 공감</span>
-                    <span><b>{c.ans}</b> 답변</span>
+                    <span><b>{c.likes?.toLocaleString()}</b> 공감</span>
+                    <span><b>{c.answers_count}</b> 답변</span>
                   </span>
-                  <span>{c.when}</span>
                 </div>
               </article>
             ))}

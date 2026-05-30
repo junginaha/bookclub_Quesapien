@@ -17,6 +17,7 @@ import {
 import type { Question } from "@/types";
 import AISummaryBlock from "@/components/seo/AISummaryBlock";
 import RelatedLinks from "@/components/seo/RelatedLinks";
+import AIExpansionPanel from "@/components/questions/AIExpansionPanel";
 
 interface Props {
   questionId: string;
@@ -95,6 +96,14 @@ export default function QuestionDetailClient({ questionId, seedQuestion, initial
               </div>
             </div>
           </div>
+
+          {/* AI 질문 확장 */}
+          <AIExpansionPanel
+            questionId={question.id}
+            questionTitle={question.title}
+            description={question.description}
+            tags={question.tags}
+          />
 
           {/* 토론 질문 */}
           {storeSessions.length > 0 && storeSessions[0].discussion_questions && (
