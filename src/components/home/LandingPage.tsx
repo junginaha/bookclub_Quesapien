@@ -184,13 +184,12 @@ export default function LandingPage() {
           <span className="wm-label">질문하는 사람들</span>
         </a>
         <div className="lp-nav-links">
-          <a href="#today">오늘의 질문</a>
-          <a href="#books">추천책</a>
-          <a href="#ask">질문 남기기</a>
-          <a href="#season">시즌</a>
-          <a href="#leaders">리더</a>
+          <a href="/questions">질문</a>
+          <a href="/bookclub">북클럽</a>
+          <a href="/archive">아카이빙</a>
+          <a href="/giants">거인의 어깨</a>
         </div>
-        <a href="#books" className="lp-nav-cta">
+        <a href="/bookclub" className="lp-nav-cta">
           <span>참여 신청</span>
         </a>
       </nav>
@@ -215,12 +214,12 @@ export default function LandingPage() {
             </p>
             <div className="lp-cta-stack">
               <div className="lp-cta-row">
-                <a href="#ask" className="lp-btn-primary">
-                  <span>지금 질문 참여하기</span>
+                <a href="/questions" className="lp-btn-primary">
+                  <span>질문 탐색하기</span>
                   <span className="lp-arrow" />
                 </a>
-                <a href="#books" className="lp-btn-skip" aria-label="북클럽으로 바로 가기">
-                  <span>SKIP</span>
+                <a href="/bookclub" className="lp-btn-skip" aria-label="북클럽으로 바로 가기">
+                  <span>북클럽</span>
                   <span className="lp-skip-arrow">
                     <span className="lp-skip-line" />
                   </span>
@@ -405,7 +404,7 @@ export default function LandingPage() {
               <div><div className="sm-k">시즌 기간</div><div className="sm-v">3월–6월</div></div>
               <div><div className="sm-k">모임 횟수</div><div className="sm-v">총 8회</div></div>
             </div>
-            <a href="#ask" className="lp-btn-primary">
+            <a href="/bookclub" className="lp-btn-primary">
               <span>이 시즌에 참여하기</span>
               <span className="lp-arrow" />
             </a>
@@ -618,7 +617,7 @@ export default function LandingPage() {
           누군가는 <em>답</em>으로 기억되고,<br />
           누군가는 <em>질문</em>으로 남습니다.
         </p>
-        <a href="#ask" className="lp-btn-cream">
+        <a href="/bookclub" className="lp-btn-cream">
           <span>지금 참여하기</span>
           <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
         </a>
@@ -629,10 +628,10 @@ export default function LandingPage() {
         <div className="lp-foot-inner">
           <div className="lp-foot-mark"><em>—</em>질문하는 사람들 · 미래혁신형 북클럽</div>
           <div className="lp-foot-links">
-            <a href="#today">오늘의 질문</a>
-            <a href="#season">시즌</a>
-            <a href="#leaders">리더</a>
-            <a href="#ask">참여 신청</a>
+            <a href="/questions">질문</a>
+            <a href="/bookclub">북클럽</a>
+            <a href="/giants">거인의 어깨</a>
+            <a href="/archive">아카이빙</a>
           </div>
           <div className="lp-foot-copy">© 2026 — Quesapience.</div>
         </div>
