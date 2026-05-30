@@ -1,0 +1,42 @@
+{
+  "name": "질문하는 사람들",
+  "short_name": "질문사람들",
+  "description": "좋은 질문은 좋은 사람을 데려옵니다. 질문 기반 오프라인 북토크 커뮤니티.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4EFE5",
+  "theme_color": "#1C1F26",
+  "orientation": "portrait",
+  "lang": "ko",
+  "categories": ["education", "books", "social"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "오늘의 질문",
+      "short_name": "질문",
+      "description": "오늘의 질문 보기",
+      "url": "/questions",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "북클럽 일정",
+      "short_name": "북클럽",
+      "description": "진행 중인 북토크 확인",
+      "url": "/bookclub",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
@@ -42,7 +43,7 @@ export default async function ArchivePage() {
       />
 
       <main style={{ flex: 1 }}>
-        <ArchiveClient initialReviews={reviews} />
+        <Suspense fallback={null}><ArchiveClient initialReviews={reviews} /></Suspense>
       </main>
       <Footer />
     </div>

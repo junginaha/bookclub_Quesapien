@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ThumbsUp, BookOpen, MessageSquare, FileText, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import LikeButton from "@/components/reviews/LikeButton";
 import AISummaryBlock from "@/components/seo/AISummaryBlock";
+import AIReviewSummary from "@/components/archive/AIReviewSummary";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Review = any;
@@ -34,8 +36,15 @@ const STATIC_TALKS = [
 ];
 
 export default function ArchiveClient({ initialReviews }: { initialReviews: Review[] }) {
-  const [activeTab, setActiveTab] = useState<TabType>("reviews");
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get("tab") as TabType | null) ?? "reviews";
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [photoFilter, setPhotoFilter] = useState<"all" | "text" | "photo">("all");
+
+  useEffect(() => {
+    const tab = searchParams.get("tab") as TabType | null;
+    if (tab) setActiveTab(tab);
+  }, [searchParams]);
   const totalLikes = initialReviews.reduce((a: number, r: Review) => a + (r.likes ?? 0), 0);
   const filtered = photoFilter === "all" ? initialReviews : initialReviews.filter((r: Review) => r.type === photoFilter);
 
@@ -120,6 +129,12 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
         {/* ─ 후기 아카이브 ─ */}
         {activeTab === "reviews" && (
           <>
+            {/* AI Review Summary */}
+            <AIReviewSummary
+              reviews={filtered.map((r: any) => ({ content: r.content ?? "", quote: r.quote ?? undefined }))}
+              context="질문하는 사람들 북클럽 후기"
+            />
+
             <div style={{ display: "flex", gap: 8, marginBottom: 32, flexWrap: "wrap" }}>
               {(["all", "text", "photo"] as const).map((f) => (
                 <button key={f} onClick={() => setPhotoFilter(f)} style={{

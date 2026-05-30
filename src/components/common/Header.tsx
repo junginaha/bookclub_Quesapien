@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { Menu, X, LogOut, User, ChevronDown } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
+import SearchPalette from "./SearchPalette";
 
 const navItems = [
   {
@@ -237,6 +238,7 @@ export default function Header() {
 
           {/* Right */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <SearchPalette />
             {currentUser ? (
               <div className="hidden md:flex" style={{ alignItems: "center", gap: 8 }}>
                 <Link

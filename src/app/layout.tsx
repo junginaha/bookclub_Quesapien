@@ -77,14 +77,22 @@ export const metadata: Metadata = {
   alternates: { canonical: SITE_URL },
   other: {
     "application-name": "질문하는 사람들",
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
+    "apple-mobile-web-app-title": "질문하는 사람들",
   },
+  manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  themeColor: "#F4EFE5",
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F4EFE5" },
+    { media: "(prefers-color-scheme: dark)", color: "#1C1F26" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
