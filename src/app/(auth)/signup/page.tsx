@@ -4,7 +4,9 @@ import { BookOpen } from "lucide-react";
 import SignupForm from "@/components/auth/SignupForm";
 
 export const metadata: Metadata = {
-  title: "회원가입",
+  title: "회원가입 — 질문하는 사람이 되어요",
+  description: "질문하는 사람들에 가입하고 북토크와 질문 커뮤니티에 참여하세요. 가입 후 5개의 질문으로 당신의 Question Profile을 만들어드립니다.",
+  robots: { index: false, follow: false },
 };
 
 export default function SignupPage() {

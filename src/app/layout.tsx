@@ -93,12 +93,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="ko"
       className={`${notoSansKR.variable} ${notoSerifKR.variable} ${ebGaramond.variable}`}
     >
-      <head>
+      <body className="min-h-screen antialiased">
         {/* Stage 1: Organization + WebSite JSON-LD — sitewide */}
         <JsonLd data={orgSchema()} />
         <JsonLd data={websiteSchema()} />
-      </head>
-      <body className="min-h-screen antialiased">
         <AuthProvider>
           {children}
         </AuthProvider>

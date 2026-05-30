@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ThumbsUp, BookOpen, MessageSquare, FileText, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import LikeButton from "@/components/reviews/LikeButton";
+import AISummaryBlock from "@/components/seo/AISummaryBlock";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Review = any;
@@ -293,6 +294,19 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
           </div>
         )}
       </div>
+
+      {/* Stage 3: AI Summary Block */}
+      <AISummaryBlock
+        what="아카이빙은 질문하는 사람들의 북토크 후기, 발제문, 질문, 시즌 기록을 보존하는 지식 저장소다."
+        why="커뮤니티가 쌓아온 지적 자산을 열람하고, 과거 북토크의 통찰을 현재의 독서에 연결할 수 있다."
+        who="독서 기록을 남기고 싶은 독자, 과거 북토크 참여자, 지식 아카이브를 탐색하고 싶은 사람."
+        bullets={[
+          "후기 아카이브: 텍스트/사진 후기 모음",
+          "질문 아카이브: 역대 오늘의 질문과 인기 질문",
+          "발제문 아카이브: 각 북토크의 토론 질문지",
+          "북토크 기록: 시즌별 참여자 수와 핵심 내용",
+        ]}
+      />
     </div>
   );
 }

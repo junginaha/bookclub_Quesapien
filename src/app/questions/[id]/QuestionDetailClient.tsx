@@ -15,6 +15,8 @@ import {
   getParticipantRatio, getStatusLabel, getStatusColor,
 } from "@/lib/utils";
 import type { Question } from "@/types";
+import AISummaryBlock from "@/components/seo/AISummaryBlock";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 interface Props {
   questionId: string;
@@ -209,6 +211,31 @@ export default function QuestionDetailClient({ questionId, seedQuestion, initial
           )}
         </div>
       </div>
+
+      {/* Stage 5: Related Links */}
+      <div className="container-base">
+        <RelatedLinks
+          items={[
+            { label: "모든 질문 보기", href: "/questions", type: "question" },
+            { label: "북클럽 참여하기", href: "/bookclub", type: "booktalk" },
+            { label: "거인의 어깨에서 탐구", href: "/giants", type: "giant" },
+            { label: "후기 아카이브", href: "/archive", type: "review" },
+          ]}
+        />
+      </div>
+
+      {/* Stage 3: AI Summary Block */}
+      <AISummaryBlock
+        what={`"${question.title}" — 질문하는 사람들의 북토크 발제 질문이다.`}
+        why={question.description || "이 질문은 오프라인 독서 모임에서 깊은 대화를 이끌어내기 위해 선정되었다."}
+        who={`독서를 좋아하고 깊이 있는 대화를 원하는 사람. 관련 북토크에 참여하고 싶은 사람.`}
+        bullets={[
+          `카테고리: ${question.category}`,
+          `태그: ${question.tags.join(", ") || "—"}`,
+          `${question.session_count}회 북토크에서 진행됨`,
+          `총 ${question.participant_total}명 참여`,
+        ]}
+      />
     </div>
   );
 }

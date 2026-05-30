@@ -7,7 +7,13 @@ import type { Metadata } from "next";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://quesapience.com";
 const SITE_NAME = "질문하는 사람들";
-const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.png`;
+// Dynamic OG image via /og route (Next.js ImageResponse)
+function makeOgImageUrl(title: string, sub?: string): string {
+  const params = new URLSearchParams({ title });
+  if (sub) params.set("sub", sub);
+  return `${SITE_URL}/og?${params.toString()}`;
+}
+const DEFAULT_OG_IMAGE = makeOgImageUrl("질문하는 사람들", "좋은 질문은 좋은 사람을 데려옵니다.");
 
 interface PageMetaInput {
   title: string;
@@ -25,7 +31,7 @@ interface PageMetaInput {
 
 export function buildMetadata(input: PageMetaInput): Metadata {
   const canonical = `${SITE_URL}${input.path}`;
-  const image = input.image ?? DEFAULT_OG_IMAGE;
+  const image = input.image ?? makeOgImageUrl(input.title, input.description?.slice(0, 80));
   const ogType = input.type === "article" ? "article" : "website";
 
   return {

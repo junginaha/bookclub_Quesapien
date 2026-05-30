@@ -5,6 +5,8 @@ import LoginForm from "@/components/auth/LoginForm";
 
 export const metadata: Metadata = {
   title: "로그인",
+  description: "질문하는 사람들에 로그인하고 오늘의 질문과 북토크에 참여하세요.",
+  robots: { index: false, follow: false },
 };
 
 export default function LoginPage() {
