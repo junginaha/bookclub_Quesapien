@@ -129,13 +129,6 @@ const testimonials = [
   { who: "하린", sub: "교사 · 39", said: "우리 반 아이들에게도 이런 자리를 만들어주고 싶다고 생각했습니다. 그게 변화의 시작이었어요.", when: "AI와 인간 시즌" },
 ];
 
-const seasons = [
-  { n: "No. 03", t: "관계 회복 시즌", desc: "멀어진 사람에게 다시 다가가는 일에 대하여", when: "'25 Winter", status: "종료", live: false },
-  { n: "No. 02", t: "AI와 인간 시즌", desc: "기계의 시대에 인간으로 남는 법", when: "'25 Autumn", status: "종료", live: false },
-  { n: "No. 01", t: "사랑 시즌", desc: "우리가 사랑이라 부른 것의 다른 이름들", when: "'25 Summer", status: "종료", live: false },
-  { n: "No. 05", t: "인간 회복 시즌", desc: "소진된 사람이 다시 사람이 되는 과정", when: "'26 Summer", status: "모집 예정", live: true },
-];
-
 const leaders = [
   { initial: "J", name: "정해린", role: "시즌 04 진행", philosophy: "정답보다 진심을 믿습니다. 우리는 결론을 미루는 연습 중입니다.", q: "\"당신이 가장 오래 미뤄둔 감정은 무엇인가요?\"" },
   { initial: "S", name: "서민준", role: "시즌 03 진행", philosophy: "조용한 사람의 한 문장은 시끄러운 사람의 한 시간보다 길게 남습니다.", q: "\"당신이 마지막으로 누군가에게 진심으로 사과한 건 언제였나요?\"" },
@@ -168,142 +161,155 @@ function FloatPopup({ color, title, sub, type, onOpen }: {
   );
 }
 
-// ─── 발제 생성기 컴포넌트 ─────────────────────────────────────
-function LandingDiscussionGenerator() {
-  const [keyword, setKeyword] = useState("");
-  const [result, setResult] = useState<{
-    statement: string;
-    discussion_questions: string[];
-    icebreaker_questions: string[];
-    recommended_books: { title: string; author: string; description: string }[];
-  } | null>(null);
-  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+// ─── Archive Review Form 컴포넌트 ─────────────────────────────
+function ArchiveReviewForm() {
+  const [tab, setTab] = useState<"text" | "photo" | "video">("text");
+  const [content, setContent] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  const handleGenerate = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!keyword.trim()) return;
-    setStatus("loading");
-    setResult(null);
+    if (content.trim().length < 20) return;
+    setStatus("sending");
     try {
-      const res = await fetch("/api/ai", {
+      const res = await fetch("/api/archive/review", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ keyword: keyword.trim() }),
+        body: JSON.stringify({
+          type: tab,
+          content: content.trim(),
+          author_name: authorName.trim() || "익명",
+          photo_url: tab === "photo" ? photoUrl.trim() || null : null,
+          video_url: tab === "video" ? videoUrl.trim() || null : null,
+        }),
       });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setResult(data);
-      setStatus("done");
+      if (!res.ok) throw new Error("fail");
+      setStatus("sent");
+      setContent("");
+      setAuthorName("");
+      setPhotoUrl("");
+      setVideoUrl("");
     } catch {
       setStatus("error");
     }
+    setTimeout(() => setStatus("idle"), 4000);
   };
 
   return (
-    <section className="lp-section" id="generator" style={{ background: "var(--lp-bg-ink)", color: "var(--lp-cream)", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 70% 60% at 90% 10%, rgba(176,138,74,0.15), transparent 60%)" }} />
-      <div className="lp-section-head" style={{ position: "relative" }}>
-        <div className="lp-left">
-          <div className="lp-eyebrow" style={{ color: "rgba(163,154,140,0.6)" }}>DISCUSSION GENERATOR — 발제 생성기</div>
-          <h2 className="lp-h-section" style={{ color: "rgba(236,227,207,0.95)" }}>
-            키워드 하나로<br /><span className="lp-em">북클럽 발제</span>를 만들어드립니다.
-          </h2>
-        </div>
-        <p className="lp-lede" style={{ color: "rgba(163,154,140,0.65)" }}>
-          주제어를 입력하면 발제문, 토론 질문, 아이스브레이킹 질문, 추천 도서를 즉시 생성합니다.
-          리더를 위한 도구입니다.
-        </p>
-      </div>
+    <div style={{ marginTop: 56, padding: "36px 40px", borderRadius: 16, background: "rgba(255,255,255,0.4)", border: "1px solid var(--lp-line-soft)" }}>
+      <div style={{ fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--lp-muted)", marginBottom: 10 }}>후기 남기기</div>
+      <p style={{ fontSize: 15, color: "var(--lp-ink-soft)", marginBottom: 24, lineHeight: 1.6 }}>당신의 변화를 기록해주세요.</p>
 
-      <form onSubmit={handleGenerate} style={{ maxWidth: 600, position: "relative" }}>
-        <div style={{
-          display: "flex", gap: 10, alignItems: "stretch",
-          background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)",
-          borderRadius: 14, padding: "12px 16px",
-          marginBottom: 20,
-        }}>
-          <input
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="주제어를 입력하세요 — 예: 외로움, 번아웃, 사랑, 죽음"
-            style={{
-              flex: 1, background: "none", border: "none", outline: "none",
-              fontSize: 15, color: "rgba(236,227,207,0.9)",
-              fontFamily: "var(--lp-sans)",
-            }}
-          />
+      {/* 탭 */}
+      <div style={{ display: "flex", gap: 0, marginBottom: 24, borderBottom: "1px solid var(--lp-line-soft)" }}>
+        {(["text", "photo", "video"] as const).map((t) => (
           <button
-            type="submit"
-            disabled={!keyword.trim() || status === "loading"}
+            key={t}
+            type="button"
+            onClick={() => setTab(t)}
             style={{
-              padding: "10px 22px", borderRadius: 10,
-              background: keyword.trim() ? "rgba(176,138,74,0.9)" : "rgba(255,255,255,0.1)",
-              color: keyword.trim() ? "var(--lp-bg-ink)" : "rgba(163,154,140,0.5)",
-              fontSize: 14, fontWeight: 600, border: "none", cursor: keyword.trim() ? "pointer" : "not-allowed",
-              whiteSpace: "nowrap", transition: "all 0.2s", flexShrink: 0,
+              padding: "8px 18px", fontSize: 13.5, background: "none", border: "none",
+              cursor: "pointer", color: tab === t ? "var(--lp-ink)" : "var(--lp-muted)",
+              borderBottom: tab === t ? "2px solid var(--lp-ink)" : "2px solid transparent",
+              marginBottom: -1, transition: "color 0.2s",
+              fontFamily: "var(--lp-serif-ko)",
             }}
           >
-            {status === "loading" ? "생성 중…" : "발제 생성"}
+            {t === "text" ? "글" : t === "photo" ? "사진" : "영상"}
           </button>
+        ))}
+      </div>
+
+      {status === "sent" ? (
+        <div style={{ padding: "24px 0", textAlign: "center" }}>
+          <div style={{ fontSize: 28, marginBottom: 12 }}>✦</div>
+          <p style={{ fontSize: 15, color: "var(--lp-ink)", marginBottom: 4 }}>후기가 전달되었습니다.</p>
+          <span style={{ fontSize: 13, color: "var(--lp-muted)" }}>소중한 기록 감사합니다.</span>
         </div>
-      </form>
-
-      {status === "done" && result && (
-        <div style={{ maxWidth: 720, position: "relative", display: "flex", flexDirection: "column", gap: 28 }}>
-          {/* 발제문 */}
-          <div style={{ padding: "24px 28px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
-            <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(163,154,140,0.5)", marginBottom: 12 }}>발제문</div>
-            <p style={{ fontFamily: "var(--lp-serif-ko)", fontSize: 17, color: "rgba(236,227,207,0.9)", lineHeight: 1.85 }}>{result.statement}</p>
-          </div>
-
-          {/* 토론 질문 */}
-          <div>
-            <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(163,154,140,0.5)", marginBottom: 14 }}>토론 질문</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {result.discussion_questions.map((q, i) => (
-                <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start", padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <span style={{ fontFamily: "var(--lp-serif)", fontSize: 24, color: "rgba(176,138,74,0.5)", lineHeight: 1, flexShrink: 0 }}>{i + 1}</span>
-                  <p style={{ fontSize: 15, color: "rgba(236,227,207,0.8)", lineHeight: 1.7 }}>{q}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 아이스브레이킹 */}
-          {result.icebreaker_questions?.length > 0 && (
-            <div>
-              <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(163,154,140,0.5)", marginBottom: 12 }}>아이스브레이킹</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {result.icebreaker_questions.map((q, i) => (
-                  <p key={i} style={{ fontSize: 14, color: "rgba(163,154,140,0.7)", lineHeight: 1.65, paddingLeft: 14, borderLeft: "1px solid rgba(176,138,74,0.4)" }}>{q}</p>
-                ))}
-              </div>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          {tab === "photo" && (
+            <div style={{ marginBottom: 12 }}>
+              <input
+                type="url"
+                placeholder="사진 URL"
+                value={photoUrl}
+                onChange={(e) => setPhotoUrl(e.target.value)}
+                style={{
+                  width: "100%", padding: "12px 16px", borderRadius: 10, fontSize: 14,
+                  border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)",
+                  color: "var(--lp-ink)", outline: "none", boxSizing: "border-box",
+                  fontFamily: "var(--lp-sans)",
+                }}
+              />
             </div>
           )}
-
-          {/* 추천 도서 */}
-          {result.recommended_books?.length > 0 && (
-            <div>
-              <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(163,154,140,0.5)", marginBottom: 12 }}>추천 도서</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {result.recommended_books.map((b, i) => (
-                  <div key={i} style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(236,227,207,0.9)", marginBottom: 4 }}>
-                      {b.title} <span style={{ fontWeight: 400, color: "rgba(163,154,140,0.6)" }}>— {b.author}</span>
-                    </div>
-                    <p style={{ fontSize: 13, color: "rgba(163,154,140,0.6)", lineHeight: 1.6 }}>{b.description}</p>
-                  </div>
-                ))}
-              </div>
+          {tab === "video" && (
+            <div style={{ marginBottom: 12 }}>
+              <input
+                type="url"
+                placeholder="YouTube 링크 (예: https://youtu.be/...)"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                style={{
+                  width: "100%", padding: "12px 16px", borderRadius: 10, fontSize: 14,
+                  border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)",
+                  color: "var(--lp-ink)", outline: "none", boxSizing: "border-box",
+                  fontFamily: "var(--lp-sans)",
+                }}
+              />
             </div>
           )}
-        </div>
+          <textarea
+            placeholder="후기를 남겨주세요 (최소 20자)"
+            rows={4}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            minLength={20}
+            required
+            style={{
+              width: "100%", padding: "14px 16px", borderRadius: 10, fontSize: 14,
+              border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)",
+              color: "var(--lp-ink)", outline: "none", resize: "vertical", boxSizing: "border-box",
+              lineHeight: 1.7, fontFamily: "var(--lp-serif-ko)",
+            }}
+          />
+          <div style={{ marginTop: 12, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <input
+              type="text"
+              placeholder="이름 (선택 · 익명 가능)"
+              value={authorName}
+              onChange={(e) => setAuthorName(e.target.value)}
+              maxLength={20}
+              style={{
+                flex: 1, minWidth: 160, padding: "10px 14px", borderRadius: 9, fontSize: 13.5,
+                border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)",
+                color: "var(--lp-ink)", outline: "none", fontFamily: "var(--lp-sans)",
+              }}
+            />
+            <button
+              type="submit"
+              disabled={content.trim().length < 20 || status === "sending"}
+              style={{
+                padding: "10px 24px", borderRadius: 9999, fontSize: 14, fontWeight: 500,
+                background: content.trim().length >= 20 ? "var(--lp-ink)" : "var(--lp-line-soft)",
+                color: content.trim().length >= 20 ? "var(--lp-cream)" : "var(--lp-muted)",
+                border: "none", cursor: content.trim().length >= 20 ? "pointer" : "not-allowed",
+                transition: "all 0.2s", whiteSpace: "nowrap",
+              }}
+            >
+              {status === "sending" ? "전송 중…" : "후기 남기기"}
+            </button>
+          </div>
+          {status === "error" && (
+            <p style={{ fontSize: 12.5, color: "rgba(239,68,68,0.8)", marginTop: 8 }}>잠시 후 다시 시도해주세요.</p>
+          )}
+        </form>
       )}
-
-      {status === "error" && (
-        <p style={{ fontSize: 13.5, color: "rgba(239,68,68,0.8)", position: "relative" }}>잠시 후 다시 시도해 주세요.</p>
-      )}
-    </section>
+    </div>
   );
 }
 
@@ -324,7 +330,6 @@ interface LandingPageProps {
 
 // ─── Main component ───────────────────────────────────────────
 export default function LandingPage({ todayQuestion, recentQuestions }: LandingPageProps) {
-  const [booksOpen, setBooksOpen] = useState(false);
   const [modalBook, setModalBook] = useState<BookClub | null>(null);
   const [activeFloat, setActiveFloat] = useState<number | null>(null);
   const [askContent, setAskContent] = useState("");
@@ -525,7 +530,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
                   <h3>{b.title}</h3>
                   <p className="bc-author">— {b.author}</p>
                 </div>
-                <div className="bc-hover-hint">클릭하여 자세히 보기</div>
+                <div className="bc-hover-hint">모임 상세 보기</div>
               </div>
               <div className="lp-book-info">
                 <div className="bi-tag">{b.tag}</div>
@@ -539,58 +544,50 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           ))}
         </div>
 
-        {/* Collapsible: 더 많은 북클럽 */}
+        {/* Mini books — always expanded */}
         <div className="lp-books-more">
           <div className="lp-books-more-head">
             <div className="bm-rule" />
-            <button
-              className="lp-books-more-toggle"
-              type="button"
-              aria-expanded={booksOpen}
-              onClick={() => setBooksOpen((o) => !o)}
-            >
-              <span>{booksOpen ? "더 적게 보기" : "더 많은 북클럽 보기"}</span>
+            <div className="lp-books-more-label">
+              <span>더 많은 북클럽</span>
               <span className="bmt-count">24개</span>
-              <span className="bmt-chev" aria-hidden="true" />
-            </button>
+            </div>
             <div className="bm-rule" />
           </div>
           <p className="lp-books-more-help">— 지금 바로 참여할 수 있는 모임들입니다.</p>
 
-          <div className={`lp-books-more-body${booksOpen ? " open" : ""}`}>
-            <div className="lp-mini-grid">
-              {miniBooks.map((b) => (
-                <div
-                  key={b.title}
-                  className="lp-mini-book"
-                  onClick={() => setModalBook(b)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === "Enter" && setModalBook(b)}
-                >
-                  <div className={`lp-mini-spine ${b.color}`} />
-                  <div className="lp-mini-body">
-                    <div className="lp-mini-title">{b.title}</div>
-                    <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어요</div>
-                    <div className="lp-mini-meta">
-                      <span className="lp-mini-tag">{b.tag}</span>
-                      <span className="lp-mini-members">
-                        <span className="mem-dot" />{b.currentParticipants}명 참여 중
-                      </span>
-                    </div>
+          <div className="lp-mini-grid">
+            {miniBooks.map((b) => (
+              <div
+                key={b.title}
+                className="lp-mini-book"
+                onClick={() => setModalBook(b)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && setModalBook(b)}
+              >
+                <div className={`lp-mini-spine ${b.color}`} />
+                <div className="lp-mini-body">
+                  <div className="lp-mini-title">{b.title}</div>
+                  <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어요</div>
+                  <div className="lp-mini-meta">
+                    <span className="lp-mini-tag">{b.tag}</span>
+                    <span className="lp-mini-members">
+                      <span className="mem-dot" />{b.currentParticipants}명 참여 중
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
+      {/* ARCHIVING — 후기 섹션 */}
       <section className="lp-section lp-testify" id="testify">
         <div className="lp-section-head">
           <div className="lp-left">
-            <div className="lp-eyebrow">ARCHIVING — 사람, 변화, 성장, 기록</div>
+            <div className="lp-eyebrow">ARCHIVING — 사람, 변화, 기록</div>
             <h2 className="lp-h-section">
               한 시즌이 지나면<br /><span className="lp-em">한 사람이</span> 바뀝니다.
             </h2>
@@ -609,76 +606,16 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </div>
           ))}
         </div>
-      </section>
 
-      {/* SEASONS */}
-      <section className="lp-section lp-seasons" id="season">
-        <div className="lp-section-head">
-          <div className="lp-left">
-            <div className="lp-eyebrow">Seasons — 시즌 시스템</div>
-            <h2 className="lp-h-section">
-              우리는 3개월에 한 번,<br />주제를 바꿉니다.
-            </h2>
-          </div>
-          <p className="lp-lede">
-            매 시즌, 하나의 주제 위에서 함께 머뭅니다. 한 가지를 충분히 깊게 다룹니다.
-          </p>
-        </div>
-
-        <article className="lp-season-feature">
-          <div>
-            <div className="lp-season-num">Season 04 · Now playing</div>
-            <h3 className="lp-season-title">외로움 <span className="lp-em">시즌</span></h3>
-            <p className="lp-lede">
-              혼자 있어도 외롭지 않은 사람과, 함께 있어도 외로운 사람.
-              이 시즌은 그 두 사람 사이의 거리를 다룹니다.
-            </p>
-            <div className="lp-season-meta">
-              <div><div className="sm-k">참여 인원</div><div className="sm-v">142명</div></div>
-              <div><div className="sm-k">시즌 기간</div><div className="sm-v">3월–6월</div></div>
-              <div><div className="sm-k">모임 횟수</div><div className="sm-v">총 8회</div></div>
-            </div>
-            <a href="/bookclub" className="lp-btn-primary">
-              <span>이 시즌에 참여하기</span>
-              <span className="lp-arrow" />
-            </a>
-          </div>
-          <div className="lp-season-qs">
-            <div className="sq-label">— 이번 시즌의 질문들</div>
-            <ul>
-              <li>혼자 있을 때 가장 나다운가요, 가장 외로운가요?</li>
-              <li>외로움은 결핍입니까, 깊이입니까?</li>
-              <li>당신을 가장 잘 아는 사람은 지금 곁에 있습니까?</li>
-              <li>&lsquo;사람과 함께 있는 외로움&rsquo;을 겪어본 적 있나요?</li>
-            </ul>
-          </div>
-        </article>
-
-        <div className="lp-section-head" style={{ marginBottom: 32 }}>
-          <div className="lp-left"><div className="lp-eyebrow">Past &amp; Coming</div></div>
-          <p className="lp-lede">한 번 지나간 시즌은 다시 열리지 않습니다.</p>
-        </div>
-
-        <div className="lp-season-list">
-          {seasons.map((s, i) => (
-            <div key={s.n} className="lp-season-row" style={i === 3 ? { opacity: 0.75 } : undefined}>
-              <div className="sr-n">{s.n}</div>
-              <div className="sr-t">{s.t}</div>
-              <div className="sr-desc">{s.desc}</div>
-              <div className="sr-when">{s.when}</div>
-              <div className={`sr-status${s.live ? " live" : ""}`}>
-                {s.live && <span className="st-dot" />}{s.status}
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* 후기 남기기 폼 */}
+        <ArchiveReviewForm />
       </section>
 
       {/* LEADERS */}
       <section className="lp-section lp-leaders" id="leaders">
         <div className="lp-section-head">
           <div className="lp-left">
-            <div className="lp-eyebrow">QUESAPIENCE 질문을 던지는 사람들</div>
+            <div className="lp-eyebrow">LEADERS — 질문을 던지는 사람들</div>
             <h2 className="lp-h-section">
               Quesapience,<br /><span className="lp-em">질문하는</span> 사람들.
             </h2>
@@ -704,11 +641,11 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
-      {/* TODAY'S QUESTION */}
-      <section className="lp-section lp-today" id="today">
+      {/* QUESTIONS HUB — Today + Ask 통합 */}
+      <section className="lp-section lp-question-hub" id="questions">
         <div className="lp-section-head">
           <div className="lp-left">
-            <div className="lp-eyebrow">Today&apos;s Question — 오늘의 질문</div>
+            <div className="lp-eyebrow">QUESTIONS — 오늘의 질문</div>
             <h2 className="lp-h-section">
               하루에 한 번,<br />
               <span className="lp-em">마음을 흔드는</span> 질문.
@@ -773,19 +710,17 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             ))}
           </div>
         </div>
-      </section>
 
-      {/* 발제 생성기 */}
-      <LandingDiscussionGenerator />
+        {/* 구분선 */}
+        <div style={{ borderTop: "1px solid var(--lp-line-soft)", margin: "56px 0 48px" }} />
 
-      {/* ASK — with real submission */}
-      <section className="lp-section lp-ask" id="ask">
+        {/* ASK 폼 */}
         <div className="lp-ask-inner">
-          <div className="lp-eyebrow">A QUESTION — 질문 남기기</div>
-          <h2 className="lp-h-section">
+          <div className="lp-eyebrow" style={{ marginBottom: 12 }}>당신의 질문을 남겨보세요</div>
+          <h3 className="lp-h-section" style={{ fontSize: "clamp(22px, 3vw, 32px)", marginBottom: 16 }}>
             당신 마음 속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.
-          </h2>
-          <p className="lp-lede">
+          </h3>
+          <p className="lp-lede" style={{ marginBottom: 32 }}>
             정답을 모으는 곳이 아닙니다. 좋은 질문 하나는, 때로 한 사람을 살립니다.
             부끄러운 질문일수록 환영합니다.
           </p>
@@ -841,61 +776,6 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               </div>
             </form>
           )}
-        </div>
-      </section>
-
-      {/* 4개 섹션 네비게이션 카드 */}
-      <section style={{ padding: "80px 0", background: "var(--lp-bg-soft, #ECE5D7)" }}>
-        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 clamp(24px,5vw,72px)" }}>
-          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--lp-muted)", fontFamily: "var(--lp-serif)", marginBottom: 40, textAlign: "center" }}>
-            Explore — 탐색하기
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
-            {[
-              { href: "/questions", label: "질문", sub: "오늘의 질문 · 인기 질문 · 질문 아카이브", color: "#5E4632", mark: "Q" },
-              { href: "/bookclub", label: "북클럽", sub: "오프라인 북토크 · 리더 소개 · 참가 신청", color: "#1B2536", mark: "B" },
-              { href: "/archive", label: "아카이빙", sub: "후기 · 발제문 · 북토크 기록", color: "#5C6B3A", mark: "A" },
-              { href: "/giants", label: "거인의 어깨", sub: "위대한 사유자 · AI 대화 · 사상 탐구", color: "#553C2A", mark: "G" },
-            ].map((item) => (
-              <a key={item.href} href={item.href} style={{ textDecoration: "none", display: "block" }}>
-                <div style={{
-                  padding: "28px", borderRadius: 14,
-                  background: "rgba(255,255,255,0.5)",
-                  border: "1px solid var(--lp-line-soft)",
-                  transition: "transform 0.2s, box-shadow 0.2s",
-                  cursor: "pointer",
-                }}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.transform = "translateY(-3px)";
-                    el.style.boxShadow = "0 12px 32px rgba(28,31,38,0.1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.transform = "translateY(0)";
-                    el.style.boxShadow = "none";
-                  }}
-                >
-                  <div style={{
-                    width: 40, height: 40, borderRadius: 10,
-                    background: item.color,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 18, color: "rgba(255,255,255,0.85)",
-                    fontFamily: "var(--lp-serif)",
-                    marginBottom: 16,
-                  }}>
-                    {item.mark}
-                  </div>
-                  <div style={{ fontFamily: "var(--lp-serif-ko)", fontSize: 20, fontWeight: 400, color: "var(--lp-ink)", marginBottom: 6 }}>
-                    {item.label}
-                  </div>
-                  <div style={{ fontSize: 13, color: "var(--lp-muted)", lineHeight: 1.65 }}>
-                    {item.sub}
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
         </div>
       </section>
 

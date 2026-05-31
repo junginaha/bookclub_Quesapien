@@ -25,6 +25,7 @@ export interface BookClub {
   maxParticipants?: number;
   currentParticipants?: number;
   sessionDates?: Array<{ date: string; topic: string; closed?: boolean }>;
+  photo_url?: string;
 }
 
 interface Props {
@@ -106,6 +107,7 @@ export default function BookDetailModal({ book, onClose }: Props) {
       hostName: detail?.hostName ?? "",
       hostIntro: detail?.hostIntro ?? "",
       maxParticipants: detail?.maxParticipants,
+      photo_url: detail?.photo_url ?? "",
     });
     setEditing(true);
   };
@@ -122,6 +124,7 @@ export default function BookDetailModal({ book, onClose }: Props) {
       host_name: form.hostName,
       host_intro: form.hostIntro,
       max_participants: form.maxParticipants,
+      photo_url: form.photo_url,
     };
     try {
       const res = await fetch(`/api/book-clubs/${detail.slug}`, {
@@ -141,6 +144,7 @@ export default function BookDetailModal({ book, onClose }: Props) {
           hostName: data.club.host_name as string,
           hostIntro: data.club.host_intro as string,
           maxParticipants: data.club.max_participants as number,
+          photo_url: data.club.photo_url as string | undefined,
         };
         setDetail(merged);
         localStorage.setItem(`bc_detail_${detail.slug}`, JSON.stringify(merged));
@@ -338,6 +342,9 @@ export default function BookDetailModal({ book, onClose }: Props) {
 
               <label className="bdm-label">모임 소개</label>
               <textarea className="bdm-textarea" rows={4} value={form.description ?? ""} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="이 북클럽을 소개해주세요." />
+
+              <label className="bdm-label">북클럽 사진 URL</label>
+              <input className="bdm-input" type="url" value={form.photo_url ?? ""} onChange={(e) => setForm((f) => ({ ...f, photo_url: e.target.value }))} placeholder="https://..." />
 
               <div className="bdm-form-actions">
                 <button type="button" className="bdm-btn-cancel" onClick={() => setEditing(false)}>취소</button>
