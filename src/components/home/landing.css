@@ -824,3 +824,31 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .nav-glow {
   animation: navGlow 3s ease-in-out infinite;
 }
+
+/* ── QUESTION HUB (merged today + ask) ── */
+.lp-question-hub .lp-ask-inner { max-width: 760px; text-align: left; }
+.lp-question-hub .lp-ask-inner .lp-h-section { color: var(--lp-ink); max-width: none; }
+.lp-question-hub .lp-ask-inner .lp-h-section em { color: var(--lp-accent); -webkit-text-fill-color: unset; }
+.lp-question-hub .lp-ask-field { background: rgba(255,255,255,0.5); border-color: var(--lp-line); }
+.lp-question-hub .lp-ask-field:focus-within { border-color: var(--lp-accent); box-shadow: 0 0 0 4px rgba(176,138,74,0.1); }
+.lp-question-hub .lp-ask-field .af-pen { background: var(--lp-bg); color: var(--lp-accent); }
+.lp-question-hub .lp-ask-field textarea { color: var(--lp-ink); }
+.lp-question-hub .lp-ask-field textarea::placeholder { color: var(--lp-muted); }
+.lp-question-hub .lp-ask-actions .aa-hint { color: var(--lp-muted); }
+.lp-question-hub .lp-ask-name { background: rgba(255,255,255,0.6); border-color: var(--lp-line); color: var(--lp-ink); }
+.lp-question-hub .lp-ask-name::placeholder { color: var(--lp-muted); font-style: normal; }
+.lp-question-hub .lp-ask-name:focus { border-color: var(--lp-accent); }
+.lp-question-hub .lp-ask-success { background: rgba(255,255,255,0.5); }
+.lp-question-hub .lp-ask-success p { color: var(--lp-ink); }
+.lp-question-hub .lp-ask-success span { color: var(--lp-muted); }
+.lp-question-hub .lp-ask-success-icon { background: var(--lp-ink); color: var(--lp-cream); }
+.lp-question-hub .lp-lede { color: var(--lp-muted); }
+
+/* ── BOOKS MORE — label (non-button) ── */
+.lp-books-more-label {
+  display: inline-flex; align-items: center; gap: 14px; white-space: nowrap;
+  padding: 12px 24px;
+  font-family: var(--lp-serif-ko); font-weight: 500; font-size: 15px;
+  letter-spacing: -0.005em; color: var(--lp-ink-soft);
+}
+.lp-books-more-label .bmt-count { font-family: var(--lp-serif); font-style: normal; color: var(--lp-accent); font-size: 14.5px; }

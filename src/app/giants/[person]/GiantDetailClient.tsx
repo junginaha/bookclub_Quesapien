@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Send, Loader2, BookOpen, MessageSquare } from "lucide-react";
+import { ArrowLeft, Send, Loader2, BookOpen, MessageSquare, Sparkles } from "lucide-react";
 import type { Giant } from "@/data/giants";
 import AISummaryBlock from "@/components/seo/AISummaryBlock";
 import RelatedLinks from "@/components/seo/RelatedLinks";
@@ -39,7 +39,15 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"about" | "chat">("about");
+  const [activeTab, setActiveTab] = useState<"about" | "chat" | "discuss">("about");
+  const [discussKeyword, setDiscussKeyword] = useState("");
+  const [discussResult, setDiscussResult] = useState<{
+    statement: string;
+    discussion_questions: string[];
+    icebreaker_questions: string[];
+    recommended_books: { title: string; author: string; description: string }[];
+  } | null>(null);
+  const [discussStatus, setDiscussStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -70,6 +78,27 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
       setDiscStatus("done");
     } catch {
       setDiscStatus("error");
+    }
+  };
+
+  const generateFromKeyword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!discussKeyword.trim()) return;
+    setDiscussStatus("loading");
+    setDiscussResult(null);
+    try {
+      const keyword = `${giant.name} ${discussKeyword.trim()}`;
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keyword }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setDiscussResult(data);
+      setDiscussStatus("done");
+    } catch {
+      setDiscussStatus("error");
     }
   };
 
@@ -183,11 +212,12 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
             <div style={{ display: "flex", gap: 0 }}>
               {[
                 { key: "about", label: "사상 & 저서", icon: <BookOpen size={15} /> },
-                { key: "chat", label: "대화 & 발제", icon: <MessageSquare size={15} /> },
+                { key: "chat", label: "지성과의 대화", icon: <MessageSquare size={15} /> },
+                { key: "discuss", label: "발제 생성", icon: <Sparkles size={15} /> },
               ].map((tab) => (
                 <button
                   key={tab.key}
-                  onClick={() => setActiveTab(tab.key as "about" | "chat")}
+                  onClick={() => setActiveTab(tab.key as "about" | "chat" | "discuss")}
                   style={{
                     display: "flex", alignItems: "center", gap: 8,
                     padding: "16px 20px", fontSize: 14, fontWeight: 500,
@@ -343,6 +373,120 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === "discuss" && (
+            <div style={{ maxWidth: 760, margin: "0 auto" }}>
+              <p style={{ fontSize: 15, color: "var(--ink-soft)", marginBottom: 28, lineHeight: 1.7 }}>
+                {giant.name}의 사상을 바탕으로 발제를 생성합니다.
+              </p>
+              <form onSubmit={generateFromKeyword} style={{ marginBottom: 32 }}>
+                <div style={{
+                  display: "flex", gap: 10, alignItems: "stretch",
+                  border: "1px solid var(--line-soft)", borderRadius: 12, padding: "12px 16px",
+                  background: "rgba(255,255,255,0.6)",
+                }}>
+                  <input
+                    value={discussKeyword}
+                    onChange={(e) => setDiscussKeyword(e.target.value)}
+                    placeholder="예: 고독, 도덕, 의미, 자유"
+                    style={{
+                      flex: 1, background: "none", border: "none", outline: "none",
+                      fontSize: 15, color: "var(--ink)",
+                      fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!discussKeyword.trim() || discussStatus === "loading"}
+                    style={{
+                      padding: "10px 22px", borderRadius: 9, flexShrink: 0,
+                      background: discussKeyword.trim() ? giant.color : "var(--line-soft)",
+                      color: discussKeyword.trim() ? "white" : "var(--muted)",
+                      fontSize: 14, fontWeight: 500, border: "none",
+                      cursor: discussKeyword.trim() ? "pointer" : "not-allowed",
+                      whiteSpace: "nowrap", transition: "all 0.2s",
+                      display: "flex", alignItems: "center", gap: 8,
+                    }}
+                  >
+                    {discussStatus === "loading" ? (
+                      <><Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} /> 생성 중…</>
+                    ) : "발제 생성"}
+                  </button>
+                </div>
+              </form>
+
+              {discussStatus === "error" && (
+                <p style={{ fontSize: 13.5, color: "#EF4444", marginBottom: 20 }}>잠시 후 다시 시도해 주세요.</p>
+              )}
+
+              {discussStatus === "done" && discussResult && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                  {/* 발제문 */}
+                  <div style={{ padding: "22px 26px", borderRadius: 14, background: `${giant.color}12`, border: `1px solid ${giant.color}30` }}>
+                    <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 12 }}>발제문</div>
+                    <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 17, color: "var(--ink-soft)", lineHeight: 1.85 }}>{discussResult.statement}</p>
+                  </div>
+                  {/* 토론 질문 */}
+                  <div>
+                    <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 14 }}>토론 질문</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {discussResult.discussion_questions.map((q, i) => (
+                        <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start", padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.6)", border: "1px solid var(--line-soft)" }}>
+                          <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 24, color: giant.color, opacity: 0.5, lineHeight: 1, flexShrink: 0 }}>{i + 1}</span>
+                          <p style={{ fontSize: 15, color: "var(--ink-soft)", lineHeight: 1.7 }}>{q}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* 아이스브레이킹 */}
+                  {discussResult.icebreaker_questions?.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 12 }}>아이스브레이킹</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        {discussResult.icebreaker_questions.map((q, i) => (
+                          <p key={i} style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.65, paddingLeft: 14, borderLeft: `2px solid ${giant.color}50` }}>{q}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {/* 추천 도서 */}
+                  {discussResult.recommended_books?.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 12 }}>추천 도서</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        {discussResult.recommended_books.map((b, i) => (
+                          <div key={i} style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.5)", border: "1px solid var(--line-soft)" }}>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)", marginBottom: 4 }}>{b.title} <span style={{ fontWeight: 400, color: "var(--muted)", fontSize: 12 }}>— {b.author}</span></div>
+                            <p style={{ fontSize: 12.5, color: "var(--muted)", lineHeight: 1.5 }}>{b.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {/* 대화로 이동 버튼 */}
+                  <button
+                    onClick={() => {
+                      setActiveTab("chat");
+                      if (discussResult.statement) {
+                        sendMessage(discussResult.statement);
+                      }
+                    }}
+                    style={{
+                      alignSelf: "flex-start", padding: "12px 24px", borderRadius: 9999,
+                      background: giant.color, color: "white",
+                      border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500,
+                      display: "flex", alignItems: "center", gap: 8, transition: "opacity 0.2s",
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.85"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
+                  >
+                    <MessageSquare size={15} />
+                    이 발제로 {giant.name}와 대화하기
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

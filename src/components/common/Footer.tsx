@@ -96,17 +96,38 @@ export default function Footer() {
           borderTop: "1px solid rgba(255,255,255,0.08)",
           paddingTop: 24,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
-          gap: 12,
+          flexDirection: "column",
+          gap: 10,
         }}>
-          <p style={{ fontSize: 12, color: "rgba(163,154,140,0.4)" }}>
-            © 2026 질문하는 사람들 · Quesapience. All rights reserved.
-          </p>
-          <p style={{ fontSize: 12, color: "rgba(163,154,140,0.3)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>
-            질문 → 책 → 대화 → 사람 → 성장
-          </p>
+          <div style={{ fontSize: 12, color: "rgba(163,154,140,0.45)" }}>
+            협업·문의:{" "}
+            <a
+              href="mailto:junginaha@kakao.com"
+              style={{
+                color: "rgba(163,154,140,0.45)",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(163,154,140,0.75)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(163,154,140,0.45)"; }}
+            >
+              junginaha@kakao.com
+            </a>
+          </div>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
+          }}>
+            <p style={{ fontSize: 12, color: "rgba(163,154,140,0.4)" }}>
+              © 2026 질문하는 사람들 · Quesapience. All rights reserved.
+            </p>
+            <p style={{ fontSize: 12, color: "rgba(163,154,140,0.3)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>
+              질문 → 책 → 대화 → 사람 → 성장
+            </p>
+          </div>
         </div>
       </div>
 

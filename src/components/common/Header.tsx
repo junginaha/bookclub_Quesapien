@@ -53,6 +53,7 @@ export default function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [activeNav, setActiveNav] = useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const currentUser = useAppStore((s) => s.currentUser);
@@ -101,24 +102,24 @@ export default function Header() {
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-  const headerBg = scrolled || !isLanding
-    ? "rgba(244, 239, 229, 0.92)"
-    : "transparent";
-  const headerBorder = scrolled || !isLanding
-    ? "1px solid var(--line)"
-    : "1px solid transparent";
+  // Transparent on landing unless scrolled > 30px or hovered
+  const showOpaque = scrolled || hovered || !isLanding;
+  const headerBg = showOpaque ? "rgba(244, 239, 229, 0.95)" : "transparent";
+  const headerBorder = showOpaque ? "1px solid var(--line)" : "1px solid transparent";
 
   return (
     <header
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         position: "fixed",
         top: 0,
         width: "100%",
         zIndex: 100,
-        transition: "background 0.35s ease, border-color 0.35s ease",
+        transition: "background 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease",
         background: headerBg,
-        backdropFilter: scrolled || !isLanding ? "blur(16px)" : "none",
-        WebkitBackdropFilter: scrolled || !isLanding ? "blur(16px)" : "none",
+        backdropFilter: showOpaque ? "blur(16px)" : "none",
+        WebkitBackdropFilter: showOpaque ? "blur(16px)" : "none",
         borderBottom: headerBorder,
       }}
     >

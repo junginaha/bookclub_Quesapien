@@ -42,7 +42,7 @@ export default function GiantsPage() {
 
       {/* Stage 4: AI Friendly Definition Block */}
       <DefinitionBlock
-        definition="거인의 어깨는 니체, 칸트, 한강 등 위대한 저자와 사상가의 저서를 기반으로 위대한 저자의 사상을 바탕으로 그들의 언어로 깊이 있는 대화를 나눌 수 있는 공간이다."
+        definition="거인의 어깨는 발제 생성, 지성들과의 대화, 무엇이든 이야기할 수 있는 공간이다."
         entityType="KnowledgeExplorer"
       />
 
