@@ -208,6 +208,18 @@
   transform: translateY(0);
 }
 
+/* ─── Nav Glow Animation ───────────────────────────────────────── */
+@keyframes navGlow {
+  0%, 100% { text-shadow: 0 0 8px rgba(176,138,74,0); }
+  50% { text-shadow: 0 0 12px rgba(176,138,74,0.6), 0 0 24px rgba(176,138,74,0.3); }
+}
+.nav-glow {
+  animation: navGlow 3s ease-in-out infinite;
+}
+.nav-glow-d1 { animation: navGlow 3s ease-in-out 0.5s infinite; }
+.nav-glow-d2 { animation: navGlow 3s ease-in-out 1.0s infinite; }
+.nav-glow-d3 { animation: navGlow 3s ease-in-out 1.5s infinite; }
+
 /* ─── Component Styles ────────────────────────────────────────── */
 @layer components {
   .container-base {

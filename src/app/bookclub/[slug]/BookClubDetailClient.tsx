@@ -103,7 +103,7 @@ export default function BookClubDetailClient({ club }: { club: any }) {
                 <div style={{
                   fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase",
                   color: "rgba(255,255,255,0.5)", fontFamily: '"EB Garamond", Georgia, serif',
-                  fontStyle: "italic", marginBottom: 16,
+                  fontStyle: "normal", marginBottom: 16,
                 }}>
                   {club.genre ?? "북클럽"} · {club.tag}
                 </div>
@@ -279,7 +279,7 @@ export default function BookClubDetailClient({ club }: { club: any }) {
                       }}>
                         <span style={{
                           fontFamily: '"EB Garamond", Georgia, serif',
-                          fontSize: 36, fontStyle: "italic",
+                          fontSize: 36, fontStyle: "normal",
                           color: bgColor, opacity: 0.4,
                           lineHeight: 1, flexShrink: 0, marginTop: -4,
                         }}>
