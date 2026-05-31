@@ -63,3 +63,25 @@ export function getStatusColor(status: string): string {
   };
   return colors[status] ?? "bg-gray-50 text-gray-500 border-gray-200";
 }
+
+// 한글 조사 자동 선택 (이/가, 은/는, 을/를, 으로/로, 이/야)
+export function josa(word: string, type: "이가" | "은는" | "을를" | "으로로" | "이야"): string {
+  if (!word) return "";
+  const last = word[word.length - 1];
+  const code = last.charCodeAt(0);
+  // 한글 범위 확인
+  if (code < 0xAC00 || code > 0xD7A3) {
+    // 영문/숫자: 받침 없음으로 처리
+    const map: Record<string, string> = { "이가": "가", "은는": "는", "을를": "를", "으로로": "로", "이야": "야" };
+    return word + map[type];
+  }
+  const jongseong = (code - 0xAC00) % 28;
+  const hasJong = jongseong !== 0;
+  const map: Record<string, [string, string]> = {
+    "이가": ["이", "가"], "은는": ["은", "는"], "을를": ["을", "를"],
+    "으로로": ["으로", "로"], "이야": ["이야", "야"],
+  };
+  // 으로/로는 'ㄹ' 받침(8)이면 받침 없는 것 사용
+  if (type === "으로로" && jongseong === 8) return word + "로";
+  return word + map[type][hasJong ? 0 : 1];
+}

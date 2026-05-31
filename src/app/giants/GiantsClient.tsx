@@ -45,7 +45,7 @@ export default function GiantsClient() {
           background: "radial-gradient(ellipse 70% 50% at 90% 50%, rgba(176,138,74,0.12), transparent 60%)",
         }} />
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)", position: "relative" }}>
-          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic", marginBottom: 24 }}>
+          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "normal", marginBottom: 24 }}>
             On the Shoulders of Giants — 거인의 어깨
           </div>
           <h1 style={{
@@ -57,7 +57,7 @@ export default function GiantsClient() {
             marginBottom: 16,
           }}>
             위대한 사유자들의<br />
-            <em style={{ fontStyle: "italic", color: "var(--gold)", fontFamily: '"EB Garamond", Georgia, serif' }}>생각</em>과 대화하다.
+            <span style={{ color: "var(--gold)", fontWeight: 600 }}>생각</span>과 대화하다.
           </h1>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.55)", lineHeight: 1.75, maxWidth: 520, marginBottom: 48 }}>
             니체는 내 질문에 어떻게 답할까? 한강이라면 이 상황을 어떻게 바라볼까?<br />
@@ -159,7 +159,7 @@ export default function GiantsClient() {
                         <div style={{
                           fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase",
                           color: "rgba(255,255,255,0.5)", fontFamily: '"EB Garamond", Georgia, serif',
-                          fontStyle: "italic",
+                          fontStyle: "normal",
                         }}>
                           {CATEGORIES.find((c) => c.value === giant.category)?.label} · {giant.nationality}
                         </div>
@@ -171,7 +171,7 @@ export default function GiantsClient() {
                           }}>
                             {giant.name}
                           </div>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontStyle: "italic" }}>
+                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontStyle: "normal" }}>
                             {giant.name_en} · {giant.birth_year}–{giant.death_year ?? "현재"}
                           </div>
                         </div>
@@ -181,7 +181,7 @@ export default function GiantsClient() {
                       <div style={{ padding: "20px 24px" }}>
                         <p style={{
                           fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.65,
-                          fontStyle: "italic",
+                          fontStyle: "normal",
                           borderLeft: `2px solid ${giant.color}`,
                           paddingLeft: 12, marginBottom: 16,
                           display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",

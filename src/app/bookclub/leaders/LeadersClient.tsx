@@ -91,11 +91,11 @@ export default function LeadersClient() {
       {/* Hero */}
       <section style={{ padding: "72px 0 56px", borderBottom: "1px solid var(--line-soft)", background: "linear-gradient(to bottom, var(--bg-soft), var(--bg))" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px,4vw,48px)" }}>
-          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--muted)", fontFamily: '"EB Garamond",Georgia,serif', fontStyle: "italic", marginBottom: 20 }}>
+          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--muted)", fontFamily: '"EB Garamond",Georgia,serif', fontStyle: "normal", marginBottom: 20 }}>
             Leaders — 리더 소개
           </div>
           <h1 style={{ fontFamily: "var(--font-noto-serif-kr),Georgia,serif", fontSize: "clamp(28px,5vw,52px)", fontWeight: 400, lineHeight: 1.2, letterSpacing: "-0.02em", color: "var(--ink)", marginBottom: 16 }}>
-            질문을 던지는<br /><em style={{ fontStyle: "italic", color: "var(--accent)", fontFamily: '"EB Garamond",Georgia,serif' }}>사람들</em>.
+            질문을 던지는<br /><span style={{ color: "var(--accent)", fontWeight: 600 }}>사람들</span>.
           </h1>
           <p style={{ fontSize: 16, color: "var(--muted)", lineHeight: 1.75, maxWidth: 480 }}>
             리더는 정답을 주지 않습니다. 더 깊은 질문을 던지고, 침묵을 편안하게 만들고, 모두가 말할 수 있는 공간을 만듭니다.
@@ -167,7 +167,7 @@ export default function LeadersClient() {
 
                   {/* Content column */}
                   <div style={{ order: isReverse ? 0 : 1, display: "flex", flexDirection: "column", gap: 24 }}>
-                    <p style={{ fontSize: 15, color: "var(--ink-soft)", lineHeight: 1.85, fontStyle: "italic", borderLeft: `3px solid ${leader.color}`, paddingLeft: 20 }}>
+                    <p style={{ fontSize: 15, color: "var(--ink-soft)", lineHeight: 1.85, fontStyle: "normal", borderLeft: `3px solid ${leader.color}`, paddingLeft: 20 }}>
                       &ldquo;{leader.philosophy}&rdquo;
                     </p>
                     <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.8 }}>

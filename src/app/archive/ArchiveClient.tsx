@@ -39,7 +39,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("tab") as TabType | null) ?? "reviews";
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
-  const [photoFilter, setPhotoFilter] = useState<"all" | "text" | "photo">("all");
+  const [photoFilter, setPhotoFilter] = useState<"all" | "text" | "photo" | "video">("all");
 
   useEffect(() => {
     const tab = searchParams.get("tab") as TabType | null;
@@ -65,7 +65,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
         background: "linear-gradient(to bottom, var(--bg-soft), var(--bg))",
       }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
-          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--muted)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic", marginBottom: 20 }}>
+          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--muted)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "normal", marginBottom: 20 }}>
             Archiving — 아카이빙
           </div>
           <h1 style={{
@@ -75,7 +75,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
             color: "var(--ink)", marginBottom: 16,
           }}>
             질문과 독서의<br />
-            <em style={{ fontStyle: "italic", color: "var(--accent)", fontFamily: '"EB Garamond", Georgia, serif' }}>기록</em>.
+            <span style={{ color: "var(--accent)", fontWeight: 600 }}>기록</span>.
           </h1>
           <p style={{ fontSize: 16, color: "var(--muted)", lineHeight: 1.75, maxWidth: 480, marginBottom: 40 }}>
             지나간 시즌의 질문들, 후기들, 발제문들, 그리고 북토크의 기록.
@@ -136,7 +136,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
             />
 
             <div style={{ display: "flex", gap: 8, marginBottom: 32, flexWrap: "wrap" }}>
-              {(["all", "text", "photo"] as const).map((f) => (
+              {(["all", "text", "photo", "video"] as const).map((f) => (
                 <button key={f} onClick={() => setPhotoFilter(f)} style={{
                   padding: "7px 18px", borderRadius: 9999, fontSize: 13.5,
                   fontWeight: photoFilter === f ? 500 : 400,
@@ -145,7 +145,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                   border: photoFilter === f ? "1px solid var(--ink)" : "1px solid var(--line)",
                   cursor: "pointer", transition: "all 0.2s",
                 }}>
-                  {{ all: "전체", text: "텍스트", photo: "사진" }[f]}
+                  {{ all: "전체", text: "텍스트", photo: "사진", video: "영상" }[f as "all" | "text" | "photo" | "video"]}
                 </button>
               ))}
             </div>
@@ -170,6 +170,20 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                         <Image src={review.photo_url} alt="후기 사진" fill style={{ objectFit: "cover" }} sizes="(max-width:640px) 100vw, 33vw" />
                       </div>
                     )}
+                    {review.video_url && !review.photo_url && (
+                      <div style={{ position: "relative", overflow: "hidden", background: "#000", borderRadius: "12px 12px 0 0" }}>
+                        {review.video_url.includes("youtube.com") || review.video_url.includes("youtu.be") ? (
+                          <iframe
+                            src={review.video_url.replace("watch?v=", "embed/").replace("youtu.be/", "www.youtube.com/embed/")}
+                            style={{ width: "100%", height: 192, border: "none" }}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        ) : (
+                          <video src={review.video_url} controls style={{ width: "100%", maxHeight: 240 }} />
+                        )}
+                      </div>
+                    )}
                     <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -183,7 +197,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                         <LikeButton reviewId={review.id} likes={review.likes ?? 0} />
                       </div>
                       {review.quote && (
-                        <blockquote style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 14, color: "var(--ink)", borderLeft: "2px solid var(--accent)", paddingLeft: 12, fontStyle: "italic" }}>
+                        <blockquote style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 14, color: "var(--ink)", borderLeft: "2px solid var(--accent)", paddingLeft: 12, fontStyle: "normal" }}>
                           &ldquo;{review.quote}&rdquo;
                         </blockquote>
                       )}
@@ -209,7 +223,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
               }}>
                 <span style={{
                   fontFamily: '"EB Garamond", Georgia, serif',
-                  fontSize: 36, fontStyle: "italic",
+                  fontSize: 36, fontStyle: "normal",
                   color: "var(--accent)", opacity: 0.3,
                   lineHeight: 1, flexShrink: 0,
                 }}>
@@ -266,7 +280,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                         background: "rgba(255,255,255,0.5)",
                         border: "1px solid var(--line-soft)",
                       }}>
-                        <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 22, fontStyle: "italic", color: "var(--accent)", opacity: 0.4, lineHeight: 1, flexShrink: 0, minWidth: 20 }}>
+                        <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 22, fontStyle: "normal", color: "var(--accent)", opacity: 0.4, lineHeight: 1, flexShrink: 0, minWidth: 20 }}>
                           {String(i + 1)}
                         </span>
                         <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.6 }}>{q}</p>

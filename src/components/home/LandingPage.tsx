@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
+import { josa } from "@/lib/utils";
 import "./landing.css";
 
 // ─── Static data ──────────────────────────────────────────────
@@ -205,7 +206,7 @@ function LandingDiscussionGenerator() {
         <div className="lp-left">
           <div className="lp-eyebrow" style={{ color: "rgba(163,154,140,0.6)" }}>DISCUSSION GENERATOR — 발제 생성기</div>
           <h2 className="lp-h-section" style={{ color: "rgba(236,227,207,0.95)" }}>
-            키워드 하나로<br /><em>북클럽 발제</em>를 만들어드립니다.
+            키워드 하나로<br /><span className="lp-em">북클럽 발제</span>를 만들어드립니다.
           </h2>
         </div>
         <p className="lp-lede" style={{ color: "rgba(163,154,140,0.65)" }}>
@@ -261,7 +262,7 @@ function LandingDiscussionGenerator() {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {result.discussion_questions.map((q, i) => (
                 <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start", padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <span style={{ fontFamily: "var(--lp-serif)", fontSize: 24, fontStyle: "italic", color: "rgba(176,138,74,0.5)", lineHeight: 1, flexShrink: 0 }}>{i + 1}</span>
+                  <span style={{ fontFamily: "var(--lp-serif)", fontSize: 24, color: "rgba(176,138,74,0.5)", lineHeight: 1, flexShrink: 0 }}>{i + 1}</span>
                   <p style={{ fontSize: 15, color: "rgba(236,227,207,0.8)", lineHeight: 1.7 }}>{q}</p>
                 </div>
               ))}
@@ -435,7 +436,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             <div className="lp-right" />
           </div>
           <h1 className="lp-h-display">
-            <span className="lp-reveal"><span>좋은 <em>질문</em>은</span></span>
+            <span className="lp-reveal"><span>좋은 <span className="lp-em">질문</span>은</span></span>
             <span className="lp-reveal"><span>좋은 사람을 데려옵니다.</span></span>
           </h1>
           <div className="lp-hero-sub">
@@ -497,7 +498,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           <div className="lp-left">
             <div className="lp-eyebrow">BOOK LOVERS 책을 건네는 마음</div>
             <h2 className="lp-h-section">
-              이 책을 누군가에게<br /><em>꼭 건네고</em> 싶었던 이유.
+              이 책을 누군가에게<br /><span className="lp-em">꼭 건네고</span> 싶었던 이유.
             </h2>
           </div>
           <p className="lp-lede">
@@ -528,7 +529,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               </div>
               <div className="lp-book-info">
                 <div className="bi-tag">{b.tag}</div>
-                <p className="bi-rec">— {b.recommender}이 건넵니다</p>
+                <p className="bi-rec">— {josa(b.recommender ?? "", "이가")} 건넵니다</p>
                 <p className="bi-reason">{b.reason}</p>
                 <div className="lp-emotion-tags">
                   {b.emotionTags?.map((t) => <span key={t}>{t}</span>)}
@@ -570,7 +571,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
                   <div className={`lp-mini-spine ${b.color}`} />
                   <div className="lp-mini-body">
                     <div className="lp-mini-title">{b.title}</div>
-                    <div className="lp-mini-rec">— {b.recommender}이 이끌어요</div>
+                    <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어요</div>
                     <div className="lp-mini-meta">
                       <span className="lp-mini-tag">{b.tag}</span>
                       <span className="lp-mini-members">
@@ -591,7 +592,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           <div className="lp-left">
             <div className="lp-eyebrow">ARCHIVING — 사람, 변화, 성장, 기록</div>
             <h2 className="lp-h-section">
-              한 시즌이 지나면<br /><em>한 사람이</em> 바뀝니다.
+              한 시즌이 지나면<br /><span className="lp-em">한 사람이</span> 바뀝니다.
             </h2>
           </div>
           <p className="lp-lede">
@@ -627,7 +628,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         <article className="lp-season-feature">
           <div>
             <div className="lp-season-num">Season 04 · Now playing</div>
-            <h3 className="lp-season-title">외로움 <em>시즌</em></h3>
+            <h3 className="lp-season-title">외로움 <span className="lp-em">시즌</span></h3>
             <p className="lp-lede">
               혼자 있어도 외롭지 않은 사람과, 함께 있어도 외로운 사람.
               이 시즌은 그 두 사람 사이의 거리를 다룹니다.
@@ -679,7 +680,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           <div className="lp-left">
             <div className="lp-eyebrow">QUESAPIENCE 질문을 던지는 사람들</div>
             <h2 className="lp-h-section">
-              Quesapience,<br /><em>질문하는</em> 사람들.
+              Quesapience,<br /><span className="lp-em">질문하는</span> 사람들.
             </h2>
           </div>
           <p className="lp-lede">
@@ -710,7 +711,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             <div className="lp-eyebrow">Today&apos;s Question — 오늘의 질문</div>
             <h2 className="lp-h-section">
               하루에 한 번,<br />
-              <em>마음을 흔드는</em> 질문.
+              <span className="lp-em">마음을 흔드는</span> 질문.
             </h2>
           </div>
           <p className="lp-lede">
@@ -782,7 +783,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         <div className="lp-ask-inner">
           <div className="lp-eyebrow">A QUESTION — 질문 남기기</div>
           <h2 className="lp-h-section">
-            당신 마음 속에<br /><em>오래 남아 있던</em> 질문은.
+            당신 마음 속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.
           </h2>
           <p className="lp-lede">
             정답을 모으는 곳이 아닙니다. 좋은 질문 하나는, 때로 한 사람을 살립니다.
@@ -846,7 +847,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
       {/* 4개 섹션 네비게이션 카드 */}
       <section style={{ padding: "80px 0", background: "var(--lp-bg-soft, #ECE5D7)" }}>
         <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 clamp(24px,5vw,72px)" }}>
-          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--lp-muted)", fontFamily: "var(--lp-serif)", fontStyle: "italic", marginBottom: 40, textAlign: "center" }}>
+          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--lp-muted)", fontFamily: "var(--lp-serif)", marginBottom: 40, textAlign: "center" }}>
             Explore — 탐색하기
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
@@ -880,7 +881,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
                     background: item.color,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 18, color: "rgba(255,255,255,0.85)",
-                    fontFamily: "var(--lp-serif)", fontStyle: "italic",
+                    fontFamily: "var(--lp-serif)",
                     marginBottom: 16,
                   }}>
                     {item.mark}
@@ -902,12 +903,12 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
       <section className="lp-final" id="final">
         <div className="lp-eyebrow">AT HEART</div>
         <p className="lp-final-quote">
-          질문은<br />가장 <em>인간적인</em><br />대화의 시작입니다.
+          질문은<br />가장 <span className="lp-em">인간적인</span><br />대화의 시작입니다.
         </p>
         <div className="lp-final-divider" />
         <p className="lp-final-end">
-          누군가는 <em>답</em>으로 기억되고,<br />
-          누군가는 <em>질문</em>으로 남습니다.
+          누군가는 <span className="lp-em">답</span>으로 기억되고,<br />
+          누군가는 <span className="lp-em">질문</span>으로 남습니다.
         </p>
         <a href="/bookclub" className="lp-btn-cream">
           <span>지금 참여하기</span>
@@ -918,7 +919,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
       {/* FOOTER */}
       <footer className="lp-footer">
         <div className="lp-foot-inner">
-          <div className="lp-foot-mark"><em>—</em>질문하는 사람들 · 미래혁신형 북클럽</div>
+          <div className="lp-foot-mark"><span className="lp-em">—</span>질문하는 사람들 · 미래혁신형 북클럽</div>
           <div className="lp-foot-links">
             <a href="/questions">질문</a>
             <a href="/bookclub">북클럽</a>

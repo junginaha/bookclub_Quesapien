@@ -131,14 +131,14 @@ export default function Header() {
               <span style={{
                 color: "var(--accent)",
                 fontFamily: '"EB Garamond", Georgia, serif',
-                fontStyle: "italic",
+                fontStyle: "normal",
                 animation: "markBreathe 3.8s ease-in-out infinite",
                 transformOrigin: "center",
               }}>?</span>
               <span style={{
                 color: "var(--ink)",
                 fontFamily: '"EB Garamond", Georgia, serif',
-                fontStyle: "italic",
+                fontStyle: "normal",
                 animation: "markBob 2.6s ease-in-out infinite",
                 transformOrigin: "center",
               }}>!</span>
@@ -156,7 +156,7 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <nav ref={navRef} style={{ display: "none", alignItems: "center", gap: 0 }} className="md:flex">
-            {navItems.map((item) => (
+            {navItems.map((item, idx) => (
               <div
                 key={item.href}
                 style={{ position: "relative" }}
@@ -165,6 +165,7 @@ export default function Header() {
               >
                 <Link
                   href={item.href}
+                  className={idx === 0 ? "nav-glow" : idx === 1 ? "nav-glow-d1" : idx === 2 ? "nav-glow-d2" : "nav-glow-d3"}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",

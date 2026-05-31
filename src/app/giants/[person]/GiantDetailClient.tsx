@@ -44,6 +44,34 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const starters = STARTER_QUESTIONS[giant.slug] ?? STARTER_QUESTIONS.default;
+  const [discResult, setDiscResult] = useState<{
+    statement: string;
+    discussion_questions: string[];
+    icebreaker_questions: string[];
+    recommended_books: { title: string; author: string; description: string }[];
+  } | null>(null);
+  const [discStatus, setDiscStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+
+  const generateDiscussion = async () => {
+    if (messages.length === 0) return;
+    setDiscStatus("loading");
+    setDiscResult(null);
+    try {
+      const context = messages.map((m) => `${m.role === "user" ? "Q" : giant.name}: ${m.content}`).join("\n");
+      const keyword = giant.name + " " + (messages[0]?.content?.slice(0, 30) ?? "");
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keyword, context }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setDiscResult(data);
+      setDiscStatus("done");
+    } catch {
+      setDiscStatus("error");
+    }
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -121,7 +149,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
             </Link>
 
             <div style={{ maxWidth: 720 }}>
-              <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic", marginBottom: 16 }}>
+              <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "normal", marginBottom: 16 }}>
                 {giant.nationality} · {giant.birth_year}–{giant.death_year ?? "현재"}
               </div>
               <h1 style={{
@@ -133,7 +161,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
               }}>
                 {giant.name}
               </h1>
-              <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.5)", fontStyle: "italic", marginBottom: 24 }}>
+              <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.5)", fontStyle: "normal", marginBottom: 24 }}>
                 {giant.name_en}
               </p>
               <p style={{
@@ -141,7 +169,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                 fontSize: 20, color: "rgba(255,255,255,0.8)",
                 lineHeight: 1.65, maxWidth: 580,
                 borderLeft: "2px solid rgba(255,255,255,0.3)", paddingLeft: 20,
-                fontStyle: "italic",
+                fontStyle: "normal",
               }}>
                 &ldquo;{giant.signature_quote}&rdquo;
               </p>
@@ -155,7 +183,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
             <div style={{ display: "flex", gap: 0 }}>
               {[
                 { key: "about", label: "사상 & 저서", icon: <BookOpen size={15} /> },
-                { key: "chat", label: `${giant.name}의 관점`, icon: <MessageSquare size={15} /> },
+                { key: "chat", label: "대화 & 발제", icon: <MessageSquare size={15} /> },
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -211,7 +239,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                       }}>
                         <span style={{
                           fontFamily: '"EB Garamond", Georgia, serif',
-                          fontSize: 28, fontStyle: "italic",
+                          fontSize: 28, fontStyle: "normal",
                           color: giant.color, opacity: 0.4,
                           lineHeight: 1, flexShrink: 0,
                         }}>
@@ -246,7 +274,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                       >
                         <span style={{
                           fontFamily: '"EB Garamond", Georgia, serif',
-                          fontSize: 32, fontStyle: "italic",
+                          fontSize: 32, fontStyle: "normal",
                           color: giant.color, opacity: 0.35, flexShrink: 0, lineHeight: 1,
                         }}>
                           Q
@@ -345,7 +373,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                         <div style={{ fontSize: 14, fontWeight: 500, color: "var(--ink)", marginBottom: 8 }}>
                           {giant.name}
                         </div>
-                        <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.75, fontStyle: "italic" }}>
+                        <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.75, fontStyle: "normal" }}>
                           &ldquo;{giant.signature_quote}&rdquo;
                         </p>
                       </div>
@@ -490,6 +518,70 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                   {giant.name}의 저서와 사상을 바탕으로 그의 관점에서 답합니다.
                 </p>
               </form>
+
+              {/* ── 발제 생성하기 ── */}
+              {messages.length > 0 && (
+                <div style={{ marginTop: 32, padding: "24px 28px", borderRadius: 16, background: "rgba(255,255,255,0.5)", border: "1px solid var(--line-soft)" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 4 }}>Discussion Generator</div>
+                      <p style={{ fontSize: 14, color: "var(--ink-soft)" }}>이 대화를 바탕으로 북클럽 발제문을 생성합니다.</p>
+                    </div>
+                    <button
+                      onClick={generateDiscussion}
+                      disabled={discStatus === "loading"}
+                      style={{
+                        padding: "10px 20px", borderRadius: 9999,
+                        background: discStatus === "loading" ? "var(--line-soft)" : giant.color,
+                        color: "white", border: "none", cursor: discStatus === "loading" ? "not-allowed" : "pointer",
+                        fontSize: 13.5, fontWeight: 500, transition: "opacity 0.2s",
+                        display: "flex", alignItems: "center", gap: 8,
+                      }}
+                    >
+                      {discStatus === "loading" ? (
+                        <><Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} /> 생성 중…</>
+                      ) : "이 대화로 발제 생성하기"}
+                    </button>
+                  </div>
+                  {discStatus === "error" && (
+                    <p style={{ fontSize: 13, color: "#EF4444", marginTop: 8 }}>잠시 후 다시 시도해 주세요.</p>
+                  )}
+                  {discStatus === "done" && discResult && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 20, marginTop: 20 }}>
+                      <div style={{ padding: "16px 20px", borderRadius: 12, background: "rgba(255,255,255,0.6)", border: "1px solid var(--line-soft)" }}>
+                        <div style={{ fontSize: 10.5, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 10 }}>발제문</div>
+                        <p style={{ fontSize: 15, color: "var(--ink-soft)", lineHeight: 1.8 }}>{discResult.statement}</p>
+                      </div>
+                      {discResult.discussion_questions.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 10.5, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 12 }}>토론 질문</div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                            {discResult.discussion_questions.map((q, i) => (
+                              <div key={i} style={{ display: "flex", gap: 12, padding: "12px 16px", borderRadius: 10, background: "rgba(255,255,255,0.5)", border: "1px solid var(--line-soft)" }}>
+                                <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 20, color: giant.color, opacity: 0.5, flexShrink: 0, lineHeight: 1 }}>{i + 1}</span>
+                                <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.65 }}>{q}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {discResult.recommended_books?.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 10.5, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 12 }}>추천 도서</div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                            {discResult.recommended_books.map((b, i) => (
+                              <div key={i} style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(255,255,255,0.4)", border: "1px solid var(--line-soft)" }}>
+                                <div style={{ fontSize: 14, fontWeight: 500, color: "var(--ink)", marginBottom: 2 }}>{b.title} <span style={{ fontWeight: 400, color: "var(--muted)", fontSize: 12 }}>— {b.author}</span></div>
+                                <p style={{ fontSize: 12.5, color: "var(--muted)", lineHeight: 1.5 }}>{b.description}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
