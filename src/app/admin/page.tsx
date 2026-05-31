@@ -7,12 +7,10 @@ export default async function AdminPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // 관리자 확인 (이메일 기반)
   const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "junginaha@gmail.com").split(",");
   if (!ADMIN_EMAILS.includes(user.email ?? "")) redirect("/");
 
-  // 관리자 데이터 로드
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const db = supabase as any;
 
   const [
@@ -20,12 +18,21 @@ export default async function AdminPage() {
     { data: questions },
     { data: sessions },
     { data: reviews },
+    { data: applications },
+    { data: landingQuestions },
   ] = await Promise.all([
     db.from("profiles").select("*").order("joined_at", { ascending: false }),
     db.from("questions").select("*, author:profiles(name,email)").order("created_at", { ascending: false }),
     db.from("sessions").select("*, question:questions(title), host:profiles(name)").order("created_at", { ascending: false }),
     db.from("reviews").select("*, author:profiles(name)").order("created_at", { ascending: false }),
+    // bookclub_applications — may not exist yet, graceful fallback
+    db.from("bookclub_applications").select("*").order("created_at", { ascending: false }).then(
+      (r: any) => r,
+      () => ({ data: [] })
+    ),
+    db.from("landing_questions").select("*").eq("is_approved", false).order("created_at", { ascending: false }),
   ]);
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   return (
     <AdminClient
@@ -33,6 +40,8 @@ export default async function AdminPage() {
       questions={questions ?? []}
       sessions={sessions ?? []}
       reviews={reviews ?? []}
+      applications={applications ?? []}
+      landingQuestions={landingQuestions ?? []}
       adminEmail={user.email ?? ""}
     />
   );

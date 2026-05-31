@@ -622,6 +622,61 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
+      {/* 4개 섹션 네비게이션 카드 */}
+      <section style={{ padding: "80px 0", background: "var(--lp-bg-soft, #ECE5D7)" }}>
+        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 clamp(24px,5vw,72px)" }}>
+          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--lp-muted)", fontFamily: "var(--lp-serif)", fontStyle: "italic", marginBottom: 40, textAlign: "center" }}>
+            Explore — 탐색하기
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
+            {[
+              { href: "/questions", label: "질문", sub: "오늘의 질문 · 인기 질문 · 질문 아카이브", color: "#5E4632", mark: "Q" },
+              { href: "/bookclub", label: "북클럽", sub: "오프라인 북토크 · 리더 소개 · 참가 신청", color: "#1B2536", mark: "B" },
+              { href: "/archive", label: "아카이빙", sub: "후기 · 발제문 · 북토크 기록", color: "#5C6B3A", mark: "A" },
+              { href: "/giants", label: "거인의 어깨", sub: "위대한 사유자 · AI 대화 · 사상 탐구", color: "#553C2A", mark: "G" },
+            ].map((item) => (
+              <a key={item.href} href={item.href} style={{ textDecoration: "none", display: "block" }}>
+                <div style={{
+                  padding: "28px", borderRadius: 14,
+                  background: "rgba(255,255,255,0.5)",
+                  border: "1px solid var(--lp-line-soft)",
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                  cursor: "pointer",
+                }}
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.transform = "translateY(-3px)";
+                    el.style.boxShadow = "0 12px 32px rgba(28,31,38,0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.transform = "translateY(0)";
+                    el.style.boxShadow = "none";
+                  }}
+                >
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 10,
+                    background: item.color,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 18, color: "rgba(255,255,255,0.85)",
+                    fontFamily: "var(--lp-serif)", fontStyle: "italic",
+                    marginBottom: 16,
+                  }}>
+                    {item.mark}
+                  </div>
+                  <div style={{ fontFamily: "var(--lp-serif-ko)", fontSize: 20, fontWeight: 400, color: "var(--lp-ink)", marginBottom: 6 }}>
+                    {item.label}
+                  </div>
+                  <div style={{ fontSize: 13, color: "var(--lp-muted)", lineHeight: 1.65 }}>
+                    {item.sub}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FINAL CTA */}
       <section className="lp-final" id="final">
         <div className="lp-eyebrow">AT HEART</div>

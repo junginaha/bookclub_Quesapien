@@ -17,17 +17,19 @@ import { formatDate } from "@/lib/utils";
 type Row = any;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-type Tab = "overview" | "users" | "questions" | "sessions" | "reviews";
+type Tab = "overview" | "users" | "questions" | "sessions" | "reviews" | "applications" | "landing_questions";
 
 interface Props {
   profiles: Row[];
   questions: Row[];
   sessions: Row[];
   reviews: Row[];
+  applications?: Row[];
+  landingQuestions?: Row[];
   adminEmail: string;
 }
 
-export default function AdminClient({ profiles, questions, sessions, reviews, adminEmail }: Props) {
+export default function AdminClient({ profiles, questions, sessions, reviews, applications = [], landingQuestions = [], adminEmail }: Props) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("overview");
   const [pending, startTransition] = useTransition();
@@ -37,6 +39,8 @@ export default function AdminClient({ profiles, questions, sessions, reviews, ad
     { label: "발제 질문", value: questions.length, icon: BookOpen, color: "bg-amber-50 text-amber-600" },
     { label: "모임", value: sessions.length, icon: Calendar, color: "bg-emerald-50 text-emerald-600" },
     { label: "후기", value: reviews.length, icon: MessageSquare, color: "bg-purple-50 text-purple-600" },
+    { label: "북클럽 신청", value: applications.length, icon: CheckCircle, color: "bg-emerald-50 text-emerald-600" },
+    { label: "미승인 질문", value: landingQuestions.length, icon: Star, color: "bg-orange-50 text-orange-600" },
   ];
 
   const callAdmin = async (action: string, id: string, extra?: Record<string, unknown>) => {
@@ -58,12 +62,14 @@ export default function AdminClient({ profiles, questions, sessions, reviews, ad
     });
   };
 
-  const TABS: { key: Tab; label: string }[] = [
+  const TABS: { key: Tab; label: string; badge?: number }[] = [
     { key: "overview", label: "대시보드" },
     { key: "users", label: `가입자 (${profiles.length})` },
-    { key: "questions", label: `질문 (${questions.length})` },
+    { key: "questions", label: `발제질문 (${questions.length})` },
     { key: "sessions", label: `모임 (${sessions.length})` },
     { key: "reviews", label: `후기 (${reviews.length})` },
+    { key: "applications", label: "북클럽 신청", badge: applications.filter((a) => a.status === "pending").length },
+    { key: "landing_questions", label: "질문 승인", badge: landingQuestions.length },
   ];
 
   return (
@@ -90,12 +96,17 @@ export default function AdminClient({ profiles, questions, sessions, reviews, ad
         <div className="flex gap-1 overflow-x-auto no-scrollbar">
           {TABS.map((t) => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={`px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+              className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                 tab === t.key
                   ? "border-warm-900 text-warm-900"
                   : "border-transparent text-warm-400 hover:text-warm-700"
               }`}>
               {t.label}
+              {t.badge != null && t.badge > 0 && (
+                <span className="min-w-4 h-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] px-1">
+                  {t.badge}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -336,6 +347,83 @@ export default function AdminClient({ profiles, questions, sessions, reviews, ad
               </tbody>
             </table>
             {reviews.length === 0 && <p className="text-center py-12 text-warm-400 text-sm">후기가 없습니다.</p>}
+          </div>
+        )}
+
+        {/* ── 북클럽 신청 탭 ── */}
+        {tab === "applications" && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-serif text-lg font-semibold text-warm-900">북클럽 신청 ({applications.length})</h2>
+              <span className="text-xs text-warm-400">pending: {applications.filter((a) => a.status === "pending").length}건</span>
+            </div>
+            {applications.length === 0 ? (
+              <p className="text-center py-12 text-warm-400 text-sm">신청이 없습니다.</p>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-warm-100">
+                <table className="w-full text-sm">
+                  <thead className="bg-warm-50 border-b border-warm-100">
+                    <tr>
+                      {["신청일", "북클럽", "이름", "이메일", "메시지", "상태"].map((h) => (
+                        <th key={h} className="text-left py-3 px-4 text-warm-500 font-medium">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-warm-50">
+                    {applications.map((a) => (
+                      <tr key={a.id} className="hover:bg-warm-50 transition-colors">
+                        <td className="py-3 px-4 text-warm-400 whitespace-nowrap">{formatDate(a.created_at)}</td>
+                        <td className="py-3 px-4 font-medium text-warm-900">{a.club_slug}</td>
+                        <td className="py-3 px-4 text-warm-700">{a.applicant_name}</td>
+                        <td className="py-3 px-4 text-warm-500">{a.applicant_email}</td>
+                        <td className="py-3 px-4 text-warm-400 max-w-xs truncate">{a.message ?? "—"}</td>
+                        <td className="py-3 px-4">
+                          <Badge variant={a.status === "pending" ? "secondary" : "default"} className="text-xs">
+                            {a.status === "pending" ? "대기" : a.status === "confirmed" ? "확정" : "거절"}
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── 랜딩 질문 승인 탭 ── */}
+        {tab === "landing_questions" && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-serif text-lg font-semibold text-warm-900">미승인 질문 ({landingQuestions.length})</h2>
+            </div>
+            {landingQuestions.length === 0 ? (
+              <p className="text-center py-12 text-warm-400 text-sm">승인 대기 중인 질문이 없습니다.</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {landingQuestions.map((q) => (
+                  <div key={q.id} className="rounded-xl border border-warm-100 p-4 bg-white flex items-start gap-4">
+                    <div className="flex-1">
+                      <p className="font-serif text-base text-warm-900 mb-1">{q.content}</p>
+                      <div className="flex gap-3 text-xs text-warm-400">
+                        <span>— {q.author_name}</span>
+                        <span>{formatDate(q.created_at)}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <Button size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                        onClick={async () => { const ok = await callAdmin("approve_landing_question", q.id); if (ok) router.refresh(); }}>
+                        <CheckCircle className="h-3.5 w-3.5" />승인
+                      </Button>
+                      <Button size="sm" variant="outline" className="gap-1 text-red-500 border-red-200 hover:bg-red-50"
+                        onClick={async () => { const ok = await callAdmin("reject_landing_question", q.id); if (ok) router.refresh(); }}>
+                        <XCircle className="h-3.5 w-3.5" />거절
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

@@ -66,6 +66,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
+    case "approve_landing_question": {
+      const { error } = await db
+        .from("landing_questions")
+        .update({ is_approved: true })
+        .eq("id", id);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: true });
+    }
+
+    case "reject_landing_question": {
+      const { error } = await db.from("landing_questions").delete().eq("id", id);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: true });
+    }
+
+    case "confirm_application": {
+      const { error } = await db
+        .from("bookclub_applications")
+        .update({ status: "confirmed" })
+        .eq("id", id);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: true });
+    }
+
     default:
       return NextResponse.json({ error: "알 수 없는 액션입니다." }, { status: 400 });
   }

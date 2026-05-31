@@ -11,13 +11,13 @@
   "categories": ["education", "books", "social"],
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/icon-192",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icon-512",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
@@ -29,14 +29,14 @@
       "short_name": "질문",
       "description": "오늘의 질문 보기",
       "url": "/questions",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-192", "sizes": "192x192" }]
     },
     {
       "name": "북클럽 일정",
       "short_name": "북클럽",
       "description": "진행 중인 북토크 확인",
       "url": "/bookclub",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-192", "sizes": "192x192" }]
     }
   ]
 }
