@@ -10,7 +10,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 export const metadata: Metadata = buildMetadata({
   title: "거인의 어깨 — 위대한 사유자와 대화",
   description:
-    "거인의 어깨는 니체, 칸트, 한강, 유발 하라리 등 위대한 저자와 사상가의 저서를 기반으로 AI가 그들의 관점에서 대화하는 지식 탐험 공간입니다.",
+    "거인의 어깨는 니체, 칸트, 한강, 유발 하라리 등 위대한 저자와 사상가의 저서와 사상을 바탕으로 그들의 관점을 탐구하는 지식 공간입니다.",
   path: "/giants",
   type: "website",
   keywords: ["니체", "칸트", "한강", "유발하라리", "피터드러커", "철학자", "사상가", "AI대화", "거인의어깨"],
@@ -21,7 +21,7 @@ const collectionLd = {
   "@type": "CollectionPage",
   name: "거인의 어깨 — 질문하는 사람들",
   description:
-    "니체, 칸트, 한강, 유발 하라리 등 위대한 저자와 사상가의 저서를 기반으로 AI와 대화하는 지식 탐험 공간",
+    "니체, 칸트, 한강, 유발 하라리 등 위대한 저자와 사상가의 저서와 사상을 바탕으로 그들의 관점을 탐구하는 지식 공간",
   url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://quesapience.com"}/giants`,
   about: [
     { "@type": "Person", name: "프리드리히 니체", alternateName: "Friedrich Nietzsche" },
@@ -42,7 +42,7 @@ export default function GiantsPage() {
 
       {/* Stage 4: AI Friendly Definition Block */}
       <DefinitionBlock
-        definition="거인의 어깨는 니체, 칸트, 한강 등 위대한 저자와 사상가의 저서를 기반으로 AI가 그들의 관점에서 질문에 답하는 지식 탐험 공간이다."
+        definition="거인의 어깨는 니체, 칸트, 한강 등 위대한 저자와 사상가의 저서를 기반으로 위대한 저자의 사상을 바탕으로 그들의 언어로 깊이 있는 대화를 나눌 수 있는 공간이다."
         entityType="KnowledgeExplorer"
       />
 

@@ -155,7 +155,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
             <div style={{ display: "flex", gap: 0 }}>
               {[
                 { key: "about", label: "사상 & 저서", icon: <BookOpen size={15} /> },
-                { key: "chat", label: `${giant.name}와 대화`, icon: <MessageSquare size={15} /> },
+                { key: "chat", label: `${giant.name}의 관점`, icon: <MessageSquare size={15} /> },
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -269,10 +269,10 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                   background: giant.color, color: "white",
                 }}>
                   <div style={{ fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)", marginBottom: 16 }}>
-                    AI와 대화하기
+                    사상 탐구하기
                   </div>
                   <p style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", lineHeight: 1.75, marginBottom: 20 }}>
-                    {giant.name}의 저서를 기반으로 AI가 그의 관점에서 당신의 질문에 답합니다.
+                    {giant.name}의 저서와 사상을 바탕으로 그의 언어와 논리로 답합니다.
                   </p>
                   <button
                     onClick={() => setActiveTab("chat")}
@@ -353,7 +353,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                   </div>
 
                   <div style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 16 }}>
-                    — 이런 질문을 던져보세요
+                    — {giant.name}에게 묻고 싶은 것을 적어보세요
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {starters.map((q) => (
@@ -462,7 +462,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                       e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
                     }}
                     onKeyDown={handleKeyDown}
-                    placeholder={`${giant.name}에게 질문하세요...`}
+                    placeholder={`${giant.name}에게 묻고 싶은 것을 적어보세요.`}
                     rows={1}
                     style={{
                       flex: 1, background: "none", border: "none", outline: "none",
@@ -487,7 +487,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                   </button>
                 </div>
                 <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>
-                  {giant.name}의 저서를 기반으로 AI가 응답합니다. 실제 발언이 아닌 창의적 해석임을 참고하세요.
+                  {giant.name}의 저서와 사상을 바탕으로 그의 관점에서 답합니다.
                 </p>
               </form>
             </div>

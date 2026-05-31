@@ -61,7 +61,7 @@ export default function GiantsClient() {
           </h1>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.55)", lineHeight: 1.75, maxWidth: 520, marginBottom: 48 }}>
             니체는 내 질문에 어떻게 답할까? 한강이라면 이 상황을 어떻게 바라볼까?<br />
-            그들의 저서를 기반으로 AI가 그들의 언어로 당신에게 답합니다.
+            그들의 저서와 사상을 바탕으로, 그들의 언어로 당신의 질문에 답합니다.
           </p>
 
           {/* Search */}
@@ -211,7 +211,7 @@ export default function GiantsClient() {
                           paddingTop: 12, borderTop: "1px solid var(--line-soft)",
                         }}>
                           <span style={{ fontSize: 12.5, color: giant.color, fontWeight: 500 }}>
-                            AI와 대화하기
+                            {giant.name}의 관점 탐구
                           </span>
                           <ChevronRight size={15} style={{ color: "var(--muted)" }} />
                         </div>

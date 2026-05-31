@@ -6,12 +6,91 @@ import "./landing.css";
 
 // ─── Static data ──────────────────────────────────────────────
 const books: BookClub[] = [
-  { color: "navy", genre: "NEW", slug: "최신간-북토크", title: "최신간 북토크, 핫한 문장들", author: "Quesapience", tag: "#신간 #트렌드", recommender: "Q5", reason: "새벽 세 시에 깨어 있는 사람만 아는 문장이 여기 있습니다. 잠들지 못한 누군가에게 이 책이 곁에 있다고 말해주고 싶었어요.", emotionTags: ["#불면", "#회복", "#고요"] },
-  { color: "cream", genre: "ESSAY · 산문", slug: "다정함의-발명", title: "다정함의 발명", author: "허지영", tag: "#관계 · #사랑", recommender: "지영", reason: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 헤어진 친구에게 부치지 못한 편지처럼 읽었습니다.", emotionTags: ["#다정함", "#일상", "#연결"] },
-  { color: "rust", genre: "PHILOSOPHY", slug: "혼자라는-감각", title: "혼자라는 감각", author: "주성원", tag: "#외로움 · #인생전환", recommender: "성원", reason: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자 있는 것이 부끄럽지 않아진 첫 책이었어요.", emotionTags: ["#고독", "#성장", "#사유"] },
-  { color: "olive", genre: "MEMOIR · 회고", slug: "아무도-보지-않는-오후", title: "아무도 보지 않는 오후", author: "김범", tag: "#창업 · #번아웃", recommender: "범", reason: "실패한 사람이 아니라, 멈춰본 적 있는 사람의 문장. 무너졌던 시기에 이 책의 챕터 7이 저를 일으켰습니다.", emotionTags: ["#회복", "#쉼", "#용기"] },
-  { color: "dusk", genre: "POETRY · 시", slug: "오늘-저녁-당신께", title: "오늘 저녁, 당신께", author: "박상현", tag: "#사랑 · #이별", recommender: "상현", reason: "시집은 빠르게 읽지 않는 것이라고 가르쳐준 책. 한 페이지에서 일주일을 머문 적이 있어요.", emotionTags: ["#느림", "#이별", "#기억"] },
-  { color: "sage", genre: "NON-FICTION", slug: "인간이라는-풍경", title: "인간이라는 풍경", author: "한강", tag: "#인간 · #사유", recommender: "한강", reason: "인간을 풍경처럼 멀리서 바라보는 시선. 미워하던 사람을 다시 사람으로 보게 만드는 책입니다.", emotionTags: ["#관계", "#용서", "#거리"] },
+  {
+    color: "navy", genre: "NEW", slug: "최신간-북토크",
+    title: "최신간 북토크, 핫한 문장들", author: "Quesapience",
+    tag: "#신간 #트렌드", recommender: "Q5",
+    reason: "새벽 세 시에 깨어 있는 사람만 아는 문장이 여기 있습니다. 잠들지 못한 누군가에게 이 책이 곁에 있다고 말해주고 싶었어요.",
+    emotionTags: ["#불면", "#회복", "#고요"],
+    hostName: "정해린", hostIntro: "정답보다 진심을 믿습니다. 우리는 결론을 미루는 연습 중입니다.",
+    schedule: "2026년 6월 28일 (토) 오후 3시", location: "서울 서초구 교대역 인근",
+    joinUrl: "https://jemjem.site", maxParticipants: 8, currentParticipants: 3,
+    description: "새로 출간된 책들 중 가장 뜨거운 문장들을 함께 읽습니다. 매 회 다른 책, 같은 깊이의 질문.",
+    sessionDates: [{ date: "2026-06-28", topic: "왜 지금 이 문장인가" }],
+  },
+  {
+    color: "cream", genre: "ESSAY · 산문", slug: "다정함의-발명",
+    title: "다정함의 발명", author: "허지영",
+    tag: "#관계 · #사랑", recommender: "지영",
+    reason: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 헤어진 친구에게 부치지 못한 편지처럼 읽었습니다.",
+    emotionTags: ["#다정함", "#일상", "#연결"],
+    hostName: "정해린", hostIntro: "대화는 답을 찾는 과정이 아니라 함께 머무는 과정입니다.",
+    schedule: "2026년 6월 14일 (토) 오후 3시 – 5시 30분", location: "서울 서초구 서초동",
+    joinUrl: "https://jemjem.site", maxParticipants: 8, currentParticipants: 5,
+    description: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 우리가 일상에서 놓치고 있는 다정함의 순간들을 함께 발견합니다.",
+    sessionDates: [
+      { date: "2026-06-14", topic: "다정함의 정의" },
+      { date: "2026-06-28", topic: "다정함을 주고받는 방법" },
+    ],
+  },
+  {
+    color: "rust", genre: "PHILOSOPHY", slug: "혼자라는-감각",
+    title: "혼자라는 감각", author: "주성원",
+    tag: "#외로움 · #인생전환", recommender: "성원",
+    reason: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자 있는 것이 부끄럽지 않아진 첫 책이었어요.",
+    emotionTags: ["#고독", "#성장", "#사유"],
+    hostName: "서민준", hostIntro: "조용한 사람의 한 문장은 시끄러운 사람의 한 시간보다 길게 남습니다.",
+    schedule: "2026년 6월 21일 (토) 오후 2시 – 4시 30분", location: "서울 마포구 합정동",
+    joinUrl: "https://jemjem.site", maxParticipants: 6, currentParticipants: 4,
+    description: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자라는 감각이 두려움이 아닌 능력이 되는 공간을 함께 만들어봅니다.",
+    sessionDates: [
+      { date: "2026-06-21", topic: "고독의 의미" },
+    ],
+  },
+  {
+    color: "olive", genre: "MEMOIR · 회고", slug: "아무도-보지-않는-오후",
+    title: "아무도 보지 않는 오후", author: "김범",
+    tag: "#창업 · #번아웃", recommender: "범",
+    reason: "실패한 사람이 아니라, 멈춰본 적 있는 사람의 문장. 무너졌던 시기에 이 책의 챕터 7이 저를 일으켰습니다.",
+    emotionTags: ["#회복", "#쉼", "#용기"],
+    hostName: "유은재", hostIntro: "대화는 답을 찾는 일이 아니라, 함께 머무는 일입니다.",
+    schedule: "2026년 6월 28일 (토) 오후 4시 – 6시 30분", location: "서울 용산구 한남동",
+    joinUrl: "https://jemjem.site", maxParticipants: 10, currentParticipants: 3,
+    description: "실패한 사람이 아니라 멈춰본 적 있는 사람의 문장. 번아웃 이후를 살아가는 법을 함께 이야기합니다.",
+    sessionDates: [
+      { date: "2026-06-28", topic: "멈춤의 의미" },
+      { date: "2026-07-12", topic: "다시 시작하는 법" },
+    ],
+  },
+  {
+    color: "dusk", genre: "POETRY · 시", slug: "오늘-저녁-당신께",
+    title: "오늘 저녁, 당신께", author: "박상현",
+    tag: "#사랑 · #이별", recommender: "상현",
+    reason: "시집은 빠르게 읽지 않는 것이라고 가르쳐준 책. 한 페이지에서 일주일을 머문 적이 있어요.",
+    emotionTags: ["#느림", "#이별", "#기억"],
+    hostName: "서민준", hostIntro: "느리게 읽는 것의 가치를 믿습니다.",
+    schedule: "2026년 7월 12일 (토) 오후 6시 – 8시", location: "서울 종로구 부암동",
+    joinUrl: "https://jemjem.site", maxParticipants: 8, currentParticipants: 8,
+    description: "시집은 빠르게 읽지 않는 것이라고 가르쳐준 책. 한 줄의 시로 한 시간을 이야기하는 모임입니다.",
+    sessionDates: [
+      { date: "2026-07-12", topic: "이별을 기억하는 방법", closed: true },
+    ],
+  },
+  {
+    color: "sage", genre: "NON-FICTION", slug: "인간이라는-풍경",
+    title: "인간이라는 풍경", author: "한강",
+    tag: "#인간 · #사유", recommender: "한강",
+    reason: "인간을 풍경처럼 멀리서 바라보는 시선. 미워하던 사람을 다시 사람으로 보게 만드는 책입니다.",
+    emotionTags: ["#관계", "#용서", "#거리"],
+    hostName: "유은재", hostIntro: "모든 사람은 이해받아야 할 이유가 있습니다.",
+    schedule: "2026년 7월 19일 (토) 오후 2시 – 4시 30분", location: "서울 마포구 망원동",
+    joinUrl: "https://jemjem.site", maxParticipants: 10, currentParticipants: 2,
+    description: "인간을 풍경처럼 멀리서 바라보는 시선. 미워하던 사람을 다시 사람으로 보게 만드는 책을 함께 읽습니다.",
+    sessionDates: [
+      { date: "2026-07-19", topic: "인간이란 무엇인가" },
+      { date: "2026-08-02", topic: "용서와 거리" },
+    ],
+  },
 ];
 
 const miniBooks: BookClub[] = [
@@ -85,6 +164,145 @@ function FloatPopup({ color, title, sub, type, onOpen }: {
         </button>
       </div>
     </div>
+  );
+}
+
+// ─── 발제 생성기 컴포넌트 ─────────────────────────────────────
+function LandingDiscussionGenerator() {
+  const [keyword, setKeyword] = useState("");
+  const [result, setResult] = useState<{
+    statement: string;
+    discussion_questions: string[];
+    icebreaker_questions: string[];
+    recommended_books: { title: string; author: string; description: string }[];
+  } | null>(null);
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+
+  const handleGenerate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!keyword.trim()) return;
+    setStatus("loading");
+    setResult(null);
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keyword: keyword.trim() }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setResult(data);
+      setStatus("done");
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  return (
+    <section className="lp-section" id="generator" style={{ background: "var(--lp-bg-ink)", color: "var(--lp-cream)", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 70% 60% at 90% 10%, rgba(176,138,74,0.15), transparent 60%)" }} />
+      <div className="lp-section-head" style={{ position: "relative" }}>
+        <div className="lp-left">
+          <div className="lp-eyebrow" style={{ color: "rgba(163,154,140,0.6)" }}>DISCUSSION GENERATOR — 발제 생성기</div>
+          <h2 className="lp-h-section" style={{ color: "rgba(236,227,207,0.95)" }}>
+            키워드 하나로<br /><em>북클럽 발제</em>를 만들어드립니다.
+          </h2>
+        </div>
+        <p className="lp-lede" style={{ color: "rgba(163,154,140,0.65)" }}>
+          주제어를 입력하면 발제문, 토론 질문, 아이스브레이킹 질문, 추천 도서를 즉시 생성합니다.
+          리더를 위한 도구입니다.
+        </p>
+      </div>
+
+      <form onSubmit={handleGenerate} style={{ maxWidth: 600, position: "relative" }}>
+        <div style={{
+          display: "flex", gap: 10, alignItems: "stretch",
+          background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)",
+          borderRadius: 14, padding: "12px 16px",
+          marginBottom: 20,
+        }}>
+          <input
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="주제어를 입력하세요 — 예: 외로움, 번아웃, 사랑, 죽음"
+            style={{
+              flex: 1, background: "none", border: "none", outline: "none",
+              fontSize: 15, color: "rgba(236,227,207,0.9)",
+              fontFamily: "var(--lp-sans)",
+            }}
+          />
+          <button
+            type="submit"
+            disabled={!keyword.trim() || status === "loading"}
+            style={{
+              padding: "10px 22px", borderRadius: 10,
+              background: keyword.trim() ? "rgba(176,138,74,0.9)" : "rgba(255,255,255,0.1)",
+              color: keyword.trim() ? "var(--lp-bg-ink)" : "rgba(163,154,140,0.5)",
+              fontSize: 14, fontWeight: 600, border: "none", cursor: keyword.trim() ? "pointer" : "not-allowed",
+              whiteSpace: "nowrap", transition: "all 0.2s", flexShrink: 0,
+            }}
+          >
+            {status === "loading" ? "생성 중…" : "발제 생성"}
+          </button>
+        </div>
+      </form>
+
+      {status === "done" && result && (
+        <div style={{ maxWidth: 720, position: "relative", display: "flex", flexDirection: "column", gap: 28 }}>
+          {/* 발제문 */}
+          <div style={{ padding: "24px 28px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
+            <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(163,154,140,0.5)", marginBottom: 12 }}>발제문</div>
+            <p style={{ fontFamily: "var(--lp-serif-ko)", fontSize: 17, color: "rgba(236,227,207,0.9)", lineHeight: 1.85 }}>{result.statement}</p>
+          </div>
+
+          {/* 토론 질문 */}
+          <div>
+            <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(163,154,140,0.5)", marginBottom: 14 }}>토론 질문</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {result.discussion_questions.map((q, i) => (
+                <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start", padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <span style={{ fontFamily: "var(--lp-serif)", fontSize: 24, fontStyle: "italic", color: "rgba(176,138,74,0.5)", lineHeight: 1, flexShrink: 0 }}>{i + 1}</span>
+                  <p style={{ fontSize: 15, color: "rgba(236,227,207,0.8)", lineHeight: 1.7 }}>{q}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 아이스브레이킹 */}
+          {result.icebreaker_questions?.length > 0 && (
+            <div>
+              <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(163,154,140,0.5)", marginBottom: 12 }}>아이스브레이킹</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {result.icebreaker_questions.map((q, i) => (
+                  <p key={i} style={{ fontSize: 14, color: "rgba(163,154,140,0.7)", lineHeight: 1.65, paddingLeft: 14, borderLeft: "1px solid rgba(176,138,74,0.4)" }}>{q}</p>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 추천 도서 */}
+          {result.recommended_books?.length > 0 && (
+            <div>
+              <div style={{ fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(163,154,140,0.5)", marginBottom: 12 }}>추천 도서</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {result.recommended_books.map((b, i) => (
+                  <div key={i} style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(236,227,207,0.9)", marginBottom: 4 }}>
+                      {b.title} <span style={{ fontWeight: 400, color: "rgba(163,154,140,0.6)" }}>— {b.author}</span>
+                    </div>
+                    <p style={{ fontSize: 13, color: "rgba(163,154,140,0.6)", lineHeight: 1.6 }}>{b.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {status === "error" && (
+        <p style={{ fontSize: 13.5, color: "rgba(239,68,68,0.8)", position: "relative" }}>잠시 후 다시 시도해 주세요.</p>
+      )}
+    </section>
   );
 }
 
@@ -555,6 +773,9 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           </div>
         </div>
       </section>
+
+      {/* 발제 생성기 */}
+      <LandingDiscussionGenerator />
 
       {/* ASK — with real submission */}
       <section className="lp-section lp-ask" id="ask">
