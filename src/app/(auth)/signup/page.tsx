@@ -1,38 +1,63 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
 import SignupForm from "@/components/auth/SignupForm";
+import { QIMark } from "@/components/common/QIMark";
 
 export const metadata: Metadata = {
-  title: "회원가입 — 질문하는 사람이 되어요",
-  description: "질문하는 사람들에 가입하고 북토크와 질문 커뮤니티에 참여하세요. 가입 후 5개의 질문으로 당신의 Question Profile을 만들어드립니다.",
+  title: "함께하기 — 질문하는 사람들",
+  description: "질문하는 사람들과 함께하세요. 책·질문·대화로 이어지는 지적 커뮤니티.",
   robots: { index: false, follow: false },
 };
 
 export default function SignupPage() {
   return (
-    <div className="min-h-screen bg-warm-50 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col items-center mb-8">
-          <Link href="/" className="flex flex-col items-center gap-3 group mb-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-warm-900 shadow-card transition-transform group-hover:scale-105">
-              <BookOpen className="h-6 w-6 text-white" />
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="font-serif text-lg font-bold text-warm-900">질문하는 사람들</span>
-              <span className="text-xs text-warm-400">미래혁신형 북클럽</span>
+    <div style={{
+      minHeight: "100vh",
+      background: "var(--bg)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "40px 24px",
+    }}>
+      <div style={{ width: "100%", maxWidth: 380 }}>
+        {/* ?! 로고 */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 40 }}>
+          <Link href="/" style={{ textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+            <QIMark size="lg" />
+            <div style={{ textAlign: "center" }}>
+              <div style={{
+                fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                fontSize: 16, fontWeight: 500, color: "var(--ink)", letterSpacing: "0.03em",
+              }}>
+                질문하는 사람들
+              </div>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 3, letterSpacing: "0.04em" }}>
+                미래혁신형 북클럽
+              </div>
             </div>
           </Link>
 
-          <h1 className="font-serif text-2xl font-bold text-warm-900 text-center">
-            질문하는 사람이 되어요
+          <h1 style={{
+            fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+            fontSize: 22, fontWeight: 400, color: "var(--ink)",
+            marginTop: 28, marginBottom: 6, textAlign: "center",
+          }}>
+            좋은 질문은 좋은 사람을<br />데려옵니다.
           </h1>
-          <p className="text-warm-400 text-sm mt-1.5 text-center">
-            책으로 시작되는 연결, 지금 시작하세요.
+          <p style={{ fontSize: 14, color: "var(--muted)", textAlign: "center" }}>
+            지금 함께하세요.
           </p>
         </div>
 
-        <div className="rounded-3xl bg-white border border-warm-100 shadow-card-lg p-8">
+        {/* 폼 카드 */}
+        <div style={{
+          background: "rgba(255,255,255,0.7)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid var(--line-soft)",
+          borderRadius: 20,
+          padding: "32px 28px",
+          boxShadow: "0 8px 40px -16px rgba(28,31,38,.12)",
+        }}>
           <SignupForm />
         </div>
       </div>

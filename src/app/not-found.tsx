@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { QIMark } from "@/components/common/QIMark";
 
 export const metadata: Metadata = {
   title: "404 — 페이지를 찾을 수 없습니다",
@@ -18,17 +19,9 @@ export default function NotFound() {
       padding: "40px 24px",
       textAlign: "center",
     }}>
-      {/* Mark */}
-      <div style={{
-        fontFamily: '"EB Garamond", Georgia, serif',
-        fontStyle: "italic",
-        fontSize: 80,
-        color: "var(--accent)",
-        lineHeight: 1,
-        marginBottom: 24,
-        opacity: 0.6,
-      }}>
-        ?
+      {/* ?! 로고 */}
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
+        <QIMark size="xl" />
       </div>
 
       <div style={{

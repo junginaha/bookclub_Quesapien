@@ -188,24 +188,32 @@ export default function Header() {
                 transformOrigin: "center",
               }}>!</span>
             </div>
-            <span
-              style={{
-                fontFamily: wordmarkIdx === 1
-                  ? '"EB Garamond", Georgia, serif'
-                  : "var(--font-noto-serif-kr), Georgia, serif",
-                fontSize: 13.5,
-                fontWeight: wordmarkIdx === 1 ? 400 : 500,
-                color: "var(--ink)",
-                letterSpacing: wordmarkIdx === 1 ? "0.04em" : "0.03em",
-                fontStyle: wordmarkIdx === 1 ? "italic" : "normal",
-                transition: "opacity 0.35s ease, transform 0.35s ease",
-                opacity: wordmarkFading ? 0 : 1,
-                transform: wordmarkFading ? "translateY(-3px)" : "translateY(0)",
-                display: "inline-block",
-                minWidth: wordmarkIdx === 1 ? "95px" : "100px",
-              }}
-            >
-              {WORDMARKS[wordmarkIdx]}
+            {/* 워드마크 교차 — 질문하는 사람들 ↔ Quesapience */}
+            <span style={{ position: "relative", display: "inline-block", height: 20, minWidth: 110, overflow: "hidden" }}>
+              {WORDMARKS.map((wm, i) => (
+                <span
+                  key={wm}
+                  style={{
+                    position: "absolute", left: 0, top: 0, whiteSpace: "nowrap",
+                    fontFamily: i === 1
+                      ? '"EB Garamond", Georgia, serif'
+                      : "var(--font-noto-serif-kr), Georgia, serif",
+                    fontSize: i === 1 ? 14.5 : 13.5,
+                    fontWeight: i === 1 ? 400 : 500,
+                    color: "var(--ink)",
+                    letterSpacing: i === 1 ? "0.06em" : "0.03em",
+                    fontStyle: i === 1 ? "italic" : "normal",
+                    lineHeight: "20px",
+                    transition: "opacity 0.4s ease, transform 0.4s cubic-bezier(.2,.8,.2,1)",
+                    opacity: wordmarkIdx === i && !wordmarkFading ? 1 : 0,
+                    transform: wordmarkIdx === i && !wordmarkFading
+                      ? "translateY(0)"
+                      : wordmarkIdx === i ? "translateY(-4px)" : "translateY(4px)",
+                  }}
+                >
+                  {wm}
+                </span>
+              ))}
             </span>
           </Link>
 
@@ -395,7 +403,7 @@ export default function Header() {
                   >
                     로그인
                   </Link>
-                  {/* 회원가입 버튼 */}
+                  {/* 함께하기 버튼 */}
                   <Link
                     href="/signup"
                     style={{
@@ -413,7 +421,7 @@ export default function Header() {
                       pointerEvents: authBtnIdx === 1 ? "auto" : "none",
                     }}
                   >
-                    회원가입
+                    함께하기
                   </Link>
                 </div>
               </div>

@@ -691,7 +691,23 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           <span className="wm-mark" aria-hidden="true">
             <span className="wm-q">?</span><span className="wm-bang">!</span>
           </span>
-          <span className="wm-label">질문하는 사람들</span>
+          {/* 랜딩 nav 워드마크 교차 */}
+          <span style={{ position: "relative", display: "inline-block", height: "1.2em", minWidth: 105, overflow: "hidden" }}>
+            {(["질문하는 사람들", "Quesapience"] as const).map((w, i) => (
+              <span key={w} style={{
+                position: "absolute", left: 0, top: 0, whiteSpace: "nowrap",
+                fontFamily: i === 1 ? '"EB Garamond", Georgia, serif' : "var(--lp-serif-ko)",
+                fontStyle: i === 1 ? "italic" : "normal",
+                fontWeight: i === 1 ? 400 : 600,
+                fontSize: i === 1 ? 15 : 19,
+                letterSpacing: i === 1 ? "0.06em" : "-0.012em",
+                lineHeight: "1.2em",
+                transition: "opacity 0.4s ease, transform 0.4s cubic-bezier(.2,.8,.2,1)",
+                opacity: navBtnIdx === i && !navBtnFading ? 1 : 0,
+                transform: navBtnIdx === i && !navBtnFading ? "translateY(0)" : navBtnIdx === i ? "translateY(-4px)" : "translateY(4px)",
+              }}>{w}</span>
+            ))}
+          </span>
         </a>
         <div className="lp-nav-links">
           <a href="/questions">질문</a>
@@ -703,7 +719,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         <div style={{ position: "relative", width: 90, height: 38, overflow: "hidden" }}>
           {[
             { href: "/login", label: "로그인", filled: false },
-            { href: "/signup", label: "회원가입", filled: true },
+            { href: "/signup", label: "함께하기", filled: true },
           ].map((btn, i) => (
             <a
               key={btn.href}
