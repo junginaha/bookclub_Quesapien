@@ -202,6 +202,13 @@ function SurveyForm({ onSubmitted }: { onSubmitted: () => void }) {
       if (q.type === "single" && v === "__other__") v = "기타: " + ((state["__other_" + q.id] as string) ?? "");
       answers[q.id] = v ?? "";
     });
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) {
+      setError("저장 실패: Supabase 환경변수 미설정 (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)");
+      setSaving(false);
+      return;
+    }
     try {
       const supabase = createClient();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
