@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+export async function GET() {
+  try {
+    const supabase = await createClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase as any)
+      .from("archive_reviews")
+      .select("id, type, content, author_name, photo_url, video_url, likes, created_at")
+      .eq("is_approved", true)
+      .order("created_at", { ascending: false })
+      .limit(60);
+    return NextResponse.json({ reviews: data ?? [] });
+  } catch {
+    return NextResponse.json({ reviews: [] });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

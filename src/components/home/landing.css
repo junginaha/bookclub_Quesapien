@@ -508,6 +508,15 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-btn-outline:hover .lp-arrow { transform: translateX(4px); }
 .lp-btn-outline .lp-arrow { color: var(--lp-muted); }
 
+/* ── SECTION TITLE LINK — 클릭하면 전체 보기 ── */
+.lp-section-title-link {
+  cursor: pointer;
+  transition: opacity .25s ease;
+}
+.lp-section-title-link:hover { opacity: 0.72; }
+.lp-section-title-link .lp-h-section { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+.lp-section-title-link:hover .lp-h-section { transform: translateX(4px); }
+
 /* ── SPARKLE NEARBY BUTTON ── */
 .lp-nearby-spark-wrap {
   position: relative;

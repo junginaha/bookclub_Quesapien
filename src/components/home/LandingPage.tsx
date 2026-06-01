@@ -733,10 +733,12 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
       <section className="lp-section lp-books" id="books">
         <div className="lp-section-head">
           <div className="lp-left">
-            <div className="lp-eyebrow">BOOK LOVERS — 책을 건네는 마음</div>
-            <h2 className="lp-h-section">
-              이 책을 누군가에게<br /><span className="lp-em">꼭 건네고</span> 싶었던 이유.
-            </h2>
+            <a href="/bookclub" className="lp-eyebrow lp-section-title-link">BOOK LOVERS — 책을 건네는 마음</a>
+            <a href="/bookclub" className="lp-section-title-link" style={{ textDecoration: "none" }}>
+              <h2 className="lp-h-section">
+                이 책을 누군가에게<br /><span className="lp-em">꼭 건네고</span> 싶었던 이유.
+              </h2>
+            </a>
           </div>
           <p className="lp-lede">
             우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다. 이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.
@@ -834,13 +836,18 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
       <section className="lp-section lp-testify" id="testify">
         <div className="lp-section-head">
           <div className="lp-left">
-            <div className="lp-eyebrow">ARCHIVING — 사람, 변화, 기록</div>
-            <h2 className="lp-h-section">
-              한 시즌이 지나면<br /><span className="lp-em">한 사람이</span> 바뀝니다.
-            </h2>
+            <a href="/archive" className="lp-eyebrow lp-section-title-link">ARCHIVING — 사람, 변화, 기록</a>
+            <a href="/archive" className="lp-section-title-link" style={{ textDecoration: "none" }}>
+              <h2 className="lp-h-section">
+                한 시즌이 지나면<br /><span className="lp-em">한 사람이</span> 바뀝니다.
+              </h2>
+            </a>
           </div>
           <p className="lp-lede">
-            가장 아끼는, 작고 단단한 목소리들이에요.
+            가장 아끼는, 작고 단단한 목소리들이에요.<br />
+            <a href="/archive" style={{ fontSize: 13, color: "var(--lp-accent)", fontFamily: "var(--lp-serif)", letterSpacing: "0.04em", opacity: 0.8 }}>
+              전체 아카이브 보기 →
+            </a>
           </p>
         </div>
         <div className="lp-test-list">
@@ -879,14 +886,19 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
       <section className="lp-section lp-question-hub" id="questions">
         <div className="lp-section-head">
           <div className="lp-left">
-            <div className="lp-eyebrow">QUESAPIENCE · QUESTIONS — 오늘의 질문</div>
-            <h2 className="lp-h-section">
-              하루에 한 번,<br />
-              <span className="lp-em">마음을 흔드는</span> 질문.
-            </h2>
+            <a href="/questions" className="lp-eyebrow lp-section-title-link">QUESAPIENCE · QUESTIONS — 오늘의 질문</a>
+            <a href="/questions" className="lp-section-title-link" style={{ textDecoration: "none" }}>
+              <h2 className="lp-h-section">
+                하루에 한 번,<br />
+                <span className="lp-em">마음을 흔드는</span> 질문.
+              </h2>
+            </a>
           </div>
           <p className="lp-lede">
-            답하지 않아도 괜찮아요. 잠시 머물러 주세요.
+            답하지 않아도 괜찮아요. 잠시 머물러 주세요.<br />
+            <a href="/questions" style={{ fontSize: 13, color: "var(--lp-accent)", fontFamily: "var(--lp-serif)", letterSpacing: "0.04em", opacity: 0.8 }}>
+              전체 질문 보기 →
+            </a>
           </p>
         </div>
 
