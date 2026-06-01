@@ -143,13 +143,12 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
       <div className="lp-nearby-trigger">
         <button className="lp-nearby-btn" onClick={detect}>
           <span className="lp-nearby-pin-icon" aria-hidden="true">
-            <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="13" height="16" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M7.5 0C3.36 0 0 3.36 0 7.5C0 13.125 7.5 18 7.5 18C7.5 18 15 13.125 15 7.5C15 3.36 11.64 0 7.5 0ZM7.5 10.125C6.045 10.125 4.875 8.955 4.875 7.5C4.875 6.045 6.045 4.875 7.5 4.875C8.955 4.875 10.125 6.045 10.125 7.5C10.125 8.955 8.955 10.125 7.5 10.125Z" fill="currentColor"/>
             </svg>
           </span>
-          <span>내 근처 북클럽</span>
+          <span>가장 가까운 모임을 찾아드려요.</span>
         </button>
-        <span className="lp-nearby-hint">위치를 허용하면 가장 가까운 모임을 찾아드려요</span>
       </div>
     );
   }
@@ -663,7 +662,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           <a href="/giants">거인의 어깨</a>
         </div>
         <a href="/bookclub" className="lp-nav-cta">
-          <span>참여 신청</span>
+          <span>북클럽 참여</span>
         </a>
       </nav>
 
@@ -689,10 +688,6 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               <div className="lp-cta-row">
                 <a href="/questions" className="lp-btn-primary">
                   <span>질문 주고 받기</span>
-                  <span className="lp-arrow" />
-                </a>
-                <a href="/bookclub" className="lp-btn-outline">
-                  <span>북클럽</span>
                   <span className="lp-arrow" />
                 </a>
               </div>
@@ -736,7 +731,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </h2>
           </div>
           <p className="lp-lede">
-            왜 이 책을 건네고 싶었는지를 함께 써요.
+            우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다. 이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.
           </p>
         </div>
 
