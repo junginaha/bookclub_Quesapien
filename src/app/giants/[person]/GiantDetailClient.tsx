@@ -55,6 +55,17 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
   const [liveQuotes, setLiveQuotes] = useState<{ content: string; author: string; source: string }[]>([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
   const [wikiSummary, setWikiSummary] = useState("");
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
+  const sessionKeyRef2 = useRef<string>(
+    typeof window !== "undefined"
+      ? (localStorage.getItem(`gk_${giant.slug}`) ?? (() => {
+          const k = Math.random().toString(36).slice(2);
+          localStorage.setItem(`gk_${giant.slug}`, k);
+          return k;
+        })())
+      : Math.random().toString(36).slice(2)
+  );
 
   useEffect(() => {
     fetch(`/api/giants/quotes/${giant.slug}`)
@@ -65,6 +76,18 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
       .then((r) => r.json())
       .then((d) => { if (d.summary) setWikiSummary(d.summary); })
       .catch(() => {});
+
+    // 이전 대화 불러오기
+    fetch(`/api/giants/conversation?slug=${giant.slug}&session=${sessionKeyRef2.current}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.conversation?.messages?.length > 0) {
+          setMessages(d.conversation.messages);
+          setConversationId(d.conversation.id);
+        }
+        setHistoryLoaded(true);
+      })
+      .catch(() => setHistoryLoaded(true));
   }, [giant.slug]);
 
   const [discResult, setDiscResult] = useState<{
@@ -148,7 +171,24 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
 
       if (!res.ok) throw new Error("API error");
       const data = await res.json();
-      setMessages((prev) => [...prev, { role: "assistant", content: data.response }]);
+      const assistantMsg = { role: "assistant" as const, content: data.response };
+      setMessages((prev) => [...prev, assistantMsg]);
+      const fullMessages = [...messages, userMessage, assistantMsg];
+
+      // 대화 자동 저장
+      fetch("/api/giants/conversation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          giantSlug: giant.slug,
+          giantName: giant.name,
+          sessionKey: sessionKeyRef2.current,
+          messages: fullMessages,
+          conversationId,
+        }),
+      }).then((r) => r.json()).then((d) => {
+        if (d.id && !conversationId) setConversationId(d.id);
+      }).catch(() => {});
     } catch {
       setMessages((prev) => [...prev, {
         role: "assistant",
@@ -581,6 +621,29 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
 
           {activeTab === "chat" && (
             <div style={{ maxWidth: 760, margin: "0 auto" }}>
+
+              {/* 이전 대화 이어가기 표시 */}
+              {historyLoaded && messages.length > 0 && conversationId && (
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "10px 16px", borderRadius: 10, marginBottom: 20,
+                  background: `${giant.color}10`, border: `1px solid ${giant.color}25`,
+                }}>
+                  <span style={{ fontSize: 13, color: "var(--ink-soft)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
+                    이전 대화를 이어가고 있어요.
+                  </span>
+                  <button
+                    onClick={() => { setMessages([]); setConversationId(null); }}
+                    style={{
+                      fontSize: 12.5, color: "var(--muted)", background: "none",
+                      border: "none", cursor: "pointer",
+                      fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                    }}
+                  >
+                    새 대화 시작
+                  </button>
+                </div>
+              )}
 
               {/* Chat intro */}
               {messages.length === 0 && (

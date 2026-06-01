@@ -106,6 +106,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Stage 1: Organization + WebSite JSON-LD — sitewide */}
         <JsonLd data={orgSchema()} />
         <JsonLd data={websiteSchema()} />
+        {/* PWA Service Worker 등록 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}`,
+          }}
+        />
         <AuthProvider>
           {children}
         </AuthProvider>
