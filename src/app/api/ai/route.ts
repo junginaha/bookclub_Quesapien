@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { anthropic, CHAT_MODEL } from "@/lib/anthropic";
+import { isOpenRouter, CHAT_MODEL } from "@/lib/anthropic";
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json() as { keyword?: string; context?: string };
-    const { keyword, context } = body;
+  const body = await request.json().catch(() => ({})) as { keyword?: string; context?: string };
+  const { keyword, context } = body;
 
-    if (!keyword || typeof keyword !== "string" || keyword.trim().length === 0) {
-      return NextResponse.json({ error: "키워드를 입력해주세요." }, { status: 400 });
-    }
-    if (keyword.trim().length > 100) {
-      return NextResponse.json({ error: "키워드는 100자 이하로 입력해주세요." }, { status: 400 });
-    }
+  if (!keyword || typeof keyword !== "string" || keyword.trim().length === 0) {
+    return NextResponse.json({ error: "키워드를 입력해주세요." }, { status: 400 });
+  }
+  if (keyword.trim().length > 100) {
+    return NextResponse.json({ error: "키워드는 100자 이하로 입력해주세요." }, { status: 400 });
+  }
 
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return NextResponse.json(getFallback(keyword));
-    }
+  const apiKey = process.env.ANTHROPIC_API_KEY ?? "";
+  if (!apiKey) return NextResponse.json(getFallback(keyword));
 
-    const systemPrompt = `당신은 지적이고 깊이 있는 북클럽 발제문을 만드는 전문가입니다. 주어진 키워드와 대화 맥락을 바탕으로 북클럽 발제문을 생성하세요.
+  const systemPrompt = `당신은 깊이 있는 북클럽 발제문을 만드는 전문가입니다.
 
 반드시 다음 JSON 형식으로만 응답하세요:
 {
@@ -29,36 +27,55 @@ export async function POST(request: NextRequest) {
   ]
 }`;
 
-    const userPrompt = context
-      ? `키워드: ${keyword.trim()}\n\n대화 맥락:\n${context}`
-      : `키워드: ${keyword.trim()}`;
+  const userPrompt = context
+    ? `키워드: ${keyword.trim()}\n\n대화 맥락:\n${context}`
+    : `키워드: ${keyword.trim()}`;
 
-    const message = await anthropic.messages.create({
-      model: CHAT_MODEL,
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userPrompt }],
+  try {
+    const baseURL = isOpenRouter ? "https://openrouter.ai/api/v1" : "https://api.anthropic.com/v1";
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    };
+    if (isOpenRouter) {
+      headers["HTTP-Referer"] = "https://jilmunhaneun-saramdeul.vercel.app";
+      headers["X-Title"] = "Quesapience";
+    } else {
+      headers["x-api-key"] = apiKey;
+      headers["anthropic-version"] = "2023-06-01";
+    }
+
+    const res = await fetch(`${baseURL}/messages`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model: CHAT_MODEL,
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }],
+      }),
     });
 
-    const textContent = message.content.find((c) => c.type === "text");
-    if (!textContent || textContent.type !== "text") throw new Error("no text");
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    const text = data?.content?.[0]?.text ?? "";
+    if (!text) throw new Error("no text");
 
-    const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("no json");
-
     return NextResponse.json(JSON.parse(jsonMatch[0]));
-  } catch (error) {
-    console.error("AI generation error:", error);
-    return NextResponse.json(getFallback((await request.json().catch(() => ({}))).keyword ?? ""));
+  } catch (err) {
+    console.error("AI generation error:", err);
+    return NextResponse.json(getFallback(keyword));
   }
 }
 
 function getFallback(keyword: string) {
   return {
-    statement: `${keyword}은(는) 우리 시대의 중요한 주제입니다. 이 주제를 통해 우리는 삶의 더 깊은 의미를 탐구할 수 있습니다.`,
+    statement: `${keyword}은(는) 우리 삶과 깊이 연결된 주제입니다. 함께 탐구하며 새로운 시각을 발견해봐요.`,
     discussion_questions: [
       `${keyword}이(가) 당신의 삶에 어떤 영향을 미쳤나요?`,
-      `이 주제에 대해 사람들이 가장 오해하는 것은 무엇일까요?`,
+      `이 주제에 대해 가장 오해받는 점은 무엇일까요?`,
       `${keyword}에 대한 당신의 관점이 바뀐 계기가 있었나요?`,
     ],
     icebreaker_questions: [
@@ -66,7 +83,7 @@ function getFallback(keyword: string) {
       `이 주제와 관련된 당신의 첫 번째 기억은 무엇인가요?`,
     ],
     recommended_books: [
-      { title: "관련 도서를 탐색 중", author: "", description: "AI 발제 생성을 위해 API 키가 필요합니다." },
+      { title: `${keyword} 관련 도서`, author: "", description: "북클럽 추천 도서를 탐색해보세요." },
     ],
   };
 }

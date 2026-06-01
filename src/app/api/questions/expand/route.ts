@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { anthropic, CHAT_MODEL } from "@/lib/anthropic";
+import { callClaude } from "@/lib/anthropic";
 
 
 
@@ -44,18 +44,9 @@ ${tags?.length ? `태그: ${tags.join(", ")}` : ""}
 - books: 이 질문을 탐구하는 데 도움이 되는 실제 존재하는 책
 - JSON 외 다른 텍스트 없이 JSON만 출력`;
 
-    const message = await anthropic.messages.create({
-      model: CHAT_MODEL,
-      max_tokens: 800,
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const text = message.content.find((c) => c.type === "text");
-    if (!text || text.type !== "text") throw new Error("No response");
-
-    const jsonMatch = text.text.match(/\{[\s\S]*\}/);
+    const text = await callClaude({ messages: [{ role: "user", content: prompt }], maxTokens: 800 });
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("Invalid JSON");
-
     const expansion = JSON.parse(jsonMatch[0]) as QuestionExpansion;
     return NextResponse.json(expansion);
   } catch (err) {

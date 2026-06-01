@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { anthropic, CHAT_MODEL } from "@/lib/anthropic";
+import { callClaude } from "@/lib/anthropic";
 
 
 
@@ -52,18 +52,9 @@ ${reviewText}
 - 파생 질문은 후기를 읽고 자연스럽게 생성되는 깊은 질문
 - JSON 외 텍스트 없이 JSON만 출력`;
 
-    const message = await anthropic.messages.create({
-      model: CHAT_MODEL,
-      max_tokens: 700,
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const text = message.content.find((c) => c.type === "text");
-    if (!text || text.type !== "text") throw new Error("No response");
-
-    const jsonMatch = text.text.match(/\{[\s\S]*\}/);
+    const text = await callClaude({ messages: [{ role: "user", content: prompt }], maxTokens: 700 });
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("Invalid JSON");
-
     return NextResponse.json(JSON.parse(jsonMatch[0]) as ReviewSummary);
   } catch (err) {
     console.error("Archive summarize error:", err);
