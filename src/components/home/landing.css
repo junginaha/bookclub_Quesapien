@@ -508,33 +508,21 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-btn-outline:hover .lp-arrow { transform: translateX(4px); }
 .lp-btn-outline .lp-arrow { color: var(--lp-muted); }
 
-/* ── NEARBY BRIDGE — 스크롤 라인에서 내 근처 북클럽으로 연결 ── */
-.lp-nearby-bridge {
-  padding: 0 var(--lp-gutter);
-  background: var(--lp-bg);
-  position: relative;
-}
-.lp-nearby-bridge-line {
-  position: absolute;
-  top: 0; left: var(--lp-gutter);
-  width: 1px; height: 56px;
-  background: linear-gradient(to bottom, var(--lp-line), transparent);
-  overflow: hidden;
-}
-.lp-nearby-bridge-line::after {
-  content: "";
-  position: absolute; top: -50%; left: 0; right: 0; height: 50%;
-  background: var(--lp-bg);
-  animation: lp-slideDown 2.2s ease-in-out infinite;
-  animation-delay: .4s;
-}
-.lp-nearby-bridge .lp-nearby-trigger,
-.lp-nearby-bridge .lp-nearby-panel {
+/* ── NEARBY ROW — 내 근처 북클럽 (books 섹션 상단) ── */
+.lp-nearby-row {
   max-width: var(--lp-max);
-  margin-left: auto; margin-right: auto;
-  padding-top: 64px;
+  margin: 0 auto clamp(40px, 5vw, 64px);
+  padding: 20px 28px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(244,239,229,0.5));
+  border: 1px solid var(--lp-line-soft);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
-@media (max-width: 760px) { .lp-nearby-bridge { display: none; } }
+.lp-nearby-row .lp-nearby-trigger { margin-bottom: 0; }
+.lp-nearby-row .lp-nearby-panel { margin-bottom: 0; border: none; background: transparent; box-shadow: none; }
+.lp-nearby-row .lp-nearby-header { background: transparent; padding-left: 0; padding-right: 0; }
+.lp-nearby-row .lp-nearby-item:first-child { border-top: 1px solid rgba(229,221,203,0.5); }
 
 /* ── BOOK COVER GENRE LABEL ── */
 .bc-genre {

@@ -715,12 +715,6 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
-      {/* NEARBY BRIDGE — 스크롤 라인 → 내 근처 북클럽 연결 */}
-      <div className="lp-nearby-bridge">
-        <div className="lp-nearby-bridge-line" aria-hidden="true" />
-        <NearbyClubsBanner books={books} onOpen={(b) => setModalBook(b)} />
-      </div>
-
       {/* BOOKS */}
       <section className="lp-section lp-books" id="books">
         <div className="lp-section-head">
@@ -731,8 +725,13 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </h2>
           </div>
           <p className="lp-lede">
-            &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 함께 써요. 이 책이 한 사람에게 어떻게 스며들었는지 함께 기록해요.
+            왜 이 책을 건네고 싶었는지를 함께 써요.
           </p>
+        </div>
+
+        {/* 위치 기반 근처 북클럽 — 섹션 상단 노출 */}
+        <div className="lp-nearby-row">
+          <NearbyClubsBanner books={books} onOpen={(b) => setModalBook(b)} />
         </div>
 
         <div className="lp-books-grid">
@@ -827,8 +826,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </h2>
           </div>
           <p className="lp-lede">
-            참여하신 분들이 모임을 마치고 남겨주신 짧은 문장들이에요.
-            과장된 후기는 싣지 않아요. 가장 아끼는, 작고 단단한 목소리들이에요.
+            가장 아끼는, 작고 단단한 목소리들이에요.
           </p>
         </div>
         <div className="lp-test-list">
@@ -874,7 +872,6 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </h2>
           </div>
           <p className="lp-lede">
-            매일 아침, 마음에 오래 머물던 질문 하나를 이곳에 남겨요.
             답하지 않아도 괜찮아요. 잠시 머물러 주세요.
           </p>
         </div>
@@ -964,12 +961,10 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
 
         {/* ASK 폼 */}
         <div className="lp-ask-inner">
-          <div className="lp-eyebrow" style={{ marginBottom: 12 }}>당신의 질문을 남겨보세요</div>
           <h3 className="lp-h-section" style={{ fontSize: "clamp(22px, 3vw, 32px)", marginBottom: 16 }}>
             당신 마음속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.
           </h3>
           <p className="lp-lede" style={{ marginBottom: 32 }}>
-            정답을 모으는 곳이 아니에요. 좋은 질문 하나가 때로 한 사람을 살려요.
             부끄러운 질문일수록 환영해요.
           </p>
 
@@ -1001,7 +996,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
                 <input
                   className="lp-ask-name"
                   type="text"
-                  placeholder="이름 (선택 · 익명 가능)"
+                  placeholder="닉네임 (익명도 괜찮아요)"
                   value={askAuthor}
                   onChange={(e) => setAskAuthor(e.target.value)}
                   maxLength={20}
