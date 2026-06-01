@@ -12,7 +12,7 @@ export const anthropic = new Anthropic({
         baseURL: "https://openrouter.ai/api/v1",
         defaultHeaders: {
           "HTTP-Referer": "https://jilmunhaneun-saramdeul.vercel.app",
-          "X-Title": "질문하는 사람들",
+          "X-Title": "Quesapience",
         },
       }
     : {}),
