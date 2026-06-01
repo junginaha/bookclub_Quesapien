@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { anthropic, FAST_MODEL } from "@/lib/anthropic";
 
 interface Message { role: "user" | "assistant"; content: string; }
 
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(getFallbackAgenda(giantName));
     }
 
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const client = anthropic;
 
     const conversationText = messages
       .map((m) => `${m.role === "user" ? "유저" : giantName}: ${m.content}`)
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     // Tool call로 Structured Output 강제
     const response = await client.messages.create({
-      model: "claude-haiku-4-5-20251001", // 저렴한 모델로 논제 추출
+      model: FAST_MODEL, // 저렴한 모델로 논제 추출
       max_tokens: 400,
       system: `당신은 ${giantName}의 사상을 바탕으로 유저의 사유를 확장하는 소크라테스식 질문을 생성하는 전문가입니다.`,
       messages: [

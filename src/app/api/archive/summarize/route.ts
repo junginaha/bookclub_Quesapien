@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { anthropic, CHAT_MODEL } from "@/lib/anthropic";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
 
 export interface ReviewSummary {
   summary: string;
@@ -52,8 +52,8 @@ ${reviewText}
 - 파생 질문은 후기를 읽고 자연스럽게 생성되는 깊은 질문
 - JSON 외 텍스트 없이 JSON만 출력`;
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-6",
+    const message = await anthropic.messages.create({
+      model: CHAT_MODEL,
       max_tokens: 700,
       messages: [{ role: "user", content: prompt }],
     });

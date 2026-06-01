@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { anthropic, CHAT_MODEL } from "@/lib/anthropic";
 
 interface Message { role: "user" | "assistant"; content: string; }
 
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ response: getFallback(giantName), limited: true });
     }
 
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const client = anthropic;
 
     // Gutendex 텍스트 확보 (캐시 or 신규 호출)
     let gutendexTitle = "";
@@ -88,7 +88,7 @@ ${staticContext}
     }));
 
     const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
+      model: CHAT_MODEL,
       max_tokens: 800,
       system: [
         {

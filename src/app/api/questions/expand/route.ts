@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { anthropic, CHAT_MODEL } from "@/lib/anthropic";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
 
 export interface QuestionExpansion {
   related: string[];
@@ -44,8 +44,8 @@ ${tags?.length ? `태그: ${tags.join(", ")}` : ""}
 - books: 이 질문을 탐구하는 데 도움이 되는 실제 존재하는 책
 - JSON 외 다른 텍스트 없이 JSON만 출력`;
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-6",
+    const message = await anthropic.messages.create({
+      model: CHAT_MODEL,
       max_tokens: 800,
       messages: [{ role: "user", content: prompt }],
     });

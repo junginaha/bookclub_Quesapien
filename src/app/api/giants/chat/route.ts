@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { anthropic, CHAT_MODEL } from "@/lib/anthropic";
 
 const PHILOSOPHICAL_FALLBACKS: Record<string, string[]> = {
   "friedrich-nietzsche": [
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ response: fallback, giantSlug, limited: true });
     }
 
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const client = anthropic;
 
     const wikiContext = wikiSummary
       ? `\n\n[공개 자료 요약 — Wikipedia]\n${wikiSummary.slice(0, 800)}`
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     }));
 
     const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
+      model: CHAT_MODEL,
       max_tokens: 600,
       system: systemPrompt,
       messages: anthropicMessages,
