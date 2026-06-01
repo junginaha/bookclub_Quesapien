@@ -206,10 +206,11 @@ function SurveyForm({ onSubmitted }: { onSubmitted: () => void }) {
       const supabase = createClient();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: sbErr } = await (supabase as any).from("ut_responses").insert({ answers });
-      if (sbErr) throw new Error(sbErr.message);
+      if (sbErr) throw new Error(sbErr.message + " (code: " + sbErr.code + ")");
       onSubmitted();
-    } catch {
-      setError("저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setError("저장 실패: " + msg);
     } finally {
       setSaving(false);
     }
