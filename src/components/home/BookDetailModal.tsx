@@ -26,6 +26,9 @@ export interface BookClub {
   currentParticipants?: number;
   sessionDates?: Array<{ date: string; topic: string; closed?: boolean }>;
   photo_url?: string;
+  // 위치 기반 서비스용 좌표
+  lat?: number;
+  lng?: number;
 }
 
 interface Props {

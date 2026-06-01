@@ -5,6 +5,22 @@ import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { josa } from "@/lib/utils";
 import "./landing.css";
 
+// ─── 거리 계산 (Haversine) ────────────────────────────────────
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function fmtDist(km: number): string {
+  if (km < 1) return `${Math.round(km * 1000)}m`;
+  if (km < 10) return `${km.toFixed(1)}km`;
+  return `${Math.round(km)}km`;
+}
+
 // ─── Static data ──────────────────────────────────────────────
 const books: BookClub[] = [
   {
@@ -15,6 +31,7 @@ const books: BookClub[] = [
     emotionTags: ["#불면", "#회복", "#고요"],
     hostName: "정해린", hostIntro: "정답보다 진심을 믿습니다. 우리는 결론을 미루는 연습 중입니다.",
     schedule: "2026년 6월 28일 (토) 오후 3시", location: "서울 서초구 교대역 인근",
+    lat: 37.4930, lng: 127.0151,
     joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 8, currentParticipants: 3,
     description: "새로 출간된 책들 중 가장 뜨거운 문장들을 함께 읽습니다. 매 회 다른 책, 같은 깊이의 질문.",
     sessionDates: [{ date: "2026-06-28", topic: "왜 지금 이 문장인가" }],
@@ -27,6 +44,7 @@ const books: BookClub[] = [
     emotionTags: ["#다정함", "#일상", "#연결"],
     hostName: "정해린", hostIntro: "대화는 답을 찾는 과정이 아니라 함께 머무는 과정입니다.",
     schedule: "2026년 6월 14일 (토) 오후 3시 – 5시 30분", location: "서울 서초구 서초동",
+    lat: 37.4946, lng: 127.0209,
     joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 8, currentParticipants: 5,
     description: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 우리가 일상에서 놓치고 있는 다정함의 순간들을 함께 발견합니다.",
     sessionDates: [
@@ -42,11 +60,10 @@ const books: BookClub[] = [
     emotionTags: ["#고독", "#성장", "#사유"],
     hostName: "서민준", hostIntro: "조용한 사람의 한 문장은 시끄러운 사람의 한 시간보다 길게 남습니다.",
     schedule: "2026년 6월 21일 (토) 오후 2시 – 4시 30분", location: "서울 마포구 합정동",
+    lat: 37.5492, lng: 126.9148,
     joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 6, currentParticipants: 4,
     description: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자라는 감각이 두려움이 아닌 능력이 되는 공간을 함께 만들어봅니다.",
-    sessionDates: [
-      { date: "2026-06-21", topic: "고독의 의미" },
-    ],
+    sessionDates: [{ date: "2026-06-21", topic: "고독의 의미" }],
   },
   {
     color: "olive", genre: "MEMOIR · 회고", slug: "아무도-보지-않는-오후",
@@ -56,6 +73,7 @@ const books: BookClub[] = [
     emotionTags: ["#회복", "#쉼", "#용기"],
     hostName: "유은재", hostIntro: "대화는 답을 찾는 일이 아니라, 함께 머무는 일입니다.",
     schedule: "2026년 6월 28일 (토) 오후 4시 – 6시 30분", location: "서울 용산구 한남동",
+    lat: 37.5344, lng: 127.0049,
     joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 10, currentParticipants: 3,
     description: "실패한 사람이 아니라 멈춰본 적 있는 사람의 문장. 번아웃 이후를 살아가는 법을 함께 이야기합니다.",
     sessionDates: [
@@ -71,11 +89,10 @@ const books: BookClub[] = [
     emotionTags: ["#느림", "#이별", "#기억"],
     hostName: "서민준", hostIntro: "느리게 읽는 것의 가치를 믿습니다.",
     schedule: "2026년 7월 12일 (토) 오후 6시 – 8시", location: "서울 종로구 부암동",
+    lat: 37.5921, lng: 126.9602,
     joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 8, currentParticipants: 8,
     description: "시집은 빠르게 읽지 않는 것이라고 가르쳐준 책. 한 줄의 시로 한 시간을 이야기하는 모임입니다.",
-    sessionDates: [
-      { date: "2026-07-12", topic: "이별을 기억하는 방법", closed: true },
-    ],
+    sessionDates: [{ date: "2026-07-12", topic: "이별을 기억하는 방법", closed: true }],
   },
   {
     color: "sage", genre: "NON-FICTION", slug: "인간이라는-풍경",
@@ -85,6 +102,7 @@ const books: BookClub[] = [
     emotionTags: ["#관계", "#용서", "#거리"],
     hostName: "유은재", hostIntro: "모든 사람은 이해받아야 할 이유가 있습니다.",
     schedule: "2026년 7월 19일 (토) 오후 2시 – 4시 30분", location: "서울 마포구 망원동",
+    lat: 37.5558, lng: 126.9073,
     joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 10, currentParticipants: 2,
     description: "인간을 풍경처럼 멀리서 바라보는 시선. 미워하던 사람을 다시 사람으로 보게 만드는 책을 함께 읽습니다.",
     sessionDates: [
@@ -93,6 +111,99 @@ const books: BookClub[] = [
     ],
   },
 ];
+
+// ─── 위치 기반 근처 모임 컴포넌트 ─────────────────────────────
+interface NearbyBook extends BookClub { distKm: number }
+
+function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onOpen: (b: BookClub) => void }) {
+  const [status, setStatus] = useState<"idle" | "loading" | "found" | "denied" | "unsupported">("idle");
+  const [nearby, setNearby] = useState<NearbyBook[]>([]);
+
+  const detect = () => {
+    if (!navigator.geolocation) { setStatus("unsupported"); return; }
+    setStatus("loading");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const withDist = allBooks
+          .filter((b) => b.lat !== undefined && b.lng !== undefined && (b.currentParticipants ?? 0) < (b.maxParticipants ?? 8))
+          .map((b) => ({ ...b, distKm: haversineKm(latitude, longitude, b.lat!, b.lng!) }))
+          .sort((a, b) => a.distKm - b.distKm)
+          .slice(0, 3);
+        setNearby(withDist);
+        setStatus("found");
+      },
+      () => setStatus("denied"),
+      { timeout: 8000, maximumAge: 300000 }
+    );
+  };
+
+  if (status === "idle") {
+    return (
+      <div className="lp-nearby-trigger">
+        <button className="lp-nearby-btn" onClick={detect}>
+          <span className="lp-nearby-icon">📍</span>
+          <span>내 근처 모임 찾기</span>
+        </button>
+        <span className="lp-nearby-hint">위치를 허용하면 가장 가까운 모임을 보여드려요</span>
+      </div>
+    );
+  }
+
+  if (status === "loading") {
+    return (
+      <div className="lp-nearby-trigger">
+        <div className="lp-nearby-loading">
+          <span className="lp-nearby-spin" />
+          <span>위치를 확인하고 있어요…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "denied" || status === "unsupported") {
+    return (
+      <div className="lp-nearby-trigger">
+        <span className="lp-nearby-hint" style={{ color: "var(--lp-muted)" }}>
+          {status === "denied" ? "위치 권한이 필요해요. 브라우저 설정에서 허용해 주세요." : "이 브라우저에서는 위치 기반 서비스를 지원하지 않아요."}
+        </span>
+      </div>
+    );
+  }
+
+  if (status === "found" && nearby.length === 0) {
+    return (
+      <div className="lp-nearby-trigger">
+        <span className="lp-nearby-hint">현재 위치 반경 내에 모집 중인 모임이 없어요. 곧 새로운 모임이 열릴 예정이에요!</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="lp-nearby-panel">
+      <div className="lp-nearby-header">
+        <span className="lp-nearby-icon">📍</span>
+        <span className="lp-nearby-title">내 근처 모임</span>
+        <button className="lp-nearby-reset" onClick={() => { setStatus("idle"); setNearby([]); }}>×</button>
+      </div>
+      <div className="lp-nearby-list">
+        {nearby.map((b) => (
+          <button key={b.slug} className="lp-nearby-item" onClick={() => onOpen(b)}>
+            <div className={`lp-nearby-dot ${b.color}`} />
+            <div className="lp-nearby-info">
+              <span className="lp-nearby-name">{b.title}</span>
+              <span className="lp-nearby-loc">{b.location}</span>
+            </div>
+            <div className="lp-nearby-dist">
+              <span className="lp-nearby-km">{fmtDist(b.distKm)}</span>
+              <span className="lp-nearby-seats">{(b.maxParticipants ?? 8) - (b.currentParticipants ?? 0)}석</span>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const miniBooks: BookClub[] = [
   { color: "terra", slug: "제자리로-돌아오는-밤에", title: "제자리로 돌아오는 밤에", recommender: "서연", tag: "#귀환", currentParticipants: 8, isMini: true },
@@ -510,6 +621,9 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다. 이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.
           </p>
         </div>
+
+        {/* 위치 기반 근처 모임 */}
+        <NearbyClubsBanner books={books} onOpen={(b) => setModalBook(b)} />
 
         <div className="lp-books-grid">
           {books.map((b) => (
