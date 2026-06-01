@@ -15,7 +15,7 @@ const books: BookClub[] = [
     emotionTags: ["#불면", "#회복", "#고요"],
     hostName: "정해린", hostIntro: "정답보다 진심을 믿습니다. 우리는 결론을 미루는 연습 중입니다.",
     schedule: "2026년 6월 28일 (토) 오후 3시", location: "서울 서초구 교대역 인근",
-    joinUrl: "https://jemjem.site", maxParticipants: 8, currentParticipants: 3,
+    joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 8, currentParticipants: 3,
     description: "새로 출간된 책들 중 가장 뜨거운 문장들을 함께 읽습니다. 매 회 다른 책, 같은 깊이의 질문.",
     sessionDates: [{ date: "2026-06-28", topic: "왜 지금 이 문장인가" }],
   },
@@ -27,7 +27,7 @@ const books: BookClub[] = [
     emotionTags: ["#다정함", "#일상", "#연결"],
     hostName: "정해린", hostIntro: "대화는 답을 찾는 과정이 아니라 함께 머무는 과정입니다.",
     schedule: "2026년 6월 14일 (토) 오후 3시 – 5시 30분", location: "서울 서초구 서초동",
-    joinUrl: "https://jemjem.site", maxParticipants: 8, currentParticipants: 5,
+    joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 8, currentParticipants: 5,
     description: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 우리가 일상에서 놓치고 있는 다정함의 순간들을 함께 발견합니다.",
     sessionDates: [
       { date: "2026-06-14", topic: "다정함의 정의" },
@@ -42,7 +42,7 @@ const books: BookClub[] = [
     emotionTags: ["#고독", "#성장", "#사유"],
     hostName: "서민준", hostIntro: "조용한 사람의 한 문장은 시끄러운 사람의 한 시간보다 길게 남습니다.",
     schedule: "2026년 6월 21일 (토) 오후 2시 – 4시 30분", location: "서울 마포구 합정동",
-    joinUrl: "https://jemjem.site", maxParticipants: 6, currentParticipants: 4,
+    joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 6, currentParticipants: 4,
     description: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자라는 감각이 두려움이 아닌 능력이 되는 공간을 함께 만들어봅니다.",
     sessionDates: [
       { date: "2026-06-21", topic: "고독의 의미" },
@@ -56,7 +56,7 @@ const books: BookClub[] = [
     emotionTags: ["#회복", "#쉼", "#용기"],
     hostName: "유은재", hostIntro: "대화는 답을 찾는 일이 아니라, 함께 머무는 일입니다.",
     schedule: "2026년 6월 28일 (토) 오후 4시 – 6시 30분", location: "서울 용산구 한남동",
-    joinUrl: "https://jemjem.site", maxParticipants: 10, currentParticipants: 3,
+    joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 10, currentParticipants: 3,
     description: "실패한 사람이 아니라 멈춰본 적 있는 사람의 문장. 번아웃 이후를 살아가는 법을 함께 이야기합니다.",
     sessionDates: [
       { date: "2026-06-28", topic: "멈춤의 의미" },
@@ -71,7 +71,7 @@ const books: BookClub[] = [
     emotionTags: ["#느림", "#이별", "#기억"],
     hostName: "서민준", hostIntro: "느리게 읽는 것의 가치를 믿습니다.",
     schedule: "2026년 7월 12일 (토) 오후 6시 – 8시", location: "서울 종로구 부암동",
-    joinUrl: "https://jemjem.site", maxParticipants: 8, currentParticipants: 8,
+    joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 8, currentParticipants: 8,
     description: "시집은 빠르게 읽지 않는 것이라고 가르쳐준 책. 한 줄의 시로 한 시간을 이야기하는 모임입니다.",
     sessionDates: [
       { date: "2026-07-12", topic: "이별을 기억하는 방법", closed: true },
@@ -85,7 +85,7 @@ const books: BookClub[] = [
     emotionTags: ["#관계", "#용서", "#거리"],
     hostName: "유은재", hostIntro: "모든 사람은 이해받아야 할 이유가 있습니다.",
     schedule: "2026년 7월 19일 (토) 오후 2시 – 4시 30분", location: "서울 마포구 망원동",
-    joinUrl: "https://jemjem.site", maxParticipants: 10, currentParticipants: 2,
+    joinUrl: "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah", maxParticipants: 10, currentParticipants: 2,
     description: "인간을 풍경처럼 멀리서 바라보는 시선. 미워하던 사람을 다시 사람으로 보게 만드는 책을 함께 읽습니다.",
     sessionDates: [
       { date: "2026-07-19", topic: "인간이란 무엇인가" },
@@ -641,55 +641,11 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
-      {/* GIANTS — 거인의 어깨 */}
-      <section className="lp-section lp-giants-preview" id="giants-preview">
-        <div className="lp-section-head">
-          <div className="lp-left">
-            <div className="lp-eyebrow">GIANTS — 거인의 어깨</div>
-            <h2 className="lp-h-section">
-              위대한 지성들과<br />
-              <span className="lp-em">나누는 대화</span>.
-            </h2>
-          </div>
-          <p className="lp-lede">
-            니체, 한강, 칸트, 하라리... 그들의 사상으로 발제를 만들고,
-            그들의 언어로 대화해보세요. 북클럽을 더욱 깊고 풍요롭게 만들어드립니다.
-          </p>
-        </div>
-
-        <div className="lp-giants-grid">
-          {[
-            { slug: "friedrich-nietzsche", name: "프리드리히 니체", tagline: "신은 죽었다. 이제 우리가 살아야 한다.", color: "#2D3748", category: "철학자" },
-            { slug: "han-kang", name: "한강", tagline: "폭력과 아름다움 사이에서 인간을 묻다.", color: "#744C24", category: "작가" },
-            { slug: "yuval-harari", name: "유발 하라리", tagline: "호모 사피엔스, 스스로를 이해하기 시작한 종.", color: "#1A3A5C", category: "사상가" },
-            { slug: "peter-drucker", name: "피터 드러커", tagline: "경영의 목적은 고객을 창조하는 것이다.", color: "#2D4A22", category: "기업가" },
-          ].map((g) => (
-            <a key={g.slug} href={`/giants/${g.slug}`} className="lp-giant-card lp-reveal">
-              <div className="lgc-color" style={{ background: g.color }}>
-                <div className="lgc-category">{g.category}</div>
-                <div className="lgc-name">{g.name}</div>
-              </div>
-              <div className="lgc-body">
-                <p className="lgc-tagline">{g.tagline}</p>
-                <span className="lgc-link">사상 탐구하기 →</span>
-              </div>
-            </a>
-          ))}
-        </div>
-
-        <div className="lp-giants-cta">
-          <a href="/giants" className="lp-btn-primary">
-            <span>거인의 어깨 탐색하기</span>
-            <span className="lp-arrow" />
-          </a>
-        </div>
-      </section>
-
       {/* QUESTIONS HUB — Today + Ask 통합 */}
       <section className="lp-section lp-question-hub" id="questions">
         <div className="lp-section-head">
           <div className="lp-left">
-            <div className="lp-eyebrow">QUESTIONS — 오늘의 질문</div>
+            <div className="lp-eyebrow">QUESAPIENCE · QUESTIONS — 오늘의 질문</div>
             <h2 className="lp-h-section">
               하루에 한 번,<br />
               <span className="lp-em">마음을 흔드는</span> 질문.
@@ -822,20 +778,36 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
-      {/* FINAL CTA */}
-      <section className="lp-final" id="final">
+      {/* GIANTS + AT HEART — 통합 하단 섹션 */}
+      <section className="lp-final lp-giants-final" id="final">
+        {/* AT HEART 상단 */}
         <div className="lp-eyebrow">AT HEART</div>
         <p className="lp-final-quote">
           질문은<br />가장 <span className="lp-em">인간적인</span><br />대화의 시작입니다.
         </p>
         <div className="lp-final-divider" />
-        <p className="lp-final-end">
-          위대한 지성들의 언어로<br />
-          <span className="lp-em">당신의 질문</span>에 함께 답합니다.
-        </p>
-        <a href="/giants" className="lp-btn-cream">
-          <span>거인의 어깨로 가기</span>
-          <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
+
+        {/* GIANTS 인물 카드 */}
+        <div className="lp-final-giants-label">GIANTS — 거인의 어깨 · 위대한 지성들과 나누는 대화</div>
+        <div className="lp-final-giants-grid">
+          {[
+            { slug: "friedrich-nietzsche", name: "니체", color: "#2D3748" },
+            { slug: "han-kang", name: "한강", color: "#744C24" },
+            { slug: "yuval-harari", name: "하라리", color: "#1A3A5C" },
+            { slug: "peter-drucker", name: "드러커", color: "#2D4A22" },
+            { slug: "immanuel-kant", name: "칸트", color: "#4A5568" },
+            { slug: "albert-camus", name: "카뮈", color: "#5B4A6B" },
+          ].map((g) => (
+            <a key={g.slug} href={`/giants/${g.slug}`} className="lp-final-giant-chip">
+              <span className="lfgc-dot" style={{ background: g.color }} />
+              {g.name}
+            </a>
+          ))}
+        </div>
+
+        {/* CTA 작게 */}
+        <a href="/giants" className="lp-final-giants-link">
+          거인의 어깨 탐색하기 →
         </a>
       </section>
 

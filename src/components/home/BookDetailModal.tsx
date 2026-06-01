@@ -104,7 +104,7 @@ export default function BookDetailModal({ book, onClose }: Props) {
       schedule: detail?.schedule ?? "",
       location: detail?.location ?? "",
       locationUrl: detail?.locationUrl ?? "",
-      joinUrl: detail?.joinUrl ?? "",
+      joinUrl: detail?.joinUrl ?? "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah",
       description: detail?.description ?? "",
       hostName: detail?.hostName ?? "",
       hostIntro: detail?.hostIntro ?? "",
@@ -165,10 +165,10 @@ export default function BookDetailModal({ book, onClose }: Props) {
     setEditing(false);
   };
 
+  const JAMJAM_URL = "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah";
   const handleJoin = () => {
-    if (detail?.joinUrl) {
-      window.open(detail.joinUrl, "_blank", "noopener");
-    }
+    const url = detail?.joinUrl || JAMJAM_URL;
+    window.open(url, "_blank", "noopener");
     if (detail?.slug) {
       localStorage.setItem(`joined_${detail.slug}`, "1");
       setJoined(true);
@@ -319,39 +319,39 @@ export default function BookDetailModal({ book, onClose }: Props) {
           ) : (
             /* Edit form */
             <form className="bdm-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-              <div className="bdm-form-title">모임 정보 편집</div>
+              <div className="bdm-form-title">모임 정보 작성 · 수정</div>
 
-              <label className="bdm-label">모임 진행자</label>
-              <input className="bdm-input" value={form.hostName ?? ""} onChange={(e) => setForm((f) => ({ ...f, hostName: e.target.value }))} placeholder="이름" />
+              <label className="bdm-label">진행자 이름</label>
+              <input className="bdm-input" value={form.hostName ?? ""} onChange={(e) => setForm((f) => ({ ...f, hostName: e.target.value }))} placeholder="예: 정해린" />
 
               <label className="bdm-label">진행자 소개</label>
-              <textarea className="bdm-textarea" rows={2} value={form.hostIntro ?? ""} onChange={(e) => setForm((f) => ({ ...f, hostIntro: e.target.value }))} placeholder="진행자에 대한 짧은 소개" />
+              <textarea className="bdm-textarea" rows={2} value={form.hostIntro ?? ""} onChange={(e) => setForm((f) => ({ ...f, hostIntro: e.target.value }))} placeholder="진행자에 대한 짧은 소개를 적어주세요." />
 
               <label className="bdm-label">모임 일정</label>
-              <input className="bdm-input" value={form.schedule ?? ""} onChange={(e) => setForm((f) => ({ ...f, schedule: e.target.value }))} placeholder="예: 매월 첫째 토요일 오후 2시" />
+              <input className="bdm-input" value={form.schedule ?? ""} onChange={(e) => setForm((f) => ({ ...f, schedule: e.target.value }))} placeholder="예: 2026년 7월 5일 (토) 오후 3시 – 5시 30분" />
 
               <label className="bdm-label">장소</label>
-              <input className="bdm-input" value={form.location ?? ""} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} placeholder="장소명" />
+              <input className="bdm-input" value={form.location ?? ""} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} placeholder="예: 서울 서초구 교대역 인근" />
 
               <label className="bdm-label">장소 지도 링크</label>
               <input className="bdm-input" type="url" value={form.locationUrl ?? ""} onChange={(e) => setForm((f) => ({ ...f, locationUrl: e.target.value }))} placeholder="https://map.kakao.com/..." />
 
-              <label className="bdm-label">참여 신청 링크</label>
-              <input className="bdm-input" type="url" value={form.joinUrl ?? ""} onChange={(e) => setForm((f) => ({ ...f, joinUrl: e.target.value }))} placeholder="https://..." />
+              <label className="bdm-label">참여 결제 링크 (잼잼)</label>
+              <input className="bdm-input" type="url" value={form.joinUrl ?? ""} onChange={(e) => setForm((f) => ({ ...f, joinUrl: e.target.value }))} placeholder="https://jamjamlink-wujdhsmq.manus.space/..." />
 
               <label className="bdm-label">최대 인원</label>
-              <input className="bdm-input" type="number" min={1} max={100} value={form.maxParticipants ?? ""} onChange={(e) => setForm((f) => ({ ...f, maxParticipants: parseInt(e.target.value) || undefined }))} placeholder="12" />
+              <input className="bdm-input" type="number" min={1} max={100} value={form.maxParticipants ?? ""} onChange={(e) => setForm((f) => ({ ...f, maxParticipants: parseInt(e.target.value) || undefined }))} placeholder="8" />
 
               <label className="bdm-label">모임 소개</label>
-              <textarea className="bdm-textarea" rows={4} value={form.description ?? ""} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="이 북클럽을 소개해주세요." />
+              <textarea className="bdm-textarea" rows={4} value={form.description ?? ""} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="이 북클럽에 대해 소개해주세요. 어떤 사람에게 어떤 시간이 될지 자유롭게 적어주세요." />
 
-              <label className="bdm-label">북클럽 사진 URL</label>
-              <input className="bdm-input" type="url" value={form.photo_url ?? ""} onChange={(e) => setForm((f) => ({ ...f, photo_url: e.target.value }))} placeholder="https://..." />
+              <label className="bdm-label">북클럽 이미지 URL</label>
+              <input className="bdm-input" type="url" value={form.photo_url ?? ""} onChange={(e) => setForm((f) => ({ ...f, photo_url: e.target.value }))} placeholder="https://... (커버 이미지 URL)" />
 
               <div className="bdm-form-actions">
                 <button type="button" className="bdm-btn-cancel" onClick={() => setEditing(false)}>취소</button>
                 <button type="submit" className="bdm-btn-save" disabled={saving}>
-                  {saving ? "저장 중…" : "저장하기"}
+                  {saving ? "저장 중…" : "저장 · 업데이트"}
                 </button>
               </div>
             </form>

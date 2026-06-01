@@ -926,3 +926,64 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ── Giants + AT HEART 통합 하단 ─────────────────────── */
+.lp-giants-final {
+  padding-top: clamp(80px, 12vw, 140px);
+  padding-bottom: clamp(80px, 12vw, 140px);
+}
+.lp-final-giants-label {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(236,227,207,0.45);
+  margin-bottom: 20px;
+  margin-top: 8px;
+  font-style: normal;
+}
+.lp-final-giants-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+.lp-final-giant-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  font-size: 13.5px;
+  color: rgba(236,227,207,0.75);
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+  font-style: normal;
+}
+.lp-final-giant-chip:hover {
+  background: rgba(255,255,255,0.14);
+  color: rgba(236,227,207,0.95);
+}
+.lfgc-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+.lp-final-giants-link {
+  font-size: 13px;
+  color: rgba(176,138,74,0.7);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+  display: block;
+  text-align: center;
+  font-style: normal;
+}
+.lp-final-giants-link:hover {
+  color: rgba(176,138,74,1);
+}
