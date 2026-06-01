@@ -169,7 +169,7 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
     return (
       <div className="lp-nearby-trigger">
         <span className="lp-nearby-hint" style={{ color: "var(--lp-muted)" }}>
-          {status === "denied" ? "위치 권한이 필요해요. 브라우저 설정에서 허용 후 다시 시도해주세요." : "이 브라우저에서는 위치 기반 서비스를 지원하지 않아요."}
+          {status === "denied" ? "위치 권한이 필요해요. 브라우저 설정에서 허용해 주시면 찾아드릴게요." : "이 브라우저에서는 위치 기반 서비스를 지원하지 않아요."}
         </span>
       </div>
     );
@@ -290,6 +290,7 @@ function ArchiveReviewForm() {
   const [photoUrl, setPhotoUrl] = useState("");
   const [photoPreview, setPhotoPreview] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
+  const [isPublic, setIsPublic] = useState(true);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "done" | "error">("idle");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -329,6 +330,7 @@ function ArchiveReviewForm() {
           author_name: authorName.trim() || "익명",
           photo_url: tab === "photo" ? photoUrl.trim() || null : null,
           video_url: tab === "video" ? videoUrl.trim() || null : null,
+          is_public: isPublic,
         }),
       });
       if (!res.ok) throw new Error("fail");
@@ -347,17 +349,44 @@ function ArchiveReviewForm() {
     color: "var(--lp-ink)", outline: "none", boxSizing: "border-box", fontFamily: "var(--lp-sans)",
   };
 
+  const canSubmit = content.trim().length >= 20 && uploadStatus !== "uploading";
+
   return (
-    <div style={{ marginTop: 56, padding: "36px 40px", borderRadius: 16, background: "rgba(255,255,255,0.4)", border: "1px solid var(--lp-line-soft)", maxWidth: 1020, margin: "56px auto 0" }}>
-      <div style={{ fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--lp-muted)", marginBottom: 10 }}>아카이빙에 기록하기</div>
+    <div style={{ padding: "36px 40px", borderRadius: 16, background: "rgba(255,255,255,0.4)", border: "1px solid var(--lp-line-soft)", maxWidth: 1020, margin: "56px auto 0" }}>
+      <div style={{ fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--lp-muted)", marginBottom: 10 }}>아카이빙에 남기기</div>
       <p style={{ fontSize: 15, color: "var(--lp-ink-soft)", marginBottom: 6, lineHeight: 1.6 }}>
-        한번쯤 남겨볼까 싶으셨다면, 그 생각이 맞아요.
+        한 번쯤 남겨볼까 싶으셨다면, 그 생각이 맞아요.
       </p>
       <p style={{ fontSize: 13.5, color: "var(--lp-muted)", marginBottom: 24, lineHeight: 1.6 }}>
-        글 · 사진 · 영상으로 당신의 변화를 기록해주세요. 검토 후 아카이빙에 실립니다.
+        글·사진·영상으로 자유롭게 기록해주세요. 공개·비공개는 직접 선택하실 수 있어요.
       </p>
 
-      {/* 탭 */}
+      {/* 공개/비공개 토글 */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+        <div style={{ display: "flex", borderRadius: 8, overflow: "hidden", border: "1px solid var(--lp-line-soft)" }}>
+          {[{ v: true, label: "공개", icon: "🌐" }, { v: false, label: "나만 보기", icon: "🔒" }].map(({ v, label, icon }) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => setIsPublic(v)}
+              style={{
+                padding: "7px 15px", fontSize: 13, border: "none", cursor: "pointer",
+                background: isPublic === v ? "var(--lp-ink)" : "transparent",
+                color: isPublic === v ? "var(--lp-cream)" : "var(--lp-muted)",
+                transition: "all .2s ease", display: "flex", alignItems: "center", gap: 5,
+                fontFamily: "var(--lp-sans)",
+              }}
+            >
+              <span>{icon}</span><span>{label}</span>
+            </button>
+          ))}
+        </div>
+        <span style={{ fontSize: 12.5, color: "var(--lp-muted)", fontFamily: "var(--lp-serif-ko)" }}>
+          {isPublic ? "아카이빙 페이지에 바로 공개돼요." : "기록은 저장되지만 공개되지 않아요."}
+        </span>
+      </div>
+
+      {/* 유형 탭 */}
       <div style={{ display: "flex", gap: 0, marginBottom: 24, borderBottom: "1px solid var(--lp-line-soft)" }}>
         {(["text", "photo", "video"] as const).map((t) => (
           <button key={t} type="button" onClick={() => setTab(t)} style={{
@@ -374,8 +403,12 @@ function ArchiveReviewForm() {
       {status === "sent" ? (
         <div style={{ padding: "32px 0", textAlign: "center" }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>✦</div>
-          <p style={{ fontSize: 16, color: "var(--lp-ink)", marginBottom: 8, fontFamily: "var(--lp-serif-ko)" }}>후기가 전달되었습니다.</p>
-          <span style={{ fontSize: 13.5, color: "var(--lp-muted)" }}>소중한 기록 감사합니다. 곧 아카이빙에 실릴 거예요.</span>
+          <p style={{ fontSize: 16, color: "var(--lp-ink)", marginBottom: 8, fontFamily: "var(--lp-serif-ko)" }}>
+            {isPublic ? "아카이빙에 올라갔어요." : "기록이 저장됐어요."}
+          </p>
+          <span style={{ fontSize: 13.5, color: "var(--lp-muted)" }}>
+            {isPublic ? "다른 분들도 읽으실 수 있어요. 감사해요." : "소중한 기록, 안전하게 담아뒀어요."}
+          </span>
         </div>
       ) : (
         <form onSubmit={handleSubmit}>
@@ -393,11 +426,11 @@ function ArchiveReviewForm() {
                   {uploadStatus === "uploading" && (
                     <div style={{ position: "absolute", inset: 0, borderRadius: 10, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, gap: 8 }}>
                       <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
-                      업로드 중...
+                      올리는 중이에요…
                     </div>
                   )}
                   {uploadStatus === "error" && (
-                    <p style={{ fontSize: 12, color: "rgba(239,68,68,0.9)", marginTop: 4 }}>업로드에 실패했어요. URL로 직접 입력해주세요.</p>
+                    <p style={{ fontSize: 12, color: "rgba(239,68,68,0.9)", marginTop: 4 }}>올리기에 실패했어요. 링크로 입력해 주실 수 있어요.</p>
                   )}
                 </div>
               ) : (
@@ -408,18 +441,18 @@ function ArchiveReviewForm() {
                 >
                   <input ref={fileRef} type="file" accept="image/*" hidden onChange={handlePhotoFile} />
                   <span style={{ fontSize: 28 }}>📷</span>
-                  <span style={{ fontSize: 14, color: "var(--lp-ink-soft)" }}>사진 선택</span>
-                  <span style={{ fontSize: 12, color: "var(--lp-muted)" }}>또는 URL을 아래에 직접 입력하세요</span>
+                  <span style={{ fontSize: 14, color: "var(--lp-ink-soft)" }}>사진 고르기</span>
+                  <span style={{ fontSize: 12, color: "var(--lp-muted)" }}>또는 아래에 링크로 올릴 수도 있어요</span>
                 </label>
               )}
               {!photoPreview && (
-                <input type="url" placeholder="사진 URL 직접 입력" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} style={{ ...inputStyle, marginTop: 8 }} />
+                <input type="url" placeholder="사진 링크 입력" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} style={{ ...inputStyle, marginTop: 8 }} />
               )}
             </div>
           )}
           {tab === "video" && (
             <div style={{ marginBottom: 16 }}>
-              <input type="url" placeholder="YouTube · Vimeo 링크 (예: https://youtu.be/...)" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} style={inputStyle} />
+              <input type="url" placeholder="YouTube · Vimeo 링크를 붙여넣어 주세요" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} style={inputStyle} />
               {videoUrl && (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) && (
                 <div style={{ marginTop: 8, borderRadius: 10, overflow: "hidden", background: "#000" }}>
                   <iframe
@@ -435,8 +468,8 @@ function ArchiveReviewForm() {
           <textarea
             placeholder={
               tab === "text"
-                ? "모임 후 변화된 것이 있나요? 어떤 문장이 오래 남았나요? (최소 20자)"
-                : "사진이나 영상에 대한 설명을 남겨주세요. (최소 20자)"
+                ? "모임 이후 달라진 것이 있으신가요? 오래 남은 문장이나 감각을 적어주세요. (20자 이상)"
+                : "사진이나 영상에 담긴 이야기를 들려주세요. (20자 이상)"
             }
             rows={tab === "text" ? 5 : 3}
             value={content}
@@ -453,7 +486,7 @@ function ArchiveReviewForm() {
           <div style={{ marginTop: 12, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             <input
               type="text"
-              placeholder="이름 (선택 · 익명 가능)"
+              placeholder="닉네임 (익명도 괜찮아요)"
               value={authorName}
               onChange={(e) => setAuthorName(e.target.value)}
               maxLength={20}
@@ -461,16 +494,16 @@ function ArchiveReviewForm() {
             />
             <button
               type="submit"
-              disabled={content.trim().length < 20 || status === "sending" || uploadStatus === "uploading"}
+              disabled={!canSubmit || status === "sending"}
               style={{
                 padding: "10px 26px", borderRadius: 9999, fontSize: 14, fontWeight: 500,
-                background: content.trim().length >= 20 && uploadStatus !== "uploading" ? "var(--lp-ink)" : "var(--lp-line-soft)",
-                color: content.trim().length >= 20 && uploadStatus !== "uploading" ? "var(--lp-cream)" : "var(--lp-muted)",
-                border: "none", cursor: content.trim().length >= 20 && uploadStatus !== "uploading" ? "pointer" : "not-allowed",
+                background: canSubmit ? "var(--lp-ink)" : "var(--lp-line-soft)",
+                color: canSubmit ? "var(--lp-cream)" : "var(--lp-muted)",
+                border: "none", cursor: canSubmit ? "pointer" : "not-allowed",
                 transition: "all 0.2s", whiteSpace: "nowrap",
               }}
             >
-              {status === "sending" ? "전송 중…" : "기록 남기기"}
+              {status === "sending" ? "저장 중…" : "기록하기"}
             </button>
           </div>
           {status === "error" && (
@@ -639,7 +672,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               <span className="lp-kw">질문</span>으로{" "}
               <span className="lp-kw k2">연결</span>되는 미래혁신형{" "}
               <span className="lp-kw k3">북클럽</span>.<br />
-              사람들이 가장 깊은 이야기를 합니다.
+              사람들이 가장 깊은 이야기를 나눠요.
             </p>
             <div className="lp-cta-stack">
               <div className="lp-cta-row">
@@ -698,7 +731,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </h2>
           </div>
           <p className="lp-lede">
-            우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다. 이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.
+            &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 함께 써요. 이 책이 한 사람에게 어떻게 스며들었는지 함께 기록해요.
           </p>
         </div>
 
@@ -795,7 +828,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           </div>
           <p className="lp-lede">
             참여하신 분들이 모임을 마치고 남겨주신 짧은 문장들이에요.
-            과장된 후기는 싣지 않아요. 가장 아끼는, 작고 견고한 낮은 목소리들입니다.
+            과장된 후기는 싣지 않아요. 가장 아끼는, 작고 단단한 목소리들이에요.
           </p>
         </div>
         <div className="lp-test-list">
@@ -841,8 +874,8 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </h2>
           </div>
           <p className="lp-lede">
-            매일 아침, 멤버 한 분이 마음에 오래 머물던 질문을 이곳에 남겨두고 가세요.
-            답하지 않아도 괜찮아요. 다만 잠시 머물러 주세요.
+            매일 아침, 마음에 오래 머물던 질문 하나를 이곳에 남겨요.
+            답하지 않아도 괜찮아요. 잠시 머물러 주세요.
           </p>
         </div>
 
@@ -955,17 +988,17 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         <div className="lp-ask-inner">
           <div className="lp-eyebrow" style={{ marginBottom: 12 }}>당신의 질문을 남겨보세요</div>
           <h3 className="lp-h-section" style={{ fontSize: "clamp(22px, 3vw, 32px)", marginBottom: 16 }}>
-            당신 마음 속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.
+            당신 마음속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.
           </h3>
           <p className="lp-lede" style={{ marginBottom: 32 }}>
-            정답을 모으는 곳이 아닙니다. 좋은 질문 하나는, 때로 한 사람을 살립니다.
-            부끄러운 질문일수록 환영합니다.
+            정답을 모으는 곳이 아니에요. 좋은 질문 하나가 때로 한 사람을 살려요.
+            부끄러운 질문일수록 환영해요.
           </p>
 
           {askStatus === "sent" ? (
             <div className="lp-ask-success">
               <div className="lp-ask-success-icon">?</div>
-              <p>질문이 전달되었습니다.</p>
+              <p>질문이 잘 전달됐어요.</p>
               <span>누군가의 마음에 닿을 거예요.</span>
             </div>
           ) : (
@@ -973,7 +1006,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               <div className="lp-ask-field" id="askField">
                 <span className="af-pen">― 당신의 질문</span>
                 <textarea
-                  placeholder="당신 마음 속에 오래 남아 있던 질문은 무엇인가요?"
+                  placeholder="마음속에 오래 담아두셨던 질문이 있으신가요?"
                   rows={3}
                   spellCheck={false}
                   aria-label="질문 입력"
@@ -1021,7 +1054,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         {/* AT HEART 상단 */}
         <div className="lp-eyebrow">AT HEART</div>
         <p className="lp-final-quote">
-          질문은<br />가장 <span className="lp-em">인간적인</span><br />대화의 시작입니다.
+          질문은<br />가장 <span className="lp-em">인간적인</span><br />대화의 시작이에요.
         </p>
         <div className="lp-final-divider" />
 
