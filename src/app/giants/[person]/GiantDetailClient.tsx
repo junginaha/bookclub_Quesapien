@@ -102,6 +102,11 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
   const [wikiSummary, setWikiSummary] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [gutendexTitle, setGutendexTitle] = useState("");
+  const [gutendexReady, setGutendexReady] = useState(false);
+  const [agenda, setAgenda] = useState<{ agenda1: string; agenda2: string; advice: string } | null>(null);
+  const [agendaLoading, setAgendaLoading] = useState(false);
+  const [streamingContent, setStreamingContent] = useState("");
   const sessionKeyRef2 = useRef<string>(
     typeof window !== "undefined"
       ? (localStorage.getItem(`gk_${giant.slug}`) ?? (() => {
@@ -121,6 +126,12 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
       .then((r) => r.json())
       .then((d) => { if (d.summary) setWikiSummary(d.summary); })
       .catch(() => {});
+
+    // Gutendex 저서 텍스트 초기화 (백그라운드)
+    fetch(`/api/giant/init?slug=${giant.slug}`)
+      .then((r) => r.json())
+      .then((d) => { if (d.title) setGutendexTitle(d.title); setGutendexReady(true); })
+      .catch(() => setGutendexReady(true));
 
     // 이전 대화 불러오기
     fetch(`/api/giants/conversation?slug=${giant.slug}&session=${sessionKeyRef2.current}`)
@@ -197,7 +208,8 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/giants/chat", {
+      // 새 Giant Chat API (Gutendex + 프롬프트 캐싱)
+      const res = await fetch("/api/giant/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -211,14 +223,30 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
           },
           messages: [...messages, userMessage],
           wikiSummary: wikiSummary || undefined,
+          useGutendex: gutendexReady,
         }),
       });
 
       if (!res.ok) throw new Error("API error");
       const data = await res.json();
+      if (data.gutendexTitle && !gutendexTitle) setGutendexTitle(data.gutendexTitle);
+
       const assistantMsg = { role: "assistant" as const, content: data.response };
       setMessages((prev) => [...prev, assistantMsg]);
       const fullMessages = [...messages, userMessage, assistantMsg];
+
+      // 3회 이상 대화 시 논제 자동 도출
+      const userTurns = fullMessages.filter((m) => m.role === "user").length;
+      if (userTurns >= 3 && !agenda && !agendaLoading) {
+        setAgendaLoading(true);
+        fetch("/api/giant/agenda", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ giantName: giant.name, giantSlug: giant.slug, messages: fullMessages }),
+        }).then((r) => r.json()).then((d) => {
+          if (d.agenda1) setAgenda(d);
+        }).catch(() => {}).finally(() => setAgendaLoading(false));
+      }
 
       // 대화 자동 저장
       fetch("/api/giants/conversation", {
@@ -810,6 +838,78 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
 
                 <div ref={messagesEndRef} />
               </div>
+
+              {/* Gutendex 출처 표시 */}
+              {gutendexTitle && (
+                <div style={{
+                  fontSize: 11.5, color: "var(--muted)", margin: "8px 0",
+                  display: "flex", alignItems: "center", gap: 6,
+                  fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "normal",
+                }}>
+                  <span style={{ opacity: 0.5 }}>—</span>
+                  저서 원문 기반: 『{gutendexTitle}』 (Project Gutenberg)
+                </div>
+              )}
+
+              {/* 거인의 논제 & 나침반 조언 카드 (3회 이상 대화 시 활성화) */}
+              {(agenda || agendaLoading) && (
+                <div style={{
+                  margin: "16px 0 8px",
+                  padding: "20px 24px",
+                  borderRadius: 14,
+                  background: `linear-gradient(135deg, ${giant.color}12, ${giant.color}06)`,
+                  border: `1px solid ${giant.color}30`,
+                }}>
+                  <div style={{
+                    fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
+                    color: giant.color, marginBottom: 14, fontFamily: '"EB Garamond", Georgia, serif',
+                  }}>
+                    거인의 논제 — {giant.name}이 던지는 질문
+                  </div>
+                  {agendaLoading && !agenda ? (
+                    <div style={{ fontSize: 13, color: "var(--muted)", display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ width: 13, height: 13, border: `2px solid ${giant.color}40`, borderTopColor: giant.color, borderRadius: "50%", animation: "spin 0.75s linear infinite", display: "inline-block" }} />
+                      논제를 도출하고 있어요…
+                    </div>
+                  ) : agenda ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {[agenda.agenda1, agenda.agenda2].map((q, i) => (
+                        <button
+                          key={i}
+                          onClick={() => sendMessage(q)}
+                          style={{
+                            textAlign: "left", padding: "12px 16px",
+                            borderRadius: 10, fontSize: 14,
+                            background: "rgba(255,255,255,0.5)",
+                            border: `1px solid ${giant.color}25`,
+                            cursor: "pointer", color: "var(--ink)", lineHeight: 1.6,
+                            fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                            transition: "background .15s",
+                            display: "flex", alignItems: "flex-start", gap: 10,
+                          }}
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.85)"; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.5)"; }}
+                        >
+                          <span style={{ color: giant.color, fontFamily: '"EB Garamond", Georgia, serif', fontSize: 16, flexShrink: 0, marginTop: 1 }}>
+                            {i === 0 ? "①" : "②"}
+                          </span>
+                          {q}
+                        </button>
+                      ))}
+                      <div style={{
+                        padding: "12px 16px", borderRadius: 10, fontSize: 13.5,
+                        color: "var(--ink-soft)", lineHeight: 1.7,
+                        fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                        borderLeft: `2px solid ${giant.color}60`,
+                        paddingLeft: 14, background: `${giant.color}08`,
+                      }}>
+                        <span style={{ fontSize: 11, letterSpacing: "0.1em", color: giant.color, display: "block", marginBottom: 4 }}>COMPASS</span>
+                        {agenda.advice}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              )}
 
               {/* Input */}
               <form onSubmit={handleSubmit} style={{
