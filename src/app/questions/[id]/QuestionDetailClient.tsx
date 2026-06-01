@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import SessionJoinButton from "@/components/sessions/SessionJoinButton";
 import ReviewForm from "@/components/reviews/ReviewForm";
-import LikeButton from "@/components/reviews/LikeButton";
 import { MapPin, Clock, Users, ArrowLeft, BookOpen, MessageSquare } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import {
@@ -149,7 +148,7 @@ export default function QuestionDetailClient({ questionId, seedQuestion, initial
                         <p className="text-sm font-medium text-warm-800">{review.author_name}</p>
                         <span className="text-xs text-warm-300">{formatDate(review.created_at)}</span>
                       </div>
-                      <LikeButton reviewId={review.id} likes={review.likes} />
+                      <span className="text-xs text-warm-300">{review.likes > 0 ? `${review.likes}` : ""}</span>
                     </div>
                     {review.quote && (
                       <blockquote className="font-serif text-base font-medium text-warm-800 border-l-2 border-warm-200 pl-3 italic leading-relaxed">

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, PenLine, ThumbsUp, MessageSquare, Bookmark, ChevronRight } from "lucide-react";
+import { Search, PenLine, MessageSquare, ChevronRight } from "lucide-react";
 
 // ─── Static fallback data ────────────────────────────────────
 const STATIC_TODAY = {
@@ -107,7 +107,7 @@ export default function QuestionsClient({
               fontWeight: 400, lineHeight: 1.2, letterSpacing: "-0.02em", color: "var(--ink)",
             }}>
               좋은 질문은<br />
-              <em style={{ fontStyle: "italic", color: "var(--accent)", fontFamily: '"EB Garamond", Georgia, serif' }}>좋은 사람</em>을 데려옵니다.
+              <em style={{ fontStyle: "normal", fontWeight: 600, color: "var(--accent)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif", background: "linear-gradient(90deg, var(--accent), #B08A4A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>좋은 사람</em>을 데려옵니다.
             </h1>
             <Link href="/questions/create" style={{
               display: "inline-flex", alignItems: "center", gap: 8,
@@ -173,16 +173,10 @@ export default function QuestionsClient({
                     {today.content}
                   </p>
                   <div style={{ display: "flex", gap: 20, flexWrap: "wrap", position: "relative" }}>
-                    {[
-                      { icon: <ThumbsUp size={13} />, value: today.likes?.toLocaleString(), label: "공감" },
-                      { icon: <Bookmark size={13} />, value: today.saves?.toLocaleString(), label: "저장" },
-                      { icon: <MessageSquare size={13} />, value: today.answers_count?.toLocaleString(), label: "답변" },
-                    ].map((s) => (
-                      <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
-                        {s.icon}
-                        <strong style={{ color: "rgba(255,255,255,0.85)" }}>{s.value}</strong> {s.label}
-                      </div>
-                    ))}
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
+                      <MessageSquare size={13} />
+                      <strong style={{ color: "rgba(255,255,255,0.85)" }}>{today.answers_count?.toLocaleString()}</strong> 답변
+                    </div>
                   </div>
                 </div>
               </section>
@@ -220,10 +214,7 @@ export default function QuestionsClient({
                         </p>
                         <div style={{ display: "flex", gap: 16, fontSize: 12, color: "var(--muted)" }}>
                           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                            <ThumbsUp size={11} /> {q.likes?.toLocaleString()}
-                          </span>
-                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                            <MessageSquare size={11} /> {q.answers_count}
+                            <MessageSquare size={11} /> {q.answers_count} 답변
                           </span>
                           <span>— {q.author_name}</span>
                         </div>
@@ -281,10 +272,7 @@ export default function QuestionsClient({
                         </div>
                         <div style={{ display: "flex", gap: 12, fontSize: 12, color: "var(--muted)", alignItems: "center" }}>
                           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                            <ThumbsUp size={11} /> {q.likes}
-                          </span>
-                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                            <MessageSquare size={11} /> {q.answers_count}
+                            <MessageSquare size={11} /> {q.answers_count} 답변
                           </span>
                           <span>— {q.author_name}</span>
                           {q.created_at && <span>{formatTimeAgo(q.created_at)}</span>}
@@ -403,8 +391,7 @@ export default function QuestionsClient({
               </div>
               {[
                 { value: "2,847", label: "누적 질문 수" },
-                { value: "18,392", label: "총 공감 수" },
-                { value: "4,203", label: "답변 수" },
+                { value: "4,203", label: "누적 답변 수" },
               ].map((s) => (
                 <div key={s.label} style={{ marginBottom: 16 }}>
                   <div style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 28, fontWeight: 400, color: "white" }}>

@@ -4,15 +4,15 @@ const WIKI_TITLES: Record<string, string> = {
   "friedrich-nietzsche": "Friedrich_Nietzsche",
   "immanuel-kant": "Immanuel_Kant",
   "arthur-schopenhauer": "Arthur_Schopenhauer",
-  "albert-camus": "Albert_Camus",
-  "simone-de-beauvoir": "Simone_de_Beauvoir",
+  "georg-hegel": "Georg_Wilhelm_Friedrich_Hegel",
+  "socrates": "Socrates",
+  "fyodor-dostoevsky": "Fyodor_Dostoevsky",
+  "leo-tolstoy": "Leo_Tolstoy",
+  "franz-kafka": "Franz_Kafka",
   "virginia-woolf": "Virginia_Woolf",
-  "yuval-harari": "Yuval_Noah_Harari",
-  "peter-drucker": "Peter_Drucker",
-  "charlie-munger": "Charlie_Munger",
-  "steve-jobs": "Steve_Jobs",
-  "han-kang": "Han_Kang",
-  "kim-young-ha": "Kim_Young-ha",
+  "albert-einstein": "Albert_Einstein",
+  "leo-da-vinci": "Leonardo_da_Vinci",
+  "marcus-aurelius": "Marcus_Aurelius",
 };
 
 const cache = new Map<string, { summary: string; ts: number }>();

@@ -1,34 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GIANTS } from "@/data/giants";
 
-// Quotable API slug mappings
+// Quotable API slug mappings (사후 70년+ 공개 도메인 인물만)
 const QUOTABLE_SLUGS: Record<string, string> = {
   "friedrich-nietzsche": "friedrich-nietzsche",
   "immanuel-kant": "immanuel-kant",
   "arthur-schopenhauer": "arthur-schopenhauer",
-  "albert-camus": "albert-camus",
-  "simone-de-beauvoir": "simone-de-beauvoir",
   "virginia-woolf": "virginia-woolf",
-  "yuval-harari": "yuval-noah-harari",
-  "peter-drucker": "peter-drucker",
-  "charlie-munger": "charlie-munger",
-  "steve-jobs": "steve-jobs",
+  "leo-tolstoy": "leo-tolstoy",
+  "fyodor-dostoevsky": "fyodor-dostoevsky",
+  "franz-kafka": "franz-kafka",
+  "albert-einstein": "albert-einstein",
+  "marcus-aurelius": "marcus-aurelius",
+  "socrates": "socrates",
+  "georg-hegel": "g-w-f-hegel",
+  "leo-da-vinci": "leonardo-da-vinci",
 };
 
-// Curated extra quotes for Korean authors (not in Quotable)
+// 큐레이티드 명언 (Quotable에 없는 인물)
 const EXTRA_QUOTES: Record<string, { content: string; source: string }[]> = {
-  "han-kang": [
-    { content: "우리는 끝까지 인간이고 싶다.", source: "소년이 온다" },
-    { content: "아름다움은 폭력 옆에서도 살아남는다.", source: "채식주의자" },
-    { content: "기억한다는 것은 그 사람 곁에 머문다는 것이다.", source: "작별하지 않는다" },
-    { content: "쓴다는 것은 죽은 자들과 함께 앉는 일이다.", source: "흰" },
-    { content: "인간이 된다는 것은 고통과 함께 산다는 것이다.", source: "소년이 온다" },
+  "socrates": [
+    { content: "검토되지 않은 삶은 살 가치가 없다.", source: "소크라테스의 변론 (플라톤)" },
+    { content: "나는 내가 모른다는 것을 안다.", source: "소크라테스" },
+    { content: "지혜는 자기 자신을 아는 것에서 시작된다.", source: "플라톤 기록" },
   ],
-  "kim-young-ha": [
-    { content: "독서는 타인의 내면으로 들어가는 가장 깊은 방법이다.", source: "여행의 이유" },
-    { content: "이야기는 우리가 살아남는 방식이다.", source: "작별인사" },
-    { content: "소설은 인간이 발명한 가장 오래된 가상현실이다.", source: "여행의 이유" },
-    { content: "여행은 낯선 곳에서 자신을 발견하는 일이다.", source: "여행의 이유" },
+  "marcus-aurelius": [
+    { content: "당신이 통제할 수 없는 것에 시간을 낭비하지 말라.", source: "명상록" },
+    { content: "오늘 하루를 마치 마지막인 것처럼 살되, 또한 영원히 살 것처럼 계획하라.", source: "명상록" },
+    { content: "장애물이 곧 길이다.", source: "명상록" },
+  ],
+  "leo-da-vinci": [
+    { content: "단순함은 궁극의 정교함이다.", source: "레오나르도 다 빈치" },
+    { content: "아는 것으로 충분하지 않다. 적용해야 한다.", source: "레오나르도 다 빈치" },
+    { content: "배움은 마음을 움직이지 않고는 사랑을 결코 이룰 수 없다.", source: "레오나르도 다 빈치" },
   ],
 };
 
