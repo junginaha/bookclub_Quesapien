@@ -99,19 +99,21 @@ export default function Footer() {
           flexDirection: "column",
           gap: 10,
         }}>
-          <div style={{ fontSize: 12, color: "rgba(163,154,140,0.45)" }}>
-            협업·문의:{" "}
+          <div style={{ fontSize: 12, color: "rgba(163,154,140,0.5)", display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            <span>협업·문의</span>
+            <span style={{ opacity: 0.4 }}>·</span>
             <a
-              href="mailto:junginaha@kakao.com"
+              href="mailto:junginaha@qsapience.com"
               style={{
-                color: "rgba(163,154,140,0.45)",
+                color: "rgba(176,138,74,0.65)",
                 textDecoration: "none",
                 transition: "color 0.2s",
+                fontWeight: 500,
               }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(163,154,140,0.75)"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(163,154,140,0.45)"; }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(176,138,74,1)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(176,138,74,0.65)"; }}
             >
-              junginaha@kakao.com
+              junginaha@qsapience.com
             </a>
           </div>
           <div style={{

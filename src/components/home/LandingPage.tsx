@@ -818,8 +818,8 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           <div className="lp-foot-links">
             <a href="/questions">질문</a>
             <a href="/bookclub">북클럽</a>
-            <a href="/giants">거인의 어깨</a>
             <a href="/archive">아카이빙</a>
+            <a href="/giants">거인의 어깨</a>
           </div>
           <div className="lp-foot-copy">© 2026 — Quesapience.</div>
         </div>
