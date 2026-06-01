@@ -97,7 +97,8 @@ interface Props { params: Promise<{ slug: string }>; }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const club = (STATIC_CLUBS[slug] ?? {}) as any;
   const title = club.title ?? "북클럽";
   const author = club.author ? ` — ${club.author}` : "";
@@ -112,7 +113,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BookClubDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   let club: any = null;
 
   try {

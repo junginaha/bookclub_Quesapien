@@ -18,11 +18,11 @@ export const anthropic = new Anthropic({
     : {}),
 });
 
-// OpenRouter는 "anthropic/" 접두사 + 최신 모델명
+// OpenRouter 모델명 (점 표기법 사용)
 export const CHAT_MODEL = isOpenRouter
-  ? "anthropic/claude-sonnet-4-5"
+  ? "anthropic/claude-sonnet-4.5"
   : "claude-sonnet-4-6";
 
 export const FAST_MODEL = isOpenRouter
-  ? "anthropic/claude-haiku-4-5"
+  ? "anthropic/claude-haiku-4.5"
   : "claude-haiku-4-5-20251001";

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ManagePage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+  const { slug: _raw } = await params; const slug = decodeURIComponent(_raw);
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();

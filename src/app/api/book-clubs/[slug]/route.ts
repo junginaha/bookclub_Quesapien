@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = await params;
+    const { slug: _s } = await params; const slug = decodeURIComponent(_s);
     const supabase = await createClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase as any)
@@ -29,7 +29,7 @@ export async function PATCH(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = await params;
+    const { slug: _s } = await params; const slug = decodeURIComponent(_s);
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
