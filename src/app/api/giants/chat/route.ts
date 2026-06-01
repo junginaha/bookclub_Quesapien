@@ -59,7 +59,9 @@ export async function POST(req: NextRequest) {
     }
 
     if (!process.env.ANTHROPIC_API_KEY) {
-      return NextResponse.json({ response: getFallback(giantSlug), giantSlug });
+      // API 키 없을 때 더 자연스러운 fallback 응답
+      const fallback = getFallback(giantSlug);
+      return NextResponse.json({ response: fallback, giantSlug, limited: true });
     }
 
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });

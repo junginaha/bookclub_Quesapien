@@ -53,6 +53,8 @@ export default async function QuestionDetailPage({ params }: Props) {
   let question = null;
   let sessions: unknown[] = [];
   let reviews: unknown[] = [];
+  let landingQ: unknown = null;
+  let landingAnswers: unknown[] = [];
 
   try {
     [question, sessions, reviews] = await Promise.all([
@@ -62,7 +64,22 @@ export default async function QuestionDetailPage({ params }: Props) {
     ]);
   } catch { /* fallback */ }
 
+  // landing_questions 테이블에서도 찾기
   if (!question) {
+    try {
+      const { createClient } = await import("@/lib/supabase/server");
+      const supabase = await createClient();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sb = supabase as any;
+      const [lqRes, laRes] = await Promise.all([
+        sb.from("landing_questions").select("*").eq("id", id).single(),
+        sb.from("landing_question_answers").select("*").eq("question_id", id).eq("is_approved", true).order("created_at", { ascending: false }).limit(30),
+      ]);
+      if (lqRes.data) { landingQ = lqRes.data; landingAnswers = laRes.data ?? []; }
+    } catch { /* */ }
+  }
+
+  if (!question && !landingQ) {
     const mockQ = mockQuestions.find((q) => q.id === id);
     if (!mockQ) notFound();
     const { crumb, faq } = buildSchemas(id, {
@@ -78,6 +95,26 @@ export default async function QuestionDetailPage({ params }: Props) {
         <Header />
         <main className="flex-1">
           <QuestionDetailClient questionId={id} seedQuestion={mockQ} initialSessions={[]} initialReviews={[]} />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // landing_question 뷰
+  if (landingQ && !question) {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const lq = landingQ as any;
+    const { crumb, faq } = buildSchemas(id, { title: lq.content ?? "", description: lq.content });
+    /* eslint-enable @typescript-eslint/no-explicit-any */
+    const { LandingQuestionView } = await import("./LandingQuestionView");
+    return (
+      <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)" }}>
+        <JsonLd data={crumb} />
+        <JsonLd data={faq} />
+        <Header />
+        <main className="flex-1">
+          <LandingQuestionView question={landingQ} answers={landingAnswers} />
         </main>
         <Footer />
       </div>

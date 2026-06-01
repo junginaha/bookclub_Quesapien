@@ -18,7 +18,7 @@ export const metadata: Metadata = buildMetadata({
   keywords: ["북클럽후기", "독서후기", "발제문", "아카이브", "북토크기록", "독서기록"],
 });
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 export default async function ArchivePage() {
   let reviews: Awaited<ReturnType<typeof getArchiveReviews>> = [];

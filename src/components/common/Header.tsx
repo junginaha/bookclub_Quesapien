@@ -452,7 +452,20 @@ export default function Header() {
                 </div>
               ))}
 
-              <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--line)", display: "flex", gap: 8 }}>
+              {/* 모바일 북클럽 참여 버튼 */}
+              <Link
+                href="/bookclub"
+                style={{
+                  display: "block", marginTop: 16, padding: "13px 0", textAlign: "center",
+                  background: "var(--ink)", color: "var(--cream-on-dark)",
+                  borderRadius: 9999, fontSize: 14, fontWeight: 500, textDecoration: "none",
+                  fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                }}
+              >
+                북클럽 참여
+              </Link>
+
+              <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line)", display: "flex", gap: 8 }}>
                 {currentUser ? (
                   <>
                     <Link
