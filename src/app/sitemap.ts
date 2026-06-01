@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { GIANTS } from "@/data/giants";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://quesapience.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jilmunhaneun-saramdeul.vercel.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

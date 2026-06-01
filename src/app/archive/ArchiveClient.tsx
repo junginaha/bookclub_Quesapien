@@ -13,7 +13,7 @@ import AIReviewSummary from "@/components/archive/AIReviewSummary";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Review = any;
 
-type TabType = "reviews" | "questions" | "discussions" | "talks";
+type TabType = "reviews" | "questions" | "discussions" | "talks" | "cases";
 
 const STATIC_QUESTIONS = [
   { id: "aq1", content: "당신은 마지막으로 언제, 진심으로 울었나요?", author_name: "편집팀", likes: 1284, answers_count: 72, created_at: "2026-05-22" },
@@ -35,6 +35,45 @@ const STATIC_TALKS = [
   { id: "t3", title: "사랑 시즌 · 종료 보고", season: "Season 01", participants: 29, date: "2025-09-10", summary: "우리가 사랑이라 부른 것의 다른 이름들. 첫 번째 시즌의 기록." },
 ];
 
+const LEADER_CASES = [
+  {
+    id: "lc-j",
+    initial: "J",
+    name: "정해린",
+    role: "시즌 04 진행자",
+    philosophy: "정답보다 진심을 믿습니다. 우리는 결론을 미루는 연습 중입니다.",
+    color: "#5E4632",
+    question: "당신이 가장 오래 미뤄둔 감정은 무엇인가요?",
+    story: "처음 북클럽을 열었을 때 저는 '잘 진행해야 한다'는 생각으로 가득했어요. 그런데 4시즌이 지나고 나서야 알았어요. 가장 좋은 북클럽은 내가 사라질 때 시작된다는 걸. 참여자들이 제 질문을 잊고 서로의 눈을 보기 시작할 때, 그때가 진짜였어요.",
+    season: "Season 04 · 2026년 봄",
+    change: "질문하는 사람에서 질문을 내려놓는 사람이 되었습니다.",
+  },
+  {
+    id: "lc-s",
+    initial: "S",
+    name: "서민준",
+    role: "시즌 03 진행자",
+    philosophy: "조용한 사람의 한 문장은 시끄러운 사람의 한 시간보다 길게 남습니다.",
+    color: "#2C5364",
+    question: "당신이 마지막으로 누군가에게 진심으로 사과한 건 언제였나요?",
+    story: "외로움 시즌 3주차에 한 참여자가 말했어요. '누군가 내 이야기를 이렇게 끝까지 들어준 건 처음이에요.' 저는 아무 말도 하지 않았는데요. 그 침묵이 제가 줄 수 있는 가장 깊은 경청이었다고 생각해요.",
+    season: "Season 03 · 2025년 겨울",
+    change: "말하는 것보다 듣는 것이 더 어렵다는 걸 배웠습니다.",
+  },
+  {
+    id: "lc-y",
+    initial: "Y",
+    name: "유은재",
+    role: "시즌 02 진행자",
+    philosophy: "대화는 답을 찾는 일이 아니라, 함께 머무는 일입니다.",
+    color: "#3D2B1F",
+    question: "기계가 더 잘하는 시대에, 인간으로 남고 싶은 부분이 있나요?",
+    story: "AI와 인간을 주제로 한 시즌이었어요. 참여자 중 한 분이 '저는 AI보다 덜 논리적이라서 부끄럽다'고 하셨을 때, 다른 분이 조용히 '저도요'라고 했어요. 그 두 글자에 방 전체가 잠시 멈췄어요. 그게 인간이 할 수 있는 것이었어요.",
+    season: "Season 02 · 2025년 가을",
+    change: "불완전함을 나누는 것이 연결의 시작이라는 걸 알았습니다.",
+  },
+];
+
 export default function ArchiveClient({ initialReviews }: { initialReviews: Review[] }) {
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("tab") as TabType | null) ?? "reviews";
@@ -50,6 +89,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
 
   const TABS = [
     { key: "reviews" as const, label: "후기 아카이브", icon: <ThumbsUp size={14} />, count: initialReviews.length },
+    { key: "cases" as const, label: "진행자 사례", icon: <MessageSquare size={14} />, count: LEADER_CASES.length },
     { key: "questions" as const, label: "질문 아카이브", icon: <MessageSquare size={14} />, count: STATIC_QUESTIONS.length },
     { key: "discussions" as const, label: "발제문 아카이브", icon: <FileText size={14} />, count: STATIC_DISCUSSIONS.length },
     { key: "talks" as const, label: "북토크 기록", icon: <BookOpen size={14} />, count: STATIC_TALKS.length },
@@ -209,6 +249,77 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
               </div>
             )}
           </>
+        )}
+
+        {/* ─ 진행자 사례 ─ */}
+        {activeTab === "cases" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
+            <p style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.75, maxWidth: 560, marginBottom: 8 }}>
+              시즌을 진행한 세 분의 이야기입니다. 그들이 북클럽을 통해 무엇을 발견했는지, 직접 남긴 기록이에요.
+            </p>
+            {LEADER_CASES.map((c) => (
+              <article key={c.id} style={{
+                borderRadius: 20, overflow: "hidden",
+                border: "1px solid var(--line-soft)",
+                background: "rgba(255,255,255,0.45)",
+              }}>
+                {/* Header bar */}
+                <div style={{
+                  padding: "28px 36px", display: "flex", gap: 20, alignItems: "flex-start",
+                  background: `linear-gradient(135deg, ${c.color}18, ${c.color}06)`,
+                  borderBottom: "1px solid var(--line-soft)",
+                }}>
+                  <div style={{
+                    width: 64, height: 64, borderRadius: "50%", flexShrink: 0,
+                    background: c.color, display: "flex", alignItems: "center", justifyContent: "center",
+                    fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                    fontSize: 26, color: "rgba(255,255,255,0.92)", fontWeight: 400,
+                    boxShadow: `0 8px 24px -8px ${c.color}66`,
+                  }}>
+                    {c.initial}
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 20, fontWeight: 400, color: "var(--ink)", marginBottom: 4 }}>
+                      {c.name}
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--muted)", letterSpacing: "0.04em", marginBottom: 12 }}>
+                      {c.role} · {c.season}
+                    </div>
+                    <p style={{
+                      fontFamily: '"EB Garamond", Georgia, serif',
+                      fontStyle: "italic", fontSize: 15,
+                      color: c.color, lineHeight: 1.6,
+                      borderLeft: `2px solid ${c.color}66`, paddingLeft: 12,
+                    }}>
+                      &ldquo;{c.question}&rdquo;
+                    </p>
+                  </div>
+                </div>
+                {/* Story */}
+                <div style={{ padding: "28px 36px" }}>
+                  <p style={{
+                    fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                    fontSize: 16, fontWeight: 300, lineHeight: 1.85,
+                    color: "var(--ink-soft)", marginBottom: 24,
+                    letterSpacing: "-0.005em",
+                  }}>
+                    {c.story}
+                  </p>
+                  <div style={{
+                    padding: "16px 20px", borderRadius: 10,
+                    background: `${c.color}0A`, border: `1px solid ${c.color}22`,
+                  }}>
+                    <div style={{ fontSize: 10.5, letterSpacing: "0.2em", textTransform: "uppercase", color: c.color, marginBottom: 6, fontFamily: '"EB Garamond", Georgia, serif' }}>
+                      Change
+                    </div>
+                    <p style={{ fontSize: 14, color: "var(--ink)", lineHeight: 1.65, fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
+                      {c.change}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
         )}
 
         {/* ─ 질문 아카이브 ─ */}

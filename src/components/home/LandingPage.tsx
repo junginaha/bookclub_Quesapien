@@ -142,10 +142,14 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
     return (
       <div className="lp-nearby-trigger">
         <button className="lp-nearby-btn" onClick={detect}>
-          <span className="lp-nearby-icon">📍</span>
-          <span>내 근처 모임 찾기</span>
+          <span className="lp-nearby-pin-icon" aria-hidden="true">
+            <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.5 0C3.36 0 0 3.36 0 7.5C0 13.125 7.5 18 7.5 18C7.5 18 15 13.125 15 7.5C15 3.36 11.64 0 7.5 0ZM7.5 10.125C6.045 10.125 4.875 8.955 4.875 7.5C4.875 6.045 6.045 4.875 7.5 4.875C8.955 4.875 10.125 6.045 10.125 7.5C10.125 8.955 8.955 10.125 7.5 10.125Z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span>내 근처 북클럽</span>
         </button>
-        <span className="lp-nearby-hint">위치를 허용하면 가장 가까운 모임을 보여드려요</span>
+        <span className="lp-nearby-hint">위치를 허용하면 가장 가까운 모임을 찾아드려요</span>
       </div>
     );
   }
@@ -155,7 +159,7 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
       <div className="lp-nearby-trigger">
         <div className="lp-nearby-loading">
           <span className="lp-nearby-spin" />
-          <span>위치를 확인하고 있어요…</span>
+          <span>근처 모임을 찾고 있어요…</span>
         </div>
       </div>
     );
@@ -165,7 +169,7 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
     return (
       <div className="lp-nearby-trigger">
         <span className="lp-nearby-hint" style={{ color: "var(--lp-muted)" }}>
-          {status === "denied" ? "위치 권한이 필요해요. 브라우저 설정에서 허용해 주세요." : "이 브라우저에서는 위치 기반 서비스를 지원하지 않아요."}
+          {status === "denied" ? "위치 권한이 필요해요. 브라우저 설정에서 허용 후 다시 시도해주세요." : "이 브라우저에서는 위치 기반 서비스를 지원하지 않아요."}
         </span>
       </div>
     );
@@ -174,7 +178,7 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
   if (status === "found" && nearby.length === 0) {
     return (
       <div className="lp-nearby-trigger">
-        <span className="lp-nearby-hint">현재 위치 반경 내에 모집 중인 모임이 없어요. 곧 새로운 모임이 열릴 예정이에요!</span>
+        <span className="lp-nearby-hint">현재 위치 근처에 모집 중인 모임이 없어요. 곧 새로운 모임이 열려요.</span>
       </div>
     );
   }
@@ -182,9 +186,15 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
   return (
     <div className="lp-nearby-panel">
       <div className="lp-nearby-header">
-        <span className="lp-nearby-icon">📍</span>
-        <span className="lp-nearby-title">내 근처 모임</span>
-        <button className="lp-nearby-reset" onClick={() => { setStatus("idle"); setNearby([]); }}>×</button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span className="lp-nearby-pin-icon lp-nearby-pin-active" aria-hidden="true">
+            <svg width="14" height="17" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.5 0C3.36 0 0 3.36 0 7.5C0 13.125 7.5 18 7.5 18C7.5 18 15 13.125 15 7.5C15 3.36 11.64 0 7.5 0ZM7.5 10.125C6.045 10.125 4.875 8.955 4.875 7.5C4.875 6.045 6.045 4.875 7.5 4.875C8.955 4.875 10.125 6.045 10.125 7.5C10.125 8.955 8.955 10.125 7.5 10.125Z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span className="lp-nearby-title">내 근처 북클럽</span>
+        </div>
+        <button className="lp-nearby-reset" onClick={() => { setStatus("idle"); setNearby([]); }} aria-label="닫기">×</button>
       </div>
       <div className="lp-nearby-list">
         {nearby.map((b) => (
@@ -196,7 +206,7 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
             </div>
             <div className="lp-nearby-dist">
               <span className="lp-nearby-km">{fmtDist(b.distKm)}</span>
-              <span className="lp-nearby-seats">{(b.maxParticipants ?? 8) - (b.currentParticipants ?? 0)}석</span>
+              <span className="lp-nearby-seats">{(b.maxParticipants ?? 8) - (b.currentParticipants ?? 0)}자리 남음</span>
             </div>
           </button>
         ))}
@@ -278,12 +288,36 @@ function ArchiveReviewForm() {
   const [content, setContent] = useState("");
   const [authorName, setAuthorName] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
+  const [photoPreview, setPhotoPreview] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "done" | "error">("idle");
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const objectUrl = URL.createObjectURL(file);
+    setPhotoPreview(objectUrl);
+    setUploadStatus("uploading");
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      if (!res.ok) throw new Error("upload failed");
+      const { url } = await res.json();
+      setPhotoUrl(url);
+      setUploadStatus("done");
+    } catch {
+      setUploadStatus("error");
+      setPhotoPreview("");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (content.trim().length < 20) return;
+    if (tab === "photo" && uploadStatus === "uploading") return;
     setStatus("sending");
     try {
       const res = await fetch("/api/archive/review", {
@@ -299,84 +333,112 @@ function ArchiveReviewForm() {
       });
       if (!res.ok) throw new Error("fail");
       setStatus("sent");
-      setContent("");
-      setAuthorName("");
-      setPhotoUrl("");
-      setVideoUrl("");
+      setContent(""); setAuthorName(""); setPhotoUrl(""); setPhotoPreview(""); setVideoUrl("");
+      setUploadStatus("idle");
     } catch {
       setStatus("error");
     }
     setTimeout(() => setStatus("idle"), 4000);
   };
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%", padding: "12px 16px", borderRadius: 10, fontSize: 14,
+    border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)",
+    color: "var(--lp-ink)", outline: "none", boxSizing: "border-box", fontFamily: "var(--lp-sans)",
+  };
+
   return (
-    <div style={{ marginTop: 56, padding: "36px 40px", borderRadius: 16, background: "rgba(255,255,255,0.4)", border: "1px solid var(--lp-line-soft)" }}>
-      <div style={{ fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--lp-muted)", marginBottom: 10 }}>후기 남기기</div>
-      <p style={{ fontSize: 15, color: "var(--lp-ink-soft)", marginBottom: 24, lineHeight: 1.6 }}>당신의 변화를 기록해주세요.</p>
+    <div style={{ marginTop: 56, padding: "36px 40px", borderRadius: 16, background: "rgba(255,255,255,0.4)", border: "1px solid var(--lp-line-soft)", maxWidth: 1020, margin: "56px auto 0" }}>
+      <div style={{ fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--lp-muted)", marginBottom: 10 }}>아카이빙에 기록하기</div>
+      <p style={{ fontSize: 15, color: "var(--lp-ink-soft)", marginBottom: 6, lineHeight: 1.6 }}>
+        한번쯤 남겨볼까 싶으셨다면, 그 생각이 맞아요.
+      </p>
+      <p style={{ fontSize: 13.5, color: "var(--lp-muted)", marginBottom: 24, lineHeight: 1.6 }}>
+        글 · 사진 · 영상으로 당신의 변화를 기록해주세요. 검토 후 아카이빙에 실립니다.
+      </p>
 
       {/* 탭 */}
       <div style={{ display: "flex", gap: 0, marginBottom: 24, borderBottom: "1px solid var(--lp-line-soft)" }}>
         {(["text", "photo", "video"] as const).map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            style={{
-              padding: "8px 18px", fontSize: 13.5, background: "none", border: "none",
-              cursor: "pointer", color: tab === t ? "var(--lp-ink)" : "var(--lp-muted)",
-              borderBottom: tab === t ? "2px solid var(--lp-ink)" : "2px solid transparent",
-              marginBottom: -1, transition: "color 0.2s",
-              fontFamily: "var(--lp-serif-ko)",
-            }}
-          >
-            {t === "text" ? "글" : t === "photo" ? "사진" : "영상"}
+          <button key={t} type="button" onClick={() => setTab(t)} style={{
+            padding: "8px 20px", fontSize: 13.5, background: "none", border: "none",
+            cursor: "pointer", color: tab === t ? "var(--lp-ink)" : "var(--lp-muted)",
+            borderBottom: tab === t ? "2px solid var(--lp-ink)" : "2px solid transparent",
+            marginBottom: -1, transition: "color 0.2s", fontFamily: "var(--lp-serif-ko)",
+          }}>
+            {t === "text" ? "✍ 글" : t === "photo" ? "📷 사진" : "🎞 영상"}
           </button>
         ))}
       </div>
 
       {status === "sent" ? (
-        <div style={{ padding: "24px 0", textAlign: "center" }}>
-          <div style={{ fontSize: 28, marginBottom: 12 }}>✦</div>
-          <p style={{ fontSize: 15, color: "var(--lp-ink)", marginBottom: 4 }}>후기가 전달되었습니다.</p>
-          <span style={{ fontSize: 13, color: "var(--lp-muted)" }}>소중한 기록 감사합니다.</span>
+        <div style={{ padding: "32px 0", textAlign: "center" }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>✦</div>
+          <p style={{ fontSize: 16, color: "var(--lp-ink)", marginBottom: 8, fontFamily: "var(--lp-serif-ko)" }}>후기가 전달되었습니다.</p>
+          <span style={{ fontSize: 13.5, color: "var(--lp-muted)" }}>소중한 기록 감사합니다. 곧 아카이빙에 실릴 거예요.</span>
         </div>
       ) : (
         <form onSubmit={handleSubmit}>
           {tab === "photo" && (
-            <div style={{ marginBottom: 12 }}>
-              <input
-                type="url"
-                placeholder="사진 URL"
-                value={photoUrl}
-                onChange={(e) => setPhotoUrl(e.target.value)}
-                style={{
-                  width: "100%", padding: "12px 16px", borderRadius: 10, fontSize: 14,
-                  border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)",
-                  color: "var(--lp-ink)", outline: "none", boxSizing: "border-box",
-                  fontFamily: "var(--lp-sans)",
-                }}
-              />
+            <div style={{ marginBottom: 16 }}>
+              {photoPreview ? (
+                <div style={{ position: "relative", marginBottom: 8 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={photoPreview} alt="미리보기" style={{ width: "100%", maxHeight: 220, objectFit: "cover", borderRadius: 10, display: "block" }} />
+                  <button
+                    type="button"
+                    onClick={() => { setPhotoPreview(""); setPhotoUrl(""); setUploadStatus("idle"); }}
+                    style={{ position: "absolute", top: 8, right: 8, width: 28, height: 28, borderRadius: "50%", background: "rgba(0,0,0,0.6)", color: "#fff", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}
+                  >×</button>
+                  {uploadStatus === "uploading" && (
+                    <div style={{ position: "absolute", inset: 0, borderRadius: 10, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, gap: 8 }}>
+                      <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
+                      업로드 중...
+                    </div>
+                  )}
+                  {uploadStatus === "error" && (
+                    <p style={{ fontSize: 12, color: "rgba(239,68,68,0.9)", marginTop: 4 }}>업로드에 실패했어요. URL로 직접 입력해주세요.</p>
+                  )}
+                </div>
+              ) : (
+                <label
+                  style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: "28px 16px", borderRadius: 10, border: "2px dashed var(--lp-line-soft)", cursor: "pointer", transition: "background .2s ease", background: "rgba(255,255,255,0.3)" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.6)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.3)")}
+                >
+                  <input ref={fileRef} type="file" accept="image/*" hidden onChange={handlePhotoFile} />
+                  <span style={{ fontSize: 28 }}>📷</span>
+                  <span style={{ fontSize: 14, color: "var(--lp-ink-soft)" }}>사진 선택</span>
+                  <span style={{ fontSize: 12, color: "var(--lp-muted)" }}>또는 URL을 아래에 직접 입력하세요</span>
+                </label>
+              )}
+              {!photoPreview && (
+                <input type="url" placeholder="사진 URL 직접 입력" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} style={{ ...inputStyle, marginTop: 8 }} />
+              )}
             </div>
           )}
           {tab === "video" && (
-            <div style={{ marginBottom: 12 }}>
-              <input
-                type="url"
-                placeholder="YouTube 링크 (예: https://youtu.be/...)"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                style={{
-                  width: "100%", padding: "12px 16px", borderRadius: 10, fontSize: 14,
-                  border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)",
-                  color: "var(--lp-ink)", outline: "none", boxSizing: "border-box",
-                  fontFamily: "var(--lp-sans)",
-                }}
-              />
+            <div style={{ marginBottom: 16 }}>
+              <input type="url" placeholder="YouTube · Vimeo 링크 (예: https://youtu.be/...)" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} style={inputStyle} />
+              {videoUrl && (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) && (
+                <div style={{ marginTop: 8, borderRadius: 10, overflow: "hidden", background: "#000" }}>
+                  <iframe
+                    src={videoUrl.replace("watch?v=", "embed/").replace("youtu.be/", "www.youtube.com/embed/")}
+                    style={{ width: "100%", height: 180, border: "none" }}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media"
+                    allowFullScreen
+                  />
+                </div>
+              )}
             </div>
           )}
           <textarea
-            placeholder="후기를 남겨주세요 (최소 20자)"
-            rows={4}
+            placeholder={
+              tab === "text"
+                ? "모임 후 변화된 것이 있나요? 어떤 문장이 오래 남았나요? (최소 20자)"
+                : "사진이나 영상에 대한 설명을 남겨주세요. (최소 20자)"
+            }
+            rows={tab === "text" ? 5 : 3}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             minLength={20}
@@ -395,24 +457,20 @@ function ArchiveReviewForm() {
               value={authorName}
               onChange={(e) => setAuthorName(e.target.value)}
               maxLength={20}
-              style={{
-                flex: 1, minWidth: 160, padding: "10px 14px", borderRadius: 9, fontSize: 13.5,
-                border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)",
-                color: "var(--lp-ink)", outline: "none", fontFamily: "var(--lp-sans)",
-              }}
+              style={{ flex: 1, minWidth: 160, padding: "10px 14px", borderRadius: 9, fontSize: 13.5, border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)", color: "var(--lp-ink)", outline: "none", fontFamily: "var(--lp-sans)" }}
             />
             <button
               type="submit"
-              disabled={content.trim().length < 20 || status === "sending"}
+              disabled={content.trim().length < 20 || status === "sending" || uploadStatus === "uploading"}
               style={{
-                padding: "10px 24px", borderRadius: 9999, fontSize: 14, fontWeight: 500,
-                background: content.trim().length >= 20 ? "var(--lp-ink)" : "var(--lp-line-soft)",
-                color: content.trim().length >= 20 ? "var(--lp-cream)" : "var(--lp-muted)",
-                border: "none", cursor: content.trim().length >= 20 ? "pointer" : "not-allowed",
+                padding: "10px 26px", borderRadius: 9999, fontSize: 14, fontWeight: 500,
+                background: content.trim().length >= 20 && uploadStatus !== "uploading" ? "var(--lp-ink)" : "var(--lp-line-soft)",
+                color: content.trim().length >= 20 && uploadStatus !== "uploading" ? "var(--lp-cream)" : "var(--lp-muted)",
+                border: "none", cursor: content.trim().length >= 20 && uploadStatus !== "uploading" ? "pointer" : "not-allowed",
                 transition: "all 0.2s", whiteSpace: "nowrap",
               }}
             >
-              {status === "sending" ? "전송 중…" : "후기 남기기"}
+              {status === "sending" ? "전송 중…" : "기록 남기기"}
             </button>
           </div>
           {status === "error" && (
@@ -446,6 +504,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
   const [askContent, setAskContent] = useState("");
   const [askAuthor, setAskAuthor] = useState("");
   const [askStatus, setAskStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [miniExpanded, setMiniExpanded] = useState(false);
   const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
   // Pick random popup items for each float element (stable per session)
@@ -658,41 +717,51 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           ))}
         </div>
 
-        {/* Mini books — always expanded */}
+        {/* Mini books — collapsible */}
         <div className="lp-books-more">
           <div className="lp-books-more-head">
             <div className="bm-rule" />
-            <div className="lp-books-more-label">
+            <button
+              className="lp-books-more-toggle"
+              onClick={() => setMiniExpanded((v) => !v)}
+              aria-expanded={miniExpanded}
+            >
               <span>더 많은 북클럽</span>
               <span className="bmt-count">24개</span>
-            </div>
+              <span className="bmt-chev" aria-hidden="true" />
+            </button>
             <div className="bm-rule" />
           </div>
-          <p className="lp-books-more-help">— 지금 바로 참여할 수 있는 모임들입니다.</p>
-
-          <div className="lp-mini-grid">
-            {miniBooks.map((b) => (
-              <div
-                key={b.title}
-                className="lp-mini-book"
-                onClick={() => setModalBook(b)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === "Enter" && setModalBook(b)}
-              >
-                <div className={`lp-mini-spine ${b.color}`} />
-                <div className="lp-mini-body">
-                  <div className="lp-mini-title">{b.title}</div>
-                  <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어요</div>
-                  <div className="lp-mini-meta">
-                    <span className="lp-mini-tag">{b.tag}</span>
-                    <span className="lp-mini-members">
-                      <span className="mem-dot" />{b.currentParticipants}명 참여 중
-                    </span>
+          <p className="lp-books-more-help">
+            {miniExpanded
+              ? "— 지금 바로 참여할 수 있는 모임들이에요."
+              : "— 마음에 드는 모임이 있을지도 모르니까요."}
+          </p>
+          <div className={`lp-books-more-body${miniExpanded ? " open" : ""}`}>
+            <div className="lp-mini-grid">
+              {miniBooks.map((b) => (
+                <div
+                  key={b.title}
+                  className="lp-mini-book"
+                  onClick={() => setModalBook(b)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && setModalBook(b)}
+                >
+                  <div className={`lp-mini-spine ${b.color}`} />
+                  <div className="lp-mini-body">
+                    <div className="lp-mini-title">{b.title}</div>
+                    <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어요</div>
+                    <div className="lp-mini-meta">
+                      <span className="lp-mini-tag">{b.tag}</span>
+                      <span className="lp-mini-members">
+                        <span className="mem-dot" />{b.currentParticipants}명 참여 중
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -721,39 +790,27 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           ))}
         </div>
 
+        {/* 아카이빙 더 보기 */}
+        <div style={{ maxWidth: 1020, margin: "32px auto 0", display: "flex", justifyContent: "flex-end" }}>
+          <a
+            href="/archive"
+            style={{
+              fontFamily: "var(--lp-serif)", fontSize: 13.5, letterSpacing: "0.06em",
+              color: "var(--lp-accent)", textDecoration: "none",
+              display: "inline-flex", alignItems: "center", gap: 6,
+              opacity: 0.85, transition: "opacity .2s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.85")}
+          >
+            더 많은 기록 보기 — 아카이빙 →
+          </a>
+        </div>
+
         {/* 후기 남기기 폼 */}
         <ArchiveReviewForm />
       </section>
 
-      {/* LEADERS */}
-      <section className="lp-section lp-leaders" id="leaders">
-        <div className="lp-section-head">
-          <div className="lp-left">
-            <div className="lp-eyebrow">LEADERS — 질문을 던지는 사람들</div>
-            <h2 className="lp-h-section">
-              Quesapience,<br /><span className="lp-em">질문하는</span> 사람들.
-            </h2>
-          </div>
-          <p className="lp-lede">
-            질문을 잘 던지는 분들과 함께합니다. 경청하고, 이해하고, 다시 묻습니다.
-          </p>
-        </div>
-        <div className="lp-leaders-grid">
-          {leaders.map((l) => (
-            <article key={l.name} className="lp-leader lp-reveal">
-              <div className="lp-leader-portrait">{l.initial}</div>
-              <div className="lp-leader-name">
-                {l.name}<span className="ln-role">— {l.role}</span>
-              </div>
-              <p className="lp-leader-philosophy">{l.philosophy}</p>
-              <div className="lp-leader-question">
-                <div className="lq-k">대표 질문</div>
-                <div className="lq-v">{l.q}</div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
 
       {/* QUESTIONS HUB — Today + Ask 통합 */}
       <section className="lp-section lp-question-hub" id="questions">
@@ -785,7 +842,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               <span><strong>{todayQuestion?.answers_count ?? "72"}</strong> 답변</span>
             </div>
             <div className="lp-q-comments">
-              <div className="qc-label">In the margins · 메모</div>
+              <div className="qc-label">In the margins · 답변 미리보기</div>
               <div className="qc-row">
                 <span className="qc-who">서연 ―</span>
                 <span className="qc-what">&ldquo;아버지 장례식 끝나고 지하철에서. 그게 마지막이었던 것 같아요.&rdquo;</span>
@@ -799,6 +856,20 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
                 <span className="qc-what">&ldquo;오늘 새벽이요. 이유는 모르겠어요.&rdquo;</span>
               </div>
             </div>
+            <a
+              href={todayQuestion?.id ? `/questions/${todayQuestion.id}` : "/questions"}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8, marginTop: "var(--lp-sp3)",
+                fontFamily: "var(--lp-serif)", fontSize: 13, letterSpacing: "0.04em",
+                color: "var(--lp-accent)", textDecoration: "none", opacity: 0.85,
+                transition: "opacity .2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.85")}
+            >
+              <span>대화 전체 보기 · {todayQuestion?.answers_count ?? 72}개 답변</span>
+              <span style={{ letterSpacing: 0 }}>→</span>
+            </a>
           </article>
 
           <div className="lp-q-card-stack">

@@ -1056,99 +1056,119 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   cursor: default;
 }
 
-/* ── 위치 기반 근처 모임 ────────────────────────────── */
+/* ── 위치 기반 근처 북클럽 ────────────────────────────── */
 .lp-nearby-trigger {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 32px;
+  gap: 16px;
+  margin-bottom: 40px;
   flex-wrap: wrap;
 }
 .lp-nearby-btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 10px 20px;
+  gap: 9px;
+  padding: 12px 24px;
   border-radius: 9999px;
   border: 1.5px solid var(--lp-line);
-  background: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.65);
   font-size: 14px;
   color: var(--lp-ink);
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition: background 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.25s;
   font-style: normal;
-  font-family: var(--lp-sans);
+  font-family: var(--lp-serif-ko);
   font-weight: 500;
+  letter-spacing: -0.005em;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 .lp-nearby-btn:hover {
   background: white;
   border-color: var(--lp-accent);
-  box-shadow: 0 4px 16px rgba(94,70,50,0.1);
+  box-shadow: 0 6px 20px rgba(94,70,50,0.12);
+  transform: translateY(-1px);
 }
-.lp-nearby-icon { font-size: 16px; line-height: 1; }
+.lp-nearby-pin-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lp-accent);
+  flex-shrink: 0;
+}
+.lp-nearby-pin-active { color: var(--lp-accent); }
 .lp-nearby-hint {
   font-size: 12.5px;
   color: var(--lp-muted);
   font-style: normal;
+  font-family: var(--lp-serif-ko);
 }
 .lp-nearby-loading {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   font-size: 13.5px;
   color: var(--lp-muted);
+  font-family: var(--lp-serif-ko);
+  padding: 4px 0;
 }
 .lp-nearby-spin {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   border: 2px solid var(--lp-line);
   border-top-color: var(--lp-accent);
   border-radius: 50%;
-  animation: lp-spin 0.8s linear infinite;
+  animation: lp-spin 0.75s linear infinite;
   flex-shrink: 0;
 }
 @keyframes lp-spin { to { transform: rotate(360deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* 결과 패널 */
 .lp-nearby-panel {
-  margin-bottom: 32px;
-  border-radius: 14px;
+  margin-bottom: 40px;
+  border-radius: 16px;
   border: 1px solid var(--lp-line-soft);
-  background: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.62);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   overflow: hidden;
+  box-shadow: 0 2px 16px rgba(28,31,38,0.05);
 }
 .lp-nearby-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
   padding: 14px 20px;
   border-bottom: 1px solid var(--lp-line-soft);
-  background: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.35);
 }
 .lp-nearby-title {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--lp-ink);
-  flex: 1;
   font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: var(--lp-serif);
 }
 .lp-nearby-reset {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: none;
-  background: rgba(28,31,38,0.08);
+  background: rgba(28,31,38,0.07);
   color: var(--lp-muted);
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s;
   line-height: 1;
 }
-.lp-nearby-reset:hover { background: rgba(28,31,38,0.14); }
+.lp-nearby-reset:hover { background: rgba(28,31,38,0.13); color: var(--lp-ink); }
 .lp-nearby-list {
   display: flex;
   flex-direction: column;
@@ -1156,23 +1176,24 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-nearby-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 20px;
+  gap: 14px;
+  padding: 16px 20px;
   border: none;
   background: none;
   cursor: pointer;
   text-align: left;
-  border-bottom: 1px solid var(--lp-line-soft);
+  border-bottom: 1px solid rgba(229,221,203,0.6);
   transition: background 0.15s;
   font-family: var(--lp-sans);
 }
 .lp-nearby-item:last-child { border-bottom: none; }
-.lp-nearby-item:hover { background: rgba(255,255,255,0.7); }
+.lp-nearby-item:hover { background: rgba(255,255,255,0.8); }
 .lp-nearby-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(94,70,50,0.1);
 }
 .lp-nearby-dot.navy  { background: #1B2536; }
 .lp-nearby-dot.cream { background: #8B7A5E; }
@@ -1180,9 +1201,11 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-nearby-dot.olive { background: #5C6B3A; }
 .lp-nearby-dot.dusk  { background: #4A5568; }
 .lp-nearby-dot.sage  { background: #7A9E7E; }
-.lp-nearby-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.lp-nearby-name { font-size: 14px; font-weight: 500; color: var(--lp-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lp-nearby-loc  { font-size: 12px; color: var(--lp-muted); }
-.lp-nearby-dist { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
-.lp-nearby-km   { font-size: 13px; font-weight: 600; color: var(--lp-accent); }
-.lp-nearby-seats { font-size: 11px; color: var(--lp-muted); }
+.lp-nearby-dot.terra { background: #B07B5C; }
+.lp-nearby-dot.mauve { background: #8C6B72; }
+.lp-nearby-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.lp-nearby-name { font-size: 14px; font-weight: 500; color: var(--lp-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.005em; font-family: var(--lp-serif-ko); }
+.lp-nearby-loc  { font-size: 12px; color: var(--lp-muted); font-family: var(--lp-sans); }
+.lp-nearby-dist { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+.lp-nearby-km   { font-size: 13.5px; font-weight: 600; color: var(--lp-accent); font-family: var(--lp-serif); }
+.lp-nearby-seats { font-size: 11px; color: var(--lp-muted); font-family: var(--lp-sans); letter-spacing: 0.02em; }

@@ -52,6 +52,16 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const starters = STARTER_QUESTIONS[giant.slug] ?? STARTER_QUESTIONS.default;
+  const [liveQuotes, setLiveQuotes] = useState<{ content: string; author: string; source: string }[]>([]);
+  const [quotesLoaded, setQuotesLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/giants/quotes/${giant.slug}`)
+      .then((r) => r.json())
+      .then((d) => { setLiveQuotes(d.quotes ?? []); setQuotesLoaded(true); })
+      .catch(() => setQuotesLoaded(true));
+  }, [giant.slug]);
+
   const [discResult, setDiscResult] = useState<{
     statement: string;
     discussion_questions: string[];
@@ -281,6 +291,49 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                       </div>
                     ))}
                   </div>
+                </section>
+
+                {/* 명언 — 외부 API */}
+                <section>
+                  <div style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+                    Quotes — 명언
+                    <span style={{ fontSize: 10, padding: "2px 7px", borderRadius: 9999, background: `${giant.color}18`, color: giant.color, letterSpacing: "0.08em" }}>
+                      Live
+                    </span>
+                  </div>
+                  {!quotesLoaded ? (
+                    <div style={{ display: "flex", gap: 10, alignItems: "center", color: "var(--muted)", fontSize: 13 }}>
+                      <span style={{ width: 14, height: 14, border: "2px solid var(--line-soft)", borderTopColor: giant.color, borderRadius: "50%", animation: "spin 0.75s linear infinite", display: "inline-block", flexShrink: 0 }} />
+                      명언을 불러오는 중...
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                      {liveQuotes.slice(0, 5).map((q, i) => (
+                        <blockquote key={i} style={{
+                          margin: 0, padding: "20px 24px",
+                          borderRadius: 12,
+                          border: "1px solid var(--line-soft)",
+                          background: i === 0 ? `${giant.color}0A` : "rgba(255,255,255,0.4)",
+                          borderLeft: `3px solid ${giant.color}${i === 0 ? "99" : "44"}`,
+                          position: "relative",
+                        }}>
+                          <p style={{
+                            fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                            fontSize: 16, fontWeight: 300,
+                            color: "var(--ink)", lineHeight: 1.75,
+                            fontStyle: "normal", marginBottom: q.source ? 10 : 0,
+                          }}>
+                            &ldquo;{q.content}&rdquo;
+                          </p>
+                          {q.source && q.source !== "Quotable.io" && (
+                            <cite style={{ fontSize: 12, color: "var(--muted)", fontStyle: "normal", letterSpacing: "0.04em" }}>
+                              — {q.source}
+                            </cite>
+                          )}
+                        </blockquote>
+                      ))}
+                    </div>
+                  )}
                 </section>
 
                 {/* 연결된 질문들 */}

@@ -349,3 +349,8 @@
     font-family: var(--font-noto-serif-kr), "Georgia", serif;
   }
 }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.grid-responsive { grid-template-columns: 1fr 360px; }
+@media (max-width: 900px) { .grid-responsive { grid-template-columns: 1fr !important; } }
+@media (max-width: 900px) { .sidebar-hide { display: none !important; } }

@@ -8,36 +8,108 @@ import type { LandingQuestion } from "@/components/home/LandingPage";
 export const revalidate = 300; // 5분 캐시
 
 export const metadata: Metadata = buildMetadata({
-  title: "질문하는 사람들 — 미래혁신형 북클럽",
+  title: "질문하는 사람들 — 미래혁신형 북클럽 | 서초구 선정",
   description:
-    "좋은 질문은 좋은 사람을 데려옵니다. 질문하는 사람들은 질문을 중심으로 사람과 책을 연결하는 오프라인 북토크 커뮤니티입니다. 서초구 선정 미래혁신형 북클럽.",
+    "좋은 질문은 좋은 사람을 데려옵니다. 질문하는 사람들은 질문·책·대화로 사람을 연결하는 서초구 선정 미래혁신형 오프라인 북클럽입니다. 위치 기반 내 근처 북클럽 참여, 오늘의 질문, 거인의 명언 탐구.",
   path: "/",
   type: "website",
   keywords: [
     "질문하는사람들", "Quesapience", "서초구북클럽",
     "미래혁신형북클럽", "오프라인독서모임", "북토크",
-    "외로움시즌", "독서질문", "지적커뮤니티",
+    "독서질문", "지적커뮤니티", "북클럽서울", "내근처북클럽",
+    "독서모임참여", "거인의어깨", "오늘의질문",
   ],
 });
 
-const landingSchema = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "@id": `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://quesapience.com"}/#homepage`,
-  name: "질문하는 사람들 — 미래혁신형 북클럽",
-  description: "좋은 질문은 좋은 사람을 데려옵니다. 질문 → 책 → 대화 → 사람 → 성장으로 이어지는 지적 커뮤니티.",
-  publisher: { "@id": `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://quesapience.com"}/#organization` },
-  inLanguage: "ko",
-  about: [
-    { "@type": "Thing", name: "독서모임" },
-    { "@type": "Thing", name: "북클럽" },
-    { "@type": "Thing", name: "질문 기반 대화" },
-  ],
-  speakable: {
-    "@type": "SpeakableSpecification",
-    cssSelector: [".lp-h-display", ".lp-lede", ".lp-q-text"],
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jilmunhaneun-saramdeul.vercel.app";
+
+const landingSchema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    url: SITE_URL,
+    name: "질문하는 사람들",
+    alternateName: "Quesapience",
+    description: "질문을 중심으로 책과 사람을 연결하는 서초구 선정 미래혁신형 북클럽",
+    inLanguage: "ko",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/questions?q={search_term_string}` },
+      "query-input": "required name=search_term_string",
+    },
   },
-};
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
+    name: "질문하는 사람들 — Quesapience",
+    url: SITE_URL,
+    logo: `${SITE_URL}/og-default.png`,
+    description: "서초구 선정 미래혁신형 북클럽. 질문 → 책 → 대화 → 사람 → 성장.",
+    foundingDate: "2025",
+    areaServed: { "@type": "City", name: "서울특별시" },
+    sameAs: [],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${SITE_URL}/#homepage`,
+    url: SITE_URL,
+    name: "질문하는 사람들 — 미래혁신형 북클럽",
+    description: "좋은 질문은 좋은 사람을 데려옵니다. 질문·책·대화로 사람을 연결하는 지적 커뮤니티.",
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    inLanguage: "ko",
+    about: [
+      { "@type": "Thing", name: "독서모임" },
+      { "@type": "Thing", name: "북클럽" },
+      { "@type": "Thing", name: "질문 기반 대화" },
+      { "@type": "Thing", name: "지적 커뮤니티" },
+    ],
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: [".lp-h-display", ".lp-lede", ".lp-q-text", ".lp-q-feature"],
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "질문하는 사람들 북클럽은 어떤 곳인가요?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "질문하는 사람들은 서초구 선정 미래혁신형 북클럽입니다. 좋은 질문 하나로 사람과 책을 연결하며, 오프라인 북토크와 온라인 아카이빙을 통해 지적 커뮤니티를 만들어갑니다.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "내 근처 북클럽에 참여하려면 어떻게 하나요?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "홈페이지에서 '내 근처 북클럽' 버튼을 클릭하고 위치를 허용하면 가장 가까운 모임을 찾아드립니다. 또는 /bookclub 페이지에서 전체 북클럽 목록을 확인할 수 있습니다.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "거인의 어깨 서비스는 무엇인가요?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "니체, 한강, 하라리 등 12명의 위대한 사유자들의 저서와 사상을 기반으로 AI가 그들의 관점에서 당신의 질문에 답하는 서비스입니다. 실제 명언도 공개 API를 통해 실시간으로 제공됩니다.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "오늘의 질문은 어떻게 선정되나요?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "매일 아침 멤버 한 분이 마음에 오래 머물던 질문을 선정합니다. 누구나 질문을 제안할 수 있으며, 가장 많은 공감을 받은 질문이 오늘의 질문으로 선정됩니다.",
+        },
+      },
+    ],
+  },
+];
 
 export default async function HomePage() {
   let todayQuestion: LandingQuestion | null = null;
