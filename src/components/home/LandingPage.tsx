@@ -361,26 +361,26 @@ function ArchiveReviewForm() {
       </p>
 
       {/* 공개/비공개 토글 */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <div style={{ display: "flex", borderRadius: 8, overflow: "hidden", border: "1px solid var(--lp-line-soft)" }}>
-          {[{ v: true, label: "공개", icon: "🌐" }, { v: false, label: "나만 보기", icon: "🔒" }].map(({ v, label, icon }) => (
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
+        <div style={{ display: "flex", borderRadius: 9999, overflow: "hidden", border: "1px solid var(--lp-line-soft)" }}>
+          {[{ v: true, label: "공개" }, { v: false, label: "나만 보기" }].map(({ v, label }) => (
             <button
               key={label}
               type="button"
               onClick={() => setIsPublic(v)}
               style={{
-                padding: "7px 15px", fontSize: 13, border: "none", cursor: "pointer",
+                padding: "7px 18px", fontSize: 13, border: "none", cursor: "pointer",
                 background: isPublic === v ? "var(--lp-ink)" : "transparent",
                 color: isPublic === v ? "var(--lp-cream)" : "var(--lp-muted)",
-                transition: "all .2s ease", display: "flex", alignItems: "center", gap: 5,
-                fontFamily: "var(--lp-sans)",
+                transition: "all .2s ease",
+                fontFamily: "var(--lp-serif-ko)", letterSpacing: "-0.005em",
               }}
             >
-              <span>{icon}</span><span>{label}</span>
+              {label}
             </button>
           ))}
         </div>
-        <span style={{ fontSize: 12.5, color: "var(--lp-muted)", fontFamily: "var(--lp-serif-ko)" }}>
+        <span style={{ fontSize: 12.5, color: "var(--lp-muted)", fontFamily: "var(--lp-serif-ko)", fontStyle: "normal" }}>
           {isPublic ? "아카이빙에 올라가요." : "나만 간직해요."}
         </span>
       </div>
@@ -389,19 +389,20 @@ function ArchiveReviewForm() {
       <div style={{ display: "flex", gap: 0, marginBottom: 24, borderBottom: "1px solid var(--lp-line-soft)" }}>
         {(["text", "photo", "video"] as const).map((t) => (
           <button key={t} type="button" onClick={() => setTab(t)} style={{
-            padding: "8px 20px", fontSize: 13.5, background: "none", border: "none",
+            padding: "8px 22px", fontSize: 13.5, background: "none", border: "none",
             cursor: "pointer", color: tab === t ? "var(--lp-ink)" : "var(--lp-muted)",
             borderBottom: tab === t ? "2px solid var(--lp-ink)" : "2px solid transparent",
-            marginBottom: -1, transition: "color 0.2s", fontFamily: "var(--lp-serif-ko)",
+            marginBottom: -1, transition: "color 0.2s",
+            fontFamily: "var(--lp-serif-ko)", letterSpacing: "-0.005em",
           }}>
-            {t === "text" ? "✍ 글" : t === "photo" ? "📷 사진" : "🎞 영상"}
+            {t === "text" ? "글" : t === "photo" ? "사진" : "영상"}
           </button>
         ))}
       </div>
 
       {status === "sent" ? (
         <div style={{ padding: "32px 0", textAlign: "center" }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>✦</div>
+          <div style={{ fontSize: 22, marginBottom: 12, fontFamily: "var(--lp-serif)", color: "var(--lp-accent)", letterSpacing: "0.2em" }}>— ✦ —</div>
           <p style={{ fontSize: 16, color: "var(--lp-ink)", marginBottom: 8, fontFamily: "var(--lp-serif-ko)" }}>
             {isPublic ? "아카이빙에 올라갔어요." : "기록이 저장됐어요."}
           </p>
@@ -439,9 +440,8 @@ function ArchiveReviewForm() {
                   onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.3)")}
                 >
                   <input ref={fileRef} type="file" accept="image/*" hidden onChange={handlePhotoFile} />
-                  <span style={{ fontSize: 28 }}>📷</span>
-                  <span style={{ fontSize: 14, color: "var(--lp-ink-soft)" }}>사진 고르기</span>
-                  <span style={{ fontSize: 12, color: "var(--lp-muted)" }}>또는 아래에 링크로 올릴 수도 있어요</span>
+                  <span style={{ fontSize: 14, color: "var(--lp-ink-soft)", fontFamily: "var(--lp-serif-ko)" }}>사진 고르기</span>
+                  <span style={{ fontSize: 12, color: "var(--lp-muted)", fontFamily: "var(--lp-serif-ko)" }}>또는 아래에 링크로 올릴 수 있어요</span>
                 </label>
               )}
               {!photoPreview && (

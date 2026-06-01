@@ -181,7 +181,7 @@ export default function BookClubDetailClient({ club }: { club: any }) {
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.12)"; }}
                     title="리더·관리자만 접근 가능"
                   >
-                    ⚙ 리더 관리
+                    리더 관리
                   </a>
                 </div>
               </div>
@@ -658,7 +658,7 @@ export default function BookClubDetailClient({ club }: { club: any }) {
             style={{ background: "var(--bg)", borderRadius: 20, padding: 40, maxWidth: 380, width: "100%", textAlign: "center" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ fontSize: 36, marginBottom: 16 }}>⏳</div>
+            <div style={{ fontSize: 28, marginBottom: 16, fontFamily: '"EB Garamond", Georgia, serif', color: "var(--muted)", letterSpacing: "0.1em" }}>— —</div>
             <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 20, fontWeight: 400, color: "var(--ink)", marginBottom: 12 }}>
               신청 링크를 준비 중이에요.
             </h3>

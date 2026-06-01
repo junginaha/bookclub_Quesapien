@@ -130,7 +130,7 @@ export default function LeaderManageClient({ club, isAdmin }: { club: any; isAdm
           )}
           {!joinUrl && (
             <p style={{ fontSize: 12, color: "#F59E0B", marginTop: 10 }}>
-              ⚠ 링크가 없으면 참여자에게 &ldquo;신청 링크 준비 중이에요.&rdquo;가 표시돼요.
+              링크가 없으면 참여자에게 &ldquo;신청 링크 준비 중이에요.&rdquo;가 표시돼요.
             </p>
           )}
         </section>
@@ -190,7 +190,7 @@ export default function LeaderManageClient({ club, isAdmin }: { club: any; isAdm
             <Save size={15} />
             {saving ? "저장 중…" : "저장하기"}
           </button>
-          {saved && <span style={{ fontSize: 13.5, color: "var(--accent)" }}>✓ 저장됐어요.</span>}
+          {saved && <span style={{ fontSize: 13.5, color: "var(--accent)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>저장됐어요.</span>}
           {error && <span style={{ fontSize: 13, color: "#EF4444" }}>{error}</span>}
         </div>
 

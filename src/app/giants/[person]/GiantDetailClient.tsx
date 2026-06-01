@@ -384,9 +384,9 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                 {/* 역량 카드 */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {[
-                    { icon: "💬", label: "대화 가능", desc: "어떤 질문도 환영해요", action: () => setActiveTab("chat") },
-                    { icon: "📋", label: "발제 생성 가능", desc: "북클럽 토론 질문지를 만들어요", action: () => setActiveTab("discuss") },
-                    { icon: "🔍", label: "질문 가능", desc: "그의 관점으로 깊이 탐구해요", action: () => { setActiveTab("chat"); } },
+                    { mark: "—", label: "대화 가능", desc: "어떤 질문도 환영해요", action: () => setActiveTab("chat") },
+                    { mark: "—", label: "발제 생성 가능", desc: "북클럽 토론 질문지를 만들어요", action: () => setActiveTab("discuss") },
+                    { mark: "—", label: "질문 가능", desc: "그의 관점으로 깊이 탐구해요", action: () => setActiveTab("chat") },
                   ].map((cap) => (
                     <button
                       key={cap.label}
@@ -410,12 +410,12 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                         el.style.transform = "translateX(0)";
                       }}
                     >
-                      <span style={{ fontSize: 20, flexShrink: 0 }}>{cap.icon}</span>
+                      <span style={{ fontSize: 16, color: giant.color, flexShrink: 0, fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "normal" }}>{cap.mark}</span>
                       <div>
-                        <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--ink)", marginBottom: 1 }}>
+                        <div style={{ fontSize: 13.5, fontWeight: 500, color: "var(--ink)", marginBottom: 2, fontFamily: "var(--font-noto-serif-kr), Georgia, serif", letterSpacing: "-0.005em" }}>
                           {cap.label}
                         </div>
-                        <div style={{ fontSize: 12, color: "var(--muted)" }}>{cap.desc}</div>
+                        <div style={{ fontSize: 12, color: "var(--muted)", fontFamily: "var(--font-noto-sans-kr), sans-serif" }}>{cap.desc}</div>
                       </div>
                       <span style={{ marginLeft: "auto", color: "var(--muted)", fontSize: 12 }}>→</span>
                     </button>
