@@ -474,49 +474,67 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-reveal { opacity: 0; transform: translateY(20px); transition: opacity .9s cubic-bezier(.2,.8,.2,1), transform .9s cubic-bezier(.2,.8,.2,1); }
 .lp-reveal.visible { opacity: 1; transform: translateY(0); }
 
-/* ── CTA ROW (hero: primary + skip) ── */
-.lp-cta-row { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+/* ── CTA ROW (hero) ── */
+.lp-cta-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 
-/* ── SKIP BUTTON ── */
-.lp-btn-skip {
-  display: inline-flex; align-items: center; gap: 10px;
-  padding: 14px 4px;
-  font-family: var(--lp-serif); font-size: var(--lp-sm);
-  letter-spacing: 0.32em; text-transform: uppercase;
-  color: var(--lp-muted);
+/* ── OUTLINE BUTTON — secondary (matches primary pill proportions) ── */
+.lp-btn-outline {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 16px 28px;
+  border: 1.5px solid rgba(28,31,38,0.28);
+  border-radius: 999px;
+  font-size: 14.5px; letter-spacing: 0.02em; font-weight: 500;
+  color: var(--lp-ink-soft);
+  background: rgba(255,255,255,0.35);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .3s ease,
+              background .3s ease, color .3s ease, box-shadow .4s ease;
+  position: relative; overflow: hidden;
+}
+.lp-btn-outline::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: -100%; width: 60%;
+  background: linear-gradient(100deg, transparent, rgba(94,70,50,0.08), transparent);
+  animation: lp-btnShimmer 5.5s ease-in-out infinite; animation-delay: 2.2s;
+  pointer-events: none; z-index: 1;
+}
+.lp-btn-outline > * { position: relative; z-index: 2; }
+.lp-btn-outline:hover {
+  border-color: var(--lp-accent);
+  background: rgba(255,255,255,0.72);
+  color: var(--lp-ink);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px -12px rgba(94,70,50,0.18);
+}
+.lp-btn-outline:hover .lp-arrow { transform: translateX(4px); }
+.lp-btn-outline .lp-arrow { color: var(--lp-muted); }
+
+/* ── NEARBY BRIDGE — 스크롤 라인에서 내 근처 북클럽으로 연결 ── */
+.lp-nearby-bridge {
+  padding: 0 var(--lp-gutter);
+  background: var(--lp-bg);
   position: relative;
-  transition: color .35s ease, letter-spacing .35s ease;
 }
-.lp-btn-skip::after {
-  content: ""; position: absolute;
-  left: 4px; right: 36px; bottom: 8px; height: 1px;
-  background: currentColor;
-  transform: scaleX(0.4); transform-origin: left; opacity: 0.5;
-  transition: transform .5s cubic-bezier(.2,.8,.2,1), opacity .35s ease;
+.lp-nearby-bridge-line {
+  position: absolute;
+  top: 0; left: var(--lp-gutter);
+  width: 1px; height: 56px;
+  background: linear-gradient(to bottom, var(--lp-line), transparent);
+  overflow: hidden;
 }
-.lp-btn-skip:hover { color: var(--lp-ink); letter-spacing: 0.38em; }
-.lp-btn-skip:hover::after { transform: scaleX(1); opacity: 1; }
-.lp-skip-arrow {
-  position: relative; width: 22px; height: 8px;
-  display: inline-block; overflow: hidden; flex-shrink: 0;
+.lp-nearby-bridge-line::after {
+  content: "";
+  position: absolute; top: -50%; left: 0; right: 0; height: 50%;
+  background: var(--lp-bg);
+  animation: lp-slideDown 2.2s ease-in-out infinite;
+  animation-delay: .4s;
 }
-.lp-skip-arrow::before,
-.lp-skip-arrow::after {
-  content: ""; position: absolute; top: 50%;
-  width: 5px; height: 1px; background: currentColor;
-  transform-origin: right center;
+.lp-nearby-bridge .lp-nearby-trigger,
+.lp-nearby-bridge .lp-nearby-panel {
+  max-width: var(--lp-max);
+  margin-left: auto; margin-right: auto;
+  padding-top: 64px;
 }
-.lp-skip-arrow::before { right: 6px; transform: translateY(-50%) rotate(45deg); }
-.lp-skip-arrow::after  { right: 6px; transform: translateY(-50%) rotate(-45deg); }
-.lp-skip-line {
-  position: absolute; top: 50%; left: 0; width: 100%; height: 1px;
-  background: currentColor; transform: translateY(-50%);
-  animation: lp-skipNudge 2.4s ease-in-out infinite;
-}
-@keyframes lp-skipNudge {
-  0%, 100% { transform: translate(0, -50%); opacity: .7; }
-  50%       { transform: translate(4px, -50%); opacity: 1; }
-}
+@media (max-width: 760px) { .lp-nearby-bridge { display: none; } }
 
 /* ── BOOK COVER GENRE LABEL ── */
 .bc-genre {

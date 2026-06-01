@@ -212,3 +212,30 @@ INSERT INTO landing_questions (content, author_name, is_featured, is_today) VALU
   ('AI 시대에도 사랑은 여전히 중요할까요?', '민지', true, false),
   ('당신을 살게 만든 한 문장은 무엇인가요?', '도연', true, false)
 ON CONFLICT DO NOTHING;
+
+-- ── 8. Archive Reviews ───────────────────────────────────────
+CREATE TABLE IF NOT EXISTS archive_reviews (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  type          TEXT NOT NULL DEFAULT 'text' CHECK (type IN ('text', 'photo', 'video')),
+  content       TEXT NOT NULL,
+  author_name   TEXT NOT NULL DEFAULT '익명',
+  author_id     UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  photo_url     TEXT,
+  video_url     TEXT,
+  likes         INTEGER NOT NULL DEFAULT 0,
+  is_approved   BOOLEAN NOT NULL DEFAULT false,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE archive_reviews ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read approved archive_reviews" ON archive_reviews FOR SELECT USING (is_approved = true);
+CREATE POLICY "Anyone can insert archive_reviews" ON archive_reviews FOR INSERT WITH CHECK (true);
+
+-- Seed: sample archive reviews (approved)
+INSERT INTO archive_reviews (type, content, author_name, is_approved) VALUES
+  ('text', '처음으로 모르는 사람 앞에서 솔직한 대화를 했어요. 그 밤이 한 달 동안 저를 흔들고 있었습니다.', '채현 · UX 디자이너 · 30', true),
+  ('text', '사람은 아직 믿을 만하다는 감각을 4년 만에 다시 느꼈습니다. 그게 가장 큰 회복이었어요.', '진우 · 개발자 · 34', true),
+  ('text', '질문 하나가 삶을 흔들었습니다. 그 후로 일을 그만두고 6개월을 쉬었어요. 후회하지 않습니다.', '윤서 · 에디터 · 28', true),
+  ('text', '대답을 잘 하려 애쓰지 않게 된 첫 번째 자리였어요. 정답 없이 머무는 법을 배웠습니다.', '도연 · 대학원생 · 26', true),
+  ('text', '우리 반 아이들에게도 이런 자리를 만들어주고 싶다고 생각했습니다. 그게 변화의 시작이었어요.', '하린 · 교사 · 39', true)
+ON CONFLICT DO NOTHING;

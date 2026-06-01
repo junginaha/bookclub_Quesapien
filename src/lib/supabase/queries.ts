@@ -153,6 +153,22 @@ export async function getMySessions(userId: string) {
   return ((data ?? []) as any[]).map((d) => d.session).filter(Boolean);
 }
 
+// ─── Archive Reviews (public submissions) ─────────────────────
+export async function getArchiveReviews(limit = 60) {
+  const supabase = await createClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any)
+    .from("archive_reviews")
+    .select("id, type, content, author_name, photo_url, video_url, likes, created_at")
+    .eq("is_approved", true)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []) as {
+    id: string; type: string; content: string; author_name: string;
+    photo_url: string | null; video_url: string | null; likes: number; created_at: string;
+  }[];
+}
+
 // ─── Reviews ───────────────────────────────────────────────────
 export async function getReviews(limit = 20) {
   const supabase = await createClient();

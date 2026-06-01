@@ -4,7 +4,7 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import ArchiveClient from "./ArchiveClient";
 import DefinitionBlock from "@/components/seo/DefinitionBlock";
-import { getReviews } from "@/lib/supabase/queries";
+import { getArchiveReviews } from "@/lib/supabase/queries";
 import { breadcrumbSchema } from "@/lib/schema";
 import { buildMetadata } from "@/lib/metadata";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -21,8 +21,8 @@ export const metadata: Metadata = buildMetadata({
 export const revalidate = 60;
 
 export default async function ArchivePage() {
-  let reviews: Awaited<ReturnType<typeof getReviews>> = [];
-  try { reviews = await getReviews(60); } catch { /* use empty */ }
+  let reviews: Awaited<ReturnType<typeof getArchiveReviews>> = [];
+  try { reviews = await getArchiveReviews(60); } catch { /* use empty */ }
 
   const crumbLd = breadcrumbSchema([
     { name: "홈", href: "/" },

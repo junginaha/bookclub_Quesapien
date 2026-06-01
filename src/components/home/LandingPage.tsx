@@ -505,6 +505,10 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
   const [askAuthor, setAskAuthor] = useState("");
   const [askStatus, setAskStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [miniExpanded, setMiniExpanded] = useState(false);
+  const [questionLikes, setQuestionLikes] = useState<number | null>(null);
+  const [questionSaves, setQuestionSaves] = useState<number | null>(null);
+  const [questionReacted, setQuestionReacted] = useState<{ like: boolean; save: boolean }>({ like: false, save: false });
+  const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
   const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
   // Pick random popup items for each float element (stable per session)
@@ -558,6 +562,22 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
       if (book) setModalBook(book);
     }
   }, [floatItems]);
+
+  const handleReact = async (type: "like" | "save") => {
+    if (!todayQuestion?.id) return;
+    try {
+      const res = await fetch(`/api/landing-questions/${todayQuestion.id}/react`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, session_key: sessionKeyRef.current }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setQuestionReacted((prev) => ({ ...prev, [type]: data.reacted }));
+      if (type === "like" && data.likes !== undefined) setQuestionLikes(data.likes);
+      if (type === "save" && data.saves !== undefined) setQuestionSaves(data.saves);
+    } catch { /* ignore */ }
+  };
 
   const handleAskSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -624,27 +644,22 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             <div className="lp-cta-stack">
               <div className="lp-cta-row">
                 <a href="/questions" className="lp-btn-primary">
-                  <span>질문 탐색하기</span>
+                  <span>질문 주고 받기</span>
                   <span className="lp-arrow" />
                 </a>
-                <a href="/bookclub" className="lp-btn-skip" aria-label="북클럽으로 바로 가기">
+                <a href="/bookclub" className="lp-btn-outline">
                   <span>북클럽</span>
-                  <span className="lp-skip-arrow">
-                    <span className="lp-skip-line" />
-                  </span>
+                  <span className="lp-arrow" />
                 </a>
               </div>
               <span className="lp-cta-note">— 생각보다 따뜻합니다.</span>
             </div>
           </div>
 
-          {/* Floating papers — secret hover links */}
+          {/* Subtle accent dots */}
           {([
-            { cls: "p1", idx: 0 },
-            { cls: "p2", idx: 1 },
-            { cls: "p3", idx: 2 },
-            { cls: "dot d1", idx: 3 },
-            { cls: "dot d2", idx: 4 },
+            { cls: "dot d1", idx: 0 },
+            { cls: "dot d2", idx: 1 },
           ] as const).map(({ cls, idx }) => (
             <div
               key={idx}
@@ -667,6 +682,12 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
+      {/* NEARBY BRIDGE — 스크롤 라인 → 내 근처 북클럽 연결 */}
+      <div className="lp-nearby-bridge">
+        <div className="lp-nearby-bridge-line" aria-hidden="true" />
+        <NearbyClubsBanner books={books} onOpen={(b) => setModalBook(b)} />
+      </div>
+
       {/* BOOKS */}
       <section className="lp-section lp-books" id="books">
         <div className="lp-section-head">
@@ -680,9 +701,6 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다. 이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.
           </p>
         </div>
-
-        {/* 위치 기반 근처 모임 */}
-        <NearbyClubsBanner books={books} onOpen={(b) => setModalBook(b)} />
 
         <div className="lp-books-grid">
           {books.map((b) => (
@@ -837,9 +855,37 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               {todayQuestion?.content ?? "당신은 마지막으로 언제,\n진심으로 울었나요?"}
             </p>
             <div className="lp-q-meta">
-              <span><strong>{todayQuestion?.likes?.toLocaleString() ?? "1,284"}</strong> 공감</span>
-              <span><strong>{todayQuestion?.saves?.toLocaleString() ?? "397"}</strong> 저장</span>
-              <span><strong>{todayQuestion?.answers_count ?? "72"}</strong> 답변</span>
+              <button
+                onClick={() => handleReact("like")}
+                style={{
+                  background: "none", border: "none", cursor: "pointer", padding: "4px 0",
+                  display: "flex", alignItems: "center", gap: 6,
+                  color: questionReacted.like ? "var(--lp-accent)" : "inherit",
+                  transition: "color .2s ease",
+                }}
+              >
+                <strong style={{ color: questionReacted.like ? "var(--lp-accent)" : undefined }}>
+                  {(questionLikes ?? todayQuestion?.likes ?? 1284).toLocaleString()}
+                </strong>
+                <span>{questionReacted.like ? "♥" : "♡"} 공감</span>
+              </button>
+              <button
+                onClick={() => handleReact("save")}
+                style={{
+                  background: "none", border: "none", cursor: "pointer", padding: "4px 0",
+                  display: "flex", alignItems: "center", gap: 6,
+                  color: questionReacted.save ? "var(--lp-accent)" : "inherit",
+                  transition: "color .2s ease",
+                }}
+              >
+                <strong style={{ color: questionReacted.save ? "var(--lp-accent)" : undefined }}>
+                  {(questionSaves ?? todayQuestion?.saves ?? 397).toLocaleString()}
+                </strong>
+                <span>{questionReacted.save ? "★" : "☆"} 저장</span>
+              </button>
+              <span>
+                <strong>{todayQuestion?.answers_count ?? "72"}</strong> 답변
+              </span>
             </div>
             <div className="lp-q-comments">
               <div className="qc-label">In the margins · 답변 미리보기</div>
@@ -881,16 +927,23 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
                   { id: "s3", content: "당신을 살게 만든 한 문장은 무엇인가요?", likes: 2071, answers_count: 143, author_name: "" },
                 ]
             ).map((c, idx) => (
-              <article key={c.id ?? idx} className="lp-q-card lp-reveal">
-                <span className="qcard-num">No. {String(100 - idx).padStart(3, "0")}</span>
-                <p className="qcard-q">{c.content}</p>
-                <div className="qcard-foot">
-                  <span className="qf-nums">
-                    <span><b>{c.likes?.toLocaleString()}</b> 공감</span>
-                    <span><b>{c.answers_count}</b> 답변</span>
-                  </span>
-                </div>
-              </article>
+              <a
+                key={c.id ?? idx}
+                href={c.id && !c.id.startsWith("s") ? `/questions/${c.id}` : "/questions"}
+                style={{ textDecoration: "none", display: "block" }}
+              >
+                <article className="lp-q-card lp-reveal">
+                  <span className="qcard-num">No. {String(100 - idx).padStart(3, "0")}</span>
+                  <p className="qcard-q">{c.content}</p>
+                  <div className="qcard-foot">
+                    <span className="qf-nums">
+                      <span><b>{c.likes?.toLocaleString()}</b> 공감</span>
+                      <span><b>{c.answers_count}</b> 답변</span>
+                    </span>
+                    <span style={{ fontSize: 12, color: "var(--lp-accent)", opacity: 0.7 }}>→</span>
+                  </div>
+                </article>
+              </a>
             ))}
           </div>
         </div>
