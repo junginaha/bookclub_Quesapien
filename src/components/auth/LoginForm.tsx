@@ -3,89 +3,118 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useAppStore } from "@/lib/store";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginForm() {
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const login = useAppStore((s) => s.login);
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const form = new FormData(e.currentTarget);
-    const email    = form.get("email") as string;
-    const password = form.get("password") as string;
-
+    setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 400));
 
-    const result = login(email, password);
-    setLoading(false);
+    try {
+      const supabase = createClient();
+      const { error: loginErr } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
 
-    if (result.error) {
-      toast.error(result.error);
-    } else {
-      toast.success("다시 만나서 반가워요!");
+      if (loginErr) {
+        if (loginErr.message.includes("Invalid login")) {
+          setError("이메일 또는 비밀번호가 맞지 않아요.");
+        } else if (loginErr.message.includes("Email not confirmed")) {
+          setError("이메일 인증이 필요해요. 받은편지함을 확인해주세요.");
+        } else {
+          setError(loginErr.message);
+        }
+        return;
+      }
+
       router.push("/");
       router.refresh();
+    } catch {
+      setError("로그인 중 오류가 발생했어요. 다시 시도해주세요.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%", padding: "12px 16px", borderRadius: 10, fontSize: 15,
+    border: "1.5px solid var(--line-soft)", background: "rgba(255,255,255,0.7)",
+    color: "var(--ink)", outline: "none", boxSizing: "border-box",
+    fontFamily: "var(--font-noto-sans-kr), sans-serif",
+    transition: "border-color .2s ease",
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="email">이메일 또는 아이디</Label>
-        <Input
-          id="email"
-          name="email"
-          type="text"
-          placeholder="이메일 또는 아이디를 입력해주세요"
-          autoComplete="username"
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div>
+        <label style={{ fontSize: 13, color: "var(--muted)", display: "block", marginBottom: 6, fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
+          이메일
+        </label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="hello@example.com"
           required
-          className="h-12"
+          style={inputStyle}
+          onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = "var(--accent)"; }}
+          onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = "var(--line-soft)"; }}
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">비밀번호</Label>
-          <Link href="#" className="text-xs text-warm-400 hover:text-warm-700 transition-colors">
-            비밀번호를 잊으셨나요?
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+          <label style={{ fontSize: 13, color: "var(--muted)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
+            비밀번호
+          </label>
+          <Link href="/signup" style={{ fontSize: 12, color: "var(--muted)", textDecoration: "none" }}>
+            계정이 없으신가요?
           </Link>
         </div>
-        <div className="relative">
-          <Input
-            id="password"
-            name="password"
-            type={showPassword ? "text" : "password"}
-            placeholder="비밀번호를 입력해주세요"
-            autoComplete="current-password"
-            required
-            className="h-12 pr-10"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors"
-          >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
-        </div>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••"
+          required
+          style={inputStyle}
+          onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = "var(--accent)"; }}
+          onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = "var(--line-soft)"; }}
+        />
       </div>
 
-      <Button type="submit" size="lg" className="w-full gap-2 h-12" disabled={loading}>
-        {loading ? <><Loader2 className="h-4 w-4 animate-spin" />로그인 중...</> : "로그인"}
-      </Button>
+      {error && (
+        <p style={{ fontSize: 13, color: "#EF4444", margin: 0 }}>{error}</p>
+      )}
 
-      <p className="text-center text-sm text-warm-400">
-        아직 계정이 없으신가요?{" "}
-        <Link href="/signup" className="text-warm-900 font-semibold hover:underline underline-offset-2">회원가입</Link>
+      <button
+        type="submit"
+        disabled={loading || !email || !password}
+        style={{
+          padding: "13px 0", borderRadius: 9999, fontSize: 15, fontWeight: 600,
+          background: loading || !email || !password ? "var(--line-soft)" : "var(--ink)",
+          color: loading || !email || !password ? "var(--muted)" : "var(--cream-on-dark)",
+          border: "none", cursor: loading || !email || !password ? "not-allowed" : "pointer",
+          fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+          transition: "all .2s ease", marginTop: 4,
+        }}
+      >
+        {loading ? "로그인 중…" : "로그인"}
+      </button>
+
+      <p style={{ textAlign: "center", fontSize: 13.5, color: "var(--muted)", margin: 0, fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
+        처음이신가요?{" "}
+        <Link href="/signup" style={{ color: "var(--accent)", fontWeight: 500, textDecoration: "none" }}>
+          회원가입
+        </Link>
       </p>
     </form>
   );

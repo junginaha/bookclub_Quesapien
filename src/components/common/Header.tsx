@@ -60,11 +60,26 @@ export default function Header() {
   const [wordmarkIdx, setWordmarkIdx] = useState(0);
   const [wordmarkFading, setWordmarkFading] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [authBtnIdx, setAuthBtnIdx] = useState(0); // 0=로그인, 1=회원가입
+  const [authBtnFading, setAuthBtnFading] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const currentUser = useAppStore((s) => s.currentUser);
   const logout = useAppStore((s) => s.logout);
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 로그인/회원가입 버튼 순환 (비로그인 시)
+  useEffect(() => {
+    if (currentUser) return;
+    const interval = setInterval(() => {
+      setAuthBtnFading(true);
+      setTimeout(() => {
+        setAuthBtnIdx((i) => (i + 1) % 2);
+        setAuthBtnFading(false);
+      }, 300);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, [currentUser]);
 
   // 워드마크 자동 전환
   useEffect(() => {
@@ -356,36 +371,51 @@ export default function Header() {
                 )}
               </div>
             ) : (
-              <div className="hidden md:flex" style={{ alignItems: "center", gap: 8 }}>
-                <Link
-                  href="/login"
-                  style={{
-                    fontSize: 13.5, color: "var(--ink-soft)", textDecoration: "none",
-                    padding: "7px 16px", borderRadius: 9999,
-                    border: "1px solid var(--line-soft)",
-                    transition: "border-color .2s ease, color .2s ease",
-                    fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-                  }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLElement).style.color = "var(--accent)"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--line-soft)"; (e.currentTarget as HTMLElement).style.color = "var(--ink-soft)"; }}
-                >
-                  로그인
-                </Link>
-                <Link
-                  href="/signup"
-                  style={{
-                    fontSize: 13.5, fontWeight: 500,
-                    background: "var(--ink)", color: "var(--cream-on-dark)",
-                    borderRadius: 9999, padding: "7px 20px",
-                    textDecoration: "none", letterSpacing: "0.02em",
-                    fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-                    transition: "opacity .2s ease",
-                  }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.85"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
-                >
-                  가입하기
-                </Link>
+              /* 비로그인 — 순환 애니메이션 버튼 */
+              <div className="hidden md:flex" style={{ alignItems: "center" }}>
+                <div style={{ position: "relative", height: 36, width: 110, overflow: "hidden" }}>
+                  {/* 로그인 버튼 */}
+                  <Link
+                    href="/login"
+                    style={{
+                      position: "absolute", inset: 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 13.5, fontWeight: 500, textDecoration: "none",
+                      borderRadius: 9999, padding: "0 20px",
+                      border: "1.5px solid var(--line)",
+                      color: "var(--ink-soft)",
+                      fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                      transition: "opacity .3s ease, transform .3s ease",
+                      opacity: authBtnIdx === 0 && !authBtnFading ? 1 : 0,
+                      transform: authBtnIdx === 0 && !authBtnFading
+                        ? "translateY(0)"
+                        : authBtnIdx === 0 ? "translateY(-6px)" : "translateY(6px)",
+                      pointerEvents: authBtnIdx === 0 ? "auto" : "none",
+                    }}
+                  >
+                    로그인
+                  </Link>
+                  {/* 회원가입 버튼 */}
+                  <Link
+                    href="/signup"
+                    style={{
+                      position: "absolute", inset: 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 13.5, fontWeight: 600, textDecoration: "none",
+                      borderRadius: 9999, padding: "0 16px",
+                      background: "var(--ink)", color: "var(--cream-on-dark)",
+                      fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                      transition: "opacity .3s ease, transform .3s ease",
+                      opacity: authBtnIdx === 1 && !authBtnFading ? 1 : 0,
+                      transform: authBtnIdx === 1 && !authBtnFading
+                        ? "translateY(0)"
+                        : authBtnIdx === 1 ? "translateY(-6px)" : "translateY(6px)",
+                      pointerEvents: authBtnIdx === 1 ? "auto" : "none",
+                    }}
+                  >
+                    회원가입
+                  </Link>
+                </div>
               </div>
             )}
 

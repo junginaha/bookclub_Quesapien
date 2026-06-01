@@ -19,14 +19,39 @@ export default async function MyPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Fetch profile, reviews, sessions, and onboarding answers in parallel
+  // 프로필 + 활동 데이터 병렬 로드
   const [profile, myReviews, mySessions] = await Promise.all([
-    getProfile(user.id),
+    getProfile(user.id).catch(() => null),
     getMyReviews(user.id).catch(() => []),
     getMySessions(user.id).catch(() => []),
   ]);
 
-  if (!profile) redirect("/login");
+  // 프로필 없으면 자동 생성 (Supabase Auth 직접 가입 사용자)
+  let resolvedProfile = profile;
+  if (!resolvedProfile) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sb = supabase as any;
+      const { data } = await sb.from("profiles").upsert({
+        id: user.id,
+        email: user.email ?? "",
+        name: user.user_metadata?.name ?? user.email?.split("@")[0] ?? "익명",
+      }).select().single();
+      resolvedProfile = data;
+    } catch { /* ignore */ }
+  }
+
+  // resolvedProfile이 여전히 없으면 기본값으로 대체
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const finalProfile: any = resolvedProfile ?? {
+    id: user.id,
+    email: user.email ?? "",
+    name: user.user_metadata?.name ?? user.email?.split("@")[0] ?? "익명",
+    avatar_url: null,
+    bio: null,
+    joined_at: new Date().toISOString(),
+    session_count: 0,
+  };
 
   // Try to load onboarding answers from user metadata
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -39,7 +64,7 @@ export default async function MyPage() {
       <Header />
       <main className="flex-1">
         <MyPageClient
-          profile={profile}
+          profile={finalProfile}
           myReviews={myReviews}
           mySessions={mySessions}
           onboardingAnswers={onboardingAnswers}

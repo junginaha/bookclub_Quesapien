@@ -561,6 +561,8 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
   const [modalBook, setModalBook] = useState<BookClub | null>(null);
   const [activeFloat, setActiveFloat] = useState<number | null>(null);
   const [askContent, setAskContent] = useState("");
+  const [navBtnIdx, setNavBtnIdx] = useState(0); // 0=로그인, 1=회원가입
+  const [navBtnFading, setNavBtnFading] = useState(false);
   const [askAuthor, setAskAuthor] = useState("");
   const [askStatus, setAskStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [miniExpanded, setMiniExpanded] = useState(false);
@@ -585,6 +587,15 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
   const [floatItems] = useState(() =>
     [0, 1, 2, 3, 4].map(() => floatPopupPool[Math.floor(Math.random() * floatPopupPool.length)])
   );
+
+  // 랜딩 nav 버튼 순환
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNavBtnFading(true);
+      setTimeout(() => { setNavBtnIdx((i) => (i + 1) % 2); setNavBtnFading(false); }, 300);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const nav = document.getElementById("lp-nav");
@@ -688,9 +699,36 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           <a href="/archive">아카이빙</a>
           <a href="/giants">거인의 어깨</a>
         </div>
-        <a href="/bookclub" className="lp-nav-cta">
-          <span>북클럽 참여</span>
-        </a>
+        {/* 로그인/회원가입 순환 버튼 */}
+        <div style={{ position: "relative", width: 90, height: 38, overflow: "hidden" }}>
+          {[
+            { href: "/login", label: "로그인", filled: false },
+            { href: "/signup", label: "회원가입", filled: true },
+          ].map((btn, i) => (
+            <a
+              key={btn.href}
+              href={btn.href}
+              className={btn.filled ? "lp-nav-cta" : ""}
+              style={{
+                position: "absolute", inset: 0,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "var(--lp-sm)", fontWeight: 500,
+                textDecoration: "none",
+                ...(btn.filled ? {} : {
+                  border: "1px solid var(--lp-line)",
+                  borderRadius: 9999,
+                  color: "var(--lp-ink-soft)",
+                }),
+                transition: "opacity .3s ease, transform .3s ease",
+                opacity: navBtnIdx === i && !navBtnFading ? 1 : 0,
+                transform: navBtnIdx === i && !navBtnFading ? "translateY(0)" : navBtnIdx === i ? "translateY(-5px)" : "translateY(5px)",
+                pointerEvents: navBtnIdx === i ? "auto" : "none",
+              }}
+            >
+              <span>{btn.label}</span>
+            </a>
+          ))}
+        </div>
       </nav>
 
       {/* HERO */}
