@@ -54,12 +54,17 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
   const starters = STARTER_QUESTIONS[giant.slug] ?? STARTER_QUESTIONS.default;
   const [liveQuotes, setLiveQuotes] = useState<{ content: string; author: string; source: string }[]>([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
+  const [wikiSummary, setWikiSummary] = useState("");
 
   useEffect(() => {
     fetch(`/api/giants/quotes/${giant.slug}`)
       .then((r) => r.json())
       .then((d) => { setLiveQuotes(d.quotes ?? []); setQuotesLoaded(true); })
       .catch(() => setQuotesLoaded(true));
+    fetch(`/api/giants/wiki/${giant.slug}`)
+      .then((r) => r.json())
+      .then((d) => { if (d.summary) setWikiSummary(d.summary); })
+      .catch(() => {});
   }, [giant.slug]);
 
   const [discResult, setDiscResult] = useState<{
@@ -137,6 +142,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
             signature_quote: giant.signature_quote,
           },
           messages: [...messages, userMessage],
+          wikiSummary: wikiSummary || undefined,
         }),
       });
 
@@ -375,20 +381,75 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
 
               {/* Right Sidebar */}
               <div style={{ display: "flex", flexDirection: "column", gap: 20 }} className="sidebar-hide">
-                <div style={{
-                  padding: 28, borderRadius: 16,
-                  background: giant.color, color: "white",
-                }}>
-                  <div style={{ fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)", marginBottom: 16 }}>
-                    사상 탐구하기
+                {/* 역량 카드 */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {[
+                    { icon: "💬", label: "대화 가능", desc: "어떤 질문도 환영해요", action: () => setActiveTab("chat") },
+                    { icon: "📋", label: "발제 생성 가능", desc: "북클럽 토론 질문지를 만들어요", action: () => setActiveTab("discuss") },
+                    { icon: "🔍", label: "질문 가능", desc: "그의 관점으로 깊이 탐구해요", action: () => { setActiveTab("chat"); } },
+                  ].map((cap) => (
+                    <button
+                      key={cap.label}
+                      onClick={cap.action}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 12,
+                        padding: "12px 16px", borderRadius: 10,
+                        background: "rgba(255,255,255,0.5)",
+                        border: "1px solid var(--line-soft)",
+                        cursor: "pointer", textAlign: "left",
+                        transition: "background 0.15s, transform 0.15s",
+                      }}
+                      onMouseEnter={(e) => {
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.background = "rgba(255,255,255,0.85)";
+                        el.style.transform = "translateX(2px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.background = "rgba(255,255,255,0.5)";
+                        el.style.transform = "translateX(0)";
+                      }}
+                    >
+                      <span style={{ fontSize: 20, flexShrink: 0 }}>{cap.icon}</span>
+                      <div>
+                        <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--ink)", marginBottom: 1 }}>
+                          {cap.label}
+                        </div>
+                        <div style={{ fontSize: 12, color: "var(--muted)" }}>{cap.desc}</div>
+                      </div>
+                      <span style={{ marginLeft: "auto", color: "var(--muted)", fontSize: 12 }}>→</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* 바로 시작하기 */}
+                <div style={{ padding: "24px", borderRadius: 16, background: giant.color, color: "white" }}>
+                  <div style={{ fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)", marginBottom: 12 }}>
+                    바로 시작하기
                   </div>
-                  <p style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", lineHeight: 1.75, marginBottom: 20 }}>
-                    저서와 사상을 바탕으로, 그의 언어로 답해요.
-                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {starters.map((q, i) => (
+                      <button
+                        key={i}
+                        onClick={() => { setActiveTab("chat"); sendMessage(q); }}
+                        style={{
+                          textAlign: "left", padding: "10px 12px",
+                          borderRadius: 8, fontSize: 13, color: "rgba(255,255,255,0.85)",
+                          background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
+                          cursor: "pointer", transition: "background 0.15s",
+                          lineHeight: 1.5,
+                        }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.2)"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.1)"; }}
+                      >
+                        &ldquo;{q}&rdquo;
+                      </button>
+                    ))}
+                  </div>
                   <button
                     onClick={() => setActiveTab("chat")}
                     style={{
-                      width: "100%", padding: "12px 0",
+                      marginTop: 14, width: "100%", padding: "11px 0",
                       borderRadius: 10, background: "rgba(255,255,255,0.2)",
                       color: "white", fontSize: 14, fontWeight: 500,
                       border: "1px solid rgba(255,255,255,0.3)", cursor: "pointer",
@@ -399,31 +460,6 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                   >
                     대화 시작하기 →
                   </button>
-                </div>
-
-                <div style={{ padding: "24px", borderRadius: 16, border: "1px solid var(--line-soft)", background: "rgba(255,255,255,0.4)" }}>
-                  <div style={{ fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 12 }}>
-                    추천 질문
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    {starters.map((q) => (
-                      <button
-                        key={q}
-                        onClick={() => { setActiveTab("chat"); sendMessage(q); }}
-                        style={{
-                          textAlign: "left", padding: "10px 12px",
-                          borderRadius: 8, fontSize: 13, color: "var(--ink-soft)",
-                          background: "none", border: "1px solid var(--line-soft)",
-                          cursor: "pointer", transition: "background 0.15s",
-                          lineHeight: 1.5,
-                        }}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--bg-soft)"; }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "none"; }}
-                      >
-                        {q}
-                      </button>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>

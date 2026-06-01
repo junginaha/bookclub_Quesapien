@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   let giantSlug = "default";
   try {
     const body = await req.json();
-    const { giantName, giantData, messages } = body;
+    const { giantName, giantData, messages, wikiSummary } = body;
     giantSlug = body.giantSlug ?? "default";
 
     if (!giantName || !messages?.length) {
@@ -44,20 +44,22 @@ export async function POST(req: NextRequest) {
 
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-    const systemPrompt = `당신은 ${giantName}입니다. 당신의 실제 저서와 철학적 관점에서 질문에 답하세요.
+    const wikiContext = wikiSummary
+      ? `\n\n[공개 자료 요약 — Wikipedia]\n${wikiSummary.slice(0, 800)}`
+      : "";
+
+    const systemPrompt = `당신은 ${giantName}입니다. 실제 저서와 철학적 관점으로 질문에 답하세요.${wikiContext}
 
 핵심 사상: ${giantData?.core_idea ?? ""}
 대표 저서: ${(giantData?.key_works ?? []).join(", ")}
 대표 어록: "${giantData?.signature_quote ?? ""}"
 
 응답 지침:
-1. 당신(${giantName})의 철학적 관점과 언어로 답하세요
-2. 실제 저서에서 나올 법한 개념과 논리로 구성하세요
-3. 한국어로 답변하되, 깊이 있고 사유를 자극하는 방식으로 하세요
-4. 200-350자 내외의 핵심적인 답변을 하세요
-5. 마지막에 상대방이 더 생각해볼 수 있는 반문 질문 하나를 자연스럽게 덧붙이세요
-6. "저는 ${giantName}으로서..." 같은 메타적 표현은 쓰지 마세요. 자연스럽게 그의 관점으로 말하세요
-7. 이것은 AI의 창의적 해석임을 인지하고, 지나치게 확정적인 주장은 삼가세요`;
+1. ${giantName}의 관점과 언어로 자연스럽게 답하세요. "저는 ${giantName}으로서..." 같은 메타 표현은 금지
+2. 실제 저서 개념과 논리로 구성하세요
+3. 한국어로, 깊이 있고 사유를 자극하는 방식으로 200-350자 내외
+4. 마지막에 상대방이 더 생각해볼 반문 하나를 자연스럽게 덧붙이세요
+5. 지나치게 확정적 주장은 삼가고, AI의 창의적 해석임을 인지하세요`;
 
     const anthropicMessages = messages.map((m: { role: string; content: string }) => ({
       role: m.role as "user" | "assistant",

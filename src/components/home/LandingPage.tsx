@@ -541,8 +541,19 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
   const [questionLikes, setQuestionLikes] = useState<number | null>(null);
   const [questionSaves, setQuestionSaves] = useState<number | null>(null);
   const [questionReacted, setQuestionReacted] = useState<{ like: boolean; save: boolean }>({ like: false, save: false });
+  const [dbBooks, setDbBooks] = useState<BookClub[]>([]);
   const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
   const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+
+  // DB에서 북클럽 불러오기 (위치 기반용 lat/lng 포함)
+  useEffect(() => {
+    fetch("/api/book-clubs?mini=false")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.clubs?.length > 0) setDbBooks(d.clubs);
+      })
+      .catch(() => {});
+  }, []);
 
   // Pick random popup items for each float element (stable per session)
   const [floatItems] = useState(() =>
@@ -731,7 +742,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
 
         {/* 위치 기반 근처 북클럽 — 섹션 상단 노출 */}
         <div className="lp-nearby-row">
-          <NearbyClubsBanner books={books} onOpen={(b) => setModalBook(b)} />
+          <NearbyClubsBanner books={dbBooks.length > 0 ? dbBooks : books} onOpen={(b) => setModalBook(b)} />
         </div>
 
         <div className="lp-books-grid">

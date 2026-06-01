@@ -19,7 +19,7 @@ const COLOR_MAP: Record<string, string> = {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default function BookClubDetailClient({ club }: { club: any }) {
-  const [joinStep, setJoinStep] = useState<"idle" | "confirm" | "submitting" | "done" | "error">("idle");
+  const [joinStep, setJoinStep] = useState<"idle" | "confirm" | "submitting" | "done" | "error" | "no-link">("idle");
   const [applicantName, setApplicantName] = useState("");
   const [applicantEmail, setApplicantEmail] = useState("");
   const [applicantMsg, setApplicantMsg] = useState("");
@@ -36,10 +36,13 @@ export default function BookClubDetailClient({ club }: { club: any }) {
     : 5;
 
   const handleJoin = () => {
+    if (isClosed) return;
     if (club.join_url && club.join_url.startsWith("http")) {
+      // 리더가 설정한 잼잼링크로 바로 이동
       window.open(club.join_url, "_blank");
     } else {
-      setJoinStep("confirm");
+      // 잼잼링크 미설정 → 안내 표시
+      setJoinStep("no-link");
     }
   };
 
@@ -145,7 +148,7 @@ export default function BookClubDetailClient({ club }: { club: any }) {
                     onMouseEnter={(e) => { if (!isClosed) (e.currentTarget as HTMLElement).style.opacity = "0.88"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
                   >
-                    {isClosed ? "마감된 북클럽" : "참가 신청하기"}
+                    {isClosed ? "마감됐어요" : "참여하기"}
                     {!isClosed && <ChevronRight size={16} />}
                   </button>
 
@@ -156,12 +159,30 @@ export default function BookClubDetailClient({ club }: { club: any }) {
                       color: "rgba(255,255,255,0.7)", fontSize: 14,
                     }}>
                       <Users size={14} />
-                      잔여 {remaining}석
+                      {remaining}자리 남음
                       {remaining <= 2 && (
                         <span style={{ color: "#FF8A8A", fontWeight: 500 }}>· 마감 임박</span>
                       )}
                     </div>
                   )}
+
+                  {/* 리더 관리 버튼 (리더만 표시 — 클라이언트에서 auth 체크 안 함, 링크 자체가 서버에서 보호됨) */}
+                  <a
+                    href={`/bookclub/manage/${club.slug}`}
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: 6,
+                      padding: "12px 18px", borderRadius: 9999,
+                      background: "rgba(255,255,255,0.12)",
+                      color: "rgba(255,255,255,0.6)", fontSize: 13,
+                      border: "1px solid rgba(255,255,255,0.2)", textDecoration: "none",
+                      transition: "background .2s",
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.22)"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.12)"; }}
+                    title="리더·관리자만 접근 가능"
+                  >
+                    ⚙ 리더 관리
+                  </a>
                 </div>
               </div>
 
@@ -622,6 +643,35 @@ export default function BookClubDetailClient({ club }: { club: any }) {
                 취소
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 잼잼링크 미설정 안내 */}
+      {joinStep === "no-link" && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 1000,
+          background: "rgba(28,31,38,0.6)", backdropFilter: "blur(4px)",
+          display: "flex", alignItems: "center", justifyContent: "center", padding: 24,
+        }} onClick={() => setJoinStep("idle")}>
+          <div
+            style={{ background: "var(--bg)", borderRadius: 20, padding: 40, maxWidth: 380, width: "100%", textAlign: "center" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontSize: 36, marginBottom: 16 }}>⏳</div>
+            <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 20, fontWeight: 400, color: "var(--ink)", marginBottom: 12 }}>
+              신청 링크를 준비 중이에요.
+            </h3>
+            <p style={{ fontSize: 13.5, color: "var(--muted)", lineHeight: 1.75, marginBottom: 24 }}>
+              리더가 곧 신청 링크를 등록할 거예요.<br />
+              조금만 기다려 주세요.
+            </p>
+            <button
+              onClick={() => setJoinStep("idle")}
+              style={{ width: "100%", padding: "12px 0", borderRadius: 10, background: bgColor, color: "white", fontSize: 14, border: "none", cursor: "pointer" }}
+            >
+              닫기
+            </button>
           </div>
         </div>
       )}
