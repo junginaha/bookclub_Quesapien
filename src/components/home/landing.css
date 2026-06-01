@@ -987,3 +987,71 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-final-giants-link:hover {
   color: rgba(176,138,74,1);
 }
+
+/* ── 관리자 참여링크 설정 (BookDetailModal 내부) ─── */
+.bdm-admin-url {
+  margin: 16px 0 0;
+  padding: 14px 16px;
+  background: rgba(28,31,38,0.04);
+  border-radius: 10px;
+  border: 1px dashed rgba(28,31,38,0.12);
+}
+.bdm-admin-url-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(94,70,50,0.6);
+  margin-bottom: 8px;
+}
+.bdm-admin-url-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.bdm-admin-url-input {
+  flex: 1;
+  border: 1px solid rgba(28,31,38,0.15);
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  color: var(--lp-ink);
+  background: rgba(255,255,255,0.7);
+  outline: none;
+  min-width: 0;
+}
+.bdm-admin-url-input:focus {
+  border-color: rgba(94,70,50,0.4);
+  background: white;
+}
+.bdm-admin-url-btn {
+  padding: 7px 14px;
+  border-radius: 7px;
+  border: none;
+  background: rgba(28,31,38,0.85);
+  color: rgba(236,227,207,0.9);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+.bdm-admin-url-btn:disabled { opacity: 0.4; cursor: default; }
+.bdm-admin-url-btn:not(:disabled):hover { opacity: 0.8; }
+.bdm-admin-url-hint {
+  font-size: 11px;
+  color: rgba(28,31,38,0.3);
+  margin-top: 6px;
+}
+/* 모집 준비 중 버튼 */
+.bdm-btn-join-pending {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-radius: 9999px;
+  background: rgba(28,31,38,0.06);
+  color: rgba(28,31,38,0.4);
+  font-size: 14px;
+  font-style: normal;
+  cursor: default;
+}

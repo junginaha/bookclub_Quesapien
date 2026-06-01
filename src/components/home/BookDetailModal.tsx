@@ -165,14 +165,35 @@ export default function BookDetailModal({ book, onClose }: Props) {
     setEditing(false);
   };
 
-  const JAMJAM_URL = "https://jamjamlink-wujdhsmq.manus.space/?code=NkR5M28GWYafp5h7Hgnbah";
+  // 참여 신청 — admin이 설정한 URL로 이동 (URL 없으면 준비 중 안내)
+  const hasJoinUrl = !!(detail?.joinUrl?.trim());
   const handleJoin = () => {
-    const url = detail?.joinUrl || JAMJAM_URL;
-    window.open(url, "_blank", "noopener");
+    if (!hasJoinUrl) return; // URL 미설정 시 동작 없음
+    window.open(detail!.joinUrl!, "_blank", "noopener,noreferrer");
     if (detail?.slug) {
       localStorage.setItem(`joined_${detail.slug}`, "1");
       setJoined(true);
     }
+  };
+
+  // 관리자용: 참여 링크 빠른 저장 (편집 폼 열지 않고 즉시 적용)
+  const [quickUrl, setQuickUrl] = useState("");
+  const [quickSaving, setQuickSaving] = useState(false);
+  const handleQuickUrlSave = async () => {
+    if (!detail || !quickUrl.trim()) return;
+    setQuickSaving(true);
+    const update = { ...detail, joinUrl: quickUrl.trim() };
+    try {
+      await fetch(`/api/book-clubs/${detail.slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ join_url: quickUrl.trim() }),
+      });
+    } catch { /* fallback to local */ }
+    setDetail(update);
+    localStorage.setItem(`bc_detail_${detail.slug}`, JSON.stringify(update));
+    setQuickUrl("");
+    setQuickSaving(false);
   };
 
   if (!book) return null;
@@ -295,6 +316,55 @@ export default function BookDetailModal({ book, onClose }: Props) {
                 </div>
               )}
 
+              {/* 관리자 전용: 참여 링크 빠른 설정 (사용자에게 보이지 않음) */}
+              {canEdit && (
+                <div className="bdm-admin-url">
+                  <div className="bdm-admin-url-label">
+                    참여 링크 {hasJoinUrl ? "✓ 설정됨" : "— 미설정"}
+                  </div>
+                  <div className="bdm-admin-url-row">
+                    <input
+                      className="bdm-admin-url-input"
+                      type="url"
+                      value={quickUrl}
+                      onChange={(e) => setQuickUrl(e.target.value)}
+                      placeholder="잼잼 결제 링크를 붙여넣으세요"
+                      onPaste={(e) => {
+                        // 붙여넣기 즉시 자동 저장
+                        const pasted = e.clipboardData.getData("text");
+                        if (pasted.startsWith("http")) {
+                          e.preventDefault();
+                          setQuickUrl(pasted);
+                          setTimeout(async () => {
+                            if (!detail) return;
+                            const update = { ...detail, joinUrl: pasted };
+                            try {
+                              await fetch(`/api/book-clubs/${detail.slug}`, {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ join_url: pasted }),
+                              });
+                            } catch { /* local fallback */ }
+                            setDetail(update);
+                            localStorage.setItem(`bc_detail_${detail.slug}`, JSON.stringify(update));
+                            setQuickUrl("");
+                          }, 100);
+                        }
+                      }}
+                    />
+                    <button
+                      className="bdm-admin-url-btn"
+                      type="button"
+                      disabled={!quickUrl.trim() || quickSaving}
+                      onClick={handleQuickUrlSave}
+                    >
+                      {quickSaving ? "저장 중" : "저장"}
+                    </button>
+                  </div>
+                  <div className="bdm-admin-url-hint">붙여넣으면 자동 저장됩니다</div>
+                </div>
+              )}
+
               {/* CTA */}
               <div className="bdm-footer">
                 {canEdit && (
@@ -307,13 +377,19 @@ export default function BookDetailModal({ book, onClose }: Props) {
                     {(detail.maxParticipants - (detail.currentParticipants ?? 0))}자리 남음
                   </span>
                 )}
-                <button
-                  className={`bdm-btn-join${joined ? " joined" : ""}`}
-                  onClick={handleJoin}
-                >
-                  {joined ? "참여 신청 완료 ✓" : "참여 신청하기"}
-                  {!joined && <span className="bdm-arrow" />}
-                </button>
+                {hasJoinUrl ? (
+                  <button
+                    className={`bdm-btn-join${joined ? " joined" : ""}`}
+                    onClick={handleJoin}
+                  >
+                    {joined ? "참여 신청 완료 ✓" : "참여 신청하기"}
+                    {!joined && <span className="bdm-arrow" />}
+                  </button>
+                ) : (
+                  <span className="bdm-btn-join-pending">
+                    모집 준비 중입니다
+                  </span>
+                )}
               </div>
             </>
           ) : (
@@ -336,8 +412,8 @@ export default function BookDetailModal({ book, onClose }: Props) {
               <label className="bdm-label">장소 지도 링크</label>
               <input className="bdm-input" type="url" value={form.locationUrl ?? ""} onChange={(e) => setForm((f) => ({ ...f, locationUrl: e.target.value }))} placeholder="https://map.kakao.com/..." />
 
-              <label className="bdm-label">참여 결제 링크 (잼잼)</label>
-              <input className="bdm-input" type="url" value={form.joinUrl ?? ""} onChange={(e) => setForm((f) => ({ ...f, joinUrl: e.target.value }))} placeholder="https://jamjamlink-wujdhsmq.manus.space/..." />
+              <label className="bdm-label">참여 링크 (잼잼 — 내부용)</label>
+              <input className="bdm-input" type="url" value={form.joinUrl ?? ""} onChange={(e) => setForm((f) => ({ ...f, joinUrl: e.target.value }))} placeholder="잼잼 결제 링크를 붙여넣으세요" />
 
               <label className="bdm-label">최대 인원</label>
               <input className="bdm-input" type="number" min={1} max={100} value={form.maxParticipants ?? ""} onChange={(e) => setForm((f) => ({ ...f, maxParticipants: parseInt(e.target.value) || undefined }))} placeholder="8" />
