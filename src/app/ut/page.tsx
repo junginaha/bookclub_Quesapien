@@ -1,7 +1,45 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+
+const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const SB_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+
+async function sbInsert(answers: AnswerMap): Promise<string | null> {
+  if (!SB_URL || !SB_KEY) return "Supabase 환경변수 미설정";
+  const res = await fetch(`${SB_URL}/rest/v1/ut_responses`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SB_KEY,
+      "Authorization": `Bearer ${SB_KEY}`,
+      "Prefer": "return=minimal",
+    },
+    body: JSON.stringify({ answers }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    return `HTTP ${res.status}: ${text}`;
+  }
+  return null;
+}
+
+async function sbSelect(): Promise<AnswerMap[]> {
+  if (!SB_URL || !SB_KEY) return [];
+  const res = await fetch(`${SB_URL}/rest/v1/ut_responses?select=id,created_at,answers&order=created_at.desc`, {
+    headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+async function sbDeleteAll(): Promise<void> {
+  if (!SB_URL || !SB_KEY) return;
+  await fetch(`${SB_URL}/rest/v1/ut_responses?id=neq.00000000-0000-0000-0000-000000000000`, {
+    method: "DELETE",
+    headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` },
+  });
+}
 
 /* ============================= 문항 정의 ============================= */
 type QType = "short" | "long" | "single" | "multi" | "scale" | "ranking";
@@ -202,25 +240,10 @@ function SurveyForm({ onSubmitted }: { onSubmitted: () => void }) {
       if (q.type === "single" && v === "__other__") v = "기타: " + ((state["__other_" + q.id] as string) ?? "");
       answers[q.id] = v ?? "";
     });
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !key) {
-      setError("저장 실패: Supabase 환경변수 미설정 (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)");
-      setSaving(false);
-      return;
-    }
-    try {
-      const supabase = createClient();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: sbErr } = await (supabase as any).from("ut_responses").insert({ answers });
-      if (sbErr) throw new Error(sbErr.message + " (code: " + sbErr.code + ")");
-      onSubmitted();
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      setError("저장 실패: " + msg);
-    } finally {
-      setSaving(false);
-    }
+    const err = await sbInsert(answers);
+    setSaving(false);
+    if (err) { setError("저장 실패 — " + err); return; }
+    onSubmitted();
   }
 
   let curSec: string | null = null;
@@ -413,26 +436,16 @@ function ResultsView() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    try {
-      const supabase = createClient();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: rows } = await (supabase as any)
-        .from("ut_responses")
-        .select("id, created_at, answers")
-        .order("created_at", { ascending: false });
-      setData(rows ?? []);
-    } finally {
-      setLoading(false);
-    }
+    const rows = await sbSelect();
+    setData(rows as unknown as RawResponse[]);
+    setLoading(false);
   }, []);
 
   useEffect(() => { load(); }, [load]);
 
   async function handleClear() {
     if (!confirm("저장된 모든 응답을 삭제합니다. 되돌릴 수 없습니다. 계속할까요?")) return;
-    const supabase = createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from("ut_responses").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    await sbDeleteAll();
     load();
   }
 
