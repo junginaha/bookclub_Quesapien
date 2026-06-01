@@ -23,7 +23,7 @@ export default function LoginForm() {
     const password = form.get("password") as string;
 
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 400)); // 자연스러운 딜레이
+    await new Promise((r) => setTimeout(r, 400));
 
     const result = login(email, password);
     setLoading(false);
@@ -31,7 +31,7 @@ export default function LoginForm() {
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success("환영합니다!");
+      toast.success("다시 만나서 반가워요!");
       router.push("/");
       router.refresh();
     }
@@ -40,8 +40,16 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="email">이메일</Label>
-        <Input id="email" name="email" type="email" placeholder="hello@example.com" autoComplete="email" required className="h-12" />
+        <Label htmlFor="email">이메일 또는 아이디</Label>
+        <Input
+          id="email"
+          name="email"
+          type="text"
+          placeholder="이메일 또는 아이디를 입력해주세요"
+          autoComplete="username"
+          required
+          className="h-12"
+        />
       </div>
 
       <div className="flex flex-col gap-2">
@@ -52,17 +60,23 @@ export default function LoginForm() {
           </Link>
         </div>
         <div className="relative">
-          <Input id="password" name="password" type={showPassword ? "text" : "password"} placeholder="비밀번호 입력" autoComplete="current-password" required className="h-12 pr-10" />
-          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors">
+          <Input
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="비밀번호를 입력해주세요"
+            autoComplete="current-password"
+            required
+            className="h-12 pr-10"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors"
+          >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-      </div>
-
-      <div className="rounded-xl bg-warm-50 border border-warm-100 p-3">
-        <p className="text-xs text-warm-500 font-medium mb-1">테스트 계정</p>
-        <p className="text-xs text-warm-400">이메일: minsu@example.com</p>
-        <p className="text-xs text-warm-400">비밀번호: password123</p>
       </div>
 
       <Button type="submit" size="lg" className="w-full gap-2 h-12" disabled={loading}>
@@ -70,7 +84,7 @@ export default function LoginForm() {
       </Button>
 
       <p className="text-center text-sm text-warm-400">
-        계정이 없으신가요?{" "}
+        아직 계정이 없으신가요?{" "}
         <Link href="/signup" className="text-warm-900 font-semibold hover:underline underline-offset-2">회원가입</Link>
       </p>
     </form>

@@ -33,7 +33,7 @@ interface Props {
   onClose: () => void;
 }
 
-const ADMIN_EMAILS = ["junginaha@gmail.com"];
+const ADMIN_EMAILS = ["junginaha@gmail.com", "kimjungin@quesapience.com"];
 
 export default function BookDetailModal({ book, onClose }: Props) {
   const currentUser = useAppStore((s) => s.currentUser);
@@ -43,7 +43,9 @@ export default function BookDetailModal({ book, onClose }: Props) {
   const [saving, setSaving] = useState(false);
   const [joined, setJoined] = useState(false);
 
-  const isAdmin = currentUser ? ADMIN_EMAILS.includes(currentUser.email) : false;
+  const isAdmin = currentUser
+    ? ADMIN_EMAILS.includes(currentUser.email) || currentUser.name === "kimjungin"
+    : false;
   const isHost = currentUser && detail?.hostName === currentUser.name;
   const canEdit = isAdmin || isHost;
 

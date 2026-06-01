@@ -182,6 +182,19 @@ export const useAppStore = create<AppStore>()(
 
       // ── Auth ────────────────────────────────────────
       login: (email, password) => {
+        // 관리자 특수 계정
+        if (email === "kimjungin" && password === "kimjungin1") {
+          set((s) => {
+            s.currentUser = {
+              id: "admin-kimjungin",
+              email: "kimjungin@quesapience.com",
+              name: "kimjungin",
+              joined_at: new Date().toISOString(),
+              session_count: 0,
+            };
+          });
+          return {};
+        }
         const user = get().users.find(
           (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
         );

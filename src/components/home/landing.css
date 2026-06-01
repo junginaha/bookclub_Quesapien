@@ -852,3 +852,77 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   letter-spacing: -0.005em; color: var(--lp-ink-soft);
 }
 .lp-books-more-label .bmt-count { font-family: var(--lp-serif); font-style: normal; color: var(--lp-accent); font-size: 14.5px; }
+
+/* ── Giants Preview Section ─────────────────────────── */
+.lp-giants-preview .lp-giants-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 40px;
+}
+.lp-giant-card {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--lp-line-soft);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+  background: white;
+}
+.lp-giant-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px -12px rgba(28,31,38,0.18);
+}
+.lgc-color {
+  padding: 28px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 120px;
+}
+.lgc-category {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  font-style: normal;
+}
+.lgc-name {
+  font-family: var(--lp-serif-ko);
+  font-size: 20px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.95);
+  font-style: normal;
+  margin-top: auto;
+}
+.lgc-body {
+  padding: 16px 20px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.lgc-tagline {
+  font-size: 13.5px;
+  color: var(--lp-ink-soft);
+  line-height: 1.65;
+  font-style: normal;
+}
+.lgc-link {
+  font-size: 12.5px;
+  color: var(--lp-accent);
+  font-weight: 500;
+  margin-top: auto;
+  font-style: normal;
+}
+.lp-giants-cta {
+  margin-top: 40px;
+  text-align: center;
+}
+@media (max-width: 600px) {
+  .lp-giants-preview .lp-giants-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

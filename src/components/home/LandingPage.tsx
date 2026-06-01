@@ -501,13 +501,13 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
       <section className="lp-section lp-books" id="books">
         <div className="lp-section-head">
           <div className="lp-left">
-            <div className="lp-eyebrow">BOOK LOVERS 책을 건네는 마음</div>
+            <div className="lp-eyebrow">BOOK LOVERS — 책을 건네는 마음</div>
             <h2 className="lp-h-section">
-              이 책을 누군가에게<br /><span className="lp-em">꼭 건네고</span> 싶었던 이유.
+              이 책을 누군가에게<br /><span className="lp-em">꼭 건네드리고</span> 싶었던 이유.
             </h2>
           </div>
           <p className="lp-lede">
-            우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다. 우리는 이 책이 한 사람에게 어떻게 스며들었는가를 기록합니다.
+            저희는 &lsquo;왜 이 책을 건네드리고 싶었는지&rsquo;를 씁니다. 이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.
           </p>
         </div>
 
@@ -534,7 +534,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               </div>
               <div className="lp-book-info">
                 <div className="bi-tag">{b.tag}</div>
-                <p className="bi-rec">— {josa(b.recommender ?? "", "이가")} 건넵니다</p>
+                <p className="bi-rec">— {josa(b.recommender ?? "", "이가")} 건네드립니다</p>
                 <p className="bi-reason">{b.reason}</p>
                 <div className="lp-emotion-tags">
                   {b.emotionTags?.map((t) => <span key={t}>{t}</span>)}
@@ -569,7 +569,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
                 <div className={`lp-mini-spine ${b.color}`} />
                 <div className="lp-mini-body">
                   <div className="lp-mini-title">{b.title}</div>
-                  <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어요</div>
+                  <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어드려요</div>
                   <div className="lp-mini-meta">
                     <span className="lp-mini-tag">{b.tag}</span>
                     <span className="lp-mini-members">
@@ -593,8 +593,8 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </h2>
           </div>
           <p className="lp-lede">
-            참여자들이 시즌의 끝에 남기고 간 짧은 문장들입니다.
-            과장된 후기는 싣지 않습니다. 우리가 가장 아끼는 작고 견고한 낮은 목소리입니다.
+            참여하신 분들이 모임을 마치고 남겨주신 짧은 문장들이에요.
+            과장된 후기는 싣지 않아요. 가장 아끼는, 작고 견고한 낮은 목소리들입니다.
           </p>
         </div>
         <div className="lp-test-list">
@@ -621,7 +621,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </h2>
           </div>
           <p className="lp-lede">
-            &lsquo;질문을 잘 던지는 사람&rsquo;과 함께합니다. 듣고, 이해하고, 다시 묻습니다.
+            질문을 잘 던지는 분들과 함께합니다. 경청하고, 이해하고, 다시 여쭤봅니다.
           </p>
         </div>
         <div className="lp-leaders-grid">
@@ -641,6 +641,50 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
+      {/* GIANTS — 거인의 어깨 */}
+      <section className="lp-section lp-giants-preview" id="giants-preview">
+        <div className="lp-section-head">
+          <div className="lp-left">
+            <div className="lp-eyebrow">GIANTS — 거인의 어깨</div>
+            <h2 className="lp-h-section">
+              위대한 지성들과<br />
+              <span className="lp-em">나누는 대화</span>.
+            </h2>
+          </div>
+          <p className="lp-lede">
+            니체, 한강, 칸트, 하라리... 그들의 사상으로 발제를 만들고,
+            그들의 언어로 대화해보세요. 북클럽을 더욱 깊고 풍요롭게 만들어드립니다.
+          </p>
+        </div>
+
+        <div className="lp-giants-grid">
+          {[
+            { slug: "friedrich-nietzsche", name: "프리드리히 니체", tagline: "신은 죽었다. 이제 우리가 살아야 한다.", color: "#2D3748", category: "철학자" },
+            { slug: "han-kang", name: "한강", tagline: "폭력과 아름다움 사이에서 인간을 묻다.", color: "#744C24", category: "작가" },
+            { slug: "yuval-harari", name: "유발 하라리", tagline: "호모 사피엔스, 스스로를 이해하기 시작한 종.", color: "#1A3A5C", category: "사상가" },
+            { slug: "peter-drucker", name: "피터 드러커", tagline: "경영의 목적은 고객을 창조하는 것이다.", color: "#2D4A22", category: "기업가" },
+          ].map((g) => (
+            <a key={g.slug} href={`/giants/${g.slug}`} className="lp-giant-card lp-reveal">
+              <div className="lgc-color" style={{ background: g.color }}>
+                <div className="lgc-category">{g.category}</div>
+                <div className="lgc-name">{g.name}</div>
+              </div>
+              <div className="lgc-body">
+                <p className="lgc-tagline">{g.tagline}</p>
+                <span className="lgc-link">사상 탐구하기 →</span>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div className="lp-giants-cta">
+          <a href="/giants" className="lp-btn-primary">
+            <span>거인의 어깨 탐색하기</span>
+            <span className="lp-arrow" />
+          </a>
+        </div>
+      </section>
+
       {/* QUESTIONS HUB — Today + Ask 통합 */}
       <section className="lp-section lp-question-hub" id="questions">
         <div className="lp-section-head">
@@ -652,9 +696,8 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </h2>
           </div>
           <p className="lp-lede">
-            매일 아침, 멤버 한 사람이 자신의 마음에 오래 머물던 질문을
-            이곳에 두고 갑니다. 답하지 않아도 좋습니다. 다만 잠시 머물러
-            주세요.
+            매일 아침, 멤버 한 분이 마음에 오래 머물던 질문을 이곳에 남겨두세요.
+            답하지 않으셔도 괜찮아요. 다만 잠시 머물러 주세요.
           </p>
         </div>
 
@@ -770,7 +813,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
                   type="submit"
                   disabled={askStatus === "sending" || askContent.trim().length < 5}
                 >
-                  <span>{askStatus === "sending" ? "전송 중…" : "질문 남기기"}</span>
+                  <span>{askStatus === "sending" ? "전송 중…" : "질문 남겨보기"}</span>
                   <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
                 </button>
               </div>
@@ -787,11 +830,11 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </p>
         <div className="lp-final-divider" />
         <p className="lp-final-end">
-          누군가는 <span className="lp-em">답</span>으로 기억되고,<br />
-          누군가는 <span className="lp-em">질문</span>으로 남습니다.
+          위대한 지성들의 언어로<br />
+          <span className="lp-em">당신의 질문</span>에 함께 답합니다.
         </p>
-        <a href="/bookclub" className="lp-btn-cream">
-          <span>지금 참여하기</span>
+        <a href="/giants" className="lp-btn-cream">
+          <span>거인의 어깨로 가기</span>
           <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
         </a>
       </section>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "junginaha@gmail.com").split(",");
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "junginaha@gmail.com,kimjungin@quesapience.com").split(",");
 
 export async function GET(
   _request: NextRequest,

@@ -7,7 +7,7 @@ export default async function AdminPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "junginaha@gmail.com").split(",");
+  const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "junginaha@gmail.com,kimjungin@quesapience.com").split(",");
   if (!ADMIN_EMAILS.includes(user.email ?? "")) redirect("/");
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
