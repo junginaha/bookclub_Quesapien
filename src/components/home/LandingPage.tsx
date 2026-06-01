@@ -503,11 +503,11 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           <div className="lp-left">
             <div className="lp-eyebrow">BOOK LOVERS — 책을 건네는 마음</div>
             <h2 className="lp-h-section">
-              이 책을 누군가에게<br /><span className="lp-em">꼭 건네드리고</span> 싶었던 이유.
+              이 책을 누군가에게<br /><span className="lp-em">꼭 건네고</span> 싶었던 이유.
             </h2>
           </div>
           <p className="lp-lede">
-            저희는 &lsquo;왜 이 책을 건네드리고 싶었는지&rsquo;를 씁니다. 이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.
+            우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다. 이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.
           </p>
         </div>
 
@@ -534,7 +534,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               </div>
               <div className="lp-book-info">
                 <div className="bi-tag">{b.tag}</div>
-                <p className="bi-rec">— {josa(b.recommender ?? "", "이가")} 건네드립니다</p>
+                <p className="bi-rec">— {josa(b.recommender ?? "", "이가")} 건넵니다</p>
                 <p className="bi-reason">{b.reason}</p>
                 <div className="lp-emotion-tags">
                   {b.emotionTags?.map((t) => <span key={t}>{t}</span>)}
@@ -569,7 +569,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
                 <div className={`lp-mini-spine ${b.color}`} />
                 <div className="lp-mini-body">
                   <div className="lp-mini-title">{b.title}</div>
-                  <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어드려요</div>
+                  <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어요</div>
                   <div className="lp-mini-meta">
                     <span className="lp-mini-tag">{b.tag}</span>
                     <span className="lp-mini-members">
@@ -621,7 +621,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </h2>
           </div>
           <p className="lp-lede">
-            질문을 잘 던지는 분들과 함께합니다. 경청하고, 이해하고, 다시 여쭤봅니다.
+            질문을 잘 던지는 분들과 함께합니다. 경청하고, 이해하고, 다시 묻습니다.
           </p>
         </div>
         <div className="lp-leaders-grid">
@@ -652,8 +652,8 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </h2>
           </div>
           <p className="lp-lede">
-            매일 아침, 멤버 한 분이 마음에 오래 머물던 질문을 이곳에 남겨두세요.
-            답하지 않으셔도 괜찮아요. 다만 잠시 머물러 주세요.
+            매일 아침, 멤버 한 분이 마음에 오래 머물던 질문을 이곳에 남겨두고 가세요.
+            답하지 않아도 괜찮아요. 다만 잠시 머물러 주세요.
           </p>
         </div>
 

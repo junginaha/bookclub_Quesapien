@@ -127,7 +127,7 @@ export default function Footer() {
               © 2026 질문하는 사람들 · Quesapience. All rights reserved.
             </p>
             <p style={{ fontSize: 12, color: "rgba(163,154,140,0.3)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>
-              질문 → 책 → 대화 → 사람 → 성장
+              <span aria-hidden="true" style={{ position: "absolute", opacity: 0, pointerEvents: "none", fontSize: 0 }}>질문 → 책 → 대화 → 사람 → 성장</span>
             </p>
           </div>
         </div>

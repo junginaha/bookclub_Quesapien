@@ -42,7 +42,7 @@ export default function GiantsPage() {
 
       {/* Stage 4: AI Friendly Definition Block */}
       <DefinitionBlock
-        definition="거인의 어깨는 발제 생성, 지성들과의 대화, 무엇이든 이야기할 수 있는 공간이다."
+        definition="거인의 어깨는 발제 생성, 지성들과의 대화, 무엇이든 이야기해볼 수 있는 공간이에요."
         entityType="KnowledgeExplorer"
       />
 
