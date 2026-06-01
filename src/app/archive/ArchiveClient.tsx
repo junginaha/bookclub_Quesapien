@@ -420,8 +420,8 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                       {c.role} · {c.season}
                     </div>
                     <p style={{
-                      fontFamily: '"EB Garamond", Georgia, serif',
-                      fontStyle: "italic", fontSize: 15,
+                      fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                      fontStyle: "normal", fontSize: 15,
                       color: c.color, lineHeight: 1.6,
                       borderLeft: `2px solid ${c.color}66`, paddingLeft: 12,
                     }}>

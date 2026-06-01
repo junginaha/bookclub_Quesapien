@@ -291,7 +291,7 @@ export default function MyPageClient({ profile, myReviews, mySessions, onboardin
                 {myReviews.map((review) => (
                   <div key={review.id} style={{ padding: "24px", borderRadius: 12, border: "1px solid var(--line-soft)", background: "rgba(255,255,255,0.4)" }}>
                     {review.quote && (
-                      <blockquote style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 16, color: "var(--ink)", borderLeft: "2px solid var(--accent)", paddingLeft: 16, marginBottom: 12, fontStyle: "italic" }}>
+                      <blockquote style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 16, color: "var(--ink)", borderLeft: "2px solid var(--accent)", paddingLeft: 16, marginBottom: 12, fontStyle: "normal" }}>
                         &ldquo;{review.quote}&rdquo;
                       </blockquote>
                     )}
@@ -348,7 +348,7 @@ export default function MyPageClient({ profile, myReviews, mySessions, onboardin
               </div>
               <h2 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 28, fontWeight: 400, color: "var(--ink)", marginBottom: 8 }}>
                 질문하는 사람들과 함께<br />
-                <em style={{ color: "var(--accent)", fontStyle: "italic", fontFamily: '"EB Garamond", Georgia, serif' }}>더 깊이</em> 탐구하세요.
+                <em style={{ fontStyle: "normal", fontWeight: 600, color: "var(--accent)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>더 깊이</em> 탐구하세요.
               </h2>
             </div>
 

@@ -141,7 +141,7 @@ export default function BookClubClient({ initialClubs }: { initialClubs: any[] }
             marginBottom: 20,
           }}>
             책과 질문으로<br />
-            <em style={{ fontStyle: "italic", color: "var(--accent)", fontFamily: '"EB Garamond", Georgia, serif' }}>만나는</em> 사람들.
+            <em style={{ fontStyle: "normal", fontWeight: 600, color: "var(--accent)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif", background: "linear-gradient(90deg, var(--accent), #B08A4A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>만나는</em> 사람들.
           </h1>
           <p style={{ fontSize: 16, color: "var(--muted)", lineHeight: 1.75, maxWidth: 480, marginBottom: 40 }}>
             리더와 함께 읽고, 질문하고, 대화해요.<br />
@@ -243,8 +243,8 @@ export default function BookClubClient({ initialClubs }: { initialClubs: any[] }
                             letterSpacing: "0.12em",
                             textTransform: "uppercase",
                             color: "rgba(255,255,255,0.7)",
-                            fontFamily: '"EB Garamond", Georgia, serif',
-                            fontStyle: "italic",
+                            fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                            fontStyle: "normal",
                           }}>
                             {club.genre ?? "북클럽"}
                           </span>
