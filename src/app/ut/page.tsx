@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 /* ============================= 문항 정의 ============================= */
 type QType = "short" | "long" | "single" | "multi" | "scale" | "ranking";
@@ -202,12 +203,10 @@ function SurveyForm({ onSubmitted }: { onSubmitted: () => void }) {
       answers[q.id] = v ?? "";
     });
     try {
-      const res = await fetch("/api/ut/responses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(answers),
-      });
-      if (!res.ok) throw new Error("save failed");
+      const supabase = createClient();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: sbErr } = await (supabase as any).from("ut_responses").insert({ answers });
+      if (sbErr) throw new Error(sbErr.message);
       onSubmitted();
     } catch {
       setError("저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
@@ -407,9 +406,13 @@ function ResultsView() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/ut/responses");
-      const json = await res.json();
-      setData(Array.isArray(json) ? json : []);
+      const supabase = createClient();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: rows } = await (supabase as any)
+        .from("ut_responses")
+        .select("id, created_at, answers")
+        .order("created_at", { ascending: false });
+      setData(rows ?? []);
     } finally {
       setLoading(false);
     }
@@ -419,7 +422,9 @@ function ResultsView() {
 
   async function handleClear() {
     if (!confirm("저장된 모든 응답을 삭제합니다. 되돌릴 수 없습니다. 계속할까요?")) return;
-    await fetch("/api/ut/responses", { method: "DELETE" });
+    const supabase = createClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("ut_responses").delete().neq("id", "00000000-0000-0000-0000-000000000000");
     load();
   }
 
