@@ -10,7 +10,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 export const metadata: Metadata = buildMetadata({
   title: "거인의 어깨 — 위대한 사유자와 대화",
   description:
-    "거인의 어깨는 니체, 칸트, 한강, 유발 하라리 등 위대한 저자와 사상가의 저서와 사상을 바탕으로 그들의 관점을 탐구하는 지식 공간입니다.",
+    "거인의 어깨는 니체, 칸트, 소크라테스, 도스토옙스키 등 사후 70년 이상 지난 위대한 지성들의 저서와 사상을 탐구하고 AI로 대화하는 지식 공간이에요.",
   path: "/giants",
   type: "website",
   keywords: ["니체", "칸트", "한강", "유발하라리", "피터드러커", "철학자", "사상가", "AI대화", "거인의어깨"],

@@ -319,7 +319,7 @@ export default function BookClubDetailClient({ club }: { club: any }) {
               {(club.recommended_for ?? []).length > 0 && (
                 <section>
                   <div style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 24 }}>
-                    For — 이런 분께 추천합니다
+                    이런 분께 드려요
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {(club.recommended_for as string[]).map((rec, i) => (
@@ -480,8 +480,8 @@ export default function BookClubDetailClient({ club }: { club: any }) {
 
                 {!isClosed && (
                   <p style={{ fontSize: 12, color: "var(--muted)", textAlign: "center", lineHeight: 1.6 }}>
-                    신청 후 확정 시 이메일로 안내드립니다.<br />
-                    참가비는 확정 후 안내됩니다.
+                    확정 후 이메일로 알려드릴게요.<br />
+                    참가비는 확정 후 알려드릴게요.
                   </p>
                 )}
               </div>
@@ -692,7 +692,7 @@ export default function BookClubDetailClient({ club }: { club: any }) {
               신청이 완료되었습니다
             </h3>
             <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75, marginBottom: 28 }}>
-              확인 후 이메일로 안내드립니다.<br />
+              확인 후 이메일로 알려드릴게요.<br />
               마이페이지에서 신청 내역을 확인할 수 있습니다.
             </p>
             <Link href="/mypage" style={{

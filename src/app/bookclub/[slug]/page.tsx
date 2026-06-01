@@ -18,8 +18,7 @@ const STATIC_CLUBS: Record<string, object> = {
     host_philosophy: "대화는 답을 찾는 과정이 아니라, 함께 머무는 과정입니다. 이 공간에서 당신은 옳은 대답을 할 필요가 없어요.",
     schedule: "2026년 6월 14일 (토) 오후 3시 — 5시 30분", location: "서울시 서초구 서초동",
     location_detail: "강남 교보문고 근처 (참여 확정 후 정확한 장소 안내)",
-    location_url: "https://maps.google.com",
-    join_url: "https://forms.google.com",
+    
     max_participants: 8, current_participants: 5, status: "active",
     description: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 우리가 일상에서 놓치고 있는 다정함의 순간들을 함께 발견합니다.",
     why_this_book: "사랑을 거창하게 생각해온 우리에게 필요한 책입니다. 거대한 로맨스보다 매일의 작은 행동들이 우리를 연결한다는 것을 이 책은 조용히, 하지만 분명하게 말합니다.",
@@ -47,7 +46,7 @@ const STATIC_CLUBS: Record<string, object> = {
     host_philosophy: "저는 빠른 대화보다 느린 대화를 선호합니다. 침묵도 대화의 일부라고 생각해요.",
     schedule: "2026년 6월 21일 (토) 오후 2시 — 4시 30분", location: "서울시 마포구 상수동",
     location_detail: "합정 근처 독립서점 (참여 확정 후 상세 주소 안내)",
-    join_url: "https://forms.google.com",
+    
     max_participants: 6, current_participants: 4, status: "active",
     description: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자 있는 것이 부끄럽지 않아진 첫 번째 모임입니다.",
     why_this_book: "혼자이기 때문에 더 깊어지는 것들이 있습니다. 이 책은 혼자라는 감각을 두려움이 아니라 능력으로 바라보게 합니다.",
