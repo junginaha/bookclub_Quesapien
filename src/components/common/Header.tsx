@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, LogOut, User, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, User, ChevronDown, Archive, Settings } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
 import SearchPalette from "./SearchPalette";
@@ -48,6 +48,8 @@ const navItems = [
   },
 ];
 
+const WORDMARKS = ["질문하는 사람들", "Quesapience"] as const;
+
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
@@ -55,10 +57,26 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [activeNav, setActiveNav] = useState<string | null>(null);
+  const [wordmarkIdx, setWordmarkIdx] = useState(0);
+  const [wordmarkFading, setWordmarkFading] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
   const currentUser = useAppStore((s) => s.currentUser);
   const logout = useAppStore((s) => s.logout);
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 워드마크 자동 전환
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordmarkFading(true);
+      setTimeout(() => {
+        setWordmarkIdx((i) => (i + 1) % WORDMARKS.length);
+        setWordmarkFading(false);
+      }, 350);
+    }, 3200);
+    return () => clearInterval(interval);
+  }, []);
 
   const isLanding = pathname === "/";
 
@@ -78,11 +96,22 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => { setMobileOpen(false); }, [pathname]);
+  useEffect(() => { setMobileOpen(false); setProfileOpen(false); }, [pathname]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     logout();
-    toast.success("로그아웃 되었습니다.");
+    setProfileOpen(false);
+    toast.success("로그아웃됐어요.");
     router.push("/");
   };
 
@@ -126,7 +155,7 @@ export default function Header() {
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
         <div style={{ display: "flex", height: 64, alignItems: "center", justifyContent: "space-between" }}>
 
-          {/* Logo */}
+          {/* Logo — 워드마크 자동 전환 */}
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 1, fontSize: 20, lineHeight: 1 }}>
               <span style={{
@@ -144,14 +173,24 @@ export default function Header() {
                 transformOrigin: "center",
               }}>!</span>
             </div>
-            <span style={{
-              fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-              fontSize: 13.5,
-              fontWeight: 500,
-              color: "var(--ink)",
-              letterSpacing: "0.03em",
-            }}>
-              질문하는 사람들
+            <span
+              style={{
+                fontFamily: wordmarkIdx === 1
+                  ? '"EB Garamond", Georgia, serif'
+                  : "var(--font-noto-serif-kr), Georgia, serif",
+                fontSize: 13.5,
+                fontWeight: wordmarkIdx === 1 ? 400 : 500,
+                color: "var(--ink)",
+                letterSpacing: wordmarkIdx === 1 ? "0.04em" : "0.03em",
+                fontStyle: wordmarkIdx === 1 ? "italic" : "normal",
+                transition: "opacity 0.35s ease, transform 0.35s ease",
+                opacity: wordmarkFading ? 0 : 1,
+                transform: wordmarkFading ? "translateY(-3px)" : "translateY(0)",
+                display: "inline-block",
+                minWidth: wordmarkIdx === 1 ? "95px" : "100px",
+              }}
+            >
+              {WORDMARKS[wordmarkIdx]}
             </span>
           </Link>
 
@@ -242,45 +281,110 @@ export default function Header() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SearchPalette />
             {currentUser ? (
-              <div className="hidden md:flex" style={{ alignItems: "center", gap: 8 }}>
-                <Link
-                  href="/mypage"
-                  title={currentUser.name}
+              /* 로그인 상태 — 프로필 드롭다운 */
+              <div ref={profileRef} style={{ position: "relative" }} className="hidden md:block">
+                <button
+                  onClick={() => setProfileOpen((o) => !o)}
                   style={{
-                    width: 32, height: 32, borderRadius: "50%",
-                    background: "var(--accent)", color: "var(--cream-on-dark)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    textDecoration: "none", fontSize: 13, fontWeight: 600,
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "5px 12px 5px 5px",
+                    border: "1px solid var(--line-soft)",
+                    borderRadius: 9999, background: "rgba(255,255,255,0.6)",
+                    cursor: "pointer", transition: "all .2s ease",
                   }}
                 >
-                  {currentUser.name[0]}
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  title="로그아웃"
-                  style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: 4, display: "flex", alignItems: "center" }}
-                >
-                  <LogOut size={15} />
+                  <div style={{
+                    width: 28, height: 28, borderRadius: "50%",
+                    background: "var(--accent)", color: "white",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 12.5, fontWeight: 600, flexShrink: 0,
+                  }}>
+                    {currentUser.name[0]}
+                  </div>
+                  <span style={{ fontSize: 13, color: "var(--ink-soft)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
+                    {currentUser.name}
+                  </span>
+                  <ChevronDown size={12} style={{ color: "var(--muted)", transition: "transform .2s ease", transform: profileOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
                 </button>
+
+                {profileOpen && (
+                  <div style={{
+                    position: "absolute", top: "calc(100% + 8px)", right: 0,
+                    minWidth: 200, background: "rgba(244,239,229,0.98)",
+                    backdropFilter: "blur(20px)", border: "1px solid var(--line)",
+                    borderRadius: 14, boxShadow: "0 24px 60px -16px rgba(28,31,38,.18)",
+                    padding: "8px 0", zIndex: 200,
+                  }}>
+                    <div style={{ padding: "10px 16px 8px", borderBottom: "1px solid var(--line-soft)" }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 500, color: "var(--ink)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
+                        {currentUser.name}
+                      </div>
+                      <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 2 }}>{currentUser.email}</div>
+                    </div>
+                    {[
+                      { href: "/mypage", icon: <User size={13} />, label: "내 프로필" },
+                      { href: "/archive?mine=true", icon: <Archive size={13} />, label: "내 아카이브" },
+                      { href: "/mypage?tab=questions", icon: <Settings size={13} />, label: "내 질문" },
+                    ].map((item) => (
+                      <Link key={item.href} href={item.href} onClick={() => setProfileOpen(false)} style={{
+                        display: "flex", alignItems: "center", gap: 9,
+                        padding: "9px 16px", fontSize: 13.5, color: "var(--ink-soft)",
+                        textDecoration: "none", transition: "background .15s",
+                        fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                      }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(28,31,38,0.04)"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+                      >
+                        <span style={{ color: "var(--muted)" }}>{item.icon}</span>
+                        {item.label}
+                      </Link>
+                    ))}
+                    <div style={{ borderTop: "1px solid var(--line-soft)", marginTop: 4 }} />
+                    <button onClick={handleLogout} style={{
+                      display: "flex", alignItems: "center", gap: 9,
+                      padding: "9px 16px", fontSize: 13.5, color: "var(--muted)",
+                      background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left",
+                      transition: "color .15s",
+                      fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                    }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#EF4444"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}
+                    >
+                      <LogOut size={13} /> 로그아웃
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="hidden md:flex" style={{ alignItems: "center", gap: 8 }}>
                 <Link
                   href="/login"
-                  style={{ fontSize: 13.5, color: "var(--ink-soft)", textDecoration: "none", padding: "6px 12px" }}
+                  style={{
+                    fontSize: 13.5, color: "var(--ink-soft)", textDecoration: "none",
+                    padding: "7px 16px", borderRadius: 9999,
+                    border: "1px solid var(--line-soft)",
+                    transition: "border-color .2s ease, color .2s ease",
+                    fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                  }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLElement).style.color = "var(--accent)"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--line-soft)"; (e.currentTarget as HTMLElement).style.color = "var(--ink-soft)"; }}
                 >
                   로그인
                 </Link>
                 <Link
                   href="/signup"
                   style={{
-                    fontSize: 13, fontWeight: 500,
+                    fontSize: 13.5, fontWeight: 500,
                     background: "var(--ink)", color: "var(--cream-on-dark)",
-                    borderRadius: 9999, padding: "7px 18px",
+                    borderRadius: 9999, padding: "7px 20px",
                     textDecoration: "none", letterSpacing: "0.02em",
+                    fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                    transition: "opacity .2s ease",
                   }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.85"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
                 >
-                  시작하기
+                  가입하기
                 </Link>
               </div>
             )}

@@ -12,7 +12,7 @@ import AIReviewSummary from "@/components/archive/AIReviewSummary";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Review = any;
 
-type TabType = "reviews" | "questions" | "discussions" | "talks" | "cases";
+type TabType = "reviews" | "mine" | "cases" | "questions" | "discussions" | "talks";
 
 const STATIC_QUESTIONS = [
   { id: "aq1", content: "당신은 마지막으로 언제, 진심으로 울었나요?", author_name: "편집팀", likes: 1284, answers_count: 72, created_at: "2026-05-22" },
@@ -75,19 +75,55 @@ const LEADER_CASES = [
 
 export default function ArchiveClient({ initialReviews }: { initialReviews: Review[] }) {
   const searchParams = useSearchParams();
-  const initialTab = (searchParams.get("tab") as TabType | null) ?? "reviews";
+  const initialTab = (searchParams.get("tab") as TabType | null) ?? (searchParams.get("mine") === "true" ? "mine" : "reviews");
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [photoFilter, setPhotoFilter] = useState<"all" | "text" | "photo" | "video">("all");
+  const [myReviews, setMyReviews] = useState<Review[]>([]);
+  const [myLoading, setMyLoading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
 
   useEffect(() => {
     const tab = searchParams.get("tab") as TabType | null;
     if (tab) setActiveTab(tab);
+    else if (searchParams.get("mine") === "true") setActiveTab("mine");
   }, [searchParams]);
+
+  useEffect(() => {
+    if (activeTab === "mine" && myReviews.length === 0 && !myLoading) {
+      setMyLoading(true);
+      fetch("/api/archive/mine")
+        .then((r) => r.json())
+        .then((d) => { setMyReviews(d.reviews ?? []); })
+        .catch(() => {})
+        .finally(() => setMyLoading(false));
+    }
+  }, [activeTab, myReviews.length, myLoading]);
+
+  const handleDeleteReview = async (id: string) => {
+    if (!confirm("기록을 삭제할까요?")) return;
+    const res = await fetch(`/api/archive/review/${id}`, { method: "DELETE" });
+    if (res.ok) setMyReviews((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const handleEditSave = async (id: string) => {
+    const res = await fetch(`/api/archive/review/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: editContent }),
+    });
+    if (res.ok) {
+      setMyReviews((prev) => prev.map((r) => r.id === id ? { ...r, content: editContent } : r));
+      setEditingId(null);
+    }
+  };
+
   const totalLikes = initialReviews.reduce((a: number, r: Review) => a + (r.likes ?? 0), 0);
   const filtered = photoFilter === "all" ? initialReviews : initialReviews.filter((r: Review) => r.type === photoFilter);
 
   const TABS = [
     { key: "reviews" as const, label: "후기 아카이브", icon: <Heart size={14} />, count: initialReviews.length },
+    { key: "mine" as const, label: "내 아카이브", icon: <Heart size={14} />, count: myReviews.length || undefined },
     { key: "cases" as const, label: "진행자 사례", icon: <MessageSquare size={14} />, count: LEADER_CASES.length },
     { key: "questions" as const, label: "질문 아카이브", icon: <MessageSquare size={14} />, count: STATIC_QUESTIONS.length },
     { key: "discussions" as const, label: "발제문 아카이브", icon: <FileText size={14} />, count: STATIC_DISCUSSIONS.length },
@@ -245,6 +281,108 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
               </div>
             )}
           </>
+        )}
+
+        {/* ─ 내 아카이브 ─ */}
+        {activeTab === "mine" && (
+          <div>
+            {myLoading ? (
+              <div style={{ textAlign: "center", padding: "60px 0", color: "var(--muted)" }}>불러오는 중…</div>
+            ) : myReviews.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "80px 0", color: "var(--muted)", lineHeight: 1.75, fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
+                아직 내 기록이 없어요.<br />
+                <a href="/#testify" style={{ color: "var(--accent)", fontSize: 13.5, textDecoration: "none", marginTop: 8, display: "inline-block" }}>
+                  첫 기록 남기기 →
+                </a>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {myReviews.map((review: Review) => (
+                  <div key={review.id} style={{
+                    borderRadius: 14, overflow: "hidden",
+                    border: "1px solid var(--line-soft)",
+                    background: "rgba(255,255,255,0.5)",
+                  }}>
+                    {review.photo_url && (
+                      <div style={{ position: "relative", height: 180, overflow: "hidden" }}>
+                        <Image src={review.photo_url} alt="후기 사진" fill style={{ objectFit: "cover" }} sizes="100vw" />
+                      </div>
+                    )}
+                    <div style={{ padding: "20px 24px" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{
+                            fontSize: 11, padding: "2px 8px", borderRadius: 9999,
+                            background: review.is_approved ? "rgba(94,70,50,0.1)" : "rgba(245,158,11,0.1)",
+                            color: review.is_approved ? "var(--accent)" : "#B45309",
+                            letterSpacing: "0.06em", textTransform: "uppercase",
+                          }}>
+                            {review.is_approved ? "공개" : "비공개"}
+                          </span>
+                          <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{formatDate(review.created_at)}</span>
+                        </div>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          {editingId !== review.id && (
+                            <button
+                              onClick={() => { setEditingId(review.id); setEditContent(review.content); }}
+                              style={{ fontSize: 12.5, color: "var(--muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}
+                            >
+                              수정
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDeleteReview(review.id)}
+                            style={{ fontSize: 12.5, color: "#EF4444", background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}
+                          >
+                            삭제
+                          </button>
+                        </div>
+                      </div>
+                      {editingId === review.id ? (
+                        <div>
+                          <textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            rows={4}
+                            style={{
+                              width: "100%", padding: "12px 14px", borderRadius: 10, fontSize: 14,
+                              border: "1px solid var(--line-soft)", background: "rgba(255,255,255,0.7)",
+                              color: "var(--ink)", outline: "none", resize: "vertical", boxSizing: "border-box",
+                              lineHeight: 1.7, fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                            }}
+                          />
+                          <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                            <button
+                              onClick={() => handleEditSave(review.id)}
+                              style={{
+                                padding: "8px 20px", borderRadius: 9999, fontSize: 13.5,
+                                background: "var(--ink)", color: "var(--cream-on-dark)",
+                                border: "none", cursor: "pointer",
+                                fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                              }}
+                            >저장</button>
+                            <button
+                              onClick={() => setEditingId(null)}
+                              style={{
+                                padding: "8px 18px", borderRadius: 9999, fontSize: 13.5,
+                                background: "transparent", color: "var(--muted)",
+                                border: "1px solid var(--line-soft)", cursor: "pointer",
+                                fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                              }}
+                            >취소</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.75, fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
+                          {review.content}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
         {/* ─ 진행자 사례 ─ */}

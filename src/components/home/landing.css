@@ -508,6 +508,84 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-btn-outline:hover .lp-arrow { transform: translateX(4px); }
 .lp-btn-outline .lp-arrow { color: var(--lp-muted); }
 
+/* ── SPARKLE NEARBY BUTTON ── */
+.lp-nearby-spark-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lp-nearby-spark-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 28px;
+  background: linear-gradient(135deg, var(--lp-accent) 0%, var(--lp-gold) 60%, #C8975A 100%);
+  color: rgba(255,255,255,0.95);
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-size: 14.5px;
+  font-weight: 500;
+  font-family: var(--lp-serif-ko);
+  letter-spacing: -0.005em;
+  overflow: visible;
+  transition: transform 0.3s cubic-bezier(.2,.8,.2,1), box-shadow 0.3s ease;
+  animation: lp-nearbyGlow 2.4s ease-in-out infinite;
+  z-index: 1;
+}
+.lp-nearby-spark-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 16px 48px -12px rgba(94,70,50,0.55), 0 0 32px rgba(176,138,74,0.4);
+}
+
+@keyframes lp-nearbyGlow {
+  0%, 100% { box-shadow: 0 6px 24px -8px rgba(94,70,50,0.4), 0 0 0 0 rgba(176,138,74,0); }
+  50% { box-shadow: 0 10px 36px -8px rgba(94,70,50,0.55), 0 0 28px -4px rgba(176,138,74,0.35); }
+}
+
+/* 펄스 링 */
+.lp-spark-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(176,138,74,0.5);
+  animation: lp-sparkRing 2.4s ease-out infinite;
+  pointer-events: none;
+}
+.lp-spark-ring-2 {
+  animation-delay: 1.2s;
+  border-color: rgba(94,70,50,0.3);
+}
+@keyframes lp-sparkRing {
+  0%  { transform: scale(1);   opacity: 0.9; }
+  100%{ transform: scale(1.55); opacity: 0;   }
+}
+
+/* 파티클 ✦ 반짝 */
+.lp-spark {
+  position: absolute;
+  font-size: 11px;
+  color: var(--lp-gold);
+  pointer-events: none;
+  animation: lp-sparkFloat 3s ease-in-out infinite;
+  font-family: var(--lp-serif);
+}
+.lp-spark-1 { top: -10px; left: 18px;  animation-delay: 0s;    font-size: 10px; }
+.lp-spark-2 { top: -6px;  right: 22px; animation-delay: 0.8s;  font-size: 8px;  }
+.lp-spark-3 { bottom: -8px; left: 30px;  animation-delay: 1.6s;  font-size: 14px; color: var(--lp-accent); opacity: 0.5; }
+.lp-spark-4 { bottom: -6px; right: 16px; animation-delay: 2.4s;  font-size: 9px;  }
+
+@keyframes lp-sparkFloat {
+  0%, 100% { transform: translateY(0) scale(1);   opacity: 0; }
+  20%       { opacity: 0.9; }
+  50%       { transform: translateY(-8px) scale(1.2); opacity: 1; }
+  80%       { opacity: 0.6; }
+}
+
+.lp-spark-pin { color: rgba(255,255,255,0.9); }
+
 /* ── NEARBY ROW — 내 근처 북클럽 (books 섹션 상단) ── */
 .lp-nearby-row {
   max-width: var(--lp-max);
