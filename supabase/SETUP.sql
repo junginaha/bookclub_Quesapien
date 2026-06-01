@@ -1,7 +1,5 @@
 -- ============================================================
--- 질문하는 사람들 — 전체 스키마 설정
--- https://app.supabase.com/project/smoehxmgnnaulrxjkqvm/sql/new
--- 이 파일 전체를 복사해서 SQL Editor에 붙여넣고 실행하세요.
+-- 질문하는 사람들 — 전체 스키마 설정 (idempotent)
 -- ============================================================
 
 -- ── 1. Landing Book Clubs ────────────────────────────────────
@@ -50,9 +48,12 @@ CREATE TRIGGER landing_book_clubs_updated
   FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 
 ALTER TABLE landing_book_clubs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Public read landing_book_clubs" ON landing_book_clubs FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "Admin or host can update" ON landing_book_clubs FOR UPDATE USING (auth.uid() = host_id OR auth.uid() = created_by);
-CREATE POLICY IF NOT EXISTS "Auth user can insert" ON landing_book_clubs FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Public read landing_book_clubs" ON landing_book_clubs;
+DROP POLICY IF EXISTS "Admin or host can update" ON landing_book_clubs;
+DROP POLICY IF EXISTS "Auth user can insert" ON landing_book_clubs;
+CREATE POLICY "Public read landing_book_clubs" ON landing_book_clubs FOR SELECT USING (true);
+CREATE POLICY "Admin or host can update" ON landing_book_clubs FOR UPDATE USING (auth.uid() = host_id OR auth.uid() = created_by);
+CREATE POLICY "Auth user can insert" ON landing_book_clubs FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
 -- ── 2. Landing Questions ─────────────────────────────────────
 CREATE TABLE IF NOT EXISTS landing_questions (
@@ -70,8 +71,10 @@ CREATE TABLE IF NOT EXISTS landing_questions (
 );
 
 ALTER TABLE landing_questions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Public read approved questions" ON landing_questions FOR SELECT USING (is_approved = true);
-CREATE POLICY IF NOT EXISTS "Anyone can insert question" ON landing_questions FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public read approved questions" ON landing_questions;
+DROP POLICY IF EXISTS "Anyone can insert question" ON landing_questions;
+CREATE POLICY "Public read approved questions" ON landing_questions FOR SELECT USING (is_approved = true);
+CREATE POLICY "Anyone can insert question" ON landing_questions FOR INSERT WITH CHECK (true);
 
 -- ── 3. Landing Question Answers ──────────────────────────────
 CREATE TABLE IF NOT EXISTS landing_question_answers (
@@ -86,10 +89,11 @@ CREATE TABLE IF NOT EXISTS landing_question_answers (
 );
 
 ALTER TABLE landing_question_answers ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Public read answers" ON landing_question_answers FOR SELECT USING (is_approved = true);
-CREATE POLICY IF NOT EXISTS "Anyone can answer" ON landing_question_answers FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public read answers" ON landing_question_answers;
+DROP POLICY IF EXISTS "Anyone can answer" ON landing_question_answers;
+CREATE POLICY "Public read answers" ON landing_question_answers FOR SELECT USING (is_approved = true);
+CREATE POLICY "Anyone can answer" ON landing_question_answers FOR INSERT WITH CHECK (true);
 
--- 답변 수 자동 증가
 CREATE OR REPLACE FUNCTION increment_answers_count()
 RETURNS TRIGGER LANGUAGE plpgsql AS $$
 BEGIN
@@ -113,8 +117,10 @@ CREATE TABLE IF NOT EXISTS landing_question_reactions (
 );
 
 ALTER TABLE landing_question_reactions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Public read reactions" ON landing_question_reactions FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "Anyone can react" ON landing_question_reactions FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public read reactions" ON landing_question_reactions;
+DROP POLICY IF EXISTS "Anyone can react" ON landing_question_reactions;
+CREATE POLICY "Public read reactions" ON landing_question_reactions FOR SELECT USING (true);
+CREATE POLICY "Anyone can react" ON landing_question_reactions FOR INSERT WITH CHECK (true);
 
 -- ── 5. Archive Reviews ───────────────────────────────────────
 CREATE TABLE IF NOT EXISTS archive_reviews (
@@ -131,8 +137,10 @@ CREATE TABLE IF NOT EXISTS archive_reviews (
 );
 
 ALTER TABLE archive_reviews ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Public read approved reviews" ON archive_reviews FOR SELECT USING (is_approved = true);
-CREATE POLICY IF NOT EXISTS "Anyone can insert review" ON archive_reviews FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public read approved reviews" ON archive_reviews;
+DROP POLICY IF EXISTS "Anyone can insert review" ON archive_reviews;
+CREATE POLICY "Public read approved reviews" ON archive_reviews FOR SELECT USING (is_approved = true);
+CREATE POLICY "Anyone can insert review" ON archive_reviews FOR INSERT WITH CHECK (true);
 
 -- ── 6. Archive Review Likes ──────────────────────────────────
 CREATE TABLE IF NOT EXISTS archive_review_likes (
@@ -142,9 +150,12 @@ CREATE TABLE IF NOT EXISTS archive_review_likes (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (review_id, session_key)
 );
+
 ALTER TABLE archive_review_likes ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Anyone can like" ON archive_review_likes FOR INSERT WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "Public read likes" ON archive_review_likes FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Anyone can like" ON archive_review_likes;
+DROP POLICY IF EXISTS "Public read likes" ON archive_review_likes;
+CREATE POLICY "Anyone can like" ON archive_review_likes FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public read likes" ON archive_review_likes FOR SELECT USING (true);
 
 -- ── 7. Storage Bucket ────────────────────────────────────────
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

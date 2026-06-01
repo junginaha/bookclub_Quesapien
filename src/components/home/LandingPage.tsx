@@ -123,8 +123,27 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
     if (!navigator.geolocation) { setStatus("unsupported"); return; }
     setStatus("loading");
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const { latitude, longitude } = pos.coords;
+        try {
+          // PostGIS 지오쿼리 우선 시도
+          const res = await fetch(
+            `/api/book-clubs/nearby?lat=${latitude}&lng=${longitude}&radius=15`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            if (data.clubs?.length > 0) {
+              const withDist: NearbyBook[] = data.clubs.map((c: BookClub & { distance_km?: number }) => ({
+                ...c,
+                distKm: c.distance_km ?? haversineKm(latitude, longitude, c.lat!, c.lng!),
+              }));
+              setNearby(withDist.slice(0, 3));
+              setStatus("found");
+              return;
+            }
+          }
+        } catch { /* fall through */ }
+        // Fallback: 클라이언트 Haversine
         const withDist = allBooks
           .filter((b) => b.lat !== undefined && b.lng !== undefined && (b.currentParticipants ?? 0) < (b.maxParticipants ?? 8))
           .map((b) => ({ ...b, distKm: haversineKm(latitude, longitude, b.lat!, b.lng!) }))
