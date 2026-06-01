@@ -252,7 +252,7 @@ export default function MyPageClient({ profile, myReviews, mySessions, onboardin
               </div>
               {upcomingSessions.length === 0 ? (
                 <div style={{ padding: "32px 0", textAlign: "center" }}>
-                  <p style={{ fontSize: 14, color: "var(--muted)", marginBottom: 12 }}>예정된 모임이 없습니다.</p>
+                  <p style={{ fontSize: 14, color: "var(--muted)", marginBottom: 12 }}>예정된 모임이 없어요.</p>
                   <Link href="/bookclub" style={{ fontSize: 13, color: "var(--accent)", textDecoration: "none" }}>
                     북클럽 탐색하기 →
                   </Link>

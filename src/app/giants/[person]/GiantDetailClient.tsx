@@ -146,7 +146,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
     } catch {
       setMessages((prev) => [...prev, {
         role: "assistant",
-        content: `죄송합니다. 지금은 ${giant.name}과의 대화를 이어갈 수 없습니다. 잠시 후 다시 시도해 주세요.`,
+        content: `${giant.name}이(가) 잠시 자리를 비웠어요. 조금 후에 다시 이야기 나눠요.`,
       }]);
     } finally {
       setIsLoading(false);
@@ -368,7 +368,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                     ))}
                   </div>
                   <p style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 12 }}>
-                    ↑ 클릭하면 {giant.name}와 바로 대화를 시작합니다
+                    ↑ 클릭하면 바로 대화가 시작돼요
                   </p>
                 </section>
               </div>
@@ -383,7 +383,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                     사상 탐구하기
                   </div>
                   <p style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", lineHeight: 1.75, marginBottom: 20 }}>
-                    {giant.name}의 저서와 사상을 바탕으로 그의 언어와 논리로 답합니다.
+                    저서와 사상을 바탕으로, 그의 언어로 답해요.
                   </p>
                   <button
                     onClick={() => setActiveTab("chat")}
@@ -432,7 +432,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
           {activeTab === "discuss" && (
             <div style={{ maxWidth: 760, margin: "0 auto" }}>
               <p style={{ fontSize: 15, color: "var(--ink-soft)", marginBottom: 28, lineHeight: 1.7 }}>
-                {giant.name}의 사상을 바탕으로 발제를 생성합니다.
+                {giant.name}의 관점으로 발제를 만들어요.
               </p>
               <form onSubmit={generateFromKeyword} style={{ marginBottom: 32 }}>
                 <div style={{

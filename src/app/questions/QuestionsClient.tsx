@@ -248,7 +248,7 @@ export default function QuestionsClient({
 
               {filtered.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-                  <p style={{ marginBottom: 12 }}>검색 결과가 없습니다.</p>
+                  <p style={{ marginBottom: 12 }}>검색된 질문이 없어요.</p>
                   <button onClick={() => setSearch("")} style={{ fontSize: 13, color: "var(--accent)", background: "none", border: "none", cursor: "pointer" }}>
                     전체 보기
                   </button>
@@ -313,7 +313,7 @@ export default function QuestionsClient({
               {askStatus === "sent" ? (
                 <div style={{ textAlign: "center", padding: "20px 0" }}>
                   <div style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 36, color: "var(--accent)", marginBottom: 12 }}>?</div>
-                  <p style={{ fontSize: 14, color: "var(--ink-soft)" }}>질문이 전달되었습니다.</p>
+                  <p style={{ fontSize: 14, color: "var(--ink-soft)" }}>질문이 잘 전달됐어요.</p>
                   <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>누군가의 마음에 닿을 거예요.</p>
                 </div>
               ) : (
@@ -321,7 +321,7 @@ export default function QuestionsClient({
                   <textarea
                     value={askContent}
                     onChange={(e) => setAskContent(e.target.value)}
-                    placeholder="마음 속에 오래 남아 있던 질문을 적어주세요."
+                    placeholder="마음속에 오래 남아 있던 질문을 적어주세요."
                     rows={4}
                     style={{
                       width: "100%", background: "rgba(255,255,255,0.5)",
@@ -335,7 +335,7 @@ export default function QuestionsClient({
                   <input
                     value={askAuthor}
                     onChange={(e) => setAskAuthor(e.target.value)}
-                    placeholder="이름 (선택 · 익명 가능)"
+                    placeholder="닉네임 (익명도 괜찮아요)"
                     style={{
                       width: "100%", background: "rgba(255,255,255,0.5)",
                       border: "1px solid var(--line)", borderRadius: 10,
@@ -359,7 +359,7 @@ export default function QuestionsClient({
                   </button>
                   {askStatus === "error" && (
                     <p style={{ fontSize: 12, color: "#EF4444", marginTop: 8, textAlign: "center" }}>
-                      잠시 후 다시 시도해주세요.
+                      잠시 후 다시 눌러주세요.
                     </p>
                   )}
                 </form>

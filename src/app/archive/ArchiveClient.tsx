@@ -4,9 +4,8 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ThumbsUp, BookOpen, MessageSquare, FileText, Calendar } from "lucide-react";
+import { BookOpen, MessageSquare, FileText, Calendar, Heart } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import LikeButton from "@/components/reviews/LikeButton";
 import AISummaryBlock from "@/components/seo/AISummaryBlock";
 import AIReviewSummary from "@/components/archive/AIReviewSummary";
 
@@ -88,7 +87,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
   const filtered = photoFilter === "all" ? initialReviews : initialReviews.filter((r: Review) => r.type === photoFilter);
 
   const TABS = [
-    { key: "reviews" as const, label: "후기 아카이브", icon: <ThumbsUp size={14} />, count: initialReviews.length },
+    { key: "reviews" as const, label: "후기 아카이브", icon: <Heart size={14} />, count: initialReviews.length },
     { key: "cases" as const, label: "진행자 사례", icon: <MessageSquare size={14} />, count: LEADER_CASES.length },
     { key: "questions" as const, label: "질문 아카이브", icon: <MessageSquare size={14} />, count: STATIC_QUESTIONS.length },
     { key: "discussions" as const, label: "발제문 아카이브", icon: <FileText size={14} />, count: STATIC_DISCUSSIONS.length },
@@ -191,10 +190,10 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
             </div>
 
             {filtered.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "80px 0", color: "var(--muted)" }}>
+              <div style={{ textAlign: "center", padding: "80px 0", color: "var(--muted)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif", lineHeight: 1.75 }}>
                 {initialReviews.length === 0
-                  ? "아직 후기가 없습니다. 모임에 참여하고 첫 후기를 남겨보세요!"
-                  : "해당 유형의 후기가 없습니다."}
+                  ? <>아직 첫 기록이 없어요.<br />모임에 다녀오셨다면 처음이 되어주세요.</>
+                  : "이 유형의 기록은 아직 없어요."}
               </div>
             ) : (
               <div style={{ columns: "1 auto", columnWidth: 300, gap: 16 }}>
@@ -225,16 +224,13 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                       </div>
                     )}
                     <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "white" }}>
-                            {review.author?.name?.[0] ?? "?"}
-                          </div>
-                          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--ink)" }}>
-                            {review.author?.name ?? "익명"}
-                          </span>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "white" }}>
+                          {(review.author?.name ?? review.author_name ?? "?")[0]}
                         </div>
-                        <LikeButton reviewId={review.id} likes={review.likes ?? 0} />
+                        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--ink)" }}>
+                          {review.author?.name ?? review.author_name ?? "익명"}
+                        </span>
                       </div>
                       {review.quote && (
                         <blockquote style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 14, color: "var(--ink)", borderLeft: "2px solid var(--accent)", paddingLeft: 12, fontStyle: "normal" }}>
@@ -255,7 +251,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
         {activeTab === "cases" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
             <p style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.75, maxWidth: 560, marginBottom: 8 }}>
-              시즌을 진행한 세 분의 이야기입니다. 그들이 북클럽을 통해 무엇을 발견했는지, 직접 남긴 기록이에요.
+              시즌을 진행한 세 분의 이야기예요. 북클럽을 통해 무엇이 달라졌는지, 직접 남긴 기록이에요.
             </p>
             {LEADER_CASES.map((c) => (
               <article key={c.id} style={{
@@ -346,7 +342,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                   </p>
                   <div style={{ display: "flex", gap: 16, fontSize: 12, color: "var(--muted)" }}>
                     <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                      <ThumbsUp size={11} /> {q.likes.toLocaleString()}
+                      <Heart size={11} /> {q.likes.toLocaleString()}
                     </span>
                     <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
                       <MessageSquare size={11} /> {q.answers_count}

@@ -45,7 +45,7 @@ export default function BookClubDetailClient({ club }: { club: any }) {
 
   const handleSubmitJoin = async () => {
     if (!applicantName.trim() || !applicantEmail.trim()) {
-      setJoinError("이름과 이메일을 입력해주세요.");
+      setJoinError("이름과 이메일을 적어주세요.");
       return;
     }
     setJoinStep("submitting");

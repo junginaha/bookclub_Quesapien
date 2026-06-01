@@ -178,7 +178,7 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
   if (status === "found" && nearby.length === 0) {
     return (
       <div className="lp-nearby-trigger">
-        <span className="lp-nearby-hint">현재 위치 근처에 모집 중인 모임이 없어요. 곧 새로운 모임이 열려요.</span>
+        <span className="lp-nearby-hint">지금은 근처에 빈 자리가 없어요. 곧 새 모임이 열릴 거예요.</span>
       </div>
     );
   }
@@ -358,7 +358,7 @@ function ArchiveReviewForm() {
         한 번쯤 남겨볼까 싶으셨다면, 그 생각이 맞아요.
       </p>
       <p style={{ fontSize: 13.5, color: "var(--lp-muted)", marginBottom: 24, lineHeight: 1.6 }}>
-        글·사진·영상으로 자유롭게 기록해주세요. 공개·비공개는 직접 선택하실 수 있어요.
+        글·사진·영상으로 남겨주세요. 공개 여부는 직접 고르실 수 있어요.
       </p>
 
       {/* 공개/비공개 토글 */}
@@ -382,7 +382,7 @@ function ArchiveReviewForm() {
           ))}
         </div>
         <span style={{ fontSize: 12.5, color: "var(--lp-muted)", fontFamily: "var(--lp-serif-ko)" }}>
-          {isPublic ? "아카이빙 페이지에 바로 공개돼요." : "기록은 저장되지만 공개되지 않아요."}
+          {isPublic ? "아카이빙에 올라가요." : "나만 간직해요."}
         </span>
       </div>
 
@@ -468,8 +468,8 @@ function ArchiveReviewForm() {
           <textarea
             placeholder={
               tab === "text"
-                ? "모임 이후 달라진 것이 있으신가요? 오래 남은 문장이나 감각을 적어주세요. (20자 이상)"
-                : "사진이나 영상에 담긴 이야기를 들려주세요. (20자 이상)"
+                ? "모임 이후 달라진 것, 오래 남은 문장, 작은 변화를 적어주세요."
+                : "이 사진·영상에 담긴 이야기를 들려주세요."
             }
             rows={tab === "text" ? 5 : 3}
             value={content}
@@ -507,7 +507,7 @@ function ArchiveReviewForm() {
             </button>
           </div>
           {status === "error" && (
-            <p style={{ fontSize: 12.5, color: "rgba(239,68,68,0.8)", marginTop: 8 }}>잠시 후 다시 시도해주세요.</p>
+            <p style={{ fontSize: 12.5, color: "rgba(239,68,68,0.8)", marginTop: 8 }}>잠시 후 다시 눌러주세요.</p>
           )}
         </form>
       )}
@@ -888,34 +888,12 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               {todayQuestion?.content ?? "당신은 마지막으로 언제,\n진심으로 울었나요?"}
             </p>
             <div className="lp-q-meta">
-              <button
-                onClick={() => handleReact("like")}
-                style={{
-                  background: "none", border: "none", cursor: "pointer", padding: "4px 0",
-                  display: "flex", alignItems: "center", gap: 6,
-                  color: questionReacted.like ? "var(--lp-accent)" : "inherit",
-                  transition: "color .2s ease",
-                }}
-              >
-                <strong style={{ color: questionReacted.like ? "var(--lp-accent)" : undefined }}>
-                  {(questionLikes ?? todayQuestion?.likes ?? 1284).toLocaleString()}
-                </strong>
-                <span>{questionReacted.like ? "♥" : "♡"} 공감</span>
-              </button>
-              <button
-                onClick={() => handleReact("save")}
-                style={{
-                  background: "none", border: "none", cursor: "pointer", padding: "4px 0",
-                  display: "flex", alignItems: "center", gap: 6,
-                  color: questionReacted.save ? "var(--lp-accent)" : "inherit",
-                  transition: "color .2s ease",
-                }}
-              >
-                <strong style={{ color: questionReacted.save ? "var(--lp-accent)" : undefined }}>
-                  {(questionSaves ?? todayQuestion?.saves ?? 397).toLocaleString()}
-                </strong>
-                <span>{questionReacted.save ? "★" : "☆"} 저장</span>
-              </button>
+              <span>
+                <strong>{(questionLikes ?? todayQuestion?.likes ?? 1284).toLocaleString()}</strong> 공감
+              </span>
+              <span>
+                <strong>{(questionSaves ?? todayQuestion?.saves ?? 397).toLocaleString()}</strong> 저장
+              </span>
               <span>
                 <strong>{todayQuestion?.answers_count ?? "72"}</strong> 답변
               </span>
@@ -1032,7 +1010,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               <div className="lp-ask-actions">
                 <span className="aa-hint">
                   {askStatus === "error"
-                    ? "— 잠시 후 다시 시도해주세요."
+                    ? "— 잠시 후 다시 눌러주세요."
                     : "— 좋은 질문은 누군가를 살립니다."}
                 </span>
                 <button

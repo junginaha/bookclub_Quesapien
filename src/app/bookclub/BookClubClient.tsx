@@ -144,7 +144,7 @@ export default function BookClubClient({ initialClubs }: { initialClubs: any[] }
             <em style={{ fontStyle: "italic", color: "var(--accent)", fontFamily: '"EB Garamond", Georgia, serif' }}>만나는</em> 사람들.
           </h1>
           <p style={{ fontSize: 16, color: "var(--muted)", lineHeight: 1.75, maxWidth: 480, marginBottom: 40 }}>
-            리더와 함께 읽고, 질문하고, 대화합니다.<br />
+            리더와 함께 읽고, 질문하고, 대화해요.<br />
             오프라인에서만 가능한 깊이의 연결.
           </p>
 
@@ -193,7 +193,7 @@ export default function BookClubClient({ initialClubs }: { initialClubs: any[] }
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
           {filtered.length === 0 ? (
             <div style={{ textAlign: "center", padding: "80px 0", color: "var(--muted)" }}>
-              해당 조건의 북클럽이 없습니다.
+              지금은 이 조건의 북클럽이 없어요.
             </div>
           ) : (
             <div style={{
@@ -311,10 +311,10 @@ export default function BookClubClient({ initialClubs }: { initialClubs: any[] }
                             <Users size={13} />
                             <span>
                               {isClosed
-                                ? "마감되었습니다"
+                                ? "마감됐어요"
                                 : isUpcoming
-                                ? "곧 오픈 예정"
-                                : `잔여 ${remaining}석 / ${club.max_participants}명`}
+                                ? "곧 열려요"
+                                : `${remaining}자리 남았어요 / ${club.max_participants}명`}
                             </span>
                             {!isClosed && !isUpcoming && remaining <= 2 && (
                               <span style={{ fontSize: 11, color: "#EF4444", fontWeight: 500 }}>마감 임박</span>
