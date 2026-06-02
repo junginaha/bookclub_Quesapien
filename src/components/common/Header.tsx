@@ -189,7 +189,7 @@ export default function Header() {
               }}>!</span>
             </div>
             {/* 워드마크 교차 — 질문하는 사람들 ↔ Quesapience */}
-            <span style={{ position: "relative", display: "inline-block", height: 20, minWidth: 110, overflow: "hidden" }}>
+            <span style={{ position: "relative", display: "inline-block", height: 22, minWidth: 145, overflow: "hidden" }}>
               {WORDMARKS.map((wm, i) => (
                 <span
                   key={wm}
@@ -203,7 +203,7 @@ export default function Header() {
                     color: "var(--ink)",
                     letterSpacing: i === 1 ? "0.06em" : "0.03em",
                     fontStyle: i === 1 ? "italic" : "normal",
-                    lineHeight: "20px",
+                    lineHeight: "22px",
                     transition: "opacity 0.4s ease, transform 0.4s cubic-bezier(.2,.8,.2,1)",
                     opacity: wordmarkIdx === i && !wordmarkFading ? 1 : 0,
                     transform: wordmarkIdx === i && !wordmarkFading
