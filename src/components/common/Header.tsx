@@ -189,12 +189,13 @@ export default function Header() {
               }}>!</span>
             </div>
             {/* 워드마크 교차 — 질문하는 사람들 ↔ Quesapience */}
-            <span style={{ position: "relative", display: "inline-block", height: 22, minWidth: 145 }}>
+            <span style={{ display: "inline-grid" }}>
               {WORDMARKS.map((wm, i) => (
                 <span
                   key={wm}
                   style={{
-                    position: "absolute", left: 0, top: 0, whiteSpace: "nowrap",
+                    gridArea: "1 / 1",
+                    whiteSpace: "nowrap",
                     fontFamily: i === 1
                       ? '"EB Garamond", Georgia, serif'
                       : "var(--font-noto-serif-kr), Georgia, serif",
@@ -203,7 +204,6 @@ export default function Header() {
                     color: "var(--ink)",
                     letterSpacing: i === 1 ? "0.06em" : "0.03em",
                     fontStyle: i === 1 ? "italic" : "normal",
-                    lineHeight: "22px",
                     transition: "opacity 0.4s ease, transform 0.4s cubic-bezier(.2,.8,.2,1)",
                     opacity: wordmarkIdx === i && !wordmarkFading ? 1 : 0,
                     transform: wordmarkIdx === i && !wordmarkFading
