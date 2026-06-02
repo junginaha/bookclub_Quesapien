@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import LoginForm from "@/components/auth/LoginForm";
 import { QIMark } from "@/components/common/QIMark";
 
@@ -58,7 +59,9 @@ export default function LoginPage() {
           padding: "32px 28px",
           boxShadow: "0 8px 40px -16px rgba(28,31,38,.12)",
         }}>
-          <LoginForm />
+          <Suspense fallback={null}>
+            <LoginForm />
+          </Suspense>
         </div>
       </div>
     </div>
