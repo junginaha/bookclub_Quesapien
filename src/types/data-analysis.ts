@@ -4,7 +4,7 @@ export interface ParsedData {
   columns: string[];
   rows: Record<string, unknown>[];
   fileName: string;
-  sheets?: string[];  // XLSX 다중 시트 이름 목록
+  sheets?: string[];
 }
 
 export interface ColumnStat {
@@ -23,7 +23,22 @@ export interface DatasetSummary {
   missingRatio: number;
 }
 
-export type MenuId = "upload" | "analysis";
+// ─── Cleaning ───────────────────────────────────────────────────
+
+export type MissingStrategy = "drop" | "mean" | "median" | "mode" | "constant";
+export type OutlierMethod = "iqr" | "zscore";
+export type OutlierAction = "flag" | "remove" | "clip";
+
+export interface CleaningLog {
+  id: string;
+  timestamp: number;
+  description: string;
+  rowsAffected: number;
+}
+
+// ─── Menu ───────────────────────────────────────────────────────
+
+export type MenuId = "upload" | "analysis" | "cleaning" | "visualization" | "correlation";
 
 export interface MenuItem {
   id: MenuId;

@@ -1,18 +1,24 @@
 "use client";
 
-import { UploadCloud, BarChart2, ChevronLeft, ChevronRight } from "lucide-react";
+import { UploadCloud, BarChart2, ChevronLeft, ChevronRight, Sparkles, LineChart, GitFork } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDataStore } from "@/store/dataStore";
 import type { MenuItem, MenuId } from "@/types/data-analysis";
 
 const MENU_ITEMS: MenuItem[] = [
-  { id: "upload", label: "파일 업로드", icon: "upload", requiresData: false },
-  { id: "analysis", label: "기본 데이터 분석", icon: "chart", requiresData: true },
+  { id: "upload",        label: "파일 업로드",    icon: "upload",      requiresData: false },
+  { id: "analysis",      label: "기본 데이터 분석", icon: "chart",     requiresData: true  },
+  { id: "cleaning",      label: "데이터 클리닝",  icon: "sparkles",    requiresData: true  },
+  { id: "visualization", label: "시각화",         icon: "line",        requiresData: true  },
+  { id: "correlation",   label: "상관관계 분석",  icon: "git",         requiresData: true  },
 ];
 
 const IconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  upload: UploadCloud,
-  chart: BarChart2,
+  upload:   UploadCloud,
+  chart:    BarChart2,
+  sparkles: Sparkles,
+  line:     LineChart,
+  git:      GitFork,
 };
 
 interface SidebarProps {
@@ -30,13 +36,11 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
         open ? "w-56" : "w-14"
       )}
     >
-      {/* Logo */}
       <div className="flex items-center gap-2 px-4 py-5 border-b border-gray-700">
         <BarChart2 className="shrink-0 w-5 h-5 text-blue-400" />
         {open && <span className="font-semibold text-sm whitespace-nowrap">데이터 분석기</span>}
       </div>
 
-      {/* Menu */}
       <nav className="flex-1 py-4 space-y-1 px-2">
         {MENU_ITEMS.map((item) => {
           const Icon = IconMap[item.icon];
@@ -63,7 +67,6 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
         })}
       </nav>
 
-      {/* Toggle button */}
       <button
         onClick={onToggle}
         className="absolute -right-3 top-6 z-10 flex items-center justify-center w-6 h-6 rounded-full bg-gray-700 border border-gray-600 text-gray-300 hover:bg-gray-600 transition-colors"
