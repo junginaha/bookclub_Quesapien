@@ -9,6 +9,24 @@ import { buildMetadata } from "@/lib/metadata";
 import { breadcrumbSchema, faqSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
 
+// 정적 랜딩 질문 (DB 미시드 시 폴백)
+const STATIC_LANDING_QUESTIONS: Record<string, { content: string; author_name: string; answers_count: number }> = {
+  "a1000001-0000-0000-0000-000000000001": { content: "당신은 마지막으로 언제, 진심으로 울었나요?", author_name: "편집팀", answers_count: 72 },
+  "a1000001-0000-0000-0000-000000000002": { content: "인간은 왜 외로운가요?", author_name: "민재", answers_count: 56 },
+  "a1000001-0000-0000-0000-000000000003": { content: "AI 시대에도 사랑은 여전히 중요할까요?", author_name: "서연", answers_count: 91 },
+  "a1000001-0000-0000-0000-000000000004": { content: "당신을 살게 만든 한 문장은 무엇인가요?", author_name: "현우", answers_count: 143 },
+  "a1000001-0000-0000-0000-000000000005": { content: "실패를 얼마나 오래 기억하시나요?", author_name: "지우", answers_count: 48 },
+  "a1000001-0000-0000-0000-000000000006": { content: "지금 가장 피하고 싶은 대화는 무엇인가요?", author_name: "도연", answers_count: 62 },
+  "a1000001-0000-0000-0000-000000000011": { content: "혼자 여행을 떠나본 적 있나요? 그 여행이 당신에게 남긴 것은?", author_name: "재희", answers_count: 12 },
+  "a1000001-0000-0000-0000-000000000012": { content: "부모님께 아직 하지 못한 말이 있나요?", author_name: "하린", answers_count: 21 },
+  "a1000001-0000-0000-0000-000000000013": { content: "당신의 20대를 한 단어로 표현한다면?", author_name: "민수", answers_count: 34 },
+  "a1000001-0000-0000-0000-000000000014": { content: "오늘 하루 중 가장 솔직했던 순간은 언제인가요?", author_name: "채현", answers_count: 8 },
+  "a1000001-0000-0000-0000-000000000015": { content: "지금 당신 곁에 있어줬으면 하는 사람은 누구인가요?", author_name: "은지", answers_count: 67 },
+  "a1000001-0000-0000-0000-000000000016": { content: "읽다가 멈춘 책이 있나요? 왜 멈췄나요?", author_name: "진호", answers_count: 19 },
+  "a1000001-0000-0000-0000-000000000017": { content: "당신에게 '집'은 어떤 의미인가요?", author_name: "세아", answers_count: 45 },
+  "a1000001-0000-0000-0000-000000000018": { content: "마지막으로 새로운 사람과 깊은 대화를 한 건 언제인가요?", author_name: "현우", answers_count: 28 },
+};
+
 interface Props { params: Promise<{ id: string }>; }
 
 export const revalidate = 30;
@@ -77,6 +95,24 @@ export default async function QuestionDetailPage({ params }: Props) {
       ]);
       if (lqRes.data) { landingQ = lqRes.data; landingAnswers = laRes.data ?? []; }
     } catch { /* */ }
+  }
+
+  // 정적 랜딩 질문 폴백 (DB 미시드 시)
+  if (!question && !landingQ && STATIC_LANDING_QUESTIONS[id]) {
+    const sq = STATIC_LANDING_QUESTIONS[id];
+    const { LandingQuestionView } = await import("./LandingQuestionView");
+    const { crumb, faq } = buildSchemas(id, { title: sq.content, description: sq.content });
+    return (
+      <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)" }}>
+        <JsonLd data={crumb} />
+        <JsonLd data={faq} />
+        <Header />
+        <main className="flex-1">
+          <LandingQuestionView question={{ id, content: sq.content, author_name: sq.author_name, answers_count: sq.answers_count }} answers={[]} />
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   if (!question && !landingQ) {
