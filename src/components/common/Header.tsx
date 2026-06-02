@@ -189,7 +189,7 @@ export default function Header() {
               }}>!</span>
             </div>
             {/* 워드마크 교차 — 질문하는 사람들 ↔ Quesapience */}
-            <span style={{ position: "relative", display: "inline-block", height: 22, minWidth: 145, overflow: "hidden" }}>
+            <span style={{ position: "relative", display: "inline-block", height: 22, minWidth: 145 }}>
               {WORDMARKS.map((wm, i) => (
                 <span
                   key={wm}
