@@ -14,6 +14,9 @@ export function Header() {
           <span className="text-sm font-medium text-gray-800 truncate">{data.fileName}</span>
           <span className="text-xs text-gray-500 shrink-0">
             {data.rows.length.toLocaleString()}행 · {data.columns.length}열
+            {data.sheets && (
+              <span className="ml-2 text-gray-400">({data.sheets.length}개 시트 병합)</span>
+            )}
           </span>
           <button
             onClick={clearData}

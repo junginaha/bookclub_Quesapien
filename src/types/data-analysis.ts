@@ -4,6 +4,7 @@ export interface ParsedData {
   columns: string[];
   rows: Record<string, unknown>[];
   fileName: string;
+  sheets?: string[];  // XLSX 다중 시트 이름 목록
 }
 
 export interface ColumnStat {
