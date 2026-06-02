@@ -146,6 +146,9 @@ export default function Header() {
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
+  // /questions 페이지는 자체 검색창이 있으므로 헤더 SearchPalette 숨김
+  const hideSearch = pathname === "/questions";
+
   // Transparent on landing unless scrolled > 30px or hovered
   const showOpaque = scrolled || hovered || !isLanding;
   const headerBg = showOpaque ? "rgba(244, 239, 229, 0.95)" : "transparent";
@@ -302,7 +305,7 @@ export default function Header() {
 
           {/* Right */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <SearchPalette />
+            {!hideSearch && <SearchPalette />}
             {currentUser ? (
               /* 로그인 상태 — 프로필 드롭다운 */
               <div ref={profileRef} style={{ position: "relative" }} className="hidden md:block">

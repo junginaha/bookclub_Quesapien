@@ -17,7 +17,7 @@ export const metadata: Metadata = buildMetadata({
   keywords: ["오늘의질문", "인기질문", "독서질문", "북클럽질문", "질문아카이브"],
 });
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 export default async function QuestionsPage() {
   let todayQuestion = null;
