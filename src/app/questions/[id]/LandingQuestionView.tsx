@@ -40,16 +40,16 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
   };
 
   return (
-    <div style={{ maxWidth: 760, margin: "0 auto", padding: "32px clamp(20px, 4vw, 48px) 120px" }}>
-      <Link href="/questions" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--muted)", textDecoration: "none", marginBottom: 40 }}>
+    <div style={{ maxWidth: 760, margin: "0 auto", padding: "clamp(16px, 3vw, 32px) clamp(16px, 4vw, 48px) clamp(40px, 6vw, 80px)" }}>
+      <Link href="/questions" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--muted)", textDecoration: "none", marginBottom: "clamp(16px, 3vw, 32px)" }}>
         <ArrowLeft size={14} /> 질문으로 돌아가기
       </Link>
 
       {/* 질문 카드 */}
       <div style={{
-        padding: "36px 40px", borderRadius: 16,
+        padding: "clamp(18px, 3.5vw, 32px) clamp(16px, 3.5vw, 36px)", borderRadius: 16,
         background: "var(--ink)", color: "var(--cream-on-dark)",
-        marginBottom: 40, position: "relative", overflow: "hidden",
+        marginBottom: "clamp(20px, 3vw, 36px)", position: "relative", overflow: "hidden",
       }}>
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
@@ -60,7 +60,7 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
         </div>
         <p style={{
           fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-          fontSize: "clamp(20px, 3vw, 28px)", fontWeight: 300, lineHeight: 1.55,
+          fontSize: "clamp(16px, 3vw, 24px)", fontWeight: 300, lineHeight: 1.55,
           letterSpacing: "-0.01em", position: "relative",
         }}>
           {question.content}
@@ -74,7 +74,7 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
       </div>
 
       {/* 답변 입력 */}
-      <div style={{ marginBottom: 48 }}>
+      <div style={{ marginBottom: "clamp(24px, 4vw, 48px)" }}>
         <div style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 16 }}>
           답변 남기기
         </div>
@@ -166,7 +166,7 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
       )}
 
       {answers.length === 0 && (
-        <div style={{ textAlign: "center", padding: "60px 0", color: "var(--muted)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif", lineHeight: 1.75 }}>
+        <div style={{ textAlign: "center", padding: "clamp(24px, 5vw, 60px) 0", color: "var(--muted)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif", lineHeight: 1.75 }}>
           아직 첫 답변이 없어요.<br />당신이 처음이 되어주세요.
         </div>
       )}

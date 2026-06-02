@@ -111,7 +111,7 @@ export default function QuestionsClient({
 
       {/* ── Page Header ── */}
       <section style={{
-        padding: "72px 0 40px",
+        padding: "clamp(72px, 10vw, 80px) 0 clamp(16px, 2.5vw, 32px)",
         borderBottom: "1px solid var(--line-soft)",
         background: "linear-gradient(to bottom, var(--bg-soft) 0%, var(--bg) 100%)",
       }}>
@@ -121,16 +121,16 @@ export default function QuestionsClient({
           </div>
           <h1 style={{
             fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-            fontSize: "clamp(26px, 4vw, 44px)",
+            fontSize: "clamp(22px, 4vw, 44px)",
             fontWeight: 400, lineHeight: 1.25, letterSpacing: "-0.02em", color: "var(--ink)",
-            marginBottom: 28,
+            marginBottom: "clamp(14px, 2.5vw, 28px)",
           }}>
             좋은 질문은{" "}
             <em style={{ fontStyle: "normal", fontWeight: 600, color: "var(--accent)", background: "linear-gradient(90deg, var(--accent), #B08A4A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>좋은 사람</em>을 데려옵니다.
           </h1>
 
           {/* 검색 + 질문 작성 버튼 통합 */}
-          <div style={{ display: "flex", gap: 10, alignItems: "center", maxWidth: 640 }}>
+          <div className="q-search-row" style={{ display: "flex", gap: 10, alignItems: "center", maxWidth: 640 }}>
             <div style={{
               flex: 1, display: "flex", alignItems: "center", gap: 10,
               background: "rgba(255,255,255,0.7)", border: "1px solid var(--line)",
@@ -168,11 +168,11 @@ export default function QuestionsClient({
         </div>
       </section>
 
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "56px clamp(20px, 4vw, 48px) 120px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "clamp(20px, 3.5vw, 48px) clamp(16px, 4vw, 48px) clamp(48px, 8vw, 100px)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 48 }} className="grid-responsive">
 
           {/* ── Left Column ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 56 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "clamp(28px, 4vw, 52px)" }}>
 
             {/* 오늘의 질문 */}
             {!search && (
@@ -188,7 +188,7 @@ export default function QuestionsClient({
                   style={{ textDecoration: "none", display: "block" }}
                 >
                   <div style={{
-                    padding: "36px 40px", borderRadius: 20,
+                    padding: "clamp(18px, 3.5vw, 36px) clamp(16px, 3.5vw, 40px)", borderRadius: 16,
                     background: "var(--ink)", color: "var(--cream-on-dark)",
                     position: "relative", overflow: "hidden",
                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
@@ -205,9 +205,9 @@ export default function QuestionsClient({
                     <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 70% 60% at 90% 10%, rgba(176,138,74,0.18), transparent 60%)" }} />
                     <p style={{
                       fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-                      fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: 400,
+                      fontSize: "clamp(16px, 2.5vw, 24px)", fontWeight: 400,
                       lineHeight: 1.6, color: "var(--cream-on-dark)",
-                      marginBottom: 24, position: "relative",
+                      marginBottom: "clamp(12px, 2vw, 24px)", position: "relative",
                     }}>
                       {today.content}
                     </p>
@@ -517,6 +517,13 @@ export default function QuestionsClient({
         @media (max-width: 768px) {
           .grid-responsive { grid-template-columns: 1fr !important; }
           .sidebar-hide { display: none !important; }
+        }
+        @media (max-width: 480px) {
+          .q-search-row { flex-direction: column !important; gap: 8px !important; }
+          .q-search-row a { width: 100% !important; justify-content: center; }
+          .q-featured-num { font-size: 20px !important; min-width: 20px !important; }
+          .q-card-title { font-size: 14px !important; }
+          .q-recent-padding { padding: 14px 16px !important; }
         }
       `}</style>
     </div>
