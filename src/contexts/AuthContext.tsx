@@ -1,31 +1,52 @@
 "use client";
 
-// AuthContext는 useAppStore로 대체됨
-// 하위 호환을 위해 useAuth hook은 스토어를 래핑
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { useAppStore } from "@/lib/store";
 
-interface AuthContextValue {
-  user: { id: string; name: string; email: string; avatar_url?: string } | null;
-  profile: { name: string; avatar_url?: string | null; session_count: number } | null;
-  loading: boolean;
-  refresh: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextValue>({
-  user: null, profile: null, loading: false, refresh: async () => {},
-});
+const AuthContext = createContext({});
+export function useAuth() { return useContext(AuthContext); }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  return <>{children}</>;
-}
+  const setSupabaseUser = useAppStore((s) => s.setSupabaseUser);
 
-export function useAuth(): AuthContextValue {
-  const currentUser = useAppStore((s) => s.currentUser);
-  return {
-    user: currentUser,
-    profile: currentUser,
-    loading: false,
-    refresh: async () => {},
-  };
+  useEffect(() => {
+    const supabase = createClient();
+
+    async function syncUser(userId: string, email: string, meta: Record<string, string>) {
+      // profiles 테이블에서 이름/아바타 조회
+      const { data: profile } = await (supabase as any)
+        .from("profiles")
+        .select("name, avatar_url")
+        .eq("id", userId)
+        .single();
+
+      setSupabaseUser({
+        id: userId,
+        email,
+        name: profile?.name ?? meta?.name ?? email.split("@")[0],
+        avatar_url: profile?.avatar_url ?? undefined,
+      });
+    }
+
+    // 현재 세션 확인
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        syncUser(session.user.id, session.user.email ?? "", session.user.user_metadata ?? {});
+      }
+    });
+
+    // 인증 상태 변경 구독
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session?.user) {
+        await syncUser(session.user.id, session.user.email ?? "", session.user.user_metadata ?? {});
+      } else if (event === "SIGNED_OUT") {
+        setSupabaseUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [setSupabaseUser]);
+
+  return <>{children}</>;
 }

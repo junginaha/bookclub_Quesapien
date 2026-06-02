@@ -80,6 +80,7 @@ interface AppStore {
   login:  (email: string, password: string) => { error?: string };
   signup: (name: string, email: string, password: string) => { error?: string };
   logout: () => void;
+  setSupabaseUser: (user: { id: string; email: string; name: string; avatar_url?: string } | null) => void;
   updateProfile: (data: { name?: string; bio?: string }) => void;
 
   // ── Questions ─────────────────────────────────────
@@ -228,6 +229,14 @@ export const useAppStore = create<AppStore>()(
       },
 
       logout: () => set((s) => { s.currentUser = null; }),
+      setSupabaseUser: (user) => set((s) => {
+        if (!user) { s.currentUser = null; return; }
+        s.currentUser = {
+          id: user.id, email: user.email, name: user.name,
+          avatar_url: user.avatar_url,
+          bio: undefined, joined_at: new Date().toISOString(), session_count: 0,
+        };
+      }),
 
       updateProfile: (data) => {
         const user = get().currentUser;
