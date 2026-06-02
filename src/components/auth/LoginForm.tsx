@@ -3,181 +3,161 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff, RefreshCw } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-const inputStyle: React.CSSProperties = {
+const inp: React.CSSProperties = {
   width: "100%", padding: "12px 16px", borderRadius: 10, fontSize: 15,
   border: "1.5px solid var(--line-soft)", background: "rgba(255,255,255,0.7)",
   color: "var(--ink)", outline: "none", boxSizing: "border-box",
-  fontFamily: "var(--font-noto-sans-kr), sans-serif",
-  transition: "border-color .2s ease",
+  fontFamily: "var(--font-noto-sans-kr), sans-serif", transition: "border-color .2s",
 };
+
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+      <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+    </svg>
+  );
+}
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
-  const [needsVerify, setNeedsVerify] = useState(false);
-  const [resending, setResending] = useState(false);
-  const [resent, setResent] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackError = searchParams.get("error");
 
+  const handleGoogle = async () => {
+    setGoogleLoading(true);
+    const supabase = createClient();
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); setNeedsVerify(false);
-    setLoading(true);
-
+    setError(""); setLoading(true);
     try {
       const supabase = createClient();
       const { error: loginErr } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
+        email: email.trim().toLowerCase(), password,
       });
-
       if (loginErr) {
-        if (loginErr.message.includes("Invalid login credentials") || loginErr.message.includes("invalid_credentials")) {
+        if (loginErr.message.includes("Invalid login") || loginErr.message.includes("invalid_credentials")) {
           setError("이메일 또는 비밀번호가 맞지 않아요.");
         } else if (loginErr.message.includes("Email not confirmed") || loginErr.message.includes("email_not_confirmed")) {
-          setNeedsVerify(true);
+          setError("이메일 인증이 필요해요. 새로 가입해주시거나 고객센터에 문의해주세요.");
         } else if (loginErr.message.includes("Too many")) {
-          setError("잠시 후 다시 시도해주세요. (로그인 시도 횟수 초과)");
+          setError("잠시 후 다시 시도해주세요.");
         } else {
           setError(loginErr.message);
         }
         return;
       }
-
-      router.push("/");
-      router.refresh();
+      router.push("/"); router.refresh();
     } catch {
-      setError("로그인 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.");
+      setError("로그인 중 오류가 발생했어요.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResendVerification = async () => {
-    setResending(true);
-    try {
-      const supabase = createClient();
-      await supabase.auth.resend({
-        type: "signup",
-        email: email.trim().toLowerCase(),
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-      });
-      setResent(true);
-    } catch { /* ignore */ } finally {
-      setResending(false);
-    }
-  };
-
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {/* 콜백 에러 메시지 */}
-      {callbackError === "auth_callback_error" && (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {callbackError && (
         <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.2)" }}>
-          <p style={{ fontSize: 13, color: "#EF4444", margin: 0 }}>
-            인증 링크가 만료됐거나 유효하지 않아요. 다시 로그인해주세요.
-          </p>
+          <p style={{ fontSize: 13, color: "#EF4444", margin: 0 }}>인증 링크가 만료됐거나 유효하지 않아요. 다시 로그인해주세요.</p>
         </div>
       )}
 
-      <div>
-        <label style={{ fontSize: 13, color: "var(--muted)", display: "block", marginBottom: 6, fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
-          이메일
-        </label>
+      {/* 구글 로그인 */}
+      <button onClick={handleGoogle} disabled={googleLoading}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+          width: "100%", padding: "12px 0", borderRadius: 10, fontSize: 15,
+          background: "white", border: "1.5px solid var(--line)",
+          cursor: googleLoading ? "not-allowed" : "pointer", color: "var(--ink)",
+          fontFamily: "var(--font-noto-sans-kr), sans-serif", fontWeight: 500,
+          transition: "box-shadow .2s, border-color .2s",
+          boxShadow: "0 1px 4px rgba(0,0,0,.06)", opacity: googleLoading ? 0.7 : 1,
+        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 8px rgba(0,0,0,.12)"; (e.currentTarget as HTMLElement).style.borderColor = "#ccc"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 1px 4px rgba(0,0,0,.06)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; }}
+      >
+        <GoogleIcon />
+        {googleLoading ? "연결 중…" : "Google로 계속하기"}
+      </button>
+
+      {/* 구분선 */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ flex: 1, height: 1, background: "var(--line-soft)" }} />
+        <span style={{ fontSize: 12, color: "var(--muted)" }}>또는 이메일로</span>
+        <div style={{ flex: 1, height: 1, background: "var(--line-soft)" }} />
+      </div>
+
+      {/* 이메일/비밀번호 */}
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <input
           type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-          placeholder="hello@example.com" required style={inputStyle}
-          autoComplete="email"
+          placeholder="이메일" required autoComplete="email" style={inp}
           onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = "var(--accent)"; }}
           onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = "var(--line-soft)"; }}
         />
-      </div>
-
-      <div>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, alignItems: "baseline" }}>
-          <label style={{ fontSize: 13, color: "var(--muted)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
-            비밀번호
-          </label>
-          <Link href="/forgot-password" style={{ fontSize: 12, color: "var(--muted)", textDecoration: "none", transition: "color .15s" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--accent)"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}
-          >
-            비밀번호를 잊으셨나요?
-          </Link>
-        </div>
         <div style={{ position: "relative" }}>
           <input
-            type={showPw ? "text" : "password"}
-            value={password} onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••" required style={{ ...inputStyle, paddingRight: 44 }}
-            autoComplete="current-password"
+            type={showPw ? "text" : "password"} value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="비밀번호" required autoComplete="current-password"
+            style={{ ...inp, paddingRight: 44 }}
             onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = "var(--accent)"; }}
             onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = "var(--line-soft)"; }}
           />
-          <button
-            type="button" onClick={() => setShowPw(!showPw)}
-            style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: 0, display: "flex" }}
-          >
+          <button type="button" onClick={() => setShowPw(!showPw)}
+            style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: 0, display: "flex" }}>
             {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
-      </div>
 
-      {/* 이메일 미인증 안내 */}
-      {needsVerify && (
-        <div style={{ padding: "12px 14px", borderRadius: 8, background: "rgba(176,138,74,0.08)", border: "1px solid rgba(176,138,74,0.25)" }}>
-          <p style={{ fontSize: 13, color: "var(--ink-soft)", margin: "0 0 8px" }}>
-            이메일 인증이 필요해요. 받은편지함을 확인해주세요.
-          </p>
-          {resent ? (
-            <p style={{ fontSize: 12.5, color: "var(--accent)", margin: 0 }}>✓ 인증 메일을 재전송했어요.</p>
-          ) : (
-            <button
-              type="button" onClick={handleResendVerification} disabled={resending}
-              style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12.5, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
-            >
-              <RefreshCw size={12} style={{ animation: resending ? "spin 1s linear infinite" : "none" }} />
-              {resending ? "재전송 중…" : "인증 메일 재전송"}
-            </button>
-          )}
+        {error && (
+          <div style={{ padding: "9px 12px", borderRadius: 8, background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.2)" }}>
+            <p style={{ fontSize: 13, color: "#EF4444", margin: 0 }}>{error}</p>
+          </div>
+        )}
+
+        <div style={{ textAlign: "right" }}>
+          <Link href="/forgot-password" style={{ fontSize: 12.5, color: "var(--muted)", textDecoration: "none" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--accent)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}>
+            비밀번호를 잊으셨나요?
+          </Link>
         </div>
-      )}
 
-      {error && (
-        <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.2)" }}>
-          <p style={{ fontSize: 13, color: "#EF4444", margin: 0 }}>{error}</p>
-        </div>
-      )}
-
-      <button
-        type="submit"
-        disabled={loading || !email || !password}
-        style={{
-          padding: "13px 0", borderRadius: 9999, fontSize: 15, fontWeight: 600,
-          background: loading || !email || !password ? "var(--line-soft)" : "var(--ink)",
-          color: loading || !email || !password ? "var(--muted)" : "var(--cream-on-dark)",
-          border: "none", cursor: loading || !email || !password ? "not-allowed" : "pointer",
-          fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-          transition: "all .2s ease", marginTop: 4,
-        }}
-      >
-        {loading ? "로그인 중…" : "로그인"}
-      </button>
+        <button type="submit" disabled={loading || !email || !password}
+          style={{
+            padding: "12px 0", borderRadius: 10, fontSize: 15, fontWeight: 600,
+            background: loading || !email || !password ? "var(--line-soft)" : "var(--ink)",
+            color: loading || !email || !password ? "var(--muted)" : "var(--cream-on-dark)",
+            border: "none", cursor: loading || !email || !password ? "not-allowed" : "pointer",
+            fontFamily: "var(--font-noto-serif-kr), Georgia, serif", transition: "all .2s",
+          }}>
+          {loading ? "로그인 중…" : "로그인"}
+        </button>
+      </form>
 
       <p style={{ textAlign: "center", fontSize: 13.5, color: "var(--muted)", margin: 0, fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
         처음이신가요?{" "}
-        <Link href="/signup" style={{ color: "var(--accent)", fontWeight: 500, textDecoration: "none" }}>
-          함께하기
-        </Link>
+        <Link href="/signup" style={{ color: "var(--accent)", fontWeight: 500, textDecoration: "none" }}>함께하기</Link>
       </p>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </form>
+    </div>
   );
 }
