@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
 
 const IDS = {
   today: "a1000001-0000-0000-0000-000000000001",
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabase = await createClient() as any;
+  const supabase = createServiceClient() as any;
 
   try {
     // 기존 시드 데이터 삭제
