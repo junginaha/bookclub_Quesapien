@@ -2,7 +2,8 @@ import type { ColumnType, ColumnStat, DatasetSummary } from "@/types/data-analys
 
 // ─── Type detection ───────────────────────────────────────────────
 
-const DATE_REGEX = /^\d{4}[-./]\d{1,2}[-./]\d{1,2}$/;
+// 날짜 또는 날짜+시간 형식: 2024-01-01, 2024/01/01, 2024-01-01 13:00, 2024-01-01T13:00
+const DATE_REGEX = /^\d{4}[-./]\d{1,2}[-./]\d{1,2}([T ]\d{1,2}:\d{2}(:\d{2})?)?$/;
 
 function isNumericValue(v: unknown): boolean {
   if (v === null || v === undefined || v === "") return false;
@@ -12,7 +13,8 @@ function isNumericValue(v: unknown): boolean {
 function isDateValue(v: unknown): boolean {
   if (v instanceof Date) return !isNaN(v.getTime());
   if (typeof v !== "string") return false;
-  return DATE_REGEX.test(v.trim()) && !isNaN(Date.parse(v.trim()));
+  const s = v.trim();
+  return DATE_REGEX.test(s) && !isNaN(Date.parse(s));
 }
 
 /** Determine column type from a sample of non-null values. */
@@ -75,7 +77,8 @@ export function computeColumnStat(
 ): ColumnStat {
   const nonNull = values.filter((v) => v !== null && v !== undefined && v !== "");
   const missingCount = totalRows - nonNull.length;
-  const type = detectColumnType(values, totalRows);
+  // __sheet__는 내부 메타 컬럼 — 항상 범주형
+  const type = name === "__sheet__" ? "categorical" : detectColumnType(values, totalRows);
 
   return {
     name,
