@@ -38,35 +38,41 @@ const STATIC_LANDING_QUESTIONS: Record<string, { content: string; author_name: s
   "a1000001-0000-0000-0000-000000000025": { content: "당신이 가장 많이 밑줄 친 문장은 무엇인가요?", author_name: "서진", answers_count: 61 },
 };
 
+// 오늘 기준 날짜 헬퍼 (서버 렌더링 시 실행)
+function dAgo(d: number, h = 10): string {
+  const dt = new Date(); dt.setDate(dt.getDate() - d); dt.setHours(h, 0, 0, 0);
+  return dt.toISOString();
+}
+
 // 정적 샘플 답변 (질문 상세 페이지에 미리 보여주기 위한 데이터)
 const STATIC_SAMPLE_ANSWERS: Record<string, Array<{ id: string; author_name: string; content: string; created_at: string }>> = {
   "a1000001-0000-0000-0000-000000000001": [
-    { id: "sa-001-1", author_name: "채현", content: "아버지 장례식 끝나고 지하철에서. 그게 마지막이었던 것 같아요.", created_at: "2026-05-20T10:00:00Z" },
-    { id: "sa-001-2", author_name: "현우", content: "운 적은 많은데, 진심으로 운 적은 기억이 잘 안 나요.", created_at: "2026-05-21T14:00:00Z" },
-    { id: "sa-001-3", author_name: "민지", content: "오늘 새벽이요. 이유는 모르겠어요.", created_at: "2026-05-22T03:00:00Z" },
+    { id: "sa-001-1", author_name: "채현", content: "아버지 장례식 끝나고 지하철에서. 그게 마지막이었던 것 같아요.", created_at: dAgo(14, 10) },
+    { id: "sa-001-2", author_name: "현우", content: "운 적은 많은데, 진심으로 운 적은 기억이 잘 안 나요.", created_at: dAgo(10, 14) },
+    { id: "sa-001-3", author_name: "민지", content: "오늘 새벽이요. 이유는 모르겠어요.", created_at: dAgo(3, 3) },
   ],
   "a1000001-0000-0000-0000-000000000002": [
-    { id: "sa-002-1", author_name: "서연", content: "연결되고 싶은데 연결되는 방법을 모르기 때문이 아닐까요.", created_at: "2026-05-18T09:00:00Z" },
-    { id: "sa-002-2", author_name: "민재", content: "존재 자체가 분리되어 있어서인 것 같아요. 아무리 가까워져도 끝내 혼자인 부분이 있는 것 같고.", created_at: "2026-05-19T16:00:00Z" },
-    { id: "sa-002-3", author_name: "지훈", content: "외로움은 인간이 가진 가장 솔직한 감정 중 하나라고 생각해요.", created_at: "2026-05-20T11:00:00Z" },
+    { id: "sa-002-1", author_name: "서연", content: "연결되고 싶은데 연결되는 방법을 모르기 때문이 아닐까요.", created_at: dAgo(16, 9) },
+    { id: "sa-002-2", author_name: "민재", content: "존재 자체가 분리되어 있어서인 것 같아요. 아무리 가까워져도 끝내 혼자인 부분이 있는 것 같고.", created_at: dAgo(11, 16) },
+    { id: "sa-002-3", author_name: "지훈", content: "외로움은 인간이 가진 가장 솔직한 감정 중 하나라고 생각해요.", created_at: dAgo(5, 11) },
   ],
   "a1000001-0000-0000-0000-000000000015": [
-    { id: "sa-015-1", author_name: "은지", content: "3년 전 멀어진 친구요. 그냥 한 번쯤 안부를 물어봐 줬으면 했어요.", created_at: "2026-05-25T08:00:00Z" },
-    { id: "sa-015-2", author_name: "하린", content: "특정인보다는, 그냥 내 말을 끝까지 들어줄 누군가요.", created_at: "2026-05-26T13:00:00Z" },
+    { id: "sa-015-1", author_name: "은지", content: "3년 전 멀어진 친구요. 그냥 한 번쯤 안부를 물어봐 줬으면 했어요.", created_at: dAgo(9, 8) },
+    { id: "sa-015-2", author_name: "하린", content: "특정인보다는, 그냥 내 말을 끝까지 들어줄 누군가요.", created_at: dAgo(2, 13) },
   ],
   "a1000001-0000-0000-0000-000000000016": [
-    { id: "sa-016-1", author_name: "진호", content: "카뮈의 이방인. 이해가 안 됐던 게 아니라, 너무 이해가 됐던 것 같아서.", created_at: "2026-05-22T21:00:00Z" },
-    { id: "sa-016-2", author_name: "재희", content: "어느 날 갑자기 책 속 주인공이 나 같아 보여서 읽기 무서워진 책이 있어요.", created_at: "2026-05-23T10:00:00Z" },
+    { id: "sa-016-1", author_name: "진호", content: "카뮈의 이방인. 이해가 안 됐던 게 아니라, 너무 이해가 됐던 것 같아서.", created_at: dAgo(12, 21) },
+    { id: "sa-016-2", author_name: "재희", content: "어느 날 갑자기 책 속 주인공이 나 같아 보여서 읽기 무서워진 책이 있어요.", created_at: dAgo(7, 10) },
   ],
   "a1000001-0000-0000-0000-000000000022": [
-    { id: "sa-022-1", author_name: "재원", content: "틀렸을 때 빠르게 인정하는 것이 오히려 신뢰를 만든다는 것.", created_at: "2026-05-27T09:00:00Z" },
-    { id: "sa-022-2", author_name: "지우", content: "완벽하게 준비된 적 없이 시작한 일이 오히려 더 잘 됐어요.", created_at: "2026-05-28T14:00:00Z" },
-    { id: "sa-022-3", author_name: "도현", content: "실수가 부끄럽지 않아진 순간부터 더 많은 시도를 하게 됐어요.", created_at: "2026-05-29T11:00:00Z" },
+    { id: "sa-022-1", author_name: "재원", content: "틀렸을 때 빠르게 인정하는 것이 오히려 신뢰를 만든다는 것.", created_at: dAgo(8, 9) },
+    { id: "sa-022-2", author_name: "지우", content: "완벽하게 준비된 적 없이 시작한 일이 오히려 더 잘 됐어요.", created_at: dAgo(4, 14) },
+    { id: "sa-022-3", author_name: "도현", content: "실수가 부끄럽지 않아진 순간부터 더 많은 시도를 하게 됐어요.", created_at: dAgo(1, 11) },
   ],
   "a1000001-0000-0000-0000-000000000025": [
-    { id: "sa-025-1", author_name: "서진", content: "\"당신이 읽은 것이 당신을 만든다.\" 어떤 책에서 읽었는지 기억도 안 나는데 아직도 생각나요.", created_at: "2026-05-24T18:00:00Z" },
-    { id: "sa-025-2", author_name: "하은", content: "\"두려움은 흥미가 깊어진 것이다.\" 처음 읽었을 때 숨이 멎었어요.", created_at: "2026-05-25T20:00:00Z" },
-    { id: "sa-025-3", author_name: "채현", content: "\"모든 별은 제 속도로 진다.\" 그 문장 옆에 아무 말도 적지 못했어요.", created_at: "2026-05-26T09:00:00Z" },
+    { id: "sa-025-1", author_name: "서진", content: "\"당신이 읽은 것이 당신을 만든다.\" 어떤 책에서 읽었는지 기억도 안 나는데 아직도 생각나요.", created_at: dAgo(10, 18) },
+    { id: "sa-025-2", author_name: "하은", content: "\"두려움은 흥미가 깊어진 것이다.\" 처음 읽었을 때 숨이 멎었어요.", created_at: dAgo(6, 20) },
+    { id: "sa-025-3", author_name: "채현", content: "\"모든 별은 제 속도로 진다.\" 그 문장 옆에 아무 말도 적지 못했어요.", created_at: dAgo(2, 9) },
   ],
 };
 

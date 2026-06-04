@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, MessageSquare, Send } from "lucide-react";
+import { ArrowLeft, MessageSquare, Send, Pencil, Trash2, Check, X } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { useAppStore } from "@/lib/store";
+import { isAdminEmail } from "@/lib/admin";
+import { updateLandingQuestionAction, deleteLandingQuestionAction } from "@/lib/actions/landing-questions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface Props {
@@ -16,6 +21,31 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
   const [content, setContent] = useState("");
   const [authorName, setAuthorName] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  // 관리자 기능
+  const currentUser = useAppStore((s) => s.currentUser);
+  const isAdmin = isAdminEmail(currentUser?.email);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(question.content ?? "");
+  const [displayContent, setDisplayContent] = useState(question.content ?? "");
+  const router = useRouter();
+
+  const handleSaveEdit = async () => {
+    if (!editContent.trim() || editContent.trim().length < 5) { toast.error("5자 이상 입력해주세요."); return; }
+    const result = await updateLandingQuestionAction(question.id, editContent.trim());
+    if (result.error) { toast.error(result.error as string); return; }
+    setDisplayContent(editContent.trim());
+    setIsEditing(false);
+    toast.success("수정됐어요.");
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("이 질문을 삭제할까요? 모든 답변도 함께 삭제됩니다.")) return;
+    const result = await deleteLandingQuestionAction(question.id);
+    if (result.error) { toast.error(result.error as string); return; }
+    toast.success("삭제됐어요.");
+    router.push("/questions");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,16 +89,44 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
           position: "absolute", inset: 0, pointerEvents: "none",
           background: "radial-gradient(ellipse 60% 60% at 90% 10%, rgba(176,138,74,0.15), transparent 60%)",
         }} />
-        <div style={{ fontSize: 11, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", marginBottom: 16, position: "relative" }}>
-          Today&rsquo;s Question
+        {/* 헤더 행: 라벨 + 관리자 버튼 */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, position: "relative" }}>
+          <div style={{ fontSize: 11, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
+            Today&rsquo;s Question
+          </div>
+          {isAdmin && !isEditing && (
+            <div style={{ display: "flex", gap: 6 }}>
+              <button onClick={() => { setIsEditing(true); setEditContent(displayContent); }} title="수정"
+                style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 7, padding: "5px 10px", cursor: "pointer", color: "rgba(255,255,255,0.8)", display: "flex", alignItems: "center", gap: 5, fontSize: 12 }}>
+                <Pencil size={11} /> 수정
+              </button>
+              <button onClick={handleDelete} title="삭제"
+                style={{ background: "rgba(239,68,68,0.18)", border: "1px solid rgba(239,68,68,0.4)", borderRadius: 7, padding: "5px 10px", cursor: "pointer", color: "rgba(255,120,120,0.95)", display: "flex", alignItems: "center", gap: 5, fontSize: 12 }}>
+                <Trash2 size={11} /> 삭제
+              </button>
+            </div>
+          )}
         </div>
-        <p style={{
-          fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-          fontSize: "clamp(16px, 3vw, 24px)", fontWeight: 300, lineHeight: 1.55,
-          letterSpacing: "-0.01em", position: "relative",
-        }}>
-          {question.content}
-        </p>
+
+        {isAdmin && isEditing ? (
+          <div style={{ position: "relative" }}>
+            <textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} rows={3} autoFocus
+              style={{ width: "100%", padding: "12px 14px", borderRadius: 8, fontSize: "clamp(15px, 2.5vw, 22px)", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.3)", color: "var(--cream-on-dark)", outline: "none", resize: "vertical", fontFamily: "var(--font-noto-serif-kr), Georgia, serif", lineHeight: 1.55, boxSizing: "border-box", marginBottom: 10 }}
+            />
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={handleSaveEdit} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8, fontSize: 13, background: "rgba(255,255,255,0.18)", color: "white", border: "1px solid rgba(255,255,255,0.3)", cursor: "pointer" }}>
+                <Check size={12} /> 저장
+              </button>
+              <button onClick={() => setIsEditing(false)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8, fontSize: 13, background: "none", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer" }}>
+                <X size={12} /> 취소
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(16px, 3vw, 24px)", fontWeight: 300, lineHeight: 1.55, letterSpacing: "-0.01em", position: "relative" }}>
+            {displayContent}
+          </p>
+        )}
         <div style={{ display: "flex", gap: 20, marginTop: 24, fontSize: 13, color: "rgba(255,255,255,0.4)", position: "relative" }}>
           <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
             <MessageSquare size={13} /> {answers.length} 답변

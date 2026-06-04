@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { PenLine, MessageSquare, ChevronRight, Search } from "lucide-react";
+import { PenLine, MessageSquare, ChevronRight, Search, Pencil, Trash2, Check, X, Star, Calendar } from "lucide-react";
+import { useAppStore } from "@/lib/store";
+import { isAdminEmail } from "@/lib/admin";
+import {
+  updateLandingQuestionAction,
+  deleteLandingQuestionAction,
+  toggleFeaturedLandingQuestion,
+  toggleTodayLandingQuestion,
+} from "@/lib/actions/landing-questions";
+import { toast } from "sonner";
 
 // ── 고정 UUID (DB 시드와 동일) ────────────────────────────────────────────
 const IDS = {
@@ -48,25 +57,25 @@ const STATIC_FEATURED = [
 ];
 
 const STATIC_RECENT = [
-  { id: IDS.r1, content: "혼자 여행을 떠나본 적 있나요? 그 여행이 당신에게 남긴 것은?", author_name: "재희", likes: 47, answers_count: 12, tags: ["여행", "고독"], created_at: "2026-05-30T10:00:00" },
-  { id: IDS.r2, content: "부모님께 아직 하지 못한 말이 있나요?", author_name: "하린", likes: 89, answers_count: 21, tags: ["가족", "관계"], created_at: "2026-05-29T15:30:00" },
-  { id: IDS.r3, content: "당신의 20대를 한 단어로 표현한다면?", author_name: "민수", likes: 156, answers_count: 34, tags: ["청춘", "성장"], created_at: "2026-05-29T09:00:00" },
-  { id: IDS.r4, content: "오늘 하루 중 가장 솔직했던 순간은 언제인가요?", author_name: "채현", likes: 23, answers_count: 8, tags: ["일상", "진심"], created_at: "2026-05-28T20:00:00" },
-  { id: IDS.r5, content: "지금 당신 곁에 있어줬으면 하는 사람은 누구인가요?", author_name: "은지", likes: 312, answers_count: 67, tags: ["관계", "외로움"], created_at: "2026-05-28T14:00:00" },
-  { id: IDS.r6, content: "읽다가 멈춘 책이 있나요? 왜 멈췄나요?", author_name: "진호", likes: 78, answers_count: 19, tags: ["독서", "책"], created_at: "2026-05-27T11:00:00" },
-  { id: IDS.r7, content: "당신에게 '집'은 어떤 의미인가요?", author_name: "세아", likes: 201, answers_count: 45, tags: ["일상", "공간"], created_at: "2026-05-27T08:00:00" },
-  { id: IDS.r8, content: "마지막으로 새로운 사람과 깊은 대화를 한 건 언제인가요?", author_name: "현우", likes: 134, answers_count: 28, tags: ["대화", "연결"], created_at: "2026-05-26T19:00:00" },
+  { id: IDS.r1, content: "혼자 여행을 떠나본 적 있나요? 그 여행이 당신에게 남긴 것은?", author_name: "재희", likes: 47, answers_count: 12, tags: ["여행", "고독"], created_at: daysAgo(1, 10) },
+  { id: IDS.r2, content: "부모님께 아직 하지 못한 말이 있나요?", author_name: "하린", likes: 89, answers_count: 21, tags: ["가족", "관계"], created_at: daysAgo(1, 15) },
+  { id: IDS.r3, content: "당신의 20대를 한 단어로 표현한다면?", author_name: "민수", likes: 156, answers_count: 34, tags: ["청춘", "성장"], created_at: daysAgo(1, 9) },
+  { id: IDS.r4, content: "오늘 하루 중 가장 솔직했던 순간은 언제인가요?", author_name: "채현", likes: 23, answers_count: 8, tags: ["일상", "진심"], created_at: daysAgo(0, 20) },
+  { id: IDS.r5, content: "지금 당신 곁에 있어줬으면 하는 사람은 누구인가요?", author_name: "은지", likes: 312, answers_count: 67, tags: ["관계", "외로움"], created_at: daysAgo(0, 14) },
+  { id: IDS.r6, content: "읽다가 멈춘 책이 있나요? 왜 멈췄나요?", author_name: "진호", likes: 78, answers_count: 19, tags: ["독서", "책"], created_at: daysAgo(2, 11) },
+  { id: IDS.r7, content: "당신에게 '집'은 어떤 의미인가요?", author_name: "세아", likes: 201, answers_count: 45, tags: ["일상", "공간"], created_at: daysAgo(2, 8) },
+  { id: IDS.r8, content: "마지막으로 새로운 사람과 깊은 대화를 한 건 언제인가요?", author_name: "현우", likes: 134, answers_count: 28, tags: ["대화", "연결"], created_at: daysAgo(3, 19) },
   // 외로움 (3개 보장)
-  { id: IDS.r9,  content: "혼자 밥을 먹을 때 어떤 생각이 드나요?", author_name: "소희", likes: 94, answers_count: 31, tags: ["외로움", "일상"], created_at: "2026-05-26T12:00:00" },
-  { id: IDS.r10, content: "외로움을 스스로 선택한 적이 있나요?", author_name: "정우", likes: 61, answers_count: 24, tags: ["외로움", "선택"], created_at: "2026-05-25T09:00:00" },
+  { id: IDS.r9,  content: "혼자 밥을 먹을 때 어떤 생각이 드나요?", author_name: "소희", likes: 94, answers_count: 31, tags: ["외로움", "일상"], created_at: daysAgo(3, 12) },
+  { id: IDS.r10, content: "외로움을 스스로 선택한 적이 있나요?", author_name: "정우", likes: 61, answers_count: 24, tags: ["외로움", "선택"], created_at: daysAgo(4, 9) },
   // 관계 (3개 보장)
-  { id: IDS.r11, content: "오래된 친구가 떠오를 때, 그 감정은 무엇인가요?", author_name: "유나", likes: 118, answers_count: 38, tags: ["관계", "우정"], created_at: "2026-05-25T15:00:00" },
+  { id: IDS.r11, content: "오래된 친구가 떠오를 때, 그 감정은 무엇인가요?", author_name: "유나", likes: 118, answers_count: 38, tags: ["관계", "우정"], created_at: daysAgo(4, 15) },
   // 성장 (3개 보장)
-  { id: IDS.r12, content: "실수로부터 배운 가장 중요한 것은 무엇인가요?", author_name: "재원", likes: 173, answers_count: 52, tags: ["성장", "실수"], created_at: "2026-05-24T08:00:00" },
-  { id: IDS.r13, content: "당신은 어떤 순간에 가장 크게 성장했나요?", author_name: "하은", likes: 139, answers_count: 44, tags: ["성장", "변화"], created_at: "2026-05-23T17:00:00" },
+  { id: IDS.r12, content: "실수로부터 배운 가장 중요한 것은 무엇인가요?", author_name: "재원", likes: 173, answers_count: 52, tags: ["성장", "실수"], created_at: daysAgo(5, 8) },
+  { id: IDS.r13, content: "당신은 어떤 순간에 가장 크게 성장했나요?", author_name: "하은", likes: 139, answers_count: 44, tags: ["성장", "변화"], created_at: daysAgo(5, 17) },
   // 독서 (3개 보장)
-  { id: IDS.r14, content: "책 한 권이 당신의 생각을 바꿔준 적이 있나요?", author_name: "도윤", likes: 87, answers_count: 29, tags: ["독서", "변화"], created_at: "2026-05-23T10:00:00" },
-  { id: IDS.r15, content: "당신이 가장 많이 밑줄 친 문장은 무엇인가요?", author_name: "서진", likes: 195, answers_count: 61, tags: ["독서", "문장"], created_at: "2026-05-22T14:00:00" },
+  { id: IDS.r14, content: "책 한 권이 당신의 생각을 바꿔준 적이 있나요?", author_name: "도윤", likes: 87, answers_count: 29, tags: ["독서", "변화"], created_at: daysAgo(6, 10) },
+  { id: IDS.r15, content: "당신이 가장 많이 밑줄 친 문장은 무엇인가요?", author_name: "서진", likes: 195, answers_count: 61, tags: ["독서", "문장"], created_at: daysAgo(6, 14) },
 ];
 
 function formatTimeAgo(dateStr: string) {
@@ -74,9 +83,18 @@ function formatTimeAgo(dateStr: string) {
   const min = Math.floor(diff / 60000);
   const hour = Math.floor(min / 60);
   const day = Math.floor(hour / 24);
+  if (min < 1) return "방금 전";
   if (min < 60) return `${min}분 전`;
   if (hour < 24) return `${hour}시간 전`;
   return `${day}일 전`;
+}
+
+// 오늘 기준 상대 날짜 생성 헬퍼
+function daysAgo(d: number, h = 10): string {
+  const dt = new Date();
+  dt.setDate(dt.getDate() - d);
+  dt.setHours(h, 0, 0, 0);
+  return dt.toISOString();
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -95,18 +113,67 @@ export default function QuestionsClient({
   const [askStatus, setAskStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [localQuestions, setLocalQuestions] = useState<any[]>([]);
 
+  // 관리자 상태
+  const currentUser = useAppStore((s) => s.currentUser);
+  const isAdmin = isAdminEmail(currentUser?.email);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  // 로컬 질문 목록 (DB 삭제·수정 즉시 반영용)
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
+  const [editedContents, setEditedContents] = useState<Record<string, string>>({});
+
+  // ── 관리자 핸들러 ──────────────────────────────────────────────
+  const startEdit = (q: any) => {
+    setEditingId(q.id);
+    setEditContent(editedContents[q.id] ?? q.content ?? "");
+  };
+  const cancelEdit = () => { setEditingId(null); setEditContent(""); };
+
+  const handleSaveEdit = async (id: string) => {
+    if (!editContent.trim() || editContent.trim().length < 5) { toast.error("5자 이상 입력해주세요."); return; }
+    const result = await updateLandingQuestionAction(id, editContent.trim());
+    if (result.error) { toast.error(result.error as string); return; }
+    setEditedContents((prev) => ({ ...prev, [id]: editContent.trim() }));
+    setEditingId(null);
+    toast.success("수정됐어요.");
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("이 질문을 삭제할까요? 모든 답변도 함께 삭제됩니다.")) return;
+    setDeletingId(id);
+    const result = await deleteLandingQuestionAction(id);
+    setDeletingId(null);
+    if (result.error) { toast.error(result.error as string); return; }
+    setHiddenIds((prev) => new Set([...prev, id]));
+    toast.success("삭제됐어요.");
+  };
+
+  const handleToggleFeatured = async (id: string, current: boolean) => {
+    const result = await toggleFeaturedLandingQuestion(id, current);
+    if (result.error) toast.error(result.error as string);
+    else toast.success(current ? "인기 질문에서 제거했어요." : "인기 질문으로 설정했어요.");
+  };
+
+  const handleToggleToday = async (id: string, current: boolean) => {
+    const result = await toggleTodayLandingQuestion(id, current);
+    if (result.error) toast.error(result.error as string);
+    else toast.success(current ? "오늘의 질문 해제했어요." : "오늘의 질문으로 설정했어요.");
+  };
+
   const today = todayQuestion ?? STATIC_TODAY;
   const featured = featuredQuestions.length > 0 ? featuredQuestions : STATIC_FEATURED;
   const baseRecent = recentQuestions.length > 0 ? recentQuestions : STATIC_RECENT;
   // 로컬 질문을 맨 앞에 추가해서 즉시 반영
   const recent = [...localQuestions, ...baseRecent];
 
-  const filtered = search
+  const filtered = (search
     ? recent.filter((q: any) =>
         q.content?.includes(search) ||
         (q.tags ?? []).some((t: string) => t.includes(search))
       )
-    : recent;
+    : recent
+  ).filter((q: any) => !hiddenIds.has(q.id));
 
   const handleAskSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -353,33 +420,85 @@ export default function QuestionsClient({
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {filtered.map((q: any) => (
-                    <Link
-                      key={q.id}
-                      href={`/questions/${q.id}`}
-                      style={{ textDecoration: "none" }}
-                    >
-                      <article style={{
-                        padding: "20px 24px", borderRadius: 12,
-                        border: "1px solid var(--line-soft)",
-                        background: "rgba(255,255,255,0.4)",
-                        transition: "all 0.18s ease", cursor: "pointer",
-                      }}
+                  {filtered.map((q: any) => {
+                    const displayContent = editedContents[q.id] ?? q.content;
+                    const isEditing = editingId === q.id;
+                    const isDeleting = deletingId === q.id;
+                    return (
+                      <article
+                        key={q.id}
+                        style={{
+                          padding: "20px 24px", borderRadius: 12,
+                          border: `1px solid ${isEditing ? "var(--accent)" : "var(--line-soft)"}`,
+                          background: isEditing ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)",
+                          transition: "all 0.18s ease",
+                          opacity: isDeleting ? 0.5 : 1,
+                        }}
                         onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.85)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
+                          if (!isEditing) {
+                            (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.85)";
+                            (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
+                          }
                         }}
                         onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.4)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "var(--line-soft)";
+                          if (!isEditing) {
+                            (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.4)";
+                            (e.currentTarget as HTMLElement).style.borderColor = "var(--line-soft)";
+                          }
                         }}
                       >
-                        <p style={{
-                          fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-                          fontSize: 15.5, color: "var(--ink)", lineHeight: 1.65, marginBottom: 10,
-                        }}>
-                          {q.content}
-                        </p>
+                        {/* 관리자 편집 모드 */}
+                        {isAdmin && isEditing ? (
+                          <div>
+                            <textarea
+                              value={editContent}
+                              onChange={(e) => setEditContent(e.target.value)}
+                              rows={3}
+                              style={{
+                                width: "100%", padding: "10px 12px", borderRadius: 8, fontSize: 15,
+                                border: "1px solid var(--line)", background: "rgba(255,255,255,0.8)",
+                                color: "var(--ink)", outline: "none", resize: "vertical",
+                                fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                                lineHeight: 1.65, boxSizing: "border-box", marginBottom: 10,
+                              }}
+                              autoFocus
+                            />
+                            <div style={{ display: "flex", gap: 8 }}>
+                              <button
+                                onClick={() => handleSaveEdit(q.id)}
+                                style={{
+                                  display: "inline-flex", alignItems: "center", gap: 5,
+                                  padding: "7px 14px", borderRadius: 8, fontSize: 12.5, fontWeight: 500,
+                                  background: "var(--ink)", color: "var(--cream-on-dark)",
+                                  border: "none", cursor: "pointer",
+                                }}
+                              >
+                                <Check size={12} /> 저장
+                              </button>
+                              <button
+                                onClick={cancelEdit}
+                                style={{
+                                  display: "inline-flex", alignItems: "center", gap: 5,
+                                  padding: "7px 14px", borderRadius: 8, fontSize: 12.5,
+                                  background: "none", color: "var(--muted)",
+                                  border: "1px solid var(--line)", cursor: "pointer",
+                                }}
+                              >
+                                <X size={12} /> 취소
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <Link href={`/questions/${q.id}`} style={{ textDecoration: "none", display: "block" }}>
+                            <p style={{
+                              fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                              fontSize: 15.5, color: "var(--ink)", lineHeight: 1.65, marginBottom: 10,
+                            }}>
+                              {displayContent}
+                            </p>
+                          </Link>
+                        )}
+
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
                           <div style={{ display: "flex", gap: 6 }}>
                             {(q.tags ?? []).slice(0, 3).map((tag: string) => (
@@ -391,17 +510,57 @@ export default function QuestionsClient({
                               </span>
                             ))}
                           </div>
-                          <div style={{ display: "flex", gap: 12, fontSize: 12, color: "var(--muted)", alignItems: "center" }}>
-                            <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                              <MessageSquare size={11} /> {q.answers_count} 답변
-                            </span>
-                            <span>— {q.author_name}</span>
-                            {q.created_at && <span>{formatTimeAgo(q.created_at)}</span>}
+                          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                            <div style={{ display: "flex", gap: 12, fontSize: 12, color: "var(--muted)", alignItems: "center" }}>
+                              <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                                <MessageSquare size={11} /> {q.answers_count} 답변
+                              </span>
+                              <span>— {q.author_name}</span>
+                              {q.created_at && <span>{formatTimeAgo(q.created_at)}</span>}
+                            </div>
+                            {/* 관리자 버튼 */}
+                            {isAdmin && !isEditing && (
+                              <div style={{ display: "flex", gap: 4, marginLeft: 4 }}>
+                                <button
+                                  title="수정"
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); startEdit(q); }}
+                                  style={{ background: "none", border: "1px solid var(--line-soft)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", color: "var(--muted)", display: "flex", alignItems: "center" }}
+                                >
+                                  <Pencil size={11} />
+                                </button>
+                                <button
+                                  title="삭제"
+                                  disabled={isDeleting}
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(q.id); }}
+                                  style={{ background: "none", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center" }}
+                                >
+                                  <Trash2 size={11} />
+                                </button>
+                                {q.is_featured !== undefined && (
+                                  <button
+                                    title={q.is_featured ? "인기 해제" : "인기 설정"}
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleFeatured(q.id, !!q.is_featured); }}
+                                    style={{ background: "none", border: "1px solid var(--line-soft)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", color: q.is_featured ? "var(--gold)" : "var(--muted)", display: "flex", alignItems: "center" }}
+                                  >
+                                    <Star size={11} />
+                                  </button>
+                                )}
+                                {q.is_today !== undefined && (
+                                  <button
+                                    title={q.is_today ? "Today 해제" : "Today 설정"}
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleToday(q.id, !!q.is_today); }}
+                                    style={{ background: "none", border: "1px solid var(--line-soft)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", color: q.is_today ? "var(--accent)" : "var(--muted)", display: "flex", alignItems: "center" }}
+                                  >
+                                    <Calendar size={11} />
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </article>
-                    </Link>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </section>
