@@ -515,8 +515,56 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   flex-shrink: 0;
   position: relative; z-index: 2;
 }
-.lask-icon .lask-q { color: var(--lp-accent); font-size: 15px; }
-.lask-icon .lask-b { color: var(--lp-ink); font-size: 12px; }
+.lask-icon .lask-q {
+  font-size: 15px;
+  color: #EEF700;
+  text-shadow:
+    0 0 6px rgba(238,247,0,0.9),
+    0 0 14px rgba(238,247,0,0.7),
+    0 0 28px rgba(238,247,0,0.4);
+  animation: lask-qshine 2.2s ease-in-out infinite;
+  transform-origin: 50% 80%;
+  display: inline-block;
+}
+.lask-icon .lask-b {
+  font-size: 12px;
+  color: #EEF700;
+  text-shadow:
+    0 0 4px rgba(238,247,0,0.8),
+    0 0 10px rgba(238,247,0,0.5);
+  animation: lask-bbob 2.8s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes lask-qshine {
+  0%, 100% {
+    text-shadow:
+      0 0 4px rgba(238,247,0,0.7),
+      0 0 10px rgba(238,247,0,0.4),
+      0 0 20px rgba(238,247,0,0.2);
+    transform: scale(1) rotate(-5deg);
+  }
+  50% {
+    text-shadow:
+      0 0 8px rgba(255,255,80,1),
+      0 0 18px rgba(238,247,0,0.85),
+      0 0 36px rgba(238,247,0,0.55),
+      0 0 60px rgba(200,220,0,0.25);
+    transform: scale(1.15) rotate(5deg);
+  }
+}
+@keyframes lask-bbob {
+  0%, 100% {
+    text-shadow: 0 0 4px rgba(238,247,0,0.7), 0 0 10px rgba(238,247,0,0.4);
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  50% {
+    text-shadow: 0 0 8px rgba(255,255,80,1), 0 0 18px rgba(238,247,0,0.8);
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
 
 .lask-text { position: relative; z-index: 2; }
 
