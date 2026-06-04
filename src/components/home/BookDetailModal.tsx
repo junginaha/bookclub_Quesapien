@@ -91,7 +91,9 @@ export default function BookDetailModal({ book, onClose }: Props) {
           schedule:           data.club.schedule as string,
           location:           data.club.location as string,
           locationUrl:        data.club.location_url as string,
-          joinUrl:            data.club.join_url as string,
+          // 관리자: join_url 직접, 비관리자: has_join_url 플래그로 처리
+          joinUrl: (data.club.join_url as string | undefined)
+            ?? (data.club.has_join_url ? "__hidden__" : undefined),
           description:        data.club.description as string,
           hostName:           data.club.host_name as string,
           hostIntro:          data.club.host_intro as string,
@@ -212,9 +214,10 @@ export default function BookDetailModal({ book, onClose }: Props) {
     setQuickSaving(false);
   };
 
+  // 참여 클릭 — /join API로 서버 리다이렉트 (URL 비노출)
   const handleJoin = () => {
-    if (!detail?.joinUrl?.trim()) return;
-    window.open(detail.joinUrl, "_blank", "noopener,noreferrer");
+    if (!detail?.slug) return;
+    window.open(`/api/book-clubs/${detail.slug}/join`, "_blank", "noopener,noreferrer");
     localStorage.setItem(`joined_${detail.slug}`, "1");
     setJoined(true);
   };
@@ -225,7 +228,8 @@ export default function BookDetailModal({ book, onClose }: Props) {
   const removeRow = (i: number) => setRows((r) => r.filter((_, idx) => idx !== i));
 
   const deadlinePast = isDeadlinePast(getDeadline(detail?.sessionDates));
-  const hasJoinUrl   = !!(detail?.joinUrl?.trim());
+  // __hidden__ = 비관리자용 플래그 (실제 URL은 서버에서 처리)
+  const hasJoinUrl   = !!(detail?.joinUrl?.trim()) || !!(detail as any)?.has_join_url;
   const normalDates  = getNormalDates(detail?.sessionDates);
   const detailDeadline = getDeadline(detail?.sessionDates);
 
@@ -485,18 +489,39 @@ export default function BookDetailModal({ book, onClose }: Props) {
                 onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
                 placeholder="예: 서울 서초구 교대역 인근" />
 
-              <label className="bdm-label">장소 지도 링크</label>
+              <label className="bdm-label">
+                장소 지도 링크
+                {form.locationUrl ? <span style={{ color: "var(--accent)", marginLeft: 8 }}>✓ 연결됨</span> : <span style={{ color: "var(--muted)", marginLeft: 8, fontWeight: 400 }}>— 미설정</span>}
+              </label>
               <input className="bdm-input" type="url" value={form.locationUrl ?? ""}
                 onChange={(e) => setForm((f) => ({ ...f, locationUrl: e.target.value }))}
-                placeholder="https://map.kakao.com/..." />
-
-              <label className="bdm-label">참여 링크 (URL — 사용자에게 노출 안 됨)</label>
-              <input
-                className="bdm-input" type="url" value={form.joinUrl ?? ""}
-                onChange={(e) => setForm((f) => ({ ...f, joinUrl: e.target.value }))}
-                placeholder="https://... 붙여넣으면 자동 저장"
+                placeholder="카카오맵·네이버맵 URL 붙여넣기"
                 onPaste={async (e) => {
-                  // 붙여넣기 시 즉시 DB 저장 (편집 폼 저장 없이도 반영)
+                  const pasted = e.clipboardData.getData("text").trim();
+                  if (!pasted.startsWith("http") || !detail) return;
+                  setForm((f) => ({ ...f, locationUrl: pasted }));
+                }}
+              />
+              {form.locationUrl && (
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:-4, marginBottom:6 }}>
+                  <span style={{ fontSize:11, color:"var(--muted)" }}>→ 사용자가 장소 클릭 시 지도 열림</span>
+                  <button type="button" onClick={() => setForm((f) => ({ ...f, locationUrl:"" }))}
+                    style={{ fontSize:11, color:"#EF4444", background:"none", border:"none", cursor:"pointer", padding:0 }}>삭제</button>
+                </div>
+              )}
+
+              <label className="bdm-label">
+                참여 신청 링크
+                {form.joinUrl ? <span style={{ color: "var(--accent)", marginLeft: 8 }}>✓ 연결됨 (URL 비공개)</span> : <span style={{ color: "var(--muted)", marginLeft: 8, fontWeight: 400 }}>— 미설정</span>}
+              </label>
+              <input
+                className="bdm-input" type="url"
+                value={form.joinUrl ? (form.joinUrl.length > 40 ? form.joinUrl.slice(0,38)+"…" : form.joinUrl) : ""}
+                onChange={(e) => setForm((f) => ({ ...f, joinUrl: e.target.value }))}
+                placeholder="참여 링크 붙여넣기 → 자동 저장 · 사용자에게 URL 비공개"
+                onFocus={(e) => { (e.target as HTMLInputElement).value = form.joinUrl ?? ""; }}
+                onBlur={(e) => { if(form.joinUrl && form.joinUrl.length > 40) (e.target as HTMLInputElement).value = form.joinUrl.slice(0,38)+"…"; }}
+                onPaste={async (e) => {
                   const pasted = e.clipboardData.getData("text").trim();
                   if (!pasted.startsWith("http") || !detail) return;
                   setForm((f) => ({ ...f, joinUrl: pasted }));
@@ -518,9 +543,13 @@ export default function BookDetailModal({ book, onClose }: Props) {
                   } catch { /* local only */ }
                 }}
               />
-              <div style={{ fontSize: 11, color: "var(--muted)", marginTop: -6, marginBottom: 8 }}>
-                ✓ 붙여넣으면 즉시 저장 · 사용자에게는 "참여 신청하기" 버튼으로만 표시
-              </div>
+              {form.joinUrl && (
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:-4, marginBottom:6 }}>
+                  <span style={{ fontSize:11, color:"var(--muted)" }}>→ 사용자에게 URL 비공개 · "참여 신청하기" 버튼으로만 표시</span>
+                  <button type="button" onClick={() => setForm((f) => ({ ...f, joinUrl:"" }))}
+                    style={{ fontSize:11, color:"#EF4444", background:"none", border:"none", cursor:"pointer", padding:0 }}>삭제</button>
+                </div>
+              )}
 
               <label className="bdm-label">최대 인원</label>
               <input className="bdm-input" type="number" min={1} max={100}

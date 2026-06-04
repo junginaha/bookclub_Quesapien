@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "junginaha@gmail.com,kimjungin@quesapience.com").split(",");
 
-// ── GET: 북클럽 상세 조회 (join_url은 관리자만) ──────────────────
+// ── GET: 북클럽 상세 조회 ──────────────────────────────────────────
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const { slug: _s } = await params;
     const slug = decodeURIComponent(_s);
-    const supabase = await createClient();
+    // 서비스 롤로 조회 (RLS 우회)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const db = supabase as any;
+    const db = createServiceClient() as any;
 
     const { data, error } = await db
       .from("landing_book_clubs")
@@ -25,14 +25,15 @@ export async function GET(
       return NextResponse.json({ error: "북클럽을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // 비관리자: join_url 숨김 (버튼만 표시, URL 비노출)
-    const { data: { user } } = await supabase.auth.getUser();
+    // 비관리자: join_url 숨김 (버튼 클릭 여부만 노출)
+    const authClient = await createClient();
+    const { data: { user } } = await authClient.auth.getUser();
     const isAdmin = user && ADMIN_EMAILS.includes(user.email ?? "");
     if (!isAdmin) {
-      const { join_url: _, ...safeData } = data;
-      void _;
-      // hasJoinUrl 플래그만 노출 (URL 자체는 숨김)
-      return NextResponse.json({ club: { ...safeData, has_join_url: !!(data.join_url?.trim()) } });
+      const { join_url, ...safeData } = data as { join_url: string | null } & Record<string, unknown>;
+      return NextResponse.json({
+        club: { ...safeData, has_join_url: !!(join_url?.trim()) },
+      });
     }
 
     return NextResponse.json({ club: data });
@@ -49,16 +50,19 @@ export async function PATCH(
   try {
     const { slug: _s } = await params;
     const slug = decodeURIComponent(_s);
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const db = supabase as any;
 
+    // 1) 인증 확인 (createClient — 쿠키 기반)
+    const authClient = await createClient();
+    const { data: { user } } = await authClient.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
     }
 
     const isAdmin = ADMIN_EMAILS.includes(user.email ?? "");
+
+    // 2) 실제 DB 작업은 서비스 롤 (RLS 우회)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = createServiceClient() as any;
 
     // 비관리자: 호스트 여부 확인
     if (!isAdmin) {
@@ -66,9 +70,10 @@ export async function PATCH(
         .from("landing_book_clubs")
         .select("host_id, created_by")
         .eq("slug", slug)
-        .maybeSingle() as { data: { host_id: string | null; created_by: string | null } | null };
+        .maybeSingle();
 
-      if (!club || (club?.host_id !== user.id && club?.created_by !== user.id)) {
+      const c = club as { host_id: string | null; created_by: string | null } | null;
+      if (!c || (c.host_id !== user.id && c.created_by !== user.id)) {
         return NextResponse.json({ error: "수정 권한이 없습니다." }, { status: 403 });
       }
     }
@@ -91,11 +96,11 @@ export async function PATCH(
       .from("landing_book_clubs")
       .select("id")
       .eq("slug", slug)
-      .maybeSingle() as { data: { id: string } | null };
+      .maybeSingle();
 
     let resultData;
 
-    if (existing?.id) {
+    if ((existing as { id: string } | null)?.id) {
       // ── 기존 행 업데이트 ──
       const { data, error } = await db
         .from("landing_book_clubs")
@@ -103,33 +108,30 @@ export async function PATCH(
         .eq("slug", slug)
         .select()
         .single();
-      if (error) throw new Error(`update failed: ${error.message}`);
+      if (error) throw new Error(`update: ${error.message}`);
       resultData = data;
     } else {
-      // ── 행 없음: 새로 생성 (upsert) ──
-      const titleFallback = (body.title as string)
-        ?? slug.replace(/-/g, " ");
-
+      // ── 행 없음: 신규 생성 ──
+      const titleFallback = (body.title as string) ?? slug.replace(/-/g, " ");
       const insertPayload = {
         slug,
-        title: titleFallback,
-        color: (body.color as string) ?? "navy",
-        sort_order: 99,
-        status: "active",
+        title:                titleFallback,
+        color:                (body.color as string) ?? "navy",
+        sort_order:           99,
+        status:               "active",
         current_participants: 0,
-        emotion_tags: [],
-        is_mini: false,
-        session_dates: [],
-        created_by: user.id,
+        emotion_tags:         [],
+        is_mini:              false,
+        session_dates:        [],
+        created_by:           user.id,
         ...updatePayload,
       };
-
       const { data, error } = await db
         .from("landing_book_clubs")
         .insert(insertPayload)
         .select()
         .single();
-      if (error) throw new Error(`insert failed: ${error.message}`);
+      if (error) throw new Error(`insert: ${error.message}`);
       resultData = data;
     }
 
