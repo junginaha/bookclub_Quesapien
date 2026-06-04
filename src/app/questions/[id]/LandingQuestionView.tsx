@@ -25,7 +25,11 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
       const res = await fetch(`/api/landing-questions/${question.id}/answers`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: content.trim(), author_name: authorName.trim() || "익명" }),
+        body: JSON.stringify({
+          content: content.trim(),
+          author_name: authorName.trim() || "익명",
+          question_content: question.content, // 정적 질문 자동 생성용
+        }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();

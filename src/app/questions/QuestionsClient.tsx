@@ -20,6 +20,13 @@ const IDS = {
   r6:    "a1000001-0000-0000-0000-000000000016",
   r7:    "a1000001-0000-0000-0000-000000000017",
   r8:    "a1000001-0000-0000-0000-000000000018",
+  r9:    "a1000001-0000-0000-0000-000000000019",
+  r10:   "a1000001-0000-0000-0000-000000000020",
+  r11:   "a1000001-0000-0000-0000-000000000021",
+  r12:   "a1000001-0000-0000-0000-000000000022",
+  r13:   "a1000001-0000-0000-0000-000000000023",
+  r14:   "a1000001-0000-0000-0000-000000000024",
+  r15:   "a1000001-0000-0000-0000-000000000025",
 };
 
 // ── 정적 폴백 데이터 ──────────────────────────────────────────────────────
@@ -49,6 +56,17 @@ const STATIC_RECENT = [
   { id: IDS.r6, content: "읽다가 멈춘 책이 있나요? 왜 멈췄나요?", author_name: "진호", likes: 78, answers_count: 19, tags: ["독서", "책"], created_at: "2026-05-27T11:00:00" },
   { id: IDS.r7, content: "당신에게 '집'은 어떤 의미인가요?", author_name: "세아", likes: 201, answers_count: 45, tags: ["일상", "공간"], created_at: "2026-05-27T08:00:00" },
   { id: IDS.r8, content: "마지막으로 새로운 사람과 깊은 대화를 한 건 언제인가요?", author_name: "현우", likes: 134, answers_count: 28, tags: ["대화", "연결"], created_at: "2026-05-26T19:00:00" },
+  // 외로움 (3개 보장)
+  { id: IDS.r9,  content: "혼자 밥을 먹을 때 어떤 생각이 드나요?", author_name: "소희", likes: 94, answers_count: 31, tags: ["외로움", "일상"], created_at: "2026-05-26T12:00:00" },
+  { id: IDS.r10, content: "외로움을 스스로 선택한 적이 있나요?", author_name: "정우", likes: 61, answers_count: 24, tags: ["외로움", "선택"], created_at: "2026-05-25T09:00:00" },
+  // 관계 (3개 보장)
+  { id: IDS.r11, content: "오래된 친구가 떠오를 때, 그 감정은 무엇인가요?", author_name: "유나", likes: 118, answers_count: 38, tags: ["관계", "우정"], created_at: "2026-05-25T15:00:00" },
+  // 성장 (3개 보장)
+  { id: IDS.r12, content: "실수로부터 배운 가장 중요한 것은 무엇인가요?", author_name: "재원", likes: 173, answers_count: 52, tags: ["성장", "실수"], created_at: "2026-05-24T08:00:00" },
+  { id: IDS.r13, content: "당신은 어떤 순간에 가장 크게 성장했나요?", author_name: "하은", likes: 139, answers_count: 44, tags: ["성장", "변화"], created_at: "2026-05-23T17:00:00" },
+  // 독서 (3개 보장)
+  { id: IDS.r14, content: "책 한 권이 당신의 생각을 바꿔준 적이 있나요?", author_name: "도윤", likes: 87, answers_count: 29, tags: ["독서", "변화"], created_at: "2026-05-23T10:00:00" },
+  { id: IDS.r15, content: "당신이 가장 많이 밑줄 친 문장은 무엇인가요?", author_name: "서진", likes: 195, answers_count: 61, tags: ["독서", "문장"], created_at: "2026-05-22T14:00:00" },
 ];
 
 function formatTimeAgo(dateStr: string) {
@@ -75,10 +93,13 @@ export default function QuestionsClient({
   const [askContent, setAskContent] = useState("");
   const [askAuthor, setAskAuthor] = useState("");
   const [askStatus, setAskStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [localQuestions, setLocalQuestions] = useState<any[]>([]);
 
   const today = todayQuestion ?? STATIC_TODAY;
   const featured = featuredQuestions.length > 0 ? featuredQuestions : STATIC_FEATURED;
-  const recent = recentQuestions.length > 0 ? recentQuestions : STATIC_RECENT;
+  const baseRecent = recentQuestions.length > 0 ? recentQuestions : STATIC_RECENT;
+  // 로컬 질문을 맨 앞에 추가해서 즉시 반영
+  const recent = [...localQuestions, ...baseRecent];
 
   const filtered = search
     ? recent.filter((q: any) =>
@@ -91,17 +112,37 @@ export default function QuestionsClient({
     e.preventDefault();
     if (!askContent.trim() || askContent.trim().length < 5) return;
     setAskStatus("sending");
+    // 낙관적 업데이트: 제출 즉시 목록에 추가
+    const optimisticQ = {
+      id: `local-${Date.now()}`,
+      content: askContent.trim(),
+      author_name: askAuthor.trim() || "익명",
+      likes: 0,
+      answers_count: 0,
+      tags: [],
+      created_at: new Date().toISOString(),
+    };
+    setLocalQuestions((prev) => [optimisticQ, ...prev]);
+    setAskContent(""); setAskAuthor("");
     try {
       const res = await fetch("/api/landing-questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: askContent.trim(), author_name: askAuthor.trim() || "익명" }),
+        body: JSON.stringify({ content: optimisticQ.content, author_name: optimisticQ.author_name }),
       });
       if (!res.ok) throw new Error("fail");
+      const data = await res.json();
+      // 서버 응답 ID로 업데이트 (링크 연결용)
+      if (data.question?.id) {
+        setLocalQuestions((prev) =>
+          prev.map((q) => q.id === optimisticQ.id ? { ...q, id: data.question.id } : q)
+        );
+      }
       setAskStatus("sent");
-      setAskContent(""); setAskAuthor("");
     } catch {
       setAskStatus("error");
+      // 실패 시 낙관적 항목 제거
+      setLocalQuestions((prev) => prev.filter((q) => q.id !== optimisticQ.id));
     }
     setTimeout(() => setAskStatus("idle"), 3000);
   };
