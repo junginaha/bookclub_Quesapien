@@ -22,12 +22,20 @@ export default function GiantsClient() {
   const [category, setCategory] = useState<GiantCategory>("all");
   const [search, setSearch] = useState("");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [moreExpanded, setMoreExpanded] = useState(false);
+
+  const INITIAL_SHOW = 8;
 
   const filtered = GIANTS.filter((g) => {
     const matchCat = category === "all" || g.category === category;
     const matchSearch = !search || g.name.includes(search) || g.name_en.toLowerCase().includes(search.toLowerCase()) || g.tagline.includes(search);
     return matchCat && matchSearch;
   });
+
+  // 검색/필터 중이면 전체 표시, 아니면 초기 8명만
+  const isFiltering = !!search || category !== "all";
+  const visible  = isFiltering ? filtered : filtered.slice(0, INITIAL_SHOW);
+  const hidden   = isFiltering ? [] : filtered.slice(INITIAL_SHOW);
 
   return (
     <div style={{ background: "var(--bg)" }}>
@@ -117,12 +125,13 @@ export default function GiantsClient() {
               검색 결과가 없습니다.
             </div>
           ) : (
+            <>
             <div style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
               gap: 20,
             }}>
-              {filtered.map((giant) => {
+              {visible.map((giant) => {
                 const isHovered = hoveredId === giant.id;
                 return (
                   <Link
@@ -221,6 +230,102 @@ export default function GiantsClient() {
                 );
               })}
             </div>
+
+            {/* 더 많은 지성 만나보기 — lp-books-more 스타일 */}
+            {!isFiltering && hidden.length > 0 && (
+              <div style={{ marginTop: 64 }}>
+                {/* 토글 버튼 행 */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: 24, marginBottom: 16 }}>
+                  <div style={{ height: 1, background: "var(--line-soft)" }} />
+                  <button
+                    onClick={() => setMoreExpanded((v) => !v)}
+                    aria-expanded={moreExpanded}
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: 12, whiteSpace: "nowrap",
+                      padding: "14px 26px",
+                      background: "var(--bg)", border: "1px solid var(--line)", borderRadius: 9999,
+                      fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontWeight: 500, fontSize: 14.5,
+                      letterSpacing: "-0.005em", color: "var(--ink)", cursor: "pointer",
+                      transition: "background .3s ease, border-color .3s ease, transform .3s ease",
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--bg-soft)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--bg)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}
+                  >
+                    더 많은 지성 만나보기
+                    <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "normal", color: "var(--accent)", fontSize: 14 }}>
+                      {hidden.length}명
+                    </span>
+                    {/* chevron */}
+                    <span style={{
+                      width: 12, height: 12, position: "relative", flexShrink: 0,
+                      transition: "transform .4s cubic-bezier(.2,.8,.2,1)",
+                      transform: moreExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                      display: "inline-block",
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </span>
+                  </button>
+                  <div style={{ height: 1, background: "var(--line-soft)" }} />
+                </div>
+
+                <p style={{ textAlign: "center", fontSize: 13, color: "var(--muted)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif", marginBottom: moreExpanded ? 40 : 0, transition: "margin .4s ease" }}>
+                  {moreExpanded ? "— 지금 바로 만날 수 있는 지성들이에요." : "— 더 많은 사유자들이 기다리고 있어요."}
+                </p>
+
+                {/* 숨겨진 그리드 */}
+                <div style={{
+                  overflow: "hidden",
+                  maxHeight: moreExpanded ? "4000px" : "0",
+                  opacity: moreExpanded ? 1 : 0,
+                  transition: "max-height .7s cubic-bezier(.2,.8,.2,1), opacity .5s ease",
+                }}>
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+                    gap: 20,
+                  }}>
+                    {hidden.map((giant) => {
+                      const isHovered = hoveredId === giant.id;
+                      return (
+                        <Link
+                          key={giant.id}
+                          href={`/giants/${giant.slug}`}
+                          style={{ textDecoration: "none", display: "block" }}
+                          onMouseEnter={() => setHoveredId(giant.id)}
+                          onMouseLeave={() => setHoveredId(null)}
+                        >
+                          <article style={{
+                            border: "1px solid var(--line-soft)", borderRadius: 12,
+                            overflow: "hidden", background: "var(--bg)",
+                            transition: "transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease",
+                            transform: isHovered ? "translateY(-4px)" : "translateY(0)",
+                            boxShadow: isHovered ? "0 20px 50px -16px rgba(28,31,38,.22)" : "none",
+                          }}>
+                            <div style={{ padding: "28px 24px 20px", minHeight: 120, background: `linear-gradient(135deg, ${giant.color}22 0%, ${giant.color}0a 100%)` }}>
+                              <div style={{ fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 10 }}>{giant.category}</div>
+                              <div style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 20, fontWeight: 400, color: "var(--ink)", marginBottom: 2 }}>{giant.name}</div>
+                              <div style={{ fontSize: 12, color: "var(--muted)" }}>{giant.name_en} · {giant.birth_year}–{giant.death_year ?? "현재"}</div>
+                            </div>
+                            <div style={{ padding: "20px 24px" }}>
+                              <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.65, borderLeft: `2px solid ${giant.color}`, paddingLeft: 12, marginBottom: 16, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                                &ldquo;{giant.signature_quote}&rdquo;
+                              </p>
+                              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid var(--line-soft)" }}>
+                                <span style={{ fontSize: 12.5, color: giant.color, fontWeight: 500 }}>{giant.name}의 관점 탐구</span>
+                                <ChevronRight size={15} style={{ color: "var(--muted)" }} />
+                              </div>
+                            </div>
+                          </article>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+            </>
           )}
         </div>
       </section>

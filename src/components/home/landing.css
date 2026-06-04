@@ -415,10 +415,120 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   width: 100%;
 }
 
-.lp-ask-center-btn {
-  font-size: 15px;
-  padding: 14px 36px;
+/* ── 질문 남겨보기 pill — 가까운 북클럽 찾기와 동일 구조 ── */
+.lask-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  overflow: visible;
 }
+
+/* 빛 입자 (lnd-sp 동일 패턴, accent 계열) */
+.lask-sp {
+  position: absolute;
+  font-family: var(--lp-serif);
+  color: var(--lp-accent);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 10;
+  line-height: 1;
+}
+.lask-sp.sp1 { top:-8px; left:20%; font-size:9px;  animation: lask-sp1 3.2s ease-out 0s    infinite; }
+.lask-sp.sp2 { top:-9px; left:50%; font-size:7px;  animation: lask-sp2 3.2s ease-out 0.5s  infinite; color: var(--lp-gold); }
+.lask-sp.sp3 { top:-8px; right:18%;font-size:10px; animation: lask-sp3 3.2s ease-out 1.05s infinite; color: rgba(94,70,50,0.65); }
+.lask-sp.sp4 { top:calc(50% - 5px); right:-9px; font-size:8px; animation: lask-sp4 3.2s ease-out 0.75s infinite; }
+.lask-sp.sp5 { top:calc(50% - 5px); left:-9px; font-size:11px; animation: lask-sp5 3.2s ease-out 1.6s infinite; color: var(--lp-gold); }
+.lask-sp.sp6 { bottom:-7px; left:22%; font-size:8px; animation: lask-sp6 3.2s ease-out 1.25s infinite; }
+.lask-sp.sp7 { bottom:-8px; left:52%; font-size:12px; animation: lask-sp7 3.2s ease-out 2.0s infinite; color: var(--lp-gold); }
+.lask-sp.sp8 { bottom:-7px; right:16%;font-size:7px; animation: lask-sp8 3.2s ease-out 0.3s infinite; }
+
+@keyframes lask-sp1 { 0%{opacity:0;transform:scale(.3) translate(0,0);} 14%{opacity:1;} 55%{opacity:.75;transform:scale(1.2) translate(-5px,-9px);} 100%{opacity:0;transform:scale(.4) translate(-9px,-16px);} }
+@keyframes lask-sp2 { 0%{opacity:0;transform:scale(.3) translateY(0);} 14%{opacity:1;} 55%{opacity:.8;transform:scale(1.3) translateY(-10px);} 100%{opacity:0;transform:scale(.4) translateY(-18px);} }
+@keyframes lask-sp3 { 0%{opacity:0;transform:scale(.3) translate(0,0);} 14%{opacity:1;} 55%{opacity:.7;transform:scale(1.15) translate(5px,-9px);} 100%{opacity:0;transform:scale(.4) translate(9px,-16px);} }
+@keyframes lask-sp4 { 0%{opacity:0;transform:scale(.3) translateX(0);} 14%{opacity:1;} 55%{opacity:.8;transform:scale(1.25) translateX(11px);} 100%{opacity:0;transform:scale(.4) translateX(20px);} }
+@keyframes lask-sp5 { 0%{opacity:0;transform:scale(.3) translateX(0);} 14%{opacity:1;} 55%{opacity:.8;transform:scale(1.2) translateX(-11px);} 100%{opacity:0;transform:scale(.4) translateX(-20px);} }
+@keyframes lask-sp6 { 0%{opacity:0;transform:scale(.3) translate(0,0);} 14%{opacity:1;} 55%{opacity:.7;transform:scale(1.15) translate(-5px,9px);} 100%{opacity:0;transform:scale(.4) translate(-9px,16px);} }
+@keyframes lask-sp7 { 0%{opacity:0;transform:scale(.3) translateY(0);} 14%{opacity:1;} 55%{opacity:.75;transform:scale(1.2) translateY(10px);} 100%{opacity:0;transform:scale(.4) translateY(18px);} }
+@keyframes lask-sp8 { 0%{opacity:0;transform:scale(.3) translate(0,0);} 14%{opacity:1;} 55%{opacity:.75;transform:scale(1.2) translate(5px,9px);} 100%{opacity:0;transform:scale(.4) translate(9px,16px);} }
+
+/* pill 본체 */
+.lask-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px 10px 14px;
+  background: #ffffff;
+  border: 1.5px solid rgba(94,70,50,0.35);
+  border-radius: 9999px;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: var(--lp-serif-ko);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--lp-accent);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  box-shadow: 0 2px 14px -4px rgba(94,70,50,0.22);
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .3s;
+  animation: lask-pulse 3.5s ease-in-out infinite;
+  z-index: 2;
+}
+.lask-pill:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: rgba(94,70,50,0.6);
+  box-shadow: 0 8px 28px -6px rgba(94,70,50,0.3), 0 0 0 3px rgba(94,70,50,0.07);
+}
+.lask-pill:active { transform: scale(0.97); }
+
+@keyframes lask-pulse {
+  0%,100% { box-shadow: 0 2px 14px -4px rgba(94,70,50,0.22); }
+  50%      { box-shadow: 0 5px 22px -4px rgba(176,138,74,0.35), 0 0 16px -5px rgba(94,70,50,0.18); }
+}
+
+/* 내부 shimmer */
+.lask-shimmer {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 20%, rgba(176,138,74,0.1) 45%, rgba(255,255,255,0.35) 50%, transparent 72%);
+  background-size: 300% 100%;
+  animation: lp-btnShimmer 4s ease-in-out 0.6s infinite;
+  border-radius: 9999px;
+}
+
+/* glow */
+.lask-glow {
+  position: absolute; inset: 0; border-radius: 9999px;
+  background: radial-gradient(ellipse 70% 55% at 30% 50%, rgba(176,138,74,0.1), transparent 65%);
+  pointer-events: none;
+  animation: lask-gl 3.5s ease-in-out infinite;
+}
+@keyframes lask-gl { 0%,100%{opacity:.5;} 50%{opacity:1;} }
+
+/* pin ?! 아이콘 */
+.lask-icon {
+  font-family: var(--lp-serif);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  flex-shrink: 0;
+  position: relative; z-index: 2;
+}
+.lask-icon .lask-q { color: var(--lp-accent); font-size: 15px; }
+.lask-icon .lask-b { color: var(--lp-ink); font-size: 12px; }
+
+.lask-text { position: relative; z-index: 2; }
+
+.lask-arrow {
+  width: 14px; height: 14px;
+  flex-shrink: 0; position: relative; z-index: 2;
+  opacity: 0.7;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .3s;
+}
+.lask-pill:hover .lask-arrow { transform: translateX(3px); opacity: 1; }
+
+.lp-ask-center-btn { /* 하위 호환 유지 */ }
 
 .lp-ask-center-note {
   font-family: var(--lp-serif-ko);

@@ -840,10 +840,28 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             부끄러운 질문일수록 환영해요.
           </p>
           <div className="lp-ask-center-cta">
-            <a href="/questions" className="lp-btn-cream lp-ask-center-btn">
-              <span>질문 남겨보기</span>
-              <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
-            </a>
+            {/* 가까운 북클럽 찾기와 동일 구조 pill */}
+            <div className="lask-wrap">
+              <span className="lask-sp sp1" aria-hidden="true">✦</span>
+              <span className="lask-sp sp2" aria-hidden="true">✦</span>
+              <span className="lask-sp sp3" aria-hidden="true">·</span>
+              <span className="lask-sp sp4" aria-hidden="true">✦</span>
+              <span className="lask-sp sp5" aria-hidden="true">·</span>
+              <span className="lask-sp sp6" aria-hidden="true">✦</span>
+              <span className="lask-sp sp7" aria-hidden="true">·</span>
+              <span className="lask-sp sp8" aria-hidden="true">✦</span>
+              <a href="/questions" className="lask-pill">
+                <span className="lask-shimmer" aria-hidden="true" />
+                <span className="lask-glow" aria-hidden="true" />
+                <span className="lask-icon" aria-hidden="true">
+                  <span className="lask-q">?</span><span className="lask-b">!</span>
+                </span>
+                <span className="lask-text">질문 남겨보기</span>
+                <svg className="lask-arrow" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </a>
+            </div>
             <span className="lp-ask-center-note">— 생각보다 따뜻합니다.</span>
           </div>
         </div>
