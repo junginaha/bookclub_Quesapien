@@ -797,22 +797,6 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               <span className="lp-kw k3">북클럽</span>.<br />
               <span className="lp-kw k4">사람들</span>이 가장 깊은 이야기를 나눠요.
             </p>
-            <div className="lp-cta-stack">
-              <div className="lp-cta-row">
-                <a
-                  href="#questions"
-                  className="lp-btn-primary"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById("questions")?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  <span>질문 주고 받기</span>
-                  <span className="lp-arrow" />
-                </a>
-              </div>
-              <span className="lp-cta-note">— 생각보다 따뜻합니다.</span>
-            </div>
           </div>
 
           {/* Subtle accent dots */}
@@ -850,10 +834,13 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           <p className="lp-lede" style={{ marginBottom: 40 }}>
             부끄러운 질문일수록 환영해요.
           </p>
-          <a href="/questions" className="lp-btn-cream">
-            <span>질문 남겨보기</span>
-            <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
-          </a>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
+            <a href="/questions" className="lp-btn-cream">
+              <span>질문 남겨보기</span>
+              <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
+            </a>
+            <span className="lp-cta-note">— 생각보다 따뜻합니다.</span>
+          </div>
         </div>
       </section>
 
