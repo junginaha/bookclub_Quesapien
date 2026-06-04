@@ -18,60 +18,73 @@ const COLOR_MAP: Record<string, string> = {
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export default function BookClubDetailClient({ club }: { club: any }) {
-  const [joinStep, setJoinStep] = useState<"idle" | "confirm" | "submitting" | "done" | "error" | "no-link">("idle");
-  const [applicantName, setApplicantName] = useState("");
-  const [applicantEmail, setApplicantEmail] = useState("");
-  const [applicantMsg, setApplicantMsg] = useState("");
-  const [joinError, setJoinError] = useState("");
+export default function BookClubDetailClient({ club: initialClub, isAdmin = false }: { club: any; isAdmin?: boolean }) {
+  const [club, setClub] = useState<any>(initialClub);
+  const [joinStep, setJoinStep] = useState<"idle" | "done" | "no-link">("idle");
+  const [joining, setJoining] = useState(false);
+
+  // ── 어드민 편집 상태 ──────────────────────────────────────────
+  const [editOpen, setEditOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    title:       initialClub.title ?? "",
+    schedule:    initialClub.schedule ?? "",
+    description: initialClub.description ?? "",
+    location:    initialClub.location ?? "",
+    host_name:   initialClub.host_name ?? "",
+    join_url:    initialClub.join_url ?? "",
+  });
+  const [saving, setSaving]   = useState(false);
+  const [saveMsg, setSaveMsg] = useState("");
 
   const bgColor = COLOR_MAP[club.color as string] ?? "#1B2536";
   const remaining = (club.max_participants ?? 8) - (club.current_participants ?? 0);
-  const isClosed = club.status === "closed";
+  const isClosed = club.status === "closed" || remaining <= 0;
+  const hasJoinLink = !!(club.join_url?.startsWith("http")) || !!club.has_join_url;
   const fillPct = Math.round(((club.current_participants ?? 0) / (club.max_participants ?? 8)) * 100);
-
   const reviews: any[] = club.reviews ?? [];
   const avgRating = reviews.length > 0
     ? reviews.reduce((s: number, r: any) => s + (r.rating ?? 5), 0) / reviews.length
     : 5;
 
-  const handleJoin = () => {
-    if (isClosed) return;
-    if (club.join_url && club.join_url.startsWith("http")) {
-      // 리더가 설정한 잼잼링크로 바로 이동
-      window.open(club.join_url, "_blank");
-    } else {
-      // 잼잼링크 미설정 → 안내 표시
-      setJoinStep("no-link");
-    }
+  // ── 참여 신청 — 서버 리다이렉트 (URL 비노출) ──────────────────
+  const handleJoin = async () => {
+    if (isClosed || joining) return;
+    if (!hasJoinLink) { setJoinStep("no-link"); return; }
+    setJoining(true);
+    // /api/book-clubs/[slug]/join 으로 탭 열기 → 서버가 잼잼링크로 302 리다이렉트
+    window.open(`/api/book-clubs/${club.slug}/join`, "_blank", "noopener,noreferrer");
+    setJoining(false);
+    setJoinStep("done");
+    setTimeout(() => setJoinStep("idle"), 3000);
   };
 
-  const handleSubmitJoin = async () => {
-    if (!applicantName.trim() || !applicantEmail.trim()) {
-      setJoinError("이름과 이메일을 적어주세요.");
-      return;
-    }
-    setJoinStep("submitting");
-    setJoinError("");
+  // ── 어드민 저장 ──────────────────────────────────────────────
+  const handleSave = async () => {
+    setSaving(true); setSaveMsg("");
     try {
-      const res = await fetch("/api/bookclub/join", {
-        method: "POST",
+      const res = await fetch(`/api/book-clubs/${club.slug}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          slug: club.slug,
-          applicantName: applicantName.trim(),
-          applicantEmail: applicantEmail.trim(),
-          message: applicantMsg.trim() || undefined,
+          title:       editForm.title,
+          schedule:    editForm.schedule,
+          description: editForm.description,
+          location:    editForm.location,
+          host_name:   editForm.host_name,
+          join_url:    editForm.join_url,
+          color:       club.color,
         }),
       });
-      const data = await res.json();
-      if (data.redirect) { window.open(data.redirect, "_blank"); setJoinStep("idle"); return; }
-      if (!res.ok) { setJoinError(data.error ?? "오류가 발생했습니다."); setJoinStep("confirm"); return; }
-      setJoinStep("done");
-    } catch {
-      setJoinError("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
-      setJoinStep("confirm");
-    }
+      const json = await res.json() as { club?: any; error?: string };
+      if (res.ok && json.club) {
+        setClub((prev: any) => ({ ...prev, ...json.club, join_url: editForm.join_url }));
+        setSaveMsg("✓ 저장됐어요!");
+        setTimeout(() => { setSaveMsg(""); setEditOpen(false); }, 1500);
+      } else {
+        setSaveMsg(`⚠ ${json.error ?? "저장 실패"}`);
+      }
+    } catch { setSaveMsg("⚠ 네트워크 오류"); }
+    setSaving(false);
   };
 
   return (
@@ -111,6 +124,18 @@ export default function BookClubDetailClient({ club }: { club: any }) {
                   {club.genre ?? "북클럽"} · {club.tag}
                 </div>
 
+                {/* 어드민 편집 버튼 */}
+                {isAdmin && (
+                  <button
+                    onClick={() => setEditOpen(true)}
+                    style={{ display:"inline-flex", alignItems:"center", gap:6, marginBottom:16, padding:"6px 14px", borderRadius:8, background:"rgba(255,255,255,0.12)", border:"1px solid rgba(255,255,255,0.25)", color:"rgba(255,255,255,0.8)", fontSize:12.5, cursor:"pointer", transition:"background .2s" }}
+                    onMouseEnter={(e)=>(e.currentTarget as HTMLElement).style.background="rgba(255,255,255,0.2)"}
+                    onMouseLeave={(e)=>(e.currentTarget as HTMLElement).style.background="rgba(255,255,255,0.12)"}
+                  >
+                    ✏️ 북토크 정보 편집
+                  </button>
+                )}
+
                 <h1 style={{
                   fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
                   fontSize: "clamp(28px, 5vw, 56px)",
@@ -132,25 +157,29 @@ export default function BookClubDetailClient({ club }: { club: any }) {
                   {club.description}
                 </p>
 
-                <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
                   <button
                     onClick={handleJoin}
-                    disabled={isClosed}
+                    disabled={isClosed || joining}
                     style={{
                       display: "inline-flex", alignItems: "center", gap: 8,
                       padding: "14px 28px", borderRadius: 9999,
-                      background: isClosed ? "rgba(255,255,255,0.1)" : "white",
-                      color: isClosed ? "rgba(255,255,255,0.5)" : bgColor,
+                      background: isClosed ? "rgba(255,255,255,0.1)" : joinStep==="done" ? "#10B981" : "white",
+                      color: isClosed ? "rgba(255,255,255,0.5)" : joinStep==="done" ? "white" : bgColor,
                       fontSize: 15, fontWeight: 600,
                       border: "none", cursor: isClosed ? "not-allowed" : "pointer",
-                      transition: "opacity 0.2s",
+                      transition: "all 0.2s",
                     }}
-                    onMouseEnter={(e) => { if (!isClosed) (e.currentTarget as HTMLElement).style.opacity = "0.88"; }}
+                    onMouseEnter={(e) => { if (!isClosed && joinStep!=="done") (e.currentTarget as HTMLElement).style.opacity = "0.88"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
                   >
-                    {isClosed ? "마감됐어요" : "참여하기"}
-                    {!isClosed && <ChevronRight size={16} />}
+                    {isClosed ? "마감됐어요" : joinStep==="done" ? "신청 완료 ✓" : joining ? "연결 중…" : "참여 신청하기"}
+                    {!isClosed && joinStep==="idle" && <ChevronRight size={16} />}
                   </button>
+
+                  {joinStep==="no-link" && (
+                    <span style={{ fontSize:13, color:"rgba(255,255,255,0.6)" }}>참여 링크가 준비 중입니다.</span>
+                  )}
 
                   {!isClosed && (
                     <div style={{
@@ -572,80 +601,6 @@ export default function BookClubDetailClient({ club }: { club: any }) {
         </div>
       )}
 
-      {/* ── Join Confirm Modal ── */}
-      {(joinStep === "confirm" || joinStep === "submitting") && (
-        <div style={{
-          position: "fixed", inset: 0, zIndex: 1000,
-          background: "rgba(28,31,38,0.75)", backdropFilter: "blur(6px)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          padding: 24,
-        }} onClick={() => { if (joinStep !== "submitting") setJoinStep("idle"); }}>
-          <div style={{
-            background: "var(--bg)", borderRadius: 20, padding: 40,
-            maxWidth: 460, width: "100%",
-            boxShadow: "0 40px 80px -20px rgba(28,31,38,0.4)",
-          }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 16 }}>
-              참가 신청
-            </div>
-            <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 20, fontWeight: 400, color: "var(--ink)", marginBottom: 6 }}>
-              {club.title}
-            </h3>
-            <p style={{ fontSize: 13.5, color: "var(--muted)", marginBottom: 28, lineHeight: 1.6 }}>
-              {club.schedule} · {club.location}
-            </p>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
-              <input
-                value={applicantName}
-                onChange={(e) => setApplicantName(e.target.value)}
-                placeholder="이름 *"
-                disabled={joinStep === "submitting"}
-                style={{ padding: "12px 16px", borderRadius: 10, border: "1px solid var(--line)", fontSize: 14, outline: "none", background: "rgba(255,255,255,0.6)", boxSizing: "border-box", width: "100%" }}
-              />
-              <input
-                value={applicantEmail}
-                onChange={(e) => setApplicantEmail(e.target.value)}
-                placeholder="이메일 * (확인 메일 발송)"
-                type="email"
-                disabled={joinStep === "submitting"}
-                style={{ padding: "12px 16px", borderRadius: 10, border: "1px solid var(--line)", fontSize: 14, outline: "none", background: "rgba(255,255,255,0.6)", boxSizing: "border-box", width: "100%" }}
-              />
-              <textarea
-                value={applicantMsg}
-                onChange={(e) => setApplicantMsg(e.target.value)}
-                placeholder="간단한 자기소개 (선택)"
-                rows={2}
-                disabled={joinStep === "submitting"}
-                style={{ padding: "12px 16px", borderRadius: 10, border: "1px solid var(--line)", fontSize: 14, outline: "none", background: "rgba(255,255,255,0.6)", resize: "none", boxSizing: "border-box", width: "100%", fontFamily: "inherit" }}
-              />
-              {joinError && <p style={{ fontSize: 13, color: "#EF4444" }}>{joinError}</p>}
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <button
-                onClick={handleSubmitJoin}
-                disabled={joinStep === "submitting"}
-                style={{
-                  padding: "14px 0", borderRadius: 10,
-                  background: joinStep === "submitting" ? "var(--line-soft)" : bgColor,
-                  color: "white", fontSize: 15, fontWeight: 600, border: "none",
-                  cursor: joinStep === "submitting" ? "not-allowed" : "pointer", width: "100%",
-                }}
-              >
-                {joinStep === "submitting" ? "신청 중…" : "신청 완료하기"}
-              </button>
-              <button
-                onClick={() => setJoinStep("idle")}
-                disabled={joinStep === "submitting"}
-                style={{ padding: "12px 0", borderRadius: 10, background: "transparent", color: "var(--muted)", fontSize: 14, border: "1px solid var(--line)", cursor: "pointer", width: "100%" }}
-              >
-                취소
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 잼잼링크 미설정 안내 */}
       {joinStep === "no-link" && (
@@ -702,6 +657,99 @@ export default function BookClubDetailClient({ club }: { club: any }) {
             }}>
               마이페이지 확인
             </Link>
+          </div>
+        </div>
+      )}
+
+      {/* ── 어드민 편집 패널 ── */}
+      {isAdmin && editOpen && (
+        <div style={{ position:"fixed", inset:0, zIndex:500, background:"rgba(20,24,31,0.7)", backdropFilter:"blur(6px)", display:"flex", alignItems:"flex-start", justifyContent:"flex-end" }}
+          onClick={() => setEditOpen(false)}>
+          <div style={{ width:"min(460px,100vw)", height:"100vh", background:"var(--bg)", overflowY:"auto", padding:"24px 28px", boxShadow:"-16px 0 40px rgba(0,0,0,0.3)" }}
+            onClick={(e) => e.stopPropagation()}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
+              <h2 style={{ fontFamily:"var(--font-noto-serif-kr), Georgia, serif", fontSize:18, fontWeight:500, color:"var(--ink)", margin:0 }}>
+                북토크 정보 편집
+              </h2>
+              <button onClick={() => setEditOpen(false)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:18, color:"var(--muted)" }}>✕</button>
+            </div>
+
+            {[
+              { label:"제목", key:"title", placeholder:"예: 다정함의 발명 북토크", type:"text" },
+              { label:"일시", key:"schedule", placeholder:"예: 2026년 7월 5일 (토) 오후 3시 – 5시 30분", type:"text" },
+              { label:"장소", key:"location", placeholder:"예: 서울 서초구 교대역 인근", type:"text" },
+              { label:"진행자", key:"host_name", placeholder:"예: 정해린", type:"text" },
+            ].map(({ label, key, placeholder, type }) => (
+              <div key={key} style={{ marginBottom:16 }}>
+                <label style={{ display:"block", fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"var(--muted)", marginBottom:6 }}>{label}</label>
+                <input
+                  type={type}
+                  value={(editForm as any)[key]}
+                  onChange={(e) => setEditForm((f) => ({ ...f, [key]: e.target.value }))}
+                  placeholder={placeholder}
+                  style={{ width:"100%", padding:"10px 14px", borderRadius:10, fontSize:14, border:"1px solid var(--line-soft)", background:"rgba(255,255,255,0.7)", color:"var(--ink)", outline:"none", boxSizing:"border-box" }}
+                />
+              </div>
+            ))}
+
+            <div style={{ marginBottom:16 }}>
+              <label style={{ display:"block", fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"var(--muted)", marginBottom:6 }}>세부내용</label>
+              <textarea
+                rows={4}
+                value={editForm.description}
+                onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
+                placeholder="이 북클럽에 대해 소개해주세요."
+                style={{ width:"100%", padding:"10px 14px", borderRadius:10, fontSize:14, border:"1px solid var(--line-soft)", background:"rgba(255,255,255,0.7)", color:"var(--ink)", outline:"none", resize:"vertical", boxSizing:"border-box", fontFamily:"var(--font-noto-serif-kr), Georgia, serif" }}
+              />
+            </div>
+
+            <div style={{ marginBottom:24 }}>
+              <label style={{ display:"block", fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"var(--muted)", marginBottom:6 }}>
+                참여 신청 링크 (잼잼)
+                {editForm.join_url && <span style={{ color:"var(--accent)", marginLeft:8, fontWeight:600 }}>✓ 연결됨</span>}
+              </label>
+              <input
+                type="url"
+                value={editForm.join_url}
+                onChange={(e) => setEditForm((f) => ({ ...f, join_url: e.target.value }))}
+                placeholder="잼잼 링크 붙여넣기 — 사용자에게 URL 비공개"
+                style={{ width:"100%", padding:"10px 14px", borderRadius:10, fontSize:14, border:"1px solid var(--line-soft)", background:"rgba(255,255,255,0.7)", color:"var(--ink)", outline:"none", boxSizing:"border-box" }}
+                onPaste={async (e) => {
+                  const pasted = e.clipboardData.getData("text").trim();
+                  if (!pasted.startsWith("http")) return;
+                  setEditForm((f) => ({ ...f, join_url: pasted }));
+                  // 붙여넣기 즉시 저장
+                  try {
+                    await fetch(`/api/book-clubs/${club.slug}`, {
+                      method:"PATCH", headers:{"Content-Type":"application/json"},
+                      body: JSON.stringify({ join_url: pasted, title: club.title, color: club.color }),
+                    });
+                    setSaveMsg("✓ 링크 저장됐어요!");
+                    setTimeout(() => setSaveMsg(""), 2500);
+                  } catch { /* local */ }
+                }}
+              />
+              {editForm.join_url && (
+                <div style={{ marginTop:4, fontSize:11, color:"var(--muted)" }}>
+                  → "참여 신청하기" 버튼 클릭 시 이 링크로 연결됩니다. URL은 사용자에게 노출되지 않습니다.
+                </div>
+              )}
+            </div>
+
+            {saveMsg && (
+              <div style={{ marginBottom:12, padding:"9px 14px", borderRadius:8, background: saveMsg.startsWith("✓") ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", border:`1px solid ${saveMsg.startsWith("✓") ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`, fontSize:13, color: saveMsg.startsWith("✓") ? "#10B981" : "#EF4444" }}>
+                {saveMsg}
+              </div>
+            )}
+
+            <div style={{ display:"flex", gap:10 }}>
+              <button onClick={() => setEditOpen(false)} style={{ flex:1, padding:"11px 0", borderRadius:10, fontSize:14, background:"none", border:"1px solid var(--line)", color:"var(--muted)", cursor:"pointer" }}>
+                취소
+              </button>
+              <button onClick={handleSave} disabled={saving} style={{ flex:2, padding:"11px 0", borderRadius:10, fontSize:14, fontWeight:600, background:"var(--ink)", color:"var(--cream-on-dark)", border:"none", cursor:"pointer", opacity: saving ? 0.7 : 1 }}>
+                {saving ? "저장 중…" : "저장 · 업데이트"}
+              </button>
+            </div>
           </div>
         </div>
       )}

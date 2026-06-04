@@ -112,19 +112,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "junginaha@gmail.com,kimjungin@quesapience.com").split(",");
+
 export default async function BookClubDetailPage({ params }: Props) {
   const { slug: rawSlug } = await params;
   const slug = decodeURIComponent(rawSlug);
   let club: any = null;
 
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const isAdmin = user && ADMIN_EMAILS.includes(user.email ?? "");
+
   try {
-    const supabase = await createClient();
-    const { data } = await supabase
+    const { createServiceClient } = await import("@/lib/supabase/server");
+    const db = createServiceClient() as any;
+    const { data } = await db
       .from("landing_book_clubs")
       .select("*")
       .eq("slug", slug)
-      .single();
-    if (data) club = data;
+      .maybeSingle();
+    if (data) {
+      // 비관리자에게는 join_url 숨김 (has_join_url 플래그만 전달)
+      if (!isAdmin && data.join_url) {
+        const { join_url, ...rest } = data;
+        void join_url;
+        club = { ...rest, has_join_url: true };
+      } else {
+        club = data;
+      }
+    }
   } catch { /* fallback */ }
 
   if (!club) club = STATIC_CLUBS[slug] ?? null;
@@ -148,7 +164,7 @@ export default async function BookClubDetailPage({ params }: Props) {
       <JsonLd data={crumbLd} />
 
       <Header />
-      <BookClubDetailClient club={club} />
+      <BookClubDetailClient club={club} isAdmin={!!isAdmin} />
       <Footer />
     </div>
   );
