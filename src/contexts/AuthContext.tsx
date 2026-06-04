@@ -14,10 +14,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = createClient();
 
     async function syncUser(userId: string, email: string, meta: Record<string, string>) {
-      // profiles 테이블에서 이름/아바타 조회
+      // profiles 테이블에서 전체 프로필 조회
       const { data: profile } = await (supabase as any)
         .from("profiles")
-        .select("name, avatar_url")
+        .select("name, avatar_url, bio, joined_at, session_count")
         .eq("id", userId)
         .single();
 
@@ -26,6 +26,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         name: profile?.name ?? meta?.name ?? email.split("@")[0],
         avatar_url: profile?.avatar_url ?? undefined,
+        bio: profile?.bio ?? undefined,
+        joined_at: profile?.joined_at ?? new Date().toISOString(),
+        session_count: profile?.session_count ?? 0,
       });
     }
 

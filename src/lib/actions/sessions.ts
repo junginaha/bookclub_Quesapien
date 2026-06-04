@@ -30,15 +30,34 @@ export async function joinSessionAction(sessionId: string) {
 
   if (existing) return { error: "이미 참여 중인 모임입니다." };
 
-  const { error } = await db
+  const { error: insertErr } = await db
     .from("session_participants")
     .insert({ session_id: sessionId, user_id: user.id });
 
-  if (error) return { error: "참여 신청에 실패했습니다." };
+  if (insertErr) return { error: "참여 신청에 실패했습니다." };
+
+  // sessions.current_participants +1
+  await db
+    .from("sessions")
+    .update({ current_participants: session.current_participants + 1 })
+    .eq("id", sessionId);
+
+  // profiles.session_count +1
+  const { data: prof } = await db
+    .from("profiles")
+    .select("session_count")
+    .eq("id", user.id)
+    .single();
+  if (prof != null) {
+    await db
+      .from("profiles")
+      .update({ session_count: (prof.session_count ?? 0) + 1 })
+      .eq("id", user.id);
+  }
 
   revalidatePath(`/questions/[id]`, "page");
   revalidatePath("/mypage");
-  return { success: "모임 참여가 완료되었습니다!" };
+  return { success: "모임에 참여했어요! 마이페이지에서 확인하세요." };
 }
 
 export async function leaveSessionAction(sessionId: string) {
@@ -49,15 +68,41 @@ export async function leaveSessionAction(sessionId: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
 
-  const { error } = await db
+  const { error: deleteErr } = await db
     .from("session_participants")
     .delete()
     .eq("session_id", sessionId)
     .eq("user_id", user.id);
 
-  if (error) return { error: "취소에 실패했습니다." };
+  if (deleteErr) return { error: "참여 취소에 실패했습니다." };
+
+  // sessions.current_participants -1 (min 0)
+  const { data: sess } = await db
+    .from("sessions")
+    .select("current_participants")
+    .eq("id", sessionId)
+    .single();
+  if (sess && sess.current_participants > 0) {
+    await db
+      .from("sessions")
+      .update({ current_participants: sess.current_participants - 1 })
+      .eq("id", sessionId);
+  }
+
+  // profiles.session_count -1 (min 0)
+  const { data: prof } = await db
+    .from("profiles")
+    .select("session_count")
+    .eq("id", user.id)
+    .single();
+  if (prof && prof.session_count > 0) {
+    await db
+      .from("profiles")
+      .update({ session_count: prof.session_count - 1 })
+      .eq("id", user.id);
+  }
 
   revalidatePath(`/questions/[id]`, "page");
   revalidatePath("/mypage");
-  return { success: "모임 참여가 취소되었습니다." };
+  return { success: "참여가 취소됐어요." };
 }

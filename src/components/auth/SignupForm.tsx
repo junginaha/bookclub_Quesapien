@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -34,6 +34,8 @@ export default function SignupForm() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") ?? "/";
 
   const pwStrength = !password ? null
     : password.length < 6 ? "weak"
@@ -72,7 +74,7 @@ export default function SignupForm() {
         email: email.trim().toLowerCase(), password,
       });
       if (loginErr) { setError("가입은 됐어요. 이제 로그인해주세요."); router.push("/login"); return; }
-      router.push("/");
+      router.push(next.startsWith("/") ? next : "/");
       router.refresh();
     } catch {
       setError("가입 중 오류가 발생했어요.");

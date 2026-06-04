@@ -34,6 +34,7 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackError = searchParams.get("error");
+  const next = searchParams.get("next") ?? "/";
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
@@ -64,7 +65,9 @@ export default function LoginForm() {
         }
         return;
       }
-      router.push("/"); router.refresh();
+      // next 파라미터가 있으면 해당 페이지로, 없으면 홈으로
+      router.push(next.startsWith("/") ? next : "/");
+      router.refresh();
     } catch {
       setError("로그인 중 오류가 발생했어요.");
     } finally {
