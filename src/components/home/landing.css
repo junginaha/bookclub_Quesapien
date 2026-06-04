@@ -521,98 +521,207 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-section-title-link .lp-h-section { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
 .lp-section-title-link:hover .lp-h-section { transform: translateX(4px); }
 
-/* ── SPARKLE NEARBY BUTTON ── */
-.lp-nearby-spark-wrap {
-  position: relative;
-  display: inline-flex;
+/* ── NEARBY DISCOVER CARD (idle state) ── */
+.lnd-card {
+  display: flex;
   align-items: center;
-}
-
-.lp-nearby-spark-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 28px;
-  background: linear-gradient(135deg, var(--lp-accent) 0%, var(--lp-gold) 60%, #C8975A 100%);
-  color: rgba(255,255,255,0.95);
-  border: none;
-  border-radius: 9999px;
+  gap: 24px;
+  width: 100%;
+  padding: 26px 32px;
+  background: linear-gradient(110deg, #14181F 0%, #1A2030 40%, #1E2840 100%);
+  border: 1px solid rgba(176,138,74,0.22);
+  border-radius: 14px;
   cursor: pointer;
-  font-size: 14.5px;
-  font-weight: 500;
-  font-family: var(--lp-serif-ko);
-  letter-spacing: -0.005em;
-  overflow: visible;
-  transition: transform 0.3s cubic-bezier(.2,.8,.2,1), box-shadow 0.3s ease;
-  animation: lp-nearbyGlow 2.4s ease-in-out infinite;
-  z-index: 1;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(.2,.8,.2,1), box-shadow 0.4s ease, border-color 0.4s;
+  animation: lnd-breathe 3.8s ease-in-out infinite;
 }
-.lp-nearby-spark-btn:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 16px 48px -12px rgba(94,70,50,0.55), 0 0 32px rgba(176,138,74,0.4);
+.lnd-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(176,138,74,0.45);
+  box-shadow: 0 28px 72px -20px rgba(14,18,26,0.75), 0 0 48px -12px rgba(176,138,74,0.35);
 }
 
-@keyframes lp-nearbyGlow {
-  0%, 100% { box-shadow: 0 6px 24px -8px rgba(94,70,50,0.4), 0 0 0 0 rgba(176,138,74,0); }
-  50% { box-shadow: 0 10px 36px -8px rgba(94,70,50,0.55), 0 0 28px -4px rgba(176,138,74,0.35); }
+/* shimmer 오버레이 */
+.lnd-shimmer {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 25%, rgba(221,190,133,0.07) 48%, transparent 68%);
+  background-size: 300% 100%;
+  animation: lp-btnShimmer 6s ease-in-out 0.8s infinite;
 }
 
-/* 펄스 링 */
-.lp-spark-ring {
+/* 앰비언트 warm glow */
+.lnd-card::before {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 90% at 8% 50%, rgba(176,138,74,0.13), transparent 65%),
+    radial-gradient(ellipse 40% 60% at 92% 50%, rgba(94,70,50,0.1), transparent 65%);
+}
+
+@keyframes lnd-breathe {
+  0%, 100% { box-shadow: 0 8px 32px -8px rgba(14,18,26,0.55), 0 0 0 0 rgba(176,138,74,0); }
+  50%       { box-shadow: 0 16px 52px -8px rgba(14,18,26,0.7), 0 0 40px -14px rgba(176,138,74,0.28); }
+}
+
+/* ── 위치 레이더 비주얼 ── */
+.lnd-visual {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* 레이더 링 */
+.lnd-ring {
   position: absolute;
-  inset: -3px;
-  border-radius: 9999px;
-  border: 1.5px solid rgba(176,138,74,0.5);
-  animation: lp-sparkRing 2.4s ease-out infinite;
-  pointer-events: none;
+  border-radius: 50%;
+  border: 1.5px solid rgba(176,138,74,0.55);
+  animation: lnd-expand 2.8s ease-out infinite;
+  width: 30px; height: 30px;
 }
-.lp-spark-ring-2 {
-  animation-delay: 1.2s;
-  border-color: rgba(94,70,50,0.3);
-}
-@keyframes lp-sparkRing {
-  0%  { transform: scale(1);   opacity: 0.9; }
-  100%{ transform: scale(1.55); opacity: 0;   }
+.lnd-r1 { animation-delay: 0s; }
+.lnd-r2 { animation-delay: 0.93s; }
+.lnd-r3 { animation-delay: 1.86s; }
+
+@keyframes lnd-expand {
+  0%   { width: 30px; height: 30px; opacity: 0.9; border-color: rgba(176,138,74,0.7); }
+  70%  { border-color: rgba(176,138,74,0.2); }
+  100% { width: 80px; height: 80px; opacity: 0; }
 }
 
-/* 파티클 ✦ 반짝 */
-.lp-spark {
-  position: absolute;
-  font-size: 11px;
+/* 핀 아이콘 */
+.lnd-pin {
+  position: relative;
+  z-index: 3;
   color: var(--lp-gold);
-  pointer-events: none;
-  animation: lp-sparkFloat 3s ease-in-out infinite;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  filter: drop-shadow(0 2px 8px rgba(176,138,74,0.55));
+  animation: lnd-pinFloat 2.8s ease-in-out infinite;
+}
+.lnd-pin svg { width: 28px; height: 35px; }
+
+.lnd-pin-shadow {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px; height: 4px;
+  background: radial-gradient(ellipse, rgba(176,138,74,0.55), transparent 70%);
+  border-radius: 50%;
+  animation: lnd-pinShadow 2.8s ease-in-out infinite;
+}
+
+@keyframes lnd-pinFloat {
+  0%, 100% { transform: translateY(0);    filter: drop-shadow(0 2px 8px rgba(176,138,74,0.5)); }
+  50%       { transform: translateY(-6px); filter: drop-shadow(0 8px 16px rgba(176,138,74,0.7)); }
+}
+@keyframes lnd-pinShadow {
+  0%, 100% { opacity: 0.65; transform: translateX(-50%) scaleX(1);    }
+  50%       { opacity: 0.3;  transform: translateX(-50%) scaleX(0.45); }
+}
+
+/* ── 텍스트 영역 ── */
+.lnd-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  z-index: 2;
+}
+.lnd-eyebrow {
   font-family: var(--lp-serif);
+  font-size: 10.5px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--lp-gold);
+  opacity: 0.8;
+  display: block;
 }
-.lp-spark-1 { top: -10px; left: 18px;  animation-delay: 0s;    font-size: 10px; }
-.lp-spark-2 { top: -6px;  right: 22px; animation-delay: 0.8s;  font-size: 8px;  }
-.lp-spark-3 { bottom: -8px; left: 30px;  animation-delay: 1.6s;  font-size: 14px; color: var(--lp-accent); opacity: 0.5; }
-.lp-spark-4 { bottom: -6px; right: 16px; animation-delay: 2.4s;  font-size: 9px;  }
-
-@keyframes lp-sparkFloat {
-  0%, 100% { transform: translateY(0) scale(1);   opacity: 0; }
-  20%       { opacity: 0.9; }
-  50%       { transform: translateY(-8px) scale(1.2); opacity: 1; }
-  80%       { opacity: 0.6; }
+.lnd-title {
+  font-family: var(--lp-serif-ko);
+  font-size: clamp(16px, 2vw, 21px);
+  font-weight: 600;
+  color: var(--lp-cream);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  display: block;
+  margin-top: 2px;
+}
+.lnd-desc {
+  font-family: var(--lp-serif-ko);
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(236,227,207,0.55);
+  display: block;
+  margin-top: 3px;
+  line-height: 1.5;
 }
 
-.lp-spark-pin { color: rgba(255,255,255,0.9); }
+/* ── 화살표 원 ── */
+.lnd-arrow-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(176,138,74,0.35);
+  background: rgba(176,138,74,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(176,138,74,0.85);
+  flex-shrink: 0;
+  transition: transform 0.4s cubic-bezier(.2,.8,.2,1), border-color 0.35s, background 0.35s;
+  position: relative;
+  z-index: 2;
+}
+.lnd-arrow-circle svg {
+  width: 18px; height: 18px;
+  transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+}
+.lnd-card:hover .lnd-arrow-circle {
+  background: rgba(176,138,74,0.18);
+  border-color: rgba(176,138,74,0.7);
+  transform: translateX(3px);
+}
+.lnd-card:hover .lnd-arrow-circle svg { transform: translateX(2px); }
+
+/* 모바일 */
+@media (max-width: 600px) {
+  .lnd-card { padding: 20px 20px; gap: 16px; }
+  .lnd-desc { display: none; }
+  .lnd-title { font-size: 15px; }
+  .lnd-visual { width: 58px; height: 58px; }
+  .lnd-arrow-circle { width: 36px; height: 36px; }
+  .lnd-arrow-circle svg { width: 15px; height: 15px; }
+}
 
 /* ── NEARBY ROW — 내 근처 북클럽 (books 섹션 상단) ── */
 .lp-nearby-row {
   max-width: var(--lp-max);
   margin: 0 auto clamp(40px, 5vw, 64px);
-  padding: 20px 28px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(244,239,229,0.5));
-  border: 1px solid var(--lp-line-soft);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 }
-.lp-nearby-row .lp-nearby-trigger { margin-bottom: 0; }
-.lp-nearby-row .lp-nearby-panel { margin-bottom: 0; border: none; background: transparent; box-shadow: none; }
-.lp-nearby-row .lp-nearby-header { background: transparent; padding-left: 0; padding-right: 0; }
+/* 로딩/거부 상태: 간단한 컨테이너 */
+.lp-nearby-row .lp-nearby-trigger {
+  margin-bottom: 0;
+  padding: 18px 24px;
+  border-radius: 12px;
+  background: rgba(244,239,229,0.6);
+  border: 1px solid var(--lp-line-soft);
+}
+/* found 패널 상태: 자체 스타일 그대로 */
+.lp-nearby-row .lp-nearby-panel { margin-bottom: 0; }
+.lp-nearby-row .lp-nearby-header { background: rgba(255,255,255,0.35); }
 .lp-nearby-row .lp-nearby-item:first-child { border-top: 1px solid rgba(229,221,203,0.5); }
 
 /* ── BOOK COVER GENRE LABEL ── */

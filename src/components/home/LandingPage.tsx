@@ -159,24 +159,37 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
 
   if (status === "idle") {
     return (
-      <div className="lp-nearby-spark-wrap">
-        {/* 반짝 파티클 */}
-        <span className="lp-spark lp-spark-1" aria-hidden="true">✦</span>
-        <span className="lp-spark lp-spark-2" aria-hidden="true">✦</span>
-        <span className="lp-spark lp-spark-3" aria-hidden="true">·</span>
-        <span className="lp-spark lp-spark-4" aria-hidden="true">✦</span>
-        <button className="lp-nearby-spark-btn" onClick={detect}>
-          {/* 펄스 링 */}
-          <span className="lp-spark-ring lp-spark-ring-1" aria-hidden="true" />
-          <span className="lp-spark-ring lp-spark-ring-2" aria-hidden="true" />
-          <span className="lp-nearby-pin-icon lp-spark-pin" aria-hidden="true">
-            <svg width="13" height="16" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M7.5 0C3.36 0 0 3.36 0 7.5C0 13.125 7.5 18 7.5 18C7.5 18 15 13.125 15 7.5C15 3.36 11.64 0 7.5 0ZM7.5 10.125C6.045 10.125 4.875 8.955 4.875 7.5C4.875 6.045 6.045 4.875 7.5 4.875C8.955 4.875 10.125 6.045 10.125 7.5C10.125 8.955 8.955 10.125 7.5 10.125Z" fill="currentColor"/>
+      <button className="lnd-card" onClick={detect} type="button" aria-label="가까운 북클럽 찾기">
+        {/* 앰비언트 shimmer */}
+        <span className="lnd-shimmer" aria-hidden="true" />
+
+        {/* 위치 레이더 비주얼 */}
+        <div className="lnd-visual" aria-hidden="true">
+          <span className="lnd-ring lnd-r1" />
+          <span className="lnd-ring lnd-r2" />
+          <span className="lnd-ring lnd-r3" />
+          <div className="lnd-pin">
+            <svg viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 0C5.373 0 0 5.373 0 12C0 20.25 12 30 12 30C12 30 24 20.25 24 12C24 5.373 18.627 0 12 0ZM12 16.5C9.515 16.5 7.5 14.485 7.5 12C7.5 9.515 9.515 7.5 12 7.5C14.485 7.5 16.5 9.515 16.5 12C16.5 14.485 14.485 16.5 12 16.5Z" fill="currentColor"/>
             </svg>
-          </span>
-          <span>근처에 북클럽이 있어요</span>
-        </button>
-      </div>
+            <span className="lnd-pin-shadow" />
+          </div>
+        </div>
+
+        {/* 텍스트 */}
+        <div className="lnd-text">
+          <span className="lnd-eyebrow">내 위치 기반</span>
+          <span className="lnd-title">가까운 북클럽 찾기</span>
+          <span className="lnd-desc">지금 이 순간, 주변에서 열리는 북클럽을 찾아드릴게요.</span>
+        </div>
+
+        {/* CTA 화살표 */}
+        <div className="lnd-arrow-circle" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </button>
     );
   }
 
