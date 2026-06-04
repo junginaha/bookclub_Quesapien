@@ -1195,7 +1195,11 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
       {/* FOOTER */}
       <footer className="lp-footer">
         <div className="lp-foot-inner">
-          <div className="lp-foot-mark"><span className="lp-em">—</span>질문하는 사람들 · 미래혁신형 북클럽</div>
+          <a href="/" className="lp-foot-mark" style={{ textDecoration: "none", transition: "opacity .2s" }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
+            <span className="lp-em">—</span>질문하는 사람들 · 미래혁신형 북클럽
+          </a>
           <div className="lp-foot-links">
             <a href="/questions">질문</a>
             <a href="/bookclub">북클럽</a>

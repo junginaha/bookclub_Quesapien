@@ -48,7 +48,9 @@ export default function Footer() {
 
           {/* Brand */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, textDecoration: "none", transition: "opacity .2s" }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.75")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
               <div style={{ display: "flex", gap: 1, fontSize: 20 }}>
                 <span style={{ color: "var(--accent)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>?</span>
                 <span style={{ color: "rgba(255,255,255,0.8)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>!</span>
@@ -56,7 +58,7 @@ export default function Footer() {
               <span style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 13.5, fontWeight: 500, color: "rgba(255,255,255,0.7)", letterSpacing: "0.03em" }}>
                 질문하는 사람들
               </span>
-            </div>
+            </Link>
             <p style={{ fontSize: 13.5, color: "rgba(163,154,140,0.7)", lineHeight: 1.8, maxWidth: 280 }}>
               질문으로 연결되는 지적 커뮤니티.<br />
               서초구 선정 미래혁신형 북클럽.
@@ -124,7 +126,7 @@ export default function Footer() {
             gap: 12,
           }}>
             <p style={{ fontSize: 12, color: "rgba(163,154,140,0.4)" }}>
-              © 2026 질문하는 사람들 · Quesapience. All rights reserved.
+              © 2026 <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>질문하는 사람들 · Quesapience</Link>. All rights reserved.
             </p>
             <p style={{ fontSize: 12, color: "rgba(163,154,140,0.3)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>
               <span aria-hidden="true" style={{ position: "absolute", opacity: 0, pointerEvents: "none", fontSize: 0 }}>질문 → 책 → 대화 → 사람 → 성장</span>
