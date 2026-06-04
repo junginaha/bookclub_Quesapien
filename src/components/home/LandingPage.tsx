@@ -810,10 +810,6 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
                   <span>질문 주고 받기</span>
                   <span className="lp-arrow" />
                 </a>
-                <a href="/questions" className="lp-btn-outline" style={{ fontSize: 13.5 }}>
-                  <span>질문 탐색하기</span>
-                  <span className="lp-arrow" />
-                </a>
               </div>
               <span className="lp-cta-note">— 생각보다 따뜻합니다.</span>
             </div>
@@ -845,67 +841,32 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
-      {/* ② 질문 주고 받기 — ASK 폼 (hero 바로 다음, 고정) */}
+      {/* ② 질문 주고 받기 — 다음 단계 링크 (hero 바로 다음, 고정) */}
       <section className="lp-section lp-question-hub" id="questions">
         <div className="lp-ask-inner">
           <h3 className="lp-h-section" style={{ fontSize: "clamp(22px, 3vw, 32px)", marginBottom: 16 }}>
             당신 마음속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.
           </h3>
-          <p className="lp-lede" style={{ marginBottom: 32 }}>
+          <p className="lp-lede" style={{ marginBottom: 40 }}>
             부끄러운 질문일수록 환영해요.
           </p>
-
-          {askStatus === "sent" ? (
-            <div className="lp-ask-success">
-              <div className="lp-ask-success-icon">?</div>
-              <p>질문이 잘 전달됐어요.</p>
-              <span>누군가의 마음에 닿을 거예요.</span>
-            </div>
-          ) : (
-            <form onSubmit={handleAskSubmit}>
-              <div className="lp-ask-field" id="askField">
-                <span className="af-pen">― 당신의 질문</span>
-                <textarea
-                  placeholder="마음속에 오래 담아두셨던 질문이 있으신가요?"
-                  rows={3}
-                  spellCheck={false}
-                  aria-label="질문 입력"
-                  value={askContent}
-                  onChange={(e) => setAskContent(e.target.value)}
-                  required
-                  minLength={5}
-                />
-                <span className="lp-sparkle s1" />
-                <span className="lp-sparkle s2" />
-                <span className="lp-sparkle s3" />
-              </div>
-              <div className="lp-ask-name-row">
-                <input
-                  className="lp-ask-name"
-                  type="text"
-                  placeholder="닉네임 (익명도 괜찮아요)"
-                  value={askAuthor}
-                  onChange={(e) => setAskAuthor(e.target.value)}
-                  maxLength={20}
-                />
-              </div>
-              <div className="lp-ask-actions">
-                <span className="aa-hint">
-                  {askStatus === "error"
-                    ? "— 잠시 후 다시 눌러주세요."
-                    : "— 좋은 질문은 누군가를 살립니다."}
-                </span>
-                <button
-                  className="lp-btn-cream"
-                  type="submit"
-                  disabled={askStatus === "sending" || askContent.trim().length < 5}
-                >
-                  <span>{askStatus === "sending" ? "전송 중…" : "질문 남겨보기"}</span>
-                  <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
-                </button>
-              </div>
-            </form>
-          )}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
+            <a href="/questions" className="lp-btn-cream">
+              <span>질문 남겨보기</span>
+              <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
+            </a>
+            <a href="/questions" style={{
+              fontFamily: "var(--lp-serif)", fontSize: 13.5, letterSpacing: "0.04em",
+              color: "var(--lp-accent)", textDecoration: "none", opacity: 0.8,
+              display: "inline-flex", alignItems: "center", gap: 6,
+              transition: "opacity .2s",
+            }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.8")}
+            >
+              질문 탐색하기 →
+            </a>
+          </div>
         </div>
       </section>
 
