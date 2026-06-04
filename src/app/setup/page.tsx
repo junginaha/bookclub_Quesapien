@@ -68,14 +68,16 @@ export default function SetupPage() {
   const handleDedup = async () => {
     setDedupStatus("loading"); setDedupMsg("");
     try {
-      const [r1, r2] = await Promise.all([
-        fetch("/api/admin", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({action:"dedup_answers", id:"_"}) }),
-        fetch("/api/admin", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({action:"dedup_questions", id:"_"}) }),
-      ]);
-      const d1 = await r1.json() as { deleted?: number; error?: string };
-      const d2 = await r2.json() as { deleted?: number; error?: string };
-      if (d1.error || d2.error) { setDedupStatus("error"); setDedupMsg(d1.error ?? d2.error ?? "실패"); return; }
-      setDedupStatus("done"); setDedupMsg(`중복 답변 ${d1.deleted}개, 중복 질문 ${d2.deleted}개 삭제됐어요.`);
+      // /api/admin/cleanup POST — 서비스 롤, 인증 불필요
+      const res = await fetch("/api/admin/cleanup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json() as { ok?: boolean; message?: string; answersDeleted?: number; questionsDeleted?: number; error?: string };
+      if (!res.ok || data.error) { setDedupStatus("error"); setDedupMsg(data.error ?? "실패"); return; }
+      setDedupStatus("done");
+      setDedupMsg(data.message ?? `중복 답변 ${data.answersDeleted}개, 중복 질문 ${data.questionsDeleted}개 삭제됐어요.`);
     } catch { setDedupStatus("error"); setDedupMsg("네트워크 오류"); }
   };
 
