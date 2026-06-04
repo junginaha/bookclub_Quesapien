@@ -142,6 +142,8 @@ export default function BookDetailModal({ book, onClose }: Props) {
     setSaving(true);
     const allDates = buildDates(rows, deadline);
     const update = {
+      title:           detail.title,   // upsert 시 행 생성에 필요
+      color:           detail.color,
       schedule:        form.schedule,
       location:        form.location,
       location_url:    form.locationUrl,
@@ -199,7 +201,8 @@ export default function BookDetailModal({ book, onClose }: Props) {
       await fetch(`/api/book-clubs/${detail.slug}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ join_url: u }),
+        // title·color 포함 → 행 없으면 자동 생성
+        body: JSON.stringify({ join_url: u, title: detail.title, color: detail.color }),
       });
     } catch { /* local only */ }
     const merged = { ...detail, joinUrl: u };
@@ -378,7 +381,7 @@ export default function BookDetailModal({ book, onClose }: Props) {
                               await fetch(`/api/book-clubs/${detail.slug}`, {
                                 method: "PATCH",
                                 headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ join_url: pasted }),
+                                body: JSON.stringify({ join_url: pasted, title: detail.title, color: detail.color }),
                               });
                             } catch { /* local fallback */ }
                             const merged = { ...detail, joinUrl: pasted };
@@ -488,11 +491,35 @@ export default function BookDetailModal({ book, onClose }: Props) {
                 placeholder="https://map.kakao.com/..." />
 
               <label className="bdm-label">참여 링크 (URL — 사용자에게 노출 안 됨)</label>
-              <input className="bdm-input" type="url" value={form.joinUrl ?? ""}
+              <input
+                className="bdm-input" type="url" value={form.joinUrl ?? ""}
                 onChange={(e) => setForm((f) => ({ ...f, joinUrl: e.target.value }))}
-                placeholder="https://... (참여 신청 페이지)" />
+                placeholder="https://... 붙여넣으면 자동 저장"
+                onPaste={async (e) => {
+                  // 붙여넣기 시 즉시 DB 저장 (편집 폼 저장 없이도 반영)
+                  const pasted = e.clipboardData.getData("text").trim();
+                  if (!pasted.startsWith("http") || !detail) return;
+                  setForm((f) => ({ ...f, joinUrl: pasted }));
+                  try {
+                    const res = await fetch(`/api/book-clubs/${detail.slug}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        join_url: pasted,
+                        title: detail.title,
+                        color: detail.color,
+                      }),
+                    });
+                    if (res.ok) {
+                      const data = await res.json() as { club: Record<string, unknown> };
+                      setDetail((prev) => prev ? { ...prev, joinUrl: pasted, ...(data.club.join_url !== undefined ? {} : {}) } : prev);
+                      localStorage.setItem(`bc_detail_${detail.slug}`, JSON.stringify({ ...detail, joinUrl: pasted }));
+                    }
+                  } catch { /* local only */ }
+                }}
+              />
               <div style={{ fontSize: 11, color: "var(--muted)", marginTop: -6, marginBottom: 8 }}>
-                ✓ 사용자는 URL이 아닌 "참여 신청하기" 버튼만 볼 수 있습니다.
+                ✓ 붙여넣으면 즉시 저장 · 사용자에게는 "참여 신청하기" 버튼으로만 표시
               </div>
 
               <label className="bdm-label">최대 인원</label>
