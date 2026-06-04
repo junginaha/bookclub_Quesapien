@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     id: string;
     status?: string;
     current?: boolean;
+    content?: string;
   };
   const { action, id } = body;
 
@@ -23,13 +24,15 @@ export async function POST(request: NextRequest) {
   const db = supabase as any;
 
   switch (action) {
+
+    // ── 사용자 ──────────────────────────────────────────────────
     case "delete_user": {
-      // profiles 삭제 → auth.users는 cascade로 삭제됨
       const { error } = await db.from("profiles").delete().eq("id", id);
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
       return NextResponse.json({ ok: true });
     }
 
+    // ── 발제 질문 (questions 테이블) ────────────────────────────
     case "delete_question": {
       const { error } = await db.from("questions").delete().eq("id", id);
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -45,6 +48,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
+    // ── 모임 ────────────────────────────────────────────────────
     case "delete_session": {
       const { error } = await db.from("sessions").delete().eq("id", id);
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -60,12 +64,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
+    // ── 후기 ────────────────────────────────────────────────────
     case "delete_review": {
       const { error } = await db.from("reviews").delete().eq("id", id);
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
       return NextResponse.json({ ok: true });
     }
 
+    // ── 랜딩 질문 (landing_questions 테이블) ────────────────────
     case "approve_landing_question": {
       const { error } = await db
         .from("landing_questions")
@@ -75,12 +81,58 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    case "reject_landing_question": {
+    case "reject_landing_question":
+    case "delete_landing_question": {
+      // 답변·반응도 함께 삭제
+      await db.from("landing_question_answers").delete().eq("question_id", id);
+      await db.from("landing_question_reactions").delete().eq("question_id", id);
       const { error } = await db.from("landing_questions").delete().eq("id", id);
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
       return NextResponse.json({ ok: true });
     }
 
+    case "update_landing_question": {
+      if (!body.content?.trim()) return NextResponse.json({ error: "내용을 입력해주세요." }, { status: 400 });
+      const { error } = await db
+        .from("landing_questions")
+        .update({ content: body.content.trim() })
+        .eq("id", id);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: true });
+    }
+
+    case "toggle_landing_featured": {
+      const { error } = await db
+        .from("landing_questions")
+        .update({ is_featured: !body.current })
+        .eq("id", id);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: true });
+    }
+
+    case "toggle_landing_today": {
+      if (!body.current) {
+        // 기존 today 해제
+        await db.from("landing_questions").update({ is_today: false }).eq("is_today", true);
+      }
+      const { error } = await db
+        .from("landing_questions")
+        .update({ is_today: !body.current })
+        .eq("id", id);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: true });
+    }
+
+    case "toggle_landing_approved": {
+      const { error } = await db
+        .from("landing_questions")
+        .update({ is_approved: !body.current })
+        .eq("id", id);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: true });
+    }
+
+    // ── 북클럽 신청 ─────────────────────────────────────────────
     case "confirm_application": {
       const { error } = await db
         .from("bookclub_applications")

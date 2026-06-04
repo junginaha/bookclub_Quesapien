@@ -19,18 +19,21 @@ export default async function AdminPage() {
     { data: sessions },
     { data: reviews },
     { data: applications },
-    { data: landingQuestions },
+    { data: pendingQuestions },
+    { data: allLandingQuestions },
   ] = await Promise.all([
     db.from("profiles").select("*").order("joined_at", { ascending: false }),
     db.from("questions").select("*, author:profiles(name,email)").order("created_at", { ascending: false }),
     db.from("sessions").select("*, question:questions(title), host:profiles(name)").order("created_at", { ascending: false }),
     db.from("reviews").select("*, author:profiles(name)").order("created_at", { ascending: false }),
-    // bookclub_applications — may not exist yet, graceful fallback
     db.from("bookclub_applications").select("*").order("created_at", { ascending: false }).then(
       (r: any) => r,
       () => ({ data: [] })
     ),
+    // 미승인 질문
     db.from("landing_questions").select("*").eq("is_approved", false).order("created_at", { ascending: false }),
+    // 전체 랜딩 질문
+    db.from("landing_questions").select("*").order("created_at", { ascending: false }).limit(200),
   ]);
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
@@ -41,7 +44,8 @@ export default async function AdminPage() {
       sessions={sessions ?? []}
       reviews={reviews ?? []}
       applications={applications ?? []}
-      landingQuestions={landingQuestions ?? []}
+      landingQuestions={pendingQuestions ?? []}
+      allLandingQuestions={allLandingQuestions ?? []}
       adminEmail={user.email ?? ""}
     />
   );

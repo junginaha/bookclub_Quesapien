@@ -38,11 +38,16 @@ export default function LoginForm() {
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
+    setError("");
     const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
+    const { error: oauthErr } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
+    if (oauthErr) {
+      setError("Google 로그인을 사용할 수 없어요. Supabase 대시보드에서 Google 공급자를 활성화해주세요. 이메일로 로그인해주세요.");
+      setGoogleLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

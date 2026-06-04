@@ -44,11 +44,16 @@ export default function SignupForm() {
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
+    setError("");
     const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
+    const { error: oauthErr } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
+    if (oauthErr) {
+      setError("Google 로그인을 사용할 수 없어요. 이메일로 가입해주세요.");
+      setGoogleLoading(false);
+    }
   };
 
   const handleEmailSignup = async (e: React.FormEvent) => {

@@ -17,7 +17,7 @@ import { formatDate } from "@/lib/utils";
 type Row = any;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-type Tab = "overview" | "users" | "questions" | "sessions" | "reviews" | "applications" | "landing_questions";
+type Tab = "overview" | "users" | "questions" | "sessions" | "reviews" | "applications" | "landing_questions" | "all_landing";
 
 interface Props {
   profiles: Row[];
@@ -26,13 +26,29 @@ interface Props {
   reviews: Row[];
   applications?: Row[];
   landingQuestions?: Row[];
+  allLandingQuestions?: Row[];
   adminEmail: string;
 }
 
-export default function AdminClient({ profiles, questions, sessions, reviews, applications = [], landingQuestions = [], adminEmail }: Props) {
+export default function AdminClient({
+  profiles, questions, sessions, reviews,
+  applications = [], landingQuestions = [],
+  allLandingQuestions = [], adminEmail,
+}: Props) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("overview");
   const [pending, startTransition] = useTransition();
+  // 전체 질문 로컬 상태 (즉시 반영)
+  const [localAll, setLocalAll] = useState<Row[]>(allLandingQuestions);
+  const [editingLQ, setEditingLQ] = useState<string | null>(null);
+  const [editLQContent, setEditLQContent] = useState("");
+  const [lqFilter, setLqFilter] = useState<"all" | "approved" | "pending">("all");
+
+  const filteredLQ = localAll.filter((q) => {
+    if (lqFilter === "approved") return q.is_approved;
+    if (lqFilter === "pending") return !q.is_approved;
+    return true;
+  });
 
   const stats = [
     { label: "가입자", value: profiles.length, icon: Users, color: "bg-blue-50 text-blue-600" },
@@ -40,7 +56,7 @@ export default function AdminClient({ profiles, questions, sessions, reviews, ap
     { label: "모임", value: sessions.length, icon: Calendar, color: "bg-emerald-50 text-emerald-600" },
     { label: "후기", value: reviews.length, icon: MessageSquare, color: "bg-purple-50 text-purple-600" },
     { label: "북클럽 신청", value: applications.length, icon: CheckCircle, color: "bg-emerald-50 text-emerald-600" },
-    { label: "미승인 질문", value: landingQuestions.length, icon: Star, color: "bg-orange-50 text-orange-600" },
+    { label: "전체 질문", value: allLandingQuestions.length, icon: Star, color: "bg-orange-50 text-orange-600" },
   ];
 
   const callAdmin = async (action: string, id: string, extra?: Record<string, unknown>) => {
@@ -64,12 +80,13 @@ export default function AdminClient({ profiles, questions, sessions, reviews, ap
 
   const TABS: { key: Tab; label: string; badge?: number }[] = [
     { key: "overview", label: "대시보드" },
+    { key: "all_landing", label: `질문 전체 (${allLandingQuestions.length})` },
+    { key: "landing_questions", label: "미승인 질문", badge: landingQuestions.length },
     { key: "users", label: `가입자 (${profiles.length})` },
     { key: "questions", label: `발제질문 (${questions.length})` },
     { key: "sessions", label: `모임 (${sessions.length})` },
     { key: "reviews", label: `후기 (${reviews.length})` },
     { key: "applications", label: "북클럽 신청", badge: applications.filter((a) => a.status === "pending").length },
-    { key: "landing_questions", label: "질문 승인", badge: landingQuestions.length },
   ];
 
   return (
@@ -391,7 +408,118 @@ export default function AdminClient({ profiles, questions, sessions, reviews, ap
           </div>
         )}
 
-        {/* ── 랜딩 질문 승인 탭 ── */}
+        {/* ── 전체 랜딩 질문 관리 탭 ── */}
+        {tab === "all_landing" && (
+          <div>
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <h2 className="font-serif text-lg font-semibold text-warm-900">질문 전체 관리 ({filteredLQ.length})</h2>
+              <div className="flex gap-1">
+                {(["all","approved","pending"] as const).map((f) => (
+                  <button key={f} onClick={() => setLqFilter(f)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${lqFilter===f?"bg-warm-900 text-white":"bg-warm-100 text-warm-500 hover:bg-warm-200"}`}>
+                    {f==="all"?"전체":f==="approved"?"승인됨":"미승인"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {filteredLQ.length === 0 ? (
+              <p className="text-center py-12 text-warm-400 text-sm">질문이 없습니다.</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {filteredLQ.map((q) => (
+                  <div key={q.id} className="rounded-xl border border-warm-100 bg-white overflow-hidden">
+                    <div className="p-4">
+                      {editingLQ === q.id ? (
+                        <div className="flex flex-col gap-2">
+                          <textarea
+                            value={editLQContent}
+                            onChange={(e) => setEditLQContent(e.target.value)}
+                            rows={3}
+                            className="w-full border border-warm-200 rounded-lg p-3 text-sm text-warm-900 resize-none outline-none focus:border-warm-400"
+                            autoFocus
+                          />
+                          <div className="flex gap-2">
+                            <Button size="sm" className="gap-1 bg-warm-900 text-white"
+                              onClick={async () => {
+                                const ok = await callAdmin("update_landing_question", q.id, { content: editLQContent });
+                                if (ok) {
+                                  setLocalAll((prev) => prev.map((x) => x.id === q.id ? { ...x, content: editLQContent } : x));
+                                  setEditingLQ(null);
+                                }
+                              }}>
+                              <CheckCircle className="h-3 w-3" /> 저장
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => setEditingLQ(null)}>취소</Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-warm-900 leading-relaxed">{q.content}</p>
+                      )}
+                      <div className="flex items-center gap-3 mt-2 text-xs text-warm-400 flex-wrap">
+                        <span>— {q.author_name}</span>
+                        <span>{formatDate(q.created_at)}</span>
+                        {q.is_today && <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded-full">Today</span>}
+                        {q.is_featured && <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-full">인기</span>}
+                        {q.is_approved ? <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">승인</span>
+                          : <span className="px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full">미승인</span>}
+                        <span className="ml-auto">♡ {q.likes} · 답변 {q.answers_count}</span>
+                      </div>
+                    </div>
+                    <div className="px-4 pb-3 flex flex-wrap gap-1.5 border-t border-warm-50 pt-3">
+                      {/* 수정 */}
+                      <Button size="sm" variant="outline" className="gap-1 h-7 text-xs"
+                        onClick={() => { setEditingLQ(q.id); setEditLQContent(q.content); }}>
+                        ✏️ 수정
+                      </Button>
+                      {/* 승인 토글 */}
+                      <Button size="sm" variant="outline"
+                        className={`gap-1 h-7 text-xs ${q.is_approved ? "text-emerald-600 border-emerald-200" : "text-warm-500"}`}
+                        onClick={async () => {
+                          const ok = await callAdmin("toggle_landing_approved", q.id, { current: q.is_approved });
+                          if (ok) setLocalAll((prev) => prev.map((x) => x.id===q.id ? {...x, is_approved: !x.is_approved} : x));
+                        }}>
+                        <CheckCircle className="h-3 w-3" /> {q.is_approved ? "승인 해제" : "승인"}
+                      </Button>
+                      {/* Today 토글 */}
+                      <Button size="sm" variant="outline"
+                        className={`gap-1 h-7 text-xs ${q.is_today ? "text-amber-600 border-amber-200" : "text-warm-500"}`}
+                        onClick={async () => {
+                          const ok = await callAdmin("toggle_landing_today", q.id, { current: q.is_today });
+                          if (ok) setLocalAll((prev) => {
+                            const next = !q.is_today;
+                            return prev.map((x) => x.id===q.id ? {...x, is_today: next} : {...x, is_today: next ? false : x.is_today});
+                          });
+                        }}>
+                        📅 {q.is_today ? "Today 해제" : "Today 설정"}
+                      </Button>
+                      {/* 인기 토글 */}
+                      <Button size="sm" variant="outline"
+                        className={`gap-1 h-7 text-xs ${q.is_featured ? "text-blue-600 border-blue-200" : "text-warm-500"}`}
+                        onClick={async () => {
+                          const ok = await callAdmin("toggle_landing_featured", q.id, { current: q.is_featured });
+                          if (ok) setLocalAll((prev) => prev.map((x) => x.id===q.id ? {...x, is_featured: !x.is_featured} : x));
+                        }}>
+                        <Star className="h-3 w-3" /> {q.is_featured ? "인기 해제" : "인기"}
+                      </Button>
+                      {/* 삭제 */}
+                      <Button size="sm" variant="outline"
+                        className="gap-1 h-7 text-xs text-red-500 border-red-200 hover:bg-red-50"
+                        onClick={async () => {
+                          if (!confirm("삭제할까요? 모든 답변도 함께 삭제됩니다.")) return;
+                          const ok = await callAdmin("delete_landing_question", q.id);
+                          if (ok) setLocalAll((prev) => prev.filter((x) => x.id !== q.id));
+                        }}>
+                        <Trash2 className="h-3 w-3" /> 삭제
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── 미승인 질문 승인 탭 ── */}
         {tab === "landing_questions" && (
           <div>
             <div className="flex items-center justify-between mb-4">
