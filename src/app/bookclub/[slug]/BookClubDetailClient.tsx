@@ -132,7 +132,19 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                 {/* 어드민 편집 버튼 */}
                 {isAdmin && (
                   <button
-                    onClick={() => setEditOpen(true)}
+                    onClick={() => {
+                      // 편집 열 때마다 현재 club 상태로 폼 초기화
+                      setEditForm({
+                        title:       club.title ?? "",
+                        schedule:    club.schedule ?? "",
+                        description: club.description ?? "",
+                        location:    club.location ?? "",
+                        host_name:   club.host_name ?? "",
+                        join_url:    club.join_url ?? "",
+                      });
+                      setSaveMsg("");
+                      setEditOpen(true);
+                    }}
                     style={{ display:"inline-flex", alignItems:"center", gap:6, marginBottom:16, padding:"6px 14px", borderRadius:8, background:"rgba(255,255,255,0.12)", border:"1px solid rgba(255,255,255,0.25)", color:"rgba(255,255,255,0.8)", fontSize:12.5, cursor:"pointer", transition:"background .2s" }}
                     onMouseEnter={(e)=>(e.currentTarget as HTMLElement).style.background="rgba(255,255,255,0.2)"}
                     onMouseLeave={(e)=>(e.currentTarget as HTMLElement).style.background="rgba(255,255,255,0.12)"}
@@ -708,6 +720,21 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
               />
             </div>
 
+            {/* 참여 링크 (잼잼) */}
+            <div style={{ marginBottom:16 }}>
+              <label style={{ display:"block", fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"var(--muted)", marginBottom:6 }}>
+                참여 링크 (잼잼)
+                {editForm.join_url && <span style={{ color:"var(--accent)", marginLeft:8 }}>✓ 설정됨</span>}
+              </label>
+              <input
+                type="url"
+                value={editForm.join_url}
+                onChange={(e) => setEditForm((f) => ({ ...f, join_url: e.target.value }))}
+                placeholder="잼잼 링크 붙여넣기"
+                style={{ width:"100%", padding:"10px 14px", borderRadius:10, fontSize:14, border:"1px solid var(--line-soft)", background:"rgba(255,255,255,0.7)", color:"var(--ink)", outline:"none", boxSizing:"border-box" }}
+              />
+              <p style={{ fontSize:11, color:"var(--muted)", marginTop:4 }}>저장 버튼을 눌러야 반영됩니다. 사용자에게 URL은 노출되지 않습니다.</p>
+            </div>
 
             {saveMsg && (
               <div style={{ marginBottom:12, padding:"9px 14px", borderRadius:8, background: saveMsg.startsWith("✓") ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", border:`1px solid ${saveMsg.startsWith("✓") ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`, fontSize:13, color: saveMsg.startsWith("✓") ? "#10B981" : "#EF4444" }}>

@@ -528,11 +528,9 @@ export default function BookDetailModal({ book, onClose }: Props) {
               </label>
               <input
                 className="bdm-input" type="url"
-                value={form.joinUrl ? (form.joinUrl.length > 40 ? form.joinUrl.slice(0,38)+"…" : form.joinUrl) : ""}
+                value={form.joinUrl ?? ""}
                 onChange={(e) => setForm((f) => ({ ...f, joinUrl: e.target.value }))}
-                placeholder="참여 링크 붙여넣기 → 자동 저장 · 사용자에게 URL 비공개"
-                onFocus={(e) => { (e.target as HTMLInputElement).value = form.joinUrl ?? ""; }}
-                onBlur={(e) => { if(form.joinUrl && form.joinUrl.length > 40) (e.target as HTMLInputElement).value = form.joinUrl.slice(0,38)+"…"; }}
+                placeholder="잼잼 링크 붙여넣기 · 저장 버튼으로 반영"
                 onPaste={async (e) => {
                   const pasted = e.clipboardData.getData("text").trim();
                   if (!pasted.startsWith("http") || !detail) return;
