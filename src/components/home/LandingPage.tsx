@@ -961,7 +961,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
 
         {/* 북클럽 하단 — 질문 남기기 */}
-        <div style={{ maxWidth: "var(--lp-max)", margin: "clamp(56px,8vw,96px) auto 0", borderTop: "1px solid var(--lp-line-soft)", paddingTop: "clamp(48px,6vw,80px)" }}>
+        <div className="lp-books-ask-card">
           <div className="lp-ask-inner">
             <h3 className="lp-h-section" style={{ fontSize: "clamp(22px, 3vw, 32px)", marginBottom: 16 }}>
               당신 마음속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.

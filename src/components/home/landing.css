@@ -327,6 +327,68 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 
 /* ── BOOKS ── */
 .lp-books { background: var(--lp-bg); }
+
+/* ── 북클럽 하단 질문 카드 ── */
+.lp-books-ask-card {
+  max-width: var(--lp-max);
+  margin: clamp(56px, 8vw, 96px) auto 0;
+  padding: clamp(36px, 5vw, 64px) clamp(28px, 5vw, 64px);
+  background: linear-gradient(135deg, var(--lp-bg-ink) 0%, #1A2030 60%, #1C2640 100%);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 32px 80px -24px rgba(20,24,31,0.6),
+    0 0 0 1px rgba(176,138,74,0.22);
+  color: var(--lp-cream);
+}
+
+/* 골드 앰비언트 하이라이트 */
+.lp-books-ask-card::before {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 75% 55% at 15% 0%, rgba(176,138,74,0.18), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 85% 105%, rgba(94,70,50,0.14), transparent 60%);
+}
+
+/* 제목·본문 색상 override */
+.lp-books-ask-card .lp-h-section { color: var(--lp-cream); }
+.lp-books-ask-card .lp-h-section em {
+  background: linear-gradient(90deg, #DDBE85 0%, var(--lp-gold) 50%, #DDBE85 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.lp-books-ask-card .lp-lede { color: rgba(236,227,207,0.7); }
+
+/* 입력 필드 */
+.lp-books-ask-card .lp-ask-field {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(236,227,207,0.18);
+}
+.lp-books-ask-card .lp-ask-field:focus-within {
+  border-color: rgba(176,138,74,0.6);
+  background: rgba(255,255,255,0.07);
+  box-shadow: 0 0 0 5px rgba(176,138,74,0.1), 0 20px 50px -20px rgba(0,0,0,0.5);
+}
+.lp-books-ask-card .lp-ask-field textarea { color: var(--lp-cream); }
+.lp-books-ask-card .lp-ask-field textarea::placeholder { color: rgba(236,227,207,0.35); }
+.lp-books-ask-card .af-pen { background: var(--lp-bg-ink); color: #DDBE85; }
+.lp-books-ask-card .lp-ask-name {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(236,227,207,0.15);
+  color: var(--lp-cream);
+}
+.lp-books-ask-card .lp-ask-name::placeholder { color: rgba(236,227,207,0.35); font-style: normal; }
+.lp-books-ask-card .lp-ask-name:focus { border-color: rgba(176,138,74,0.5); }
+.lp-books-ask-card .aa-hint { color: rgba(236,227,207,0.55); }
+/* lp-cta-note 생각보다 따뜻합니다 */
+.lp-books-ask-card .lp-cta-note { color: rgba(236,227,207,0.5); }
+/* 성공 상태 */
+.lp-books-ask-card .lp-ask-success p { color: var(--lp-cream); }
+.lp-books-ask-card .lp-ask-success span { color: rgba(236,227,207,0.55); }
 .lp-books-grid { max-width: var(--lp-max); margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
 @media (max-width: 1100px) { .lp-books-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
 @media (max-width: 800px)  { .lp-books-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
