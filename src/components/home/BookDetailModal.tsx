@@ -88,22 +88,24 @@ export default function BookDetailModal({ book, onClose }: Props) {
     try {
       const res = await fetch(`/api/book-clubs/${b.slug}`);
       if (res.ok) {
-        const data = await res.json() as { club: Record<string, unknown> };
+        const data = await res.json() as { club: Record<string, unknown> | null };
+        if (!data.club) return; // DB에 행 없음 — 정적 데이터 그대로 사용
+        const c = data.club;
         const merged: BookClub = {
           ...b,
-          schedule:           data.club.schedule as string,
-          location:           data.club.location as string,
-          locationUrl:        data.club.location_url as string,
-          // 관리자: join_url 직접, 비관리자: has_join_url 플래그로 처리
-          joinUrl: (data.club.join_url as string | undefined)
-            ?? (data.club.has_join_url ? "__hidden__" : undefined),
-          description:        data.club.description as string,
-          hostName:           data.club.host_name as string,
-          hostIntro:          data.club.host_intro as string,
-          maxParticipants:    data.club.max_participants as number,
-          currentParticipants: data.club.current_participants as number,
-          sessionDates:       data.club.session_dates as BookClub["sessionDates"],
-          photo_url:          data.club.photo_url as string,
+          schedule:           c.schedule as string,
+          location:           c.location as string,
+          locationUrl:        c.location_url as string,
+          // 관리자: join_url 직접, 비관리자: has_join_url 플래그
+          joinUrl: (c.join_url as string | undefined)
+            ?? (c.has_join_url ? "__hidden__" : undefined),
+          description:        c.description as string,
+          hostName:           c.host_name as string,
+          hostIntro:          c.host_intro as string,
+          maxParticipants:    c.max_participants as number,
+          currentParticipants: c.current_participants as number,
+          sessionDates:       c.session_dates as BookClub["sessionDates"],
+          photo_url:          c.photo_url as string,
         };
         setDetail(merged);
         localStorage.setItem(key, JSON.stringify(merged));
