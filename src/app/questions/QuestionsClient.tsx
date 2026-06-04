@@ -283,40 +283,41 @@ export default function QuestionsClient({
           <div style={{ display: "flex", flexDirection: "column", gap: "clamp(28px, 4vw, 52px)" }}>
 
             {/* 오늘의 질문 */}
-            {!search && (
+            {!search && !hiddenIds.has(today.id) && (
               <section>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--accent)", animation: "pulse 2s ease-in-out infinite" }} />
-                  <div style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--muted)" }}>
-                    Today&apos;s Question — 오늘의 질문
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--accent)", animation: "pulse 2s ease-in-out infinite" }} />
+                    <div style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--muted)" }}>
+                      Today&apos;s Question — 오늘의 질문
+                    </div>
                   </div>
+                  {isAdmin && (
+                    <button
+                      onClick={async () => {
+                        if (!confirm("오늘의 질문을 삭제할까요?")) return;
+                        const result = await deleteLandingQuestionAction(today.id);
+                        if (result.error) toast.error(result.error as string);
+                        else { setHiddenIds((s) => new Set([...s, today.id])); toast.success("삭제됐어요."); }
+                      }}
+                      style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 12px", borderRadius:8, fontSize:12, background:"none", border:"1px solid rgba(239,68,68,0.3)", color:"#EF4444", cursor:"pointer" }}
+                    >
+                      <Trash2 size={11} /> 삭제
+                    </button>
+                  )}
                 </div>
-                <Link
-                  href={`/questions/${today.id}`}
-                  style={{ textDecoration: "none", display: "block" }}
-                >
+                <Link href={`/questions/${today.id}`} style={{ textDecoration: "none", display: "block" }}>
                   <div style={{
                     padding: "clamp(18px, 3.5vw, 36px) clamp(16px, 3.5vw, 40px)", borderRadius: 16,
                     background: "var(--ink)", color: "var(--cream-on-dark)",
                     position: "relative", overflow: "hidden",
                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
                   }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
-                      (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 40px rgba(28,31,38,0.25)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-                      (e.currentTarget as HTMLElement).style.boxShadow = "none";
-                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 40px rgba(28,31,38,0.25)"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
                   >
                     <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 70% 60% at 90% 10%, rgba(176,138,74,0.18), transparent 60%)" }} />
-                    <p style={{
-                      fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-                      fontSize: "clamp(16px, 2.5vw, 24px)", fontWeight: 400,
-                      lineHeight: 1.6, color: "var(--cream-on-dark)",
-                      marginBottom: "clamp(12px, 2vw, 24px)", position: "relative",
-                    }}>
+                    <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(16px, 2.5vw, 24px)", fontWeight: 400, lineHeight: 1.6, color: "var(--cream-on-dark)", marginBottom: "clamp(12px, 2vw, 24px)", position: "relative" }}>
                       {today.content}
                     </p>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative" }}>
@@ -344,56 +345,45 @@ export default function QuestionsClient({
                   Popular — 인기 질문
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {featured.map((q: any, i: number) => (
-                    <Link
-                      key={q.id}
-                      href={`/questions/${q.id}`}
-                      style={{ textDecoration: "none" }}
-                    >
-                      <div style={{
-                        display: "flex", gap: 16, alignItems: "center",
-                        padding: "16px 20px", borderRadius: 12,
-                        border: "1px solid var(--line-soft)",
-                        background: i === 0 ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.3)",
-                        transition: "all 0.18s ease", cursor: "pointer",
-                      }}
-                        onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.95)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
-                          (e.currentTarget as HTMLElement).style.transform = "translateX(3px)";
+                  {featured.filter((q: any) => !hiddenIds.has(q.id)).map((q: any, i: number) => (
+                    <div key={q.id} style={{ position: "relative" }}>
+                      <Link href={`/questions/${q.id}`} style={{ textDecoration: "none", display: "block" }}>
+                        <div style={{
+                          display: "flex", gap: 16, alignItems: "center",
+                          padding: "16px 20px", paddingRight: isAdmin ? "52px" : "20px", borderRadius: 12,
+                          border: "1px solid var(--line-soft)",
+                          background: i === 0 ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.3)",
+                          transition: "all 0.18s ease", cursor: "pointer",
                         }}
-                        onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLElement).style.background = i === 0 ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.3)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "var(--line-soft)";
-                          (e.currentTarget as HTMLElement).style.transform = "translateX(0)";
-                        }}
-                      >
-                        <span style={{
-                          fontFamily: '"EB Garamond", Georgia, serif',
-                          fontSize: 28, fontStyle: "italic",
-                          color: "var(--accent)", opacity: i === 0 ? 0.9 : 0.3,
-                          lineHeight: 1, flexShrink: 0, minWidth: 28, textAlign: "center",
-                        }}>
-                          {i + 1}
-                        </span>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{
-                            fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-                            fontSize: 15.5, color: "var(--ink)", lineHeight: 1.55,
-                            marginBottom: 7, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                          }}>
-                            {q.content}
-                          </p>
-                          <div style={{ display: "flex", gap: 14, fontSize: 12, color: "var(--muted)" }}>
-                            <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                              <MessageSquare size={11} /> {q.answers_count?.toLocaleString()} 답변
-                            </span>
-                            <span>— {q.author_name}</span>
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.95)"; (e.currentTarget as HTMLElement).style.transform = "translateX(3px)"; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = i === 0 ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.3)"; (e.currentTarget as HTMLElement).style.transform = "translateX(0)"; }}
+                        >
+                          <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 28, fontStyle: "italic", color: "var(--accent)", opacity: i === 0 ? 0.9 : 0.3, lineHeight: 1, flexShrink: 0, minWidth: 28, textAlign: "center" }}>
+                            {i + 1}
+                          </span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 15.5, color: "var(--ink)", lineHeight: 1.55, marginBottom: 7, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {q.content}
+                            </p>
+                            <div style={{ display: "flex", gap: 14, fontSize: 12, color: "var(--muted)" }}>
+                              <span style={{ display: "flex", alignItems: "center", gap: 3 }}><MessageSquare size={11} /> {q.answers_count?.toLocaleString()} 답변</span>
+                              <span>— {q.author_name}</span>
+                            </div>
                           </div>
+                          <ChevronRight size={14} style={{ color: "var(--muted)", flexShrink: 0 }} />
                         </div>
-                        <ChevronRight size={14} style={{ color: "var(--muted)", flexShrink: 0 }} />
-                      </div>
-                    </Link>
+                      </Link>
+                      {/* 관리자 삭제 버튼 */}
+                      {isAdmin && (
+                        <button
+                          onClick={async (e) => { e.stopPropagation(); if (!confirm("삭제할까요?")) return; const r = await deleteLandingQuestionAction(q.id); if (r.error) toast.error(r.error as string); else { setHiddenIds((s) => new Set([...s, q.id])); toast.success("삭제됐어요."); } }}
+                          style={{ position: "absolute", top: "50%", right: 12, transform: "translateY(-50%)", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 7, padding: "5px 8px", cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center" }}
+                          title="삭제"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      )}
+                    </div>
                   ))}
                 </div>
               </section>
