@@ -6,167 +6,157 @@ import Link from "next/link";
 const ADMIN_EMAIL = "junginaha@gmail.com";
 const ADMIN_PASSWORD = "QSAdmin2026!#";
 
-export default function SetupPage() {
-  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
-  const [message, setMessage] = useState("");
-  const [mode, setMode] = useState<"create" | "reset">("create");
+const card: React.CSSProperties = {
+  background: "rgba(255,255,255,0.05)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  borderRadius: 16, padding: "28px 28px",
+  marginBottom: 16,
+};
 
-  const handleCreate = async () => {
-    setStatus("loading");
-    setMessage("");
+const btn = (color: string): React.CSSProperties => ({
+  width: "100%", padding: "12px", borderRadius: 10, fontSize: 14,
+  fontWeight: 600, border: "none", cursor: "pointer",
+  background: color, color: "white", transition: "opacity 0.2s",
+  marginBottom: 8,
+});
+
+export default function SetupPage() {
+  const [accountStatus, setAccountStatus] = useState<"idle"|"loading"|"done"|"error">("idle");
+  const [accountMsg, setAccountMsg] = useState("");
+  const [cleanStatus, setCleanStatus] = useState<"idle"|"loading"|"done"|"error">("idle");
+  const [cleanMsg, setCleanMsg] = useState("");
+  const [dedupStatus, setDedupStatus] = useState<"idle"|"loading"|"done"|"error">("idle");
+  const [dedupMsg, setDedupMsg] = useState("");
+
+  // ── 관리자 계정 생성/재설정 ──────────────────────────────────
+  const handleAccount = async () => {
+    setAccountStatus("loading"); setAccountMsg("");
     try {
-      // 1단계: 계정 생성 시도
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD, name: "절대자" }),
       });
       const data = await res.json() as { ok?: boolean; error?: string };
-
       if (res.status === 409) {
-        // 이미 존재 → 비밀번호 재설정 시도
-        setMode("reset");
-        const res2 = await fetch("/api/admin/setup", { method: "POST" });
-        const data2 = await res2.json() as { ok?: boolean; error?: string; message?: string };
-        if (res2.ok) {
-          setStatus("done");
-          setMessage("비밀번호가 재설정됐습니다.");
-        } else {
-          setStatus("error");
-          setMessage(data2.error ?? "비밀번호 재설정 실패. 아래 방법을 시도해주세요.");
-        }
+        // 이미 존재 → 비밀번호 재설정
+        const r2 = await fetch("/api/admin/setup", { method: "POST" });
+        const d2 = await r2.json() as { ok?: boolean; error?: string };
+        if (d2.ok) { setAccountStatus("done"); setAccountMsg("비밀번호가 재설정됐어요."); }
+        else { setAccountStatus("error"); setAccountMsg(d2.error ?? "재설정 실패"); }
         return;
       }
-
-      if (!res.ok) {
-        setStatus("error");
-        setMessage(data.error ?? "계정 생성 실패");
-        return;
-      }
-
-      setStatus("done");
-      setMessage("계정이 성공적으로 생성됐습니다!");
+      if (!res.ok) { setAccountStatus("error"); setAccountMsg(data.error ?? "생성 실패"); return; }
+      setAccountStatus("done"); setAccountMsg("계정이 생성됐어요!");
     } catch (e) {
-      setStatus("error");
-      setMessage(e instanceof Error ? e.message : "네트워크 오류");
+      setAccountStatus("error"); setAccountMsg(e instanceof Error ? e.message : "오류");
     }
   };
 
-  return (
-    <div style={{
-      minHeight: "100vh", background: "#1C1F26",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      padding: "40px 24px",
+  // ── 스팸 데이터 정리 ─────────────────────────────────────────
+  const handleCleanup = async () => {
+    setCleanStatus("loading"); setCleanMsg("");
+    try {
+      const res = await fetch("/api/admin/cleanup");
+      const data = await res.json() as { message?: string; deleted?: number; error?: string };
+      if (!res.ok) { setCleanStatus("error"); setCleanMsg(data.error ?? "실패"); return; }
+      setCleanStatus("done"); setCleanMsg(data.message ?? `${data.deleted}개 삭제 완료`);
+    } catch { setCleanStatus("error"); setCleanMsg("네트워크 오류"); }
+  };
+
+  // ── 중복 정리 ────────────────────────────────────────────────
+  const handleDedup = async () => {
+    setDedupStatus("loading"); setDedupMsg("");
+    try {
+      const [r1, r2] = await Promise.all([
+        fetch("/api/admin", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({action:"dedup_answers", id:"_"}) }),
+        fetch("/api/admin", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({action:"dedup_questions", id:"_"}) }),
+      ]);
+      const d1 = await r1.json() as { deleted?: number; error?: string };
+      const d2 = await r2.json() as { deleted?: number; error?: string };
+      if (d1.error || d2.error) { setDedupStatus("error"); setDedupMsg(d1.error ?? d2.error ?? "실패"); return; }
+      setDedupStatus("done"); setDedupMsg(`중복 답변 ${d1.deleted}개, 중복 질문 ${d2.deleted}개 삭제됐어요.`);
+    } catch { setDedupStatus("error"); setDedupMsg("네트워크 오류"); }
+  };
+
+  const StatusBadge = ({ s, msg }: { s: string; msg: string }) => msg ? (
+    <p style={{ fontSize: 13, marginTop: 6, marginBottom: 2, padding: "8px 12px", borderRadius: 8,
+      background: s==="done"?"rgba(16,185,129,0.12)":"rgba(239,68,68,0.12)",
+      color: s==="done"?"#6EE7B7":"#FCA5A5", border: `1px solid ${s==="done"?"rgba(16,185,129,0.3)":"rgba(239,68,68,0.3)"}`
     }}>
-      <div style={{
-        width: "100%", maxWidth: 440,
-        background: "rgba(255,255,255,0.05)",
-        border: "1px solid rgba(255,255,255,0.12)",
-        borderRadius: 20, padding: "40px 36px",
-      }}>
-        {/* Logo */}
-        <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ fontSize: 32, fontFamily: "Georgia, serif", color: "#B08A4A", marginBottom: 8 }}>?!</div>
-          <h1 style={{ fontSize: 20, fontWeight: 500, color: "#ECE3CF", fontFamily: "Georgia, serif", marginBottom: 4 }}>
-            관리자 계정 설정
-          </h1>
-          <p style={{ fontSize: 13, color: "rgba(236,227,207,0.45)" }}>
-            질문하는 사람들 · 절대자 계정 생성
-          </p>
+      {s==="done"?"✓ ":"⚠ "}{msg}
+    </p>
+  ) : null;
+
+  return (
+    <div style={{ minHeight:"100vh", background:"#14181F", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 20px" }}>
+      <div style={{ width:"100%", maxWidth:460 }}>
+
+        {/* 헤더 */}
+        <div style={{ textAlign:"center", marginBottom:28 }}>
+          <div style={{ fontSize:28, fontFamily:"Georgia, serif", color:"#B08A4A", marginBottom:6 }}>?!</div>
+          <h1 style={{ fontSize:18, fontWeight:500, color:"#ECE3CF", margin:0 }}>관리자 설정 · 절대자</h1>
         </div>
 
-        {/* 계정 정보 */}
-        <div style={{
-          background: "rgba(176,138,74,0.1)", border: "1px solid rgba(176,138,74,0.3)",
-          borderRadius: 12, padding: "18px 20px", marginBottom: 24,
-        }}>
-          <p style={{ fontSize: 11.5, letterSpacing: "0.2em", textTransform: "uppercase", color: "#B08A4A", marginBottom: 12 }}>
-            관리자 계정 정보
+        {/* 1. 계정 생성 */}
+        <div style={card}>
+          <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#B08A4A", marginBottom:12 }}>
+            Step 1 — 관리자 계정
           </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {[
-              { label: "이메일", value: ADMIN_EMAIL },
-              { label: "비밀번호", value: ADMIN_PASSWORD },
-            ].map(({ label, value }) => (
-              <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 12, color: "rgba(236,227,207,0.5)" }}>{label}</span>
-                <code style={{
-                  fontSize: 13, color: "#ECE3CF", background: "rgba(0,0,0,0.3)",
-                  padding: "3px 10px", borderRadius: 6, letterSpacing: "0.03em",
-                  userSelect: "all",
-                }}>
-                  {value}
-                </code>
-              </div>
-            ))}
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:14, padding:"10px 14px", background:"rgba(0,0,0,0.25)", borderRadius:8 }}>
+            <span style={{ fontSize:12, color:"rgba(236,227,207,0.4)" }}>이메일</span>
+            <code style={{ fontSize:12, color:"#ECE3CF", userSelect:"all" }}>{ADMIN_EMAIL}</code>
           </div>
-        </div>
-
-        {/* 결과 메시지 */}
-        {message && (
-          <div style={{
-            padding: "12px 16px", borderRadius: 10, marginBottom: 16,
-            background: status === "done" ? "rgba(16,185,129,0.12)" : "rgba(239,68,68,0.12)",
-            border: `1px solid ${status === "done" ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`,
-          }}>
-            <p style={{ fontSize: 13.5, color: status === "done" ? "#6EE7B7" : "#FCA5A5", margin: 0 }}>
-              {status === "done" ? "✓ " : "⚠ "}{message}
-            </p>
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:14, padding:"10px 14px", background:"rgba(0,0,0,0.25)", borderRadius:8 }}>
+            <span style={{ fontSize:12, color:"rgba(236,227,206,0.4)" }}>비밀번호</span>
+            <code style={{ fontSize:12, color:"#ECE3CF", userSelect:"all" }}>{ADMIN_PASSWORD}</code>
           </div>
-        )}
-
-        {/* 버튼 */}
-        {status !== "done" && (
-          <button
-            onClick={handleCreate}
-            disabled={status === "loading"}
-            style={{
-              width: "100%", padding: "14px", borderRadius: 12, fontSize: 15,
-              fontWeight: 600, border: "none", cursor: status === "loading" ? "not-allowed" : "pointer",
-              background: status === "loading" ? "rgba(255,255,255,0.1)" : "#B08A4A",
-              color: "white", transition: "all 0.2s", marginBottom: 12,
-            }}
-          >
-            {status === "loading" ? "처리 중…" : mode === "reset" ? "비밀번호 재설정" : "관리자 계정 생성"}
+          <button style={btn("#B08A4A")} onClick={handleAccount} disabled={accountStatus==="loading"}>
+            {accountStatus==="loading" ? "처리 중…" : accountStatus==="done" ? "✓ 완료" : "계정 생성 / 비밀번호 재설정"}
           </button>
-        )}
+          <StatusBadge s={accountStatus} msg={accountMsg} />
+          {accountStatus==="done" && (
+            <Link href="/login" style={{ display:"block", textAlign:"center", fontSize:13, color:"#B08A4A", marginTop:8 }}>
+              → 로그인 페이지로
+            </Link>
+          )}
+        </div>
 
-        {/* 성공 시 로그인 링크 */}
-        {status === "done" && (
-          <Link
-            href="/login"
-            style={{
-              display: "block", width: "100%", padding: "14px", borderRadius: 12,
-              fontSize: 15, fontWeight: 600, textAlign: "center",
-              background: "#B08A4A", color: "white", textDecoration: "none",
-              marginBottom: 12,
-            }}
-          >
-            로그인하러 가기 →
-          </Link>
-        )}
+        {/* 2. 스팸 삭제 */}
+        <div style={card}>
+          <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#EF4444", marginBottom:8 }}>
+            Step 2 — 스팸 데이터 삭제
+          </p>
+          <p style={{ fontSize:12, color:"rgba(236,227,207,0.4)", lineHeight:1.6, marginBottom:12 }}>
+            박상현, 에겐남, 캐나다 법률, ICT교육, 상공회의소, 에스트로겐 등 잘못된 데이터 삭제
+          </p>
+          <button style={btn("#EF4444")} onClick={handleCleanup} disabled={cleanStatus==="loading"}>
+            {cleanStatus==="loading" ? "삭제 중…" : cleanStatus==="done" ? "✓ 삭제 완료" : "스팸 데이터 전체 삭제"}
+          </button>
+          <StatusBadge s={cleanStatus} msg={cleanMsg} />
+        </div>
 
-        {/* 이미 로그인 되어있다면 */}
-        <div style={{ textAlign: "center", marginTop: 8 }}>
-          <Link href="/admin" style={{ fontSize: 12.5, color: "rgba(176,138,74,0.6)", textDecoration: "none" }}>
-            관리자 페이지 바로가기
+        {/* 3. 중복 제거 */}
+        <div style={card}>
+          <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#8B5CF6", marginBottom:8 }}>
+            Step 3 — 중복 제거
+          </p>
+          <p style={{ fontSize:12, color:"rgba(236,227,207,0.4)", lineHeight:1.6, marginBottom:12 }}>
+            같은 내용의 중복 질문·답변 자동 정리 (최초 1개 유지)
+          </p>
+          <button style={btn("#8B5CF6")} onClick={handleDedup} disabled={dedupStatus==="loading"}>
+            {dedupStatus==="loading" ? "정리 중…" : dedupStatus==="done" ? "✓ 완료" : "중복 질문·답변 정리"}
+          </button>
+          <StatusBadge s={dedupStatus} msg={dedupMsg} />
+        </div>
+
+        {/* 관리자 페이지 링크 */}
+        <div style={{ textAlign:"center", marginTop:8 }}>
+          <Link href="/admin" style={{ fontSize:13, color:"rgba(176,138,74,0.6)", textDecoration:"none" }}>
+            관리자 페이지 열기 →
           </Link>
         </div>
 
-        {/* 수동 안내 */}
-        {status === "error" && (
-          <div style={{
-            marginTop: 20, padding: "14px 16px", borderRadius: 10,
-            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-          }}>
-            <p style={{ fontSize: 12, color: "rgba(236,227,207,0.4)", lineHeight: 1.7, margin: 0 }}>
-              자동 생성이 안 된다면:<br />
-              1. <a href="/signup" style={{ color: "#B08A4A" }}>/signup</a> 에서 직접 가입<br />
-              2. 이메일: {ADMIN_EMAIL}<br />
-              3. 비밀번호: {ADMIN_PASSWORD}
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
