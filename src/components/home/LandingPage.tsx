@@ -825,21 +825,22 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
-      {/* ② 질문 주고 받기 — 다음 단계 링크 (hero 바로 다음, 고정) */}
-      <section className="lp-section lp-question-hub" id="questions">
-        <div className="lp-ask-inner">
-          <h3 className="lp-h-section" style={{ fontSize: "clamp(22px, 3vw, 32px)", marginBottom: 16 }}>
-            당신 마음속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.
-          </h3>
-          <p className="lp-lede" style={{ marginBottom: 40 }}>
+      {/* ② 질문 남겨보기 — 화면 중앙 */}
+      <section className="lp-ask-center-section" id="questions">
+        <div className="lp-ask-center-inner">
+          <h2 className="lp-ask-center-title">
+            당신 마음속에<br />
+            <span className="lp-em">오래 남아 있던</span> 질문은.
+          </h2>
+          <p className="lp-ask-center-sub">
             부끄러운 질문일수록 환영해요.
           </p>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
-            <a href="/questions" className="lp-btn-cream">
+          <div className="lp-ask-center-cta">
+            <a href="/questions" className="lp-btn-cream lp-ask-center-btn">
               <span>질문 남겨보기</span>
               <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
             </a>
-            <span className="lp-cta-note">— 생각보다 따뜻합니다.</span>
+            <span className="lp-ask-center-note">— 생각보다 따뜻합니다.</span>
           </div>
         </div>
       </section>
@@ -960,68 +961,6 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           </div>
         </div>
 
-        {/* 북클럽 하단 — 질문 남기기 */}
-        <div className="lp-books-ask-card">
-          <div className="lp-ask-inner">
-            <h3 className="lp-h-section" style={{ fontSize: "clamp(22px, 3vw, 32px)", marginBottom: 16 }}>
-              당신 마음속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.
-            </h3>
-            <p className="lp-lede" style={{ marginBottom: 32 }}>
-              부끄러운 질문일수록 환영해요.
-            </p>
-            {askStatus === "sent" ? (
-              <div className="lp-ask-success">
-                <div className="lp-ask-success-icon">?</div>
-                <p>질문이 잘 전달됐어요.</p>
-                <span>누군가의 마음에 닿을 거예요.</span>
-              </div>
-            ) : (
-              <form onSubmit={handleAskSubmit}>
-                <div className="lp-ask-field">
-                  <span className="af-pen">― 당신의 질문</span>
-                  <textarea
-                    placeholder="마음속에 오래 담아두셨던 질문이 있으신가요?"
-                    rows={3}
-                    spellCheck={false}
-                    aria-label="질문 입력"
-                    value={askContent}
-                    onChange={(e) => setAskContent(e.target.value)}
-                    required
-                    minLength={5}
-                  />
-                  <span className="lp-sparkle s1" />
-                  <span className="lp-sparkle s2" />
-                  <span className="lp-sparkle s3" />
-                </div>
-                <div className="lp-ask-name-row">
-                  <input
-                    className="lp-ask-name"
-                    type="text"
-                    placeholder="닉네임 (익명도 괜찮아요)"
-                    value={askAuthor}
-                    onChange={(e) => setAskAuthor(e.target.value)}
-                    maxLength={20}
-                  />
-                </div>
-                <div className="lp-ask-actions">
-                  <span className="aa-hint">
-                    {askStatus === "error"
-                      ? "— 잠시 후 다시 눌러주세요."
-                      : "— 좋은 질문은 누군가를 살립니다."}
-                  </span>
-                  <button
-                    className="lp-btn-cream"
-                    type="submit"
-                    disabled={askStatus === "sending" || askContent.trim().length < 5}
-                  >
-                    <span>{askStatus === "sending" ? "전송 중…" : "질문 남겨보기"}</span>
-                    <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
       </section>
 
       {/* ④ 오늘의 질문 */}

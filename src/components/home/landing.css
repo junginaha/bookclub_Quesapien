@@ -328,6 +328,68 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 /* ── BOOKS ── */
 .lp-books { background: var(--lp-bg); }
 
+/* ── 질문 남겨보기 — 화면 중앙 섹션 ── */
+.lp-ask-center-section {
+  padding: clamp(64px, 12vw, 120px) var(--lp-gutter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--lp-bg);
+}
+
+.lp-ask-center-inner {
+  max-width: 640px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.lp-ask-center-title {
+  font-family: var(--lp-serif-ko);
+  font-weight: 400;
+  font-size: clamp(28px, 4.5vw, 56px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--lp-ink);
+  margin-bottom: clamp(16px, 2.5vw, 24px);
+}
+
+.lp-ask-center-sub {
+  font-family: var(--lp-serif-ko);
+  font-weight: 400;
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: var(--lp-lh-loose);
+  color: var(--lp-muted);
+  margin-bottom: clamp(32px, 5vw, 48px);
+}
+
+.lp-ask-center-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.lp-ask-center-btn {
+  font-size: 15px;
+  padding: 14px 32px;
+}
+
+.lp-ask-center-note {
+  font-family: var(--lp-serif-ko);
+  font-size: 13.5px;
+  color: var(--lp-muted);
+  letter-spacing: -0.005em;
+}
+
+@media (max-width: 480px) {
+  .lp-ask-center-title { font-size: clamp(24px, 7vw, 36px); }
+  .lp-ask-center-btn   { width: 100%; justify-content: center; }
+}
+
 /* ── 북클럽 하단 질문 카드 ── */
 .lp-books-ask-card {
   max-width: var(--lp-max);
