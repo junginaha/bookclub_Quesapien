@@ -60,9 +60,12 @@ export default function BookDetailModal({ book, onClose }: Props) {
   const [detail, setDetail]     = useState<BookClub | null>(null);
   const [editing, setEditing]   = useState(false);
   const [saving, setSaving]     = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saveOk, setSaveOk]     = useState(false);
   const [joined, setJoined]     = useState(false);
   const [quickUrl, setQuickUrl] = useState("");
   const [quickSaving, setQuickSaving] = useState(false);
+  const [quickMsg, setQuickMsg] = useState("");
 
   // 편집 폼 상태
   const [form, setForm] = useState<Partial<BookClub>>({});
@@ -141,57 +144,53 @@ export default function BookDetailModal({ book, onClose }: Props) {
 
   const handleSave = async () => {
     if (!detail) return;
-    setSaving(true);
+    setSaving(true); setSaveError(""); setSaveOk(false);
     const allDates = buildDates(rows, deadline);
-    const update = {
-      title:           detail.title,   // upsert 시 행 생성에 필요
+    const payload = {
+      title:           detail.title,
       color:           detail.color,
-      schedule:        form.schedule,
-      location:        form.location,
-      location_url:    form.locationUrl,
-      join_url:        form.joinUrl,
-      description:     form.description,
-      host_name:       form.hostName,
-      host_intro:      form.hostIntro,
-      max_participants: form.maxParticipants,
-      photo_url:       form.photo_url,
+      schedule:        form.schedule ?? "",
+      location:        form.location ?? "",
+      location_url:    form.locationUrl ?? "",
+      join_url:        form.joinUrl ?? "",
+      description:     form.description ?? "",
+      host_name:       form.hostName ?? "",
+      host_intro:      form.hostIntro ?? "",
+      max_participants: form.maxParticipants ?? 8,
       session_dates:   allDates,
     };
     try {
       const res = await fetch(`/api/book-clubs/${detail.slug}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(update),
+        body: JSON.stringify(payload),
       });
-      if (res.ok) {
-        const data = await res.json() as { club: Record<string, unknown> };
+      const json = await res.json() as { club?: Record<string, unknown>; error?: string };
+      if (res.ok && json.club) {
+        const c = json.club;
         const merged: BookClub = {
           ...detail,
-          schedule:      data.club.schedule as string,
-          location:      data.club.location as string,
-          locationUrl:   data.club.location_url as string,
-          joinUrl:       data.club.join_url as string,
-          description:   data.club.description as string,
-          hostName:      data.club.host_name as string,
-          hostIntro:     data.club.host_intro as string,
-          maxParticipants: data.club.max_participants as number,
-          sessionDates:  data.club.session_dates as BookClub["sessionDates"],
-          photo_url:     data.club.photo_url as string,
+          schedule:       c.schedule as string,
+          location:       c.location as string,
+          locationUrl:    c.location_url as string,
+          joinUrl:        c.join_url as string,
+          description:    c.description as string,
+          hostName:       c.host_name as string,
+          hostIntro:      c.host_intro as string,
+          maxParticipants: c.max_participants as number,
+          sessionDates:   c.session_dates as BookClub["sessionDates"],
         };
         setDetail(merged);
         localStorage.setItem(`bc_detail_${detail.slug}`, JSON.stringify(merged));
+        setSaveOk(true);
+        setTimeout(() => setSaveOk(false), 3000);
       } else {
-        const merged = { ...detail, ...form, sessionDates: allDates };
-        setDetail(merged);
-        localStorage.setItem(`bc_detail_${detail.slug}`, JSON.stringify(merged));
+        setSaveError(json.error ?? "저장에 실패했어요. 다시 시도해주세요.");
       }
-    } catch {
-      const merged = { ...detail, ...form, sessionDates: allDates };
-      setDetail(merged);
-      localStorage.setItem(`bc_detail_${detail.slug}`, JSON.stringify(merged));
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "네트워크 오류");
     }
     setSaving(false);
-    setEditing(false);
   };
 
   // 빠른 URL 저장
@@ -200,18 +199,24 @@ export default function BookDetailModal({ book, onClose }: Props) {
     setQuickSaving(true);
     const u = quickUrl.trim();
     try {
-      await fetch(`/api/book-clubs/${detail.slug}`, {
+      const res = await fetch(`/api/book-clubs/${detail.slug}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        // title·color 포함 → 행 없으면 자동 생성
         body: JSON.stringify({ join_url: u, title: detail.title, color: detail.color }),
       });
-    } catch { /* local only */ }
+      if (res.ok) {
+        setQuickMsg("✓ 참여 링크 저장됐어요!");
+      } else {
+        const j = await res.json() as { error?: string };
+        setQuickMsg(`⚠ ${j.error ?? "저장 실패"}`);
+      }
+    } catch { setQuickMsg("⚠ 네트워크 오류"); }
     const merged = { ...detail, joinUrl: u };
     setDetail(merged);
     localStorage.setItem(`bc_detail_${detail.slug}`, JSON.stringify(merged));
     setQuickUrl("");
     setQuickSaving(false);
+    setTimeout(() => setQuickMsg(""), 4000);
   };
 
   // 참여 클릭 — /join API로 서버 리다이렉트 (URL 비노출)
@@ -402,6 +407,11 @@ export default function BookDetailModal({ book, onClose }: Props) {
                     </button>
                   </div>
                   <div className="bdm-admin-url-hint">URL은 사용자에게 노출되지 않습니다 · 붙여넣으면 자동 저장</div>
+                  {quickMsg && (
+                    <div style={{ marginTop: 6, fontSize: 12.5, color: quickMsg.startsWith("✓") ? "#10B981" : "#EF4444", fontWeight: 500 }}>
+                      {quickMsg}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -562,8 +572,18 @@ export default function BookDetailModal({ book, onClose }: Props) {
                 onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 placeholder="이 북클럽에 대해 소개해주세요. 어떤 사람에게 어떤 시간이 될지 자유롭게 적어주세요." />
 
+              {saveError && (
+                <div style={{ marginBottom: 10, padding: "10px 14px", borderRadius: 8, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", fontSize: 13, color: "#EF4444" }}>
+                  ⚠ {saveError}
+                </div>
+              )}
+              {saveOk && (
+                <div style={{ marginBottom: 10, padding: "10px 14px", borderRadius: 8, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)", fontSize: 13, color: "#10B981" }}>
+                  ✓ 저장됐어요!
+                </div>
+              )}
               <div className="bdm-form-actions">
-                <button type="button" className="bdm-btn-cancel" onClick={() => setEditing(false)}>취소</button>
+                <button type="button" className="bdm-btn-cancel" onClick={() => { setEditing(false); setSaveError(""); }}>취소</button>
                 <button type="submit" className="bdm-btn-save" disabled={saving}>
                   {saving ? "저장 중…" : "저장 · 업데이트"}
                 </button>
