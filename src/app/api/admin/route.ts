@@ -142,6 +142,58 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
+    // ── 중복 정리 ──────────────────────────────────────────────
+    case "dedup_answers": {
+      // 같은 question_id + 같은 content의 답변 중복 제거 (최초 1개만 유지)
+      const { data: answers } = await db
+        .from("landing_question_answers")
+        .select("id, question_id, content, created_at")
+        .order("created_at", { ascending: true });
+
+      const seen = new Map<string, string>(); // key → first id
+      const toDelete: string[] = [];
+      for (const a of (answers ?? [])) {
+        const key = `${a.question_id}::${a.content?.trim()}`;
+        if (seen.has(key)) {
+          toDelete.push(a.id);
+        } else {
+          seen.set(key, a.id);
+        }
+      }
+      if (toDelete.length > 0) {
+        await db.from("landing_question_answers").delete().in("id", toDelete);
+      }
+      return NextResponse.json({ ok: true, deleted: toDelete.length });
+    }
+
+    case "dedup_questions": {
+      // 같은 content의 landing_questions 중복 제거 (최초 1개만 유지)
+      const { data: lqs } = await db
+        .from("landing_questions")
+        .select("id, content, created_at")
+        .order("created_at", { ascending: true });
+
+      const seen2 = new Map<string, string>();
+      const toDelete2: string[] = [];
+      for (const q of (lqs ?? [])) {
+        const key = q.content?.trim();
+        if (!key) continue;
+        if (seen2.has(key)) {
+          toDelete2.push(q.id);
+        } else {
+          seen2.set(key, q.id);
+        }
+      }
+      if (toDelete2.length > 0) {
+        for (const qid of toDelete2) {
+          await db.from("landing_question_answers").delete().eq("question_id", qid);
+          await db.from("landing_question_reactions").delete().eq("question_id", qid);
+        }
+        await db.from("landing_questions").delete().in("id", toDelete2);
+      }
+      return NextResponse.json({ ok: true, deleted: toDelete2.length });
+    }
+
     default:
       return NextResponse.json({ error: "알 수 없는 액션입니다." }, { status: 400 });
   }

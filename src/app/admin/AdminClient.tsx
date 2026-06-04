@@ -148,6 +148,30 @@ export default function AdminClient({
               ))}
             </div>
 
+            {/* 중복 정리 */}
+            <div className="bg-white rounded-2xl border border-warm-100 p-5 flex flex-wrap gap-3 items-center">
+              <span className="text-sm font-semibold text-warm-700 mr-2">🧹 중복 정리</span>
+              <Button size="sm" variant="outline" className="gap-1 text-xs"
+                onClick={async () => {
+                  const res = await fetch("/api/admin", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({action:"dedup_answers", id:"_"}) });
+                  const d = await res.json() as { deleted?: number; error?: string };
+                  if (d.error) toast.error(d.error);
+                  else toast.success(`중복 답변 ${d.deleted}개 삭제됐어요.`);
+                }}>
+                중복 답변 삭제
+              </Button>
+              <Button size="sm" variant="outline" className="gap-1 text-xs"
+                onClick={async () => {
+                  if (!confirm("중복 질문을 삭제할까요?")) return;
+                  const res = await fetch("/api/admin", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({action:"dedup_questions", id:"_"}) });
+                  const d = await res.json() as { deleted?: number; error?: string };
+                  if (d.error) toast.error(d.error);
+                  else { toast.success(`중복 질문 ${d.deleted}개 삭제됐어요.`); router.refresh(); }
+                }}>
+                중복 질문 삭제
+              </Button>
+            </div>
+
             {/* 최근 가입자 */}
             <div className="bg-white rounded-2xl border border-warm-100 p-5">
               <h3 className="font-semibold text-warm-900 mb-4 flex items-center gap-2">

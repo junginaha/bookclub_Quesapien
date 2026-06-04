@@ -994,12 +994,6 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </p>
             <div className="lp-q-meta">
               <span>
-                <strong>{(questionLikes ?? todayQuestion?.likes ?? 1284).toLocaleString()}</strong> 공감
-              </span>
-              <span>
-                <strong>{(questionSaves ?? todayQuestion?.saves ?? 397).toLocaleString()}</strong> 저장
-              </span>
-              <span>
                 <strong>{todayQuestion?.answers_count ?? "72"}</strong> 답변
               </span>
             </div>
@@ -1053,7 +1047,6 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
                   <p className="qcard-q">{c.content}</p>
                   <div className="qcard-foot">
                     <span className="qf-nums">
-                      <span><b>{c.likes?.toLocaleString()}</b> 공감</span>
                       <span><b>{c.answers_count}</b> 답변</span>
                     </span>
                     <span style={{ fontSize: 12, color: "var(--lp-accent)", opacity: 0.7 }}>→</span>

@@ -388,7 +388,6 @@ export default function QuestionsClient({
                             <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
                               <MessageSquare size={11} /> {q.answers_count?.toLocaleString()} 답변
                             </span>
-                            <span>{q.likes?.toLocaleString()} 공감</span>
                             <span>— {q.author_name}</span>
                           </div>
                         </div>
@@ -502,12 +501,19 @@ export default function QuestionsClient({
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
                           <div style={{ display: "flex", gap: 6 }}>
                             {(q.tags ?? []).slice(0, 3).map((tag: string) => (
-                              <span key={tag} style={{
-                                fontSize: 11.5, padding: "3px 9px", borderRadius: 9999,
-                                background: "var(--bg-warm)", color: "var(--muted)",
-                              }}>
+                              <button
+                                key={tag}
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSearch(search === tag ? "" : tag); }}
+                                style={{
+                                  fontSize: 11.5, padding: "3px 9px", borderRadius: 9999,
+                                  background: search === tag ? "var(--accent)" : "var(--bg-warm)",
+                                  color: search === tag ? "white" : "var(--muted)",
+                                  border: "none", cursor: "pointer",
+                                  transition: "all 0.15s",
+                                }}
+                              >
                                 #{tag}
-                              </span>
+                              </button>
                             ))}
                           </div>
                           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>

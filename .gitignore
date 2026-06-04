@@ -7,3 +7,4 @@ node_modules
 .env.production
 .env.local
 tsconfig.tsbuildinfo
+*.env\n.env.*
