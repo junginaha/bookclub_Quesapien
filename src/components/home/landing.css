@@ -327,9 +327,10 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 
 /* ── BOOKS ── */
 .lp-books { background: var(--lp-bg); }
-.lp-books-grid { max-width: var(--lp-max); margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
-@media (max-width: 920px) { .lp-books-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 580px)  { .lp-books-grid { grid-template-columns: 1fr; } }
+.lp-books-grid { max-width: var(--lp-max); margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+@media (max-width: 1100px) { .lp-books-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
+@media (max-width: 800px)  { .lp-books-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+@media (max-width: 480px)  { .lp-books-grid { grid-template-columns: 1fr; gap: 16px; } }
 .lp-book { display: grid; gap: 22px; cursor: pointer; }
 .lp-book-cover { aspect-ratio: 3/4.4; border-radius: 3px; padding: 28px 24px; display: flex; flex-direction: column; justify-content: space-between; position: relative; box-shadow: inset 6px 0 12px -8px rgba(0,0,0,0.18), 0 24px 50px -30px rgba(40,30,20,.45), 0 6px 14px -8px rgba(40,30,20,.25); transition: transform .55s cubic-bezier(.2,.8,.2,1), box-shadow .55s ease; overflow: hidden; }
 .lp-book:hover .lp-book-cover { transform: translateY(-6px) rotate(-.4deg); box-shadow: inset 6px 0 12px -8px rgba(0,0,0,0.2), 0 50px 80px -30px rgba(40,30,20,.55), 0 10px 20px -8px rgba(40,30,20,.3); }

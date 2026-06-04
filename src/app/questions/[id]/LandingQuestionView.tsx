@@ -208,7 +208,7 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
               <div key={a.id ?? i} style={{
                 padding: "22px 0",
                 borderBottom: "1px solid var(--line-soft)",
-                display: "grid", gridTemplateColumns: "80px 1fr", gap: 16,
+                display: "grid", gridTemplateColumns: "80px 1fr auto", gap: 16, alignItems: "start",
               }}>
                 <div>
                   <p style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 15, color: "var(--accent)", fontStyle: "normal" }}>
@@ -221,6 +221,25 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
                 <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 15.5, fontWeight: 300, lineHeight: 1.75, color: "var(--ink)", letterSpacing: "-0.005em" }}>
                   {a.content}
                 </p>
+                {/* 관리자 삭제 버튼 */}
+                {isAdmin && a.id && (
+                  <button
+                    onClick={async () => {
+                      if (!confirm("이 답변을 삭제할까요?")) return;
+                      const res = await fetch(`/api/landing-questions/${question.id}/answers/${a.id}`, { method: "DELETE" });
+                      if (res.ok) {
+                        setAnswers((prev) => prev.filter((x: any) => x.id !== a.id));
+                        toast.success("삭제됐어요.");
+                      } else {
+                        toast.error("삭제에 실패했어요.");
+                      }
+                    }}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", padding: 4, display: "flex", alignItems: "center", marginTop: 2 }}
+                    title="답변 삭제"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                )}
               </div>
             ))}
           </div>

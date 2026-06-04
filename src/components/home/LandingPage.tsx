@@ -833,7 +833,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
 
         <div className="lp-books-grid">
-          {books.map((b) => (
+          {books.slice(0, 4).map((b) => (
             <article
               key={b.title}
               className="lp-book lp-reveal"
@@ -887,6 +887,20 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           </p>
           <div className={`lp-books-more-body${miniExpanded ? " open" : ""}`}>
             <div className="lp-mini-grid">
+              {/* 메인 그리드에서 넘친 북클럽 (5번~) 먼저 표시 */}
+              {books.slice(4).map((b) => (
+                <div key={b.slug} className="lp-mini-book" onClick={() => setModalBook(b)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && setModalBook(b)}>
+                  <div className={`lp-mini-spine ${b.color}`} />
+                  <div className="lp-mini-body">
+                    <div className="lp-mini-title">{b.title}</div>
+                    <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어요</div>
+                    <div className="lp-mini-meta">
+                      <span className="lp-mini-tag">{b.tag}</span>
+                      <span className="lp-mini-members"><span className="mem-dot" />{b.currentParticipants}명 참여 중</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
               {miniBooks.map((b) => (
                 <div
                   key={b.title}
