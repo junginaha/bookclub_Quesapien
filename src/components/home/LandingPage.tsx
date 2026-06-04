@@ -762,7 +762,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
               <span className="lp-kw">질문</span>으로{" "}
               <span className="lp-kw k2">연결</span>되는 미래혁신형{" "}
               <span className="lp-kw k3">북클럽</span>.<br />
-              사람들이 가장 깊은 이야기를 나눠요.
+              <span className="lp-kw k4">사람들</span>이 가장 깊은 이야기를 나눠요.
             </p>
             <div className="lp-cta-stack">
               <div className="lp-cta-row">
@@ -1125,7 +1125,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         {/* AT HEART 상단 */}
         <div className="lp-eyebrow">AT HEART</div>
         <p className="lp-final-quote">
-          질문은<br />가장 <span className="lp-em">인간적인</span><br />대화의 시작이에요.
+          <span className="lp-em">질문</span>은<br />가장 <span className="lp-em">인간적인</span><br />대화의 시작이에요.
         </p>
         <div className="lp-final-divider" />
 
