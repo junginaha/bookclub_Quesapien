@@ -825,6 +825,25 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
+      {/* ② 질문 주고 받기 — 다음 단계 링크 (hero 바로 다음, 고정) */}
+      <section className="lp-section lp-question-hub" id="questions">
+        <div className="lp-ask-inner">
+          <h3 className="lp-h-section" style={{ fontSize: "clamp(22px, 3vw, 32px)", marginBottom: 16 }}>
+            당신 마음속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.
+          </h3>
+          <p className="lp-lede" style={{ marginBottom: 40 }}>
+            부끄러운 질문일수록 환영해요.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
+            <a href="/questions" className="lp-btn-cream">
+              <span>질문 남겨보기</span>
+              <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
+            </a>
+            <span className="lp-cta-note">— 생각보다 따뜻합니다.</span>
+          </div>
+        </div>
+      </section>
+
       {/* ③ BOOKLOVER */}
       <section className="lp-section lp-books" id="books">
         <div className="lp-section-head">
