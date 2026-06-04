@@ -834,7 +834,71 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
-      {/* BOOKS */}
+      {/* ② 질문 주고 받기 — ASK 폼 (hero 바로 다음, 고정) */}
+      <section className="lp-section lp-question-hub" id="questions">
+        <div className="lp-ask-inner">
+          <h3 className="lp-h-section" style={{ fontSize: "clamp(22px, 3vw, 32px)", marginBottom: 16 }}>
+            당신 마음속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.
+          </h3>
+          <p className="lp-lede" style={{ marginBottom: 32 }}>
+            부끄러운 질문일수록 환영해요.
+          </p>
+
+          {askStatus === "sent" ? (
+            <div className="lp-ask-success">
+              <div className="lp-ask-success-icon">?</div>
+              <p>질문이 잘 전달됐어요.</p>
+              <span>누군가의 마음에 닿을 거예요.</span>
+            </div>
+          ) : (
+            <form onSubmit={handleAskSubmit}>
+              <div className="lp-ask-field" id="askField">
+                <span className="af-pen">― 당신의 질문</span>
+                <textarea
+                  placeholder="마음속에 오래 담아두셨던 질문이 있으신가요?"
+                  rows={3}
+                  spellCheck={false}
+                  aria-label="질문 입력"
+                  value={askContent}
+                  onChange={(e) => setAskContent(e.target.value)}
+                  required
+                  minLength={5}
+                />
+                <span className="lp-sparkle s1" />
+                <span className="lp-sparkle s2" />
+                <span className="lp-sparkle s3" />
+              </div>
+              <div className="lp-ask-name-row">
+                <input
+                  className="lp-ask-name"
+                  type="text"
+                  placeholder="닉네임 (익명도 괜찮아요)"
+                  value={askAuthor}
+                  onChange={(e) => setAskAuthor(e.target.value)}
+                  maxLength={20}
+                />
+              </div>
+              <div className="lp-ask-actions">
+                <span className="aa-hint">
+                  {askStatus === "error"
+                    ? "— 잠시 후 다시 눌러주세요."
+                    : "— 좋은 질문은 누군가를 살립니다."}
+                </span>
+                <button
+                  className="lp-btn-cream"
+                  type="submit"
+                  disabled={askStatus === "sending" || askContent.trim().length < 5}
+                >
+                  <span>{askStatus === "sending" ? "전송 중…" : "질문 남겨보기"}</span>
+                  <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </section>
+
+      {/* ③ BOOKLOVER */}
       <section className="lp-section lp-books" id="books">
         <div className="lp-section-head">
           <div className="lp-left">
@@ -951,7 +1015,96 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
         </div>
       </section>
 
-      {/* ARCHIVING — 후기 섹션 */}
+      {/* ④ 오늘의 질문 */}
+      <section className="lp-section lp-question-hub" id="today-q" style={{ background: "var(--lp-bg-soft)" }}>
+        <div className="lp-section-head">
+          <div className="lp-left">
+            <a href="/questions" className="lp-eyebrow lp-section-title-link">QUESAPIENCE · QUESTIONS — 오늘의 질문</a>
+            <a href="/questions" className="lp-section-title-link" style={{ textDecoration: "none" }}>
+              <h2 className="lp-h-section">
+                하루에 한 번,<br />
+                <span className="lp-em">마음을 흔드는</span> 질문.
+              </h2>
+            </a>
+          </div>
+          <p className="lp-lede">
+            답하지 않아도 괜찮아요. 잠시 머물러 주세요.<br />
+            <a href="/questions" style={{ fontSize: 13, color: "var(--lp-accent)", fontFamily: "var(--lp-serif)", letterSpacing: "0.04em", opacity: 0.8 }}>
+              전체 질문 보기 →
+            </a>
+          </p>
+        </div>
+
+        <div className="lp-q-grid">
+          <article className="lp-q-feature lp-reveal">
+            <div className="lp-q-marker">
+              <span className="qm-pulse" /> Today
+            </div>
+            <p className="lp-q-text">
+              {todayQuestion?.content ?? "당신은 마지막으로 언제,\n진심으로 울었나요?"}
+            </p>
+            <div className="lp-q-meta">
+              <span>
+                <strong>{todayQuestion?.answers_count ?? "72"}</strong> 답변
+              </span>
+            </div>
+            <div className="lp-q-comments">
+              <div className="qc-label">In the margins · 답변 미리보기</div>
+              <div className="qc-row">
+                <span className="qc-who">서연 ―</span>
+                <span className="qc-what">&ldquo;아버지 장례식 끝나고 지하철에서. 그게 마지막이었던 것 같아요.&rdquo;</span>
+              </div>
+              <div className="qc-row">
+                <span className="qc-who">현우 ―</span>
+                <span className="qc-what">&ldquo;운 적은 많은데, 진심으로 운 적은 기억이 잘 안 나요.&rdquo;</span>
+              </div>
+              <div className="qc-row">
+                <span className="qc-who">민지 ―</span>
+                <span className="qc-what">&ldquo;오늘 새벽이요. 이유는 모르겠어요.&rdquo;</span>
+              </div>
+            </div>
+            <a
+              href={todayQuestion?.id ? `/questions/${todayQuestion.id}` : "/questions"}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: "var(--lp-sp3)", fontFamily: "var(--lp-serif)", fontSize: 13, letterSpacing: "0.04em", color: "var(--lp-accent)", textDecoration: "none", opacity: 0.85, transition: "opacity .2s ease" }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.85")}
+            >
+              <span>대화 전체 보기 · {todayQuestion?.answers_count ?? 72}개 답변</span>
+              <span style={{ letterSpacing: 0 }}>→</span>
+            </a>
+          </article>
+
+          <div className="lp-q-card-stack">
+            {(recentQuestions && recentQuestions.length >= 3
+              ? recentQuestions.slice(0, 3)
+              : [
+                  { id: "s1", content: "인간은 왜 외로운가요?", likes: 842, answers_count: 56, author_name: "" },
+                  { id: "s2", content: "AI 시대에도 사랑은 여전히 중요할까요?", likes: 1103, answers_count: 91, author_name: "" },
+                  { id: "s3", content: "당신을 살게 만든 한 문장은 무엇인가요?", likes: 2071, answers_count: 143, author_name: "" },
+                ]
+            ).map((c, idx) => (
+              <a
+                key={c.id ?? idx}
+                href={c.id && !c.id.startsWith("s") ? `/questions/${c.id}` : "/questions"}
+                style={{ textDecoration: "none", display: "block" }}
+              >
+                <article className="lp-q-card lp-reveal">
+                  <span className="qcard-num">No. {String(100 - idx).padStart(3, "0")}</span>
+                  <p className="qcard-q">{c.content}</p>
+                  <div className="qcard-foot">
+                    <span className="qf-nums">
+                      <span><b>{c.answers_count}</b> 답변</span>
+                    </span>
+                    <span style={{ fontSize: 12, color: "var(--lp-accent)", opacity: 0.7 }}>→</span>
+                  </div>
+                </article>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ⑤ ARCHIVING — 후기 섹션 */}
       <section className="lp-section lp-testify" id="testify">
         <div className="lp-section-head">
           <div className="lp-left">
@@ -1001,166 +1154,7 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
       </section>
 
 
-      {/* QUESTIONS HUB — Today + Ask 통합 */}
-      <section className="lp-section lp-question-hub" id="questions">
-        <div className="lp-section-head">
-          <div className="lp-left">
-            <a href="/questions" className="lp-eyebrow lp-section-title-link">QUESAPIENCE · QUESTIONS — 오늘의 질문</a>
-            <a href="/questions" className="lp-section-title-link" style={{ textDecoration: "none" }}>
-              <h2 className="lp-h-section">
-                하루에 한 번,<br />
-                <span className="lp-em">마음을 흔드는</span> 질문.
-              </h2>
-            </a>
-          </div>
-          <p className="lp-lede">
-            답하지 않아도 괜찮아요. 잠시 머물러 주세요.<br />
-            <a href="/questions" style={{ fontSize: 13, color: "var(--lp-accent)", fontFamily: "var(--lp-serif)", letterSpacing: "0.04em", opacity: 0.8 }}>
-              전체 질문 보기 →
-            </a>
-          </p>
-        </div>
-
-        <div className="lp-q-grid">
-          <article className="lp-q-feature lp-reveal">
-            <div className="lp-q-marker">
-              <span className="qm-pulse" /> Today
-            </div>
-            <p className="lp-q-text">
-              {todayQuestion?.content ?? "당신은 마지막으로 언제,\n진심으로 울었나요?"}
-            </p>
-            <div className="lp-q-meta">
-              <span>
-                <strong>{todayQuestion?.answers_count ?? "72"}</strong> 답변
-              </span>
-            </div>
-            <div className="lp-q-comments">
-              <div className="qc-label">In the margins · 답변 미리보기</div>
-              <div className="qc-row">
-                <span className="qc-who">서연 ―</span>
-                <span className="qc-what">&ldquo;아버지 장례식 끝나고 지하철에서. 그게 마지막이었던 것 같아요.&rdquo;</span>
-              </div>
-              <div className="qc-row">
-                <span className="qc-who">현우 ―</span>
-                <span className="qc-what">&ldquo;운 적은 많은데, 진심으로 운 적은 기억이 잘 안 나요.&rdquo;</span>
-              </div>
-              <div className="qc-row">
-                <span className="qc-who">민지 ―</span>
-                <span className="qc-what">&ldquo;오늘 새벽이요. 이유는 모르겠어요.&rdquo;</span>
-              </div>
-            </div>
-            <a
-              href={todayQuestion?.id ? `/questions/${todayQuestion.id}` : "/questions"}
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 8, marginTop: "var(--lp-sp3)",
-                fontFamily: "var(--lp-serif)", fontSize: 13, letterSpacing: "0.04em",
-                color: "var(--lp-accent)", textDecoration: "none", opacity: 0.85,
-                transition: "opacity .2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.85")}
-            >
-              <span>대화 전체 보기 · {todayQuestion?.answers_count ?? 72}개 답변</span>
-              <span style={{ letterSpacing: 0 }}>→</span>
-            </a>
-          </article>
-
-          <div className="lp-q-card-stack">
-            {(recentQuestions && recentQuestions.length >= 3
-              ? recentQuestions.slice(0, 3)
-              : [
-                  { id: "s1", content: "인간은 왜 외로운가요?", likes: 842, answers_count: 56, author_name: "" },
-                  { id: "s2", content: "AI 시대에도 사랑은 여전히 중요할까요?", likes: 1103, answers_count: 91, author_name: "" },
-                  { id: "s3", content: "당신을 살게 만든 한 문장은 무엇인가요?", likes: 2071, answers_count: 143, author_name: "" },
-                ]
-            ).map((c, idx) => (
-              <a
-                key={c.id ?? idx}
-                href={c.id && !c.id.startsWith("s") ? `/questions/${c.id}` : "/questions"}
-                style={{ textDecoration: "none", display: "block" }}
-              >
-                <article className="lp-q-card lp-reveal">
-                  <span className="qcard-num">No. {String(100 - idx).padStart(3, "0")}</span>
-                  <p className="qcard-q">{c.content}</p>
-                  <div className="qcard-foot">
-                    <span className="qf-nums">
-                      <span><b>{c.answers_count}</b> 답변</span>
-                    </span>
-                    <span style={{ fontSize: 12, color: "var(--lp-accent)", opacity: 0.7 }}>→</span>
-                  </div>
-                </article>
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* 구분선 */}
-        <div style={{ borderTop: "1px solid var(--lp-line-soft)", margin: "56px 0 48px" }} />
-
-        {/* ASK 폼 */}
-        <div className="lp-ask-inner">
-          <h3 className="lp-h-section" style={{ fontSize: "clamp(22px, 3vw, 32px)", marginBottom: 16 }}>
-            당신 마음속에<br /><span className="lp-em">오래 남아 있던</span> 질문은.
-          </h3>
-          <p className="lp-lede" style={{ marginBottom: 32 }}>
-            부끄러운 질문일수록 환영해요.
-          </p>
-
-          {askStatus === "sent" ? (
-            <div className="lp-ask-success">
-              <div className="lp-ask-success-icon">?</div>
-              <p>질문이 잘 전달됐어요.</p>
-              <span>누군가의 마음에 닿을 거예요.</span>
-            </div>
-          ) : (
-            <form onSubmit={handleAskSubmit}>
-              <div className="lp-ask-field" id="askField">
-                <span className="af-pen">― 당신의 질문</span>
-                <textarea
-                  placeholder="마음속에 오래 담아두셨던 질문이 있으신가요?"
-                  rows={3}
-                  spellCheck={false}
-                  aria-label="질문 입력"
-                  value={askContent}
-                  onChange={(e) => setAskContent(e.target.value)}
-                  required
-                  minLength={5}
-                />
-                <span className="lp-sparkle s1" />
-                <span className="lp-sparkle s2" />
-                <span className="lp-sparkle s3" />
-              </div>
-              <div className="lp-ask-name-row">
-                <input
-                  className="lp-ask-name"
-                  type="text"
-                  placeholder="닉네임 (익명도 괜찮아요)"
-                  value={askAuthor}
-                  onChange={(e) => setAskAuthor(e.target.value)}
-                  maxLength={20}
-                />
-              </div>
-              <div className="lp-ask-actions">
-                <span className="aa-hint">
-                  {askStatus === "error"
-                    ? "— 잠시 후 다시 눌러주세요."
-                    : "— 좋은 질문은 누군가를 살립니다."}
-                </span>
-                <button
-                  className="lp-btn-cream"
-                  type="submit"
-                  disabled={askStatus === "sending" || askContent.trim().length < 5}
-                >
-                  <span>{askStatus === "sending" ? "전송 중…" : "질문 남겨보기"}</span>
-                  <span className="lp-arrow" style={{ color: "var(--lp-bg-ink)" }} />
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
-      </section>
-
-      {/* GIANTS + AT HEART — 통합 하단 섹션 */}
+      {/* ⑥ AT HEART — 통합 하단 섹션 */}
       <section className="lp-final lp-giants-final" id="final">
         {/* AT HEART 상단 */}
         <div className="lp-eyebrow">AT HEART</div>

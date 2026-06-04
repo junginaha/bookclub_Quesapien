@@ -39,6 +39,9 @@ export async function POST(request: NextRequest) {
         content: content.trim(),
         author_name: author_name?.trim() || "익명",
         author_id: user?.id ?? null,
+        is_approved: true,   // 즉시 노출
+        is_featured: false,
+        is_today: false,
       })
       .select()
       .single();
