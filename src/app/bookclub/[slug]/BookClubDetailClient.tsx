@@ -708,38 +708,6 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
               />
             </div>
 
-            <div style={{ marginBottom:24 }}>
-              <label style={{ display:"block", fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"var(--muted)", marginBottom:6 }}>
-                참여 신청 링크 (잼잼)
-                {editForm.join_url && <span style={{ color:"var(--accent)", marginLeft:8, fontWeight:600 }}>✓ 연결됨</span>}
-              </label>
-              <input
-                type="url"
-                value={editForm.join_url}
-                onChange={(e) => setEditForm((f) => ({ ...f, join_url: e.target.value }))}
-                placeholder="잼잼 링크 붙여넣기 — 사용자에게 URL 비공개"
-                style={{ width:"100%", padding:"10px 14px", borderRadius:10, fontSize:14, border:"1px solid var(--line-soft)", background:"rgba(255,255,255,0.7)", color:"var(--ink)", outline:"none", boxSizing:"border-box" }}
-                onPaste={async (e) => {
-                  const pasted = e.clipboardData.getData("text").trim();
-                  if (!pasted.startsWith("http")) return;
-                  setEditForm((f) => ({ ...f, join_url: pasted }));
-                  // 붙여넣기 즉시 저장
-                  try {
-                    await fetch(`/api/book-clubs/${club.slug}`, {
-                      method:"PATCH", headers:{"Content-Type":"application/json"},
-                      body: JSON.stringify({ join_url: pasted, title: club.title, color: club.color }),
-                    });
-                    setSaveMsg("✓ 링크 저장됐어요!");
-                    setTimeout(() => setSaveMsg(""), 2500);
-                  } catch { /* local */ }
-                }}
-              />
-              {editForm.join_url && (
-                <div style={{ marginTop:4, fontSize:11, color:"var(--muted)" }}>
-                  → "참여 신청하기" 버튼 클릭 시 이 링크로 연결됩니다. URL은 사용자에게 노출되지 않습니다.
-                </div>
-              )}
-            </div>
 
             {saveMsg && (
               <div style={{ marginBottom:12, padding:"9px 14px", borderRadius:8, background: saveMsg.startsWith("✓") ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", border:`1px solid ${saveMsg.startsWith("✓") ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`, fontSize:13, color: saveMsg.startsWith("✓") ? "#10B981" : "#EF4444" }}>
