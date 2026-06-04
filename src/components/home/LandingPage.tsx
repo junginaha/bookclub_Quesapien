@@ -828,9 +828,13 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
       {/* ② 질문 남겨보기 — 화면 중앙 */}
       <section className="lp-ask-center-section" id="questions">
         <div className="lp-ask-center-inner">
+          {/* ?! 로고 애니메이션 */}
+          <div className="lp-ask-center-logo" aria-hidden="true">
+            <span className="lac-q">?</span><span className="lac-b">!</span>
+          </div>
           <h2 className="lp-ask-center-title">
             당신 마음속에<br />
-            <span className="lp-em">오래 남아 있던</span> 질문은.
+            <span className="lp-em">오래 남아 있던</span> 질문은
           </h2>
           <p className="lp-ask-center-sub">
             부끄러운 질문일수록 환영해요.

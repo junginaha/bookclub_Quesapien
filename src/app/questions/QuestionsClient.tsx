@@ -215,7 +215,7 @@ export default function QuestionsClient({
   };
 
   return (
-    <div style={{ background: "var(--bg)" }}>
+    <div style={{ background: "var(--bg)", overflowX: "hidden" }}>
 
       {/* ── Page Header ── */}
       <section style={{
@@ -320,8 +320,8 @@ export default function QuestionsClient({
                     <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(16px, 2.5vw, 24px)", fontWeight: 400, lineHeight: 1.6, color: "var(--cream-on-dark)", marginBottom: "clamp(12px, 2vw, 24px)", position: "relative" }}>
                       {today.content}
                     </p>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative" }}>
-                      <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+                    <div className="q-today-meta" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", flexWrap: "wrap", gap: 8 }}>
+                      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
                           <MessageSquare size={12} />
                           <strong style={{ color: "rgba(255,255,255,0.85)" }}>{today.answers_count?.toLocaleString()}</strong>
@@ -329,7 +329,7 @@ export default function QuestionsClient({
                         </div>
                         <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>— {today.author_name}</div>
                       </div>
-                      <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.5)", display: "flex", alignItems: "center", gap: 4 }}>
+                      <div className="q-today-answer-btn" style={{ fontSize: 12.5, color: "rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: 4, whiteSpace: "nowrap" }}>
                         답변 보기 <ChevronRight size={13} />
                       </div>
                     </div>
@@ -358,11 +358,11 @@ export default function QuestionsClient({
                           onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.95)"; (e.currentTarget as HTMLElement).style.transform = "translateX(3px)"; }}
                           onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = i === 0 ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.3)"; (e.currentTarget as HTMLElement).style.transform = "translateX(0)"; }}
                         >
-                          <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 28, fontStyle: "italic", color: "var(--accent)", opacity: i === 0 ? 0.9 : 0.3, lineHeight: 1, flexShrink: 0, minWidth: 28, textAlign: "center" }}>
+                          <span className="q-pop-num" style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 28, fontStyle: "italic", color: "var(--accent)", opacity: i === 0 ? 0.9 : 0.3, lineHeight: 1, flexShrink: 0, minWidth: 28, textAlign: "center" }}>
                             {i + 1}
                           </span>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 15.5, color: "var(--ink)", lineHeight: 1.55, marginBottom: 7, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          <div className="q-pop-content" style={{ flex: 1, minWidth: 0 }}>
+                            <p className="q-pop-text" style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 15.5, color: "var(--ink)", lineHeight: 1.55, marginBottom: 7, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                               {q.content}
                             </p>
                             <div style={{ display: "flex", gap: 14, fontSize: 12, color: "var(--muted)" }}>
@@ -488,8 +488,8 @@ export default function QuestionsClient({
                           </Link>
                         )}
 
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-                          <div style={{ display: "flex", gap: 6 }}>
+                        <div className="q-recent-footer" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+                          <div className="q-recent-tags" style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                             {(q.tags ?? []).slice(0, 3).map((tag: string) => (
                               <button
                                 key={tag}
@@ -506,8 +506,8 @@ export default function QuestionsClient({
                               </button>
                             ))}
                           </div>
-                          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                            <div style={{ display: "flex", gap: 12, fontSize: 12, color: "var(--muted)", alignItems: "center" }}>
+                          <div className="q-recent-meta" style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                            <div style={{ display: "flex", gap: 10, fontSize: 12, color: "var(--muted)", alignItems: "center", flexWrap: "wrap" }}>
                               <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
                                 <MessageSquare size={11} /> {q.answers_count} 답변
                               </span>
@@ -516,7 +516,7 @@ export default function QuestionsClient({
                             </div>
                             {/* 관리자 버튼 */}
                             {isAdmin && !isEditing && (
-                              <div style={{ display: "flex", gap: 4, marginLeft: 4 }}>
+                              <div className="q-admin-btns" style={{ display: "flex", gap: 4 }}>
                                 <button
                                   title="수정"
                                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); startEdit(q); }}
@@ -710,16 +710,45 @@ export default function QuestionsClient({
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.4; transform: scale(1.5); }
         }
+
+        /* ── 태블릿/중간 화면 (769~1024px) ── */
+        @media (max-width: 1024px) {
+          .grid-responsive { grid-template-columns: 1fr 300px !important; gap: 28px !important; }
+        }
+
+        /* ── 모바일 (≤768px): 사이드바 숨김, 단일 컬럼 ── */
         @media (max-width: 768px) {
-          .grid-responsive { grid-template-columns: 1fr !important; }
+          .grid-responsive { grid-template-columns: 1fr !important; gap: 0 !important; }
           .sidebar-hide { display: none !important; }
         }
-        @media (max-width: 480px) {
+
+        /* ── 소형 모바일 (≤540px) ── */
+        @media (max-width: 540px) {
+          /* 검색바 */
           .q-search-row { flex-direction: column !important; gap: 8px !important; }
           .q-search-row a { width: 100% !important; justify-content: center; }
-          .q-featured-num { font-size: 20px !important; min-width: 20px !important; }
-          .q-card-title { font-size: 14px !important; }
-          .q-recent-padding { padding: 14px 16px !important; }
+
+          /* 오늘의 질문 — 답변 보기 항상 표시 */
+          .q-today-meta { flex-direction: row !important; flex-wrap: wrap !important; gap: 6px 12px !important; }
+          .q-today-answer-btn { font-size: 12px !important; }
+
+          /* 인기 질문 — 번호 작게, 텍스트 2줄 허용 */
+          .q-pop-num { font-size: 20px !important; min-width: 20px !important; }
+          .q-pop-text { white-space: normal !important; overflow: hidden !important;
+            display: -webkit-box !important; -webkit-box-orient: vertical !important;
+            -webkit-line-clamp: 2 !important; }
+          .q-pop-content { min-width: 0 !important; }
+
+          /* 최근 질문 카드 */
+          .q-recent-footer { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; }
+          .q-recent-meta { flex-wrap: wrap !important; gap: 4px 10px !important; }
+          .q-admin-btns { flex-wrap: wrap !important; gap: 4px !important; }
+        }
+
+        /* ── 극소형 (≤380px) ── */
+        @media (max-width: 380px) {
+          .q-pop-num { display: none !important; }
+          .q-pop-text { font-size: 14px !important; }
         }
       `}</style>
     </div>
