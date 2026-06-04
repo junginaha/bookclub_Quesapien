@@ -650,6 +650,21 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   flex-shrink: 0;
   position: relative;
   z-index: 2;
+  /* 선명한 파랑 + 반짝 글로우 */
+  color: #3B82F6;
+  filter: drop-shadow(0 0 3px rgba(59,130,246,0.8)) drop-shadow(0 0 6px rgba(59,130,246,0.4));
+  animation: lnd-pin-shine 2s ease-in-out infinite;
+}
+
+@keyframes lnd-pin-shine {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(59,130,246,0.7)) drop-shadow(0 0 5px rgba(59,130,246,0.35));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 5px rgba(96,165,250,1)) drop-shadow(0 0 12px rgba(59,130,246,0.65)) drop-shadow(0 0 22px rgba(37,99,235,0.35));
+    transform: scale(1.15);
+  }
 }
 
 /* ── 메인 pill 버튼 ── */
