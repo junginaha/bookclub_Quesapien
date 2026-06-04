@@ -27,6 +27,8 @@ export default function SetupPage() {
   const [cleanMsg, setCleanMsg] = useState("");
   const [dedupStatus, setDedupStatus] = useState<"idle"|"loading"|"done"|"error">("idle");
   const [dedupMsg, setDedupMsg] = useState("");
+  const [forceStatus, setForceStatus] = useState<"idle"|"loading"|"done"|"error">("idle");
+  const [forceMsg, setForceMsg] = useState("");
 
   // ── 관리자 계정 생성/재설정 ──────────────────────────────────
   const handleAccount = async () => {
@@ -62,6 +64,17 @@ export default function SetupPage() {
       if (!res.ok) { setCleanStatus("error"); setCleanMsg(data.error ?? "실패"); return; }
       setCleanStatus("done"); setCleanMsg(data.message ?? `${data.deleted}개 삭제 완료`);
     } catch { setCleanStatus("error"); setCleanMsg("네트워크 오류"); }
+  };
+
+  // ── 강제 삭제 (ilike DB 검색) ────────────────────────────────
+  const handleForceDelete = async () => {
+    setForceStatus("loading"); setForceMsg("");
+    try {
+      const res = await fetch("/api/admin/force-delete");
+      const data = await res.json() as { ok?: boolean; message?: string; deleted_count?: number; error?: string };
+      if (!res.ok) { setForceStatus("error"); setForceMsg(data.error ?? "실패"); return; }
+      setForceStatus("done"); setForceMsg(data.message ?? `${data.deleted_count}건 삭제 완료`);
+    } catch { setForceStatus("error"); setForceMsg("네트워크 오류"); }
   };
 
   // ── 중복 정리 ────────────────────────────────────────────────
@@ -122,6 +135,21 @@ export default function SetupPage() {
               → 로그인 페이지로
             </Link>
           )}
+        </div>
+
+        {/* 0. 강제 즉시 삭제 (최우선) */}
+        <div style={{ ...card, border: "1px solid rgba(239,68,68,0.5)", background: "rgba(239,68,68,0.06)" }}>
+          <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#EF4444", marginBottom:8 }}>
+            ⚡ 강제 즉시 삭제 (DB ilike 검색)
+          </p>
+          <p style={{ fontSize:12, color:"rgba(236,227,207,0.4)", lineHeight:1.6, marginBottom:12 }}>
+            박상현·에겐남 포함 내용, 캐나다 법률, ICT교육, 상공회의소, 에스트로겐, 사랑이란... 등<br/>
+            <strong style={{ color:"rgba(239,68,68,0.8)" }}>질문·답변 테이블 모두 ilike로 즉시 삭제</strong>
+          </p>
+          <button style={{ ...btn("#EF4444"), fontWeight:700, fontSize:15 }} onClick={handleForceDelete} disabled={forceStatus==="loading"}>
+            {forceStatus==="loading" ? "삭제 중…" : forceStatus==="done" ? "✓ 삭제 완료" : "⚡ 지금 즉시 강제 삭제"}
+          </button>
+          <StatusBadge s={forceStatus} msg={forceMsg} />
         </div>
 
         {/* 2. 스팸 삭제 */}
