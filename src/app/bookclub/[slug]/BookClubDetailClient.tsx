@@ -9,6 +9,8 @@ import {
 import AISummaryBlock from "@/components/seo/AISummaryBlock";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 import type { RelatedItem } from "@/components/seo/RelatedLinks";
+import { useAppStore } from "@/lib/store";
+import { isAdminEmail } from "@/lib/admin";
 
 const COLOR_MAP: Record<string, string> = {
   navy: "#1B2536", cream: "#8B7A5E", rust: "#9B4A2E",
@@ -18,7 +20,10 @@ const COLOR_MAP: Record<string, string> = {
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export default function BookClubDetailClient({ club: initialClub, isAdmin = false }: { club: any; isAdmin?: boolean }) {
+export default function BookClubDetailClient({ club: initialClub }: { club: any; isAdmin?: boolean }) {
+  // 클라이언트 측에서 admin 여부 확인 (로그인 상태 즉시 반영)
+  const currentUser = useAppStore((s) => s.currentUser);
+  const isAdmin = isAdminEmail(currentUser?.email);
   const [club, setClub] = useState<any>(initialClub);
   const [joinStep, setJoinStep] = useState<"idle" | "done" | "no-link">("idle");
   const [joining, setJoining] = useState(false);

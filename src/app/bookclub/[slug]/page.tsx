@@ -164,7 +164,7 @@ export default async function BookClubDetailPage({ params }: Props) {
       <JsonLd data={crumbLd} />
 
       <Header />
-      <BookClubDetailClient club={club} isAdmin={!!isAdmin} />
+      <BookClubDetailClient club={club} />
       <Footer />
     </div>
   );

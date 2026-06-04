@@ -75,9 +75,10 @@ export async function PATCH(
 
   // 저장할 필드만 추출 (updated_by/created_by 제외 — 컬럼 없을 수 있음)
   const SAFE_FIELDS = [
+    "title", "color",
     "schedule", "location", "location_url", "join_url",
     "description", "host_name", "host_intro",
-    "max_participants", "session_dates",
+    "max_participants", "session_dates", "status",
   ] as const;
 
   const payload: Record<string, unknown> = {};
