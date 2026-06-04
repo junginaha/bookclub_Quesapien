@@ -799,8 +799,19 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
             </p>
             <div className="lp-cta-stack">
               <div className="lp-cta-row">
-                <a href="/questions" className="lp-btn-primary">
+                <a
+                  href="#questions"
+                  className="lp-btn-primary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById("questions")?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
                   <span>질문 주고 받기</span>
+                  <span className="lp-arrow" />
+                </a>
+                <a href="/questions" className="lp-btn-outline" style={{ fontSize: 13.5 }}>
+                  <span>질문 탐색하기</span>
                   <span className="lp-arrow" />
                 </a>
               </div>

@@ -180,11 +180,29 @@ export default function SetupPage() {
           <StatusBadge s={dedupStatus} msg={dedupMsg} />
         </div>
 
-        {/* 관리자 페이지 링크 */}
-        <div style={{ textAlign:"center", marginTop:8 }}>
-          <Link href="/admin" style={{ fontSize:13, color:"rgba(176,138,74,0.6)", textDecoration:"none" }}>
-            관리자 페이지 열기 →
-          </Link>
+        {/* 전체 한번에 실행 */}
+        <div style={{ ...card, background: "rgba(176,138,74,0.08)", border: "1px solid rgba(176,138,74,0.25)" }}>
+          <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#B08A4A", marginBottom:8 }}>
+            🚀 전체 한번에 실행
+          </p>
+          <button
+            style={btn("#B08A4A")}
+            onClick={async () => {
+              await handleCreate();
+              await handleForceDelete();
+              await handleCleanup();
+              await handleDedup();
+            }}
+          >
+            계정 생성 + 스팸 삭제 + 중복 정리 한번에
+          </button>
+        </div>
+
+        {/* 관리자 페이지 / 사이트 링크 */}
+        <div style={{ display:"flex", gap:16, justifyContent:"center", marginTop:8 }}>
+          <Link href="/admin" style={{ fontSize:13, color:"rgba(176,138,74,0.7)", textDecoration:"none" }}>관리자 페이지 →</Link>
+          <Link href="/" style={{ fontSize:13, color:"rgba(236,227,207,0.4)", textDecoration:"none" }}>메인으로 →</Link>
+          <Link href="/questions" style={{ fontSize:13, color:"rgba(236,227,207,0.4)", textDecoration:"none" }}>질문 페이지 →</Link>
         </div>
 
       </div>
