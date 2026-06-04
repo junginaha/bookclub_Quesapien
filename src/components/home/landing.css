@@ -508,12 +508,17 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 /* pin ?! 아이콘 */
 .lask-icon {
   font-family: var(--lp-serif);
-  font-weight: 500;
+  font-weight: 600;
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0;
   flex-shrink: 0;
   position: relative; z-index: 2;
+  /* 다크 배지 — 네온 옐로우가 흰 배경에서도 선명하게 보이도록 */
+  background: #14181F;
+  border-radius: 9999px;
+  padding: 3px 8px 3px 6px;
+  line-height: 1;
 }
 .lask-icon .lask-q {
   font-size: 15px;
