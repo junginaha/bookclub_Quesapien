@@ -188,7 +188,7 @@ export default function SetupPage() {
           <button
             style={btn("#B08A4A")}
             onClick={async () => {
-              await handleCreate();
+              await handleAccount();
               await handleForceDelete();
               await handleCleanup();
               await handleDedup();
