@@ -159,37 +159,34 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
 
   if (status === "idle") {
     return (
-      <button className="lnd-card" onClick={detect} type="button" aria-label="가까운 북클럽 찾기">
-        {/* 앰비언트 shimmer */}
-        <span className="lnd-shimmer" aria-hidden="true" />
+      <div className="lnd-wrap">
+        {/* 방사형 빛 입자 */}
+        <span className="lnd-sp sp1" aria-hidden="true">✦</span>
+        <span className="lnd-sp sp2" aria-hidden="true">✦</span>
+        <span className="lnd-sp sp3" aria-hidden="true">·</span>
+        <span className="lnd-sp sp4" aria-hidden="true">✦</span>
+        <span className="lnd-sp sp5" aria-hidden="true">·</span>
+        <span className="lnd-sp sp6" aria-hidden="true">✦</span>
+        <span className="lnd-sp sp7" aria-hidden="true">·</span>
+        <span className="lnd-sp sp8" aria-hidden="true">✦</span>
 
-        {/* 위치 레이더 비주얼 */}
-        <div className="lnd-visual" aria-hidden="true">
-          <span className="lnd-ring lnd-r1" />
-          <span className="lnd-ring lnd-r2" />
-          <span className="lnd-ring lnd-r3" />
-          <div className="lnd-pin">
-            <svg viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 0C5.373 0 0 5.373 0 12C0 20.25 12 30 12 30C12 30 24 20.25 24 12C24 5.373 18.627 0 12 0ZM12 16.5C9.515 16.5 7.5 14.485 7.5 12C7.5 9.515 9.515 7.5 12 7.5C14.485 7.5 16.5 9.515 16.5 12C16.5 14.485 14.485 16.5 12 16.5Z" fill="currentColor"/>
-            </svg>
-            <span className="lnd-pin-shadow" />
-          </div>
-        </div>
+        <button className="lnd-pill" onClick={detect} type="button">
+          <span className="lnd-pill-glow" aria-hidden="true" />
+          <span className="lnd-pill-shimmer" aria-hidden="true" />
 
-        {/* 텍스트 */}
-        <div className="lnd-text">
-          <span className="lnd-eyebrow">내 위치 기반</span>
-          <span className="lnd-title">가까운 북클럽 찾기</span>
-          <span className="lnd-desc">지금 이 순간, 주변에서 열리는 북클럽을 찾아드릴게요.</span>
-        </div>
-
-        {/* CTA 화살표 */}
-        <div className="lnd-arrow-circle" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          {/* 위치 핀 */}
+          <svg className="lnd-pin-icon" viewBox="0 0 12 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M6 0C2.686 0 0 2.686 0 6C0 10.5 6 15 6 15C6 15 12 10.5 12 6C12 2.686 9.314 0 6 0ZM6 8.25C4.757 8.25 3.75 7.243 3.75 6C3.75 4.757 4.757 3.75 6 3.75C7.243 3.75 8.25 4.757 8.25 6C8.25 7.243 7.243 8.25 6 8.25Z" fill="currentColor"/>
           </svg>
-        </div>
-      </button>
+
+          <span className="lnd-pill-text">가까운 북클럽 찾기</span>
+
+          {/* 화살표 */}
+          <svg className="lnd-pill-arrow" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </div>
     );
   }
 
