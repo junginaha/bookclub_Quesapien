@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { josa } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 import "./landing.css";
 
 // ─── 거리 계산 (Haversine) ────────────────────────────────────
@@ -582,6 +583,28 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
   const [dbBooks, setDbBooks] = useState<BookClub[]>([]);
   const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
   const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+
+  // ── 실시간 활동 카운터 ──────────────────────────────────────
+  const [newQuestions, setNewQuestions] = useState(0);
+  const [newAnswers, setNewAnswers] = useState(0);
+  const [realtimeVisible, setRealtimeVisible] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ch = (supabase as any)
+      .channel("landing-activity")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "landing_questions" }, () => {
+        setNewQuestions((n) => n + 1);
+        setRealtimeVisible(true);
+      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "landing_question_answers" }, () => {
+        setNewAnswers((n) => n + 1);
+        setRealtimeVisible(true);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   // DB에서 북클럽 불러오기 (위치 기반용 lat/lng 포함)
   useEffect(() => {
@@ -1169,6 +1192,41 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           거인의 어깨 탐색하기 →
         </a>
       </section>
+
+      {/* ── 실시간 활동 알림 뱃지 ── */}
+      {realtimeVisible && (newQuestions > 0 || newAnswers > 0) && (
+        <div
+          style={{
+            position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+            zIndex: 300, display: "flex", alignItems: "center", gap: 10,
+            padding: "10px 20px", borderRadius: 9999,
+            background: "rgba(20,24,31,0.92)",
+            backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
+            border: "1px solid rgba(176,138,74,0.35)",
+            boxShadow: "0 8px 32px -8px rgba(0,0,0,0.5), 0 0 20px -8px rgba(176,138,74,0.3)",
+            animation: "lp-fade .4s ease",
+            cursor: "pointer",
+          }}
+          onClick={() => { setRealtimeVisible(false); setNewQuestions(0); setNewAnswers(0); }}
+          title="클릭하여 닫기"
+        >
+          {/* 라이브 도트 */}
+          <span style={{ position: "relative", display: "inline-flex", width: 8, height: 8 }}>
+            <span style={{
+              position: "absolute", inset: 0, borderRadius: "50%",
+              background: "#B08A4A",
+              animation: "lp-pulse 1.8s ease-out infinite",
+            }} />
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#B08A4A", display: "block" }} />
+          </span>
+          <span style={{ fontSize: 13, fontFamily: "var(--lp-serif-ko)", color: "rgba(236,227,207,0.9)", whiteSpace: "nowrap", letterSpacing: "-0.005em" }}>
+            {newQuestions > 0 && <><strong style={{ color: "#DDBE85" }}>새 질문 +{newQuestions}</strong></>}
+            {newQuestions > 0 && newAnswers > 0 && <span style={{ color: "rgba(236,227,207,0.4)", margin: "0 6px" }}>·</span>}
+            {newAnswers > 0 && <><strong style={{ color: "#DDBE85" }}>새 답변 +{newAnswers}</strong></>}
+          </span>
+          <span style={{ fontSize: 11, color: "rgba(236,227,207,0.3)", marginLeft: 2 }}>방금 업데이트</span>
+        </div>
+      )}
 
       {/* FOOTER */}
       <footer className="lp-footer">

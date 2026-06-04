@@ -17,10 +17,11 @@ const SPAM_KEYWORDS = [
   "비엠씨랩",
   "goor.me",
   "삼가",
+  "에스트로겐",
 ];
 
 // 삭제할 작성자 이름 (landing_questions.author_name)
-const SPAM_AUTHORS = ["박상현"];
+const SPAM_AUTHORS = ["박상현", "에겐남"];
 
 // 삭제할 정확한 내용 (완전 일치 또는 포함)
 const SPAM_EXACT = [
