@@ -8,3 +8,20 @@ node_modules
 .env.local
 tsconfig.tsbuildinfo
 *.env\n.env.*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Backend runtime
+publishing_os.db
+uploads/
+outputs/
+
+# Fonts (download via setup_fonts.sh)
+backend/fonts/*.ttf
+backend/fonts/*.otf
