@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { orgSchema, websiteSchema } from "@/lib/schema";
+import KeycapSound from "@/components/common/KeycapSound";
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ["latin"],
@@ -102,6 +103,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="ko"
       className={`${notoSansKR.variable} ${notoSerifKR.variable} ${ebGaramond.variable}`}
     >
+      <head>
+        {/* 키캡 버튼(.btn-keycap) 음각 전용 폰트 — 배민 주아(BMJUA), §C2 */}
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/BMJUA.css"
+        />
+      </head>
       <body className="min-h-screen antialiased">
         {/* Stage 1: Organization + WebSite JSON-LD — sitewide */}
         <JsonLd data={orgSchema()} />
@@ -112,6 +120,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}`,
           }}
         />
+        <KeycapSound />
         <AuthProvider>
           {children}
         </AuthProvider>

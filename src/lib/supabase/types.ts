@@ -11,6 +11,22 @@ export interface ProfileRow {
   id: string; email: string; name: string;
   avatar_url: string | null; bio: string | null;
   joined_at: string; session_count: number;
+  // Quesapience 2.0 — 009_profiles_v2.sql
+  nickname: string;
+  phone: string | null;
+  home_region: string | null;             // geography(point,4326), PostGIS WKB/GeoJSON as returned by PostgREST
+  is_operator: boolean;
+  privacy_consented_at: string | null;
+  phone_consented_at: string | null;
+  deactivated_at: string | null;
+}
+
+export interface EventRow {
+  id: number;
+  user_id: string | null;
+  name: string;
+  props: Json | null;
+  created_at: string;
 }
 export interface QuestionRow {
   id: string; title: string; description: string;
@@ -128,8 +144,13 @@ export interface Database {
     Tables: {
       profiles: {
         Row: ProfileRow;
-        Insert: Omit<ProfileRow, "joined_at" | "session_count"> & { joined_at?: string; session_count?: number; };
+        Insert: Omit<ProfileRow, "joined_at" | "session_count" | "is_operator"> & { joined_at?: string; session_count?: number; is_operator?: boolean; };
         Update: Partial<ProfileRow>;
+      };
+      events: {
+        Row: EventRow;
+        Insert: { id?: number; user_id?: string | null; name: string; props?: Json | null; created_at?: string; };
+        Update: Partial<EventRow>;
       };
       questions: {
         Row: QuestionRow;

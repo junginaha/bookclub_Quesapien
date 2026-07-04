@@ -20,6 +20,12 @@
   --cream-on-dark: #ECE3CF;
   --gutter: clamp(1.5rem, 5vw, 6rem);
 
+  /* 키캡 버튼(.btn-keycap) 전용 토큰 — 전체 UI로 확산 금지, §C2 */
+  --q-cobalt: #2338E0;
+  --q-cobalt-deep: #1424A8;
+  --q-glow: #4D6BFF;
+  --q-ivory: #F5EFD8;
+
   /* Shadcn compatibility */
   --background: 40 20% 92%;
   --foreground: 220 13% 13%;
@@ -309,6 +315,117 @@
     opacity: 0.88;
   }
 
+  /* ─── Keycap Button — Watercolor Royal Blue ──────────────────── */
+  .btn-keycap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+
+    /* 모바일 기본 */
+    width: 40px;
+    height: 38px;
+    padding: 3px 4px;
+    flex-shrink: 0;
+    position: relative;
+    isolation: isolate;
+
+    /* 수채화 — 좌상단 빛 + 우하단 어두운 풀링 + 중앙 깊이 */
+    background-color: #1A2C94;
+    background-image:
+      radial-gradient(ellipse at 82% 90%, rgba(6,10,62,0.50) 0%, transparent 50%),
+      radial-gradient(ellipse at 16% 84%, rgba(8,12,72,0.38) 0%, transparent 46%),
+      radial-gradient(ellipse at 26% 12%, rgba(110,150,255,0.62) 0%, rgba(255,255,255,0) 52%),
+      linear-gradient(148deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0) 40%);
+
+    /* 크림 아이보리 + 1px 크리스프 엠보스 — /design-refs/keycap-button.png 대조 결과
+       순백이 아니라 --q-ivory(#F5EFD8) 크림 톤, §C2 */
+    color: var(--q-ivory) !important;
+    text-shadow: 0 1px 0 rgba(6,10,62,0.60);
+    border: none;
+    border-radius: 11px;
+
+    font-family: "BMJUA", var(--font-noto-sans-kr), "Noto Sans KR", sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.3;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none !important;
+    user-select: none;
+    vertical-align: middle;
+    -webkit-font-smoothing: antialiased;
+
+    /* 깊은 입체감 — 상단 글로시 + 좌측 반사 + 하단 그림자 + 두꺼운 벽 */
+    box-shadow:
+      0 0 0 5px #2848D4,
+      inset 0 3.5px 0 rgba(255,255,255,0.52),
+      inset 3px 0 0 rgba(255,255,255,0.20),
+      inset -3px 0 0 rgba(6,10,62,0.32),
+      inset 0 -2.5px 0 rgba(6,10,62,0.48),
+      inset 0 0 20px rgba(6,10,62,0.12),
+      0 9px 0 0 #0C1A8C,
+      0 10px 0 5px #07104E;
+
+    transform: translateY(0);
+    animation: keycap-glow 3s ease-in-out infinite;
+    transition:
+      transform 0.065s cubic-bezier(.2,.8,.2,1),
+      box-shadow 0.065s cubic-bezier(.2,.8,.2,1),
+      filter 0.065s cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* 수채화 번짐 — 외곽 소프트 글로우 레이어 */
+  .btn-keycap::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 14px;
+    background: transparent;
+    box-shadow:
+      0 4px 18px rgba(30,58,210,0.38),
+      0 2px 6px rgba(30,58,210,0.22);
+    z-index: -1;
+    pointer-events: none;
+    transition: box-shadow 0.065s ease;
+  }
+
+  .btn-keycap:hover {
+    background-color: #152488;
+    color: var(--q-ivory) !important;
+    transform: translateY(2px);
+    box-shadow:
+      0 0 0 5px #2848D4,
+      inset 0 3.5px 0 rgba(255,255,255,0.42),
+      inset 3px 0 0 rgba(255,255,255,0.15),
+      inset -3px 0 0 rgba(6,10,62,0.26),
+      inset 0 -2.5px 0 rgba(6,10,62,0.38),
+      inset 0 0 20px rgba(6,10,62,0.10),
+      0 7px 0 0 #0C1A8C,
+      0 8px 0 5px #07104E;
+  }
+
+  .btn-keycap:hover::after {
+    box-shadow:
+      0 6px 24px rgba(30,58,210,0.52),
+      0 2px 8px rgba(30,58,210,0.30);
+  }
+
+  .btn-keycap:active,
+  .btn-keycap.pressed {
+    transform: translateY(7px);
+    box-shadow:
+      0 0 0 5px #2848D4,
+      inset 0 1.5px 0 rgba(255,255,255,0.18),
+      inset 2px 0 0 rgba(255,255,255,0.06),
+      inset 0 3px 7px rgba(6,10,62,0.32),
+      inset -2px 0 0 rgba(6,10,62,0.12),
+      0 2px 0 0 #0C1A8C,
+      0 3px 0 5px #07104E;
+  }
+
   .hairline {
     border-top: 1px solid var(--line);
   }
@@ -323,6 +440,27 @@
   .card-base:hover {
     box-shadow: 0 8px 32px rgba(28, 31, 38, 0.08);
     transform: translateY(-2px);
+  }
+}
+
+/* ─── Keycap 반응형 크기 (모바일→태블릿→데스크탑) ─────────────── */
+/* 버튼은 shift/fn/캡 등 다양한 너비를 쓸 수 있음 — 기본값만 반응형 처리 */
+@media (min-width: 640px) {
+  .btn-keycap {
+    width: 46px;
+    height: 44px;
+    padding: 4px 5px;
+    font-size: 10px;
+    border-radius: 11px;
+  }
+}
+@media (min-width: 1024px) {
+  .btn-keycap {
+    width: 52px;
+    height: 50px;
+    padding: 5px 6px;
+    font-size: 10.5px;
+    border-radius: 12px;
   }
 }
 
@@ -351,6 +489,18 @@
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* 버튼 주변 앰비언트 글로우 — text-shadow 변경 없음, 글자 번짐 없음 */
+@keyframes keycap-glow {
+  0%, 100% {
+    filter: drop-shadow(0 8px 14px rgba(12,26,110,0.48))
+            drop-shadow(0 0  6px rgba(30,58,210,0.20));
+  }
+  50% {
+    filter: drop-shadow(0 10px 22px rgba(28,58,200,0.72))
+            drop-shadow(0 0  14px rgba(40,80,220,0.35));
+  }
+}
 .grid-responsive { grid-template-columns: 1fr 360px; }
 @media (max-width: 900px) { .grid-responsive { grid-template-columns: 1fr !important; } }
 @media (max-width: 900px) { .sidebar-hide { display: none !important; } }
