@@ -2,83 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { MapPin, Calendar, Users, ChevronRight, Filter } from "lucide-react";
+import { MapPin, Calendar, Users, ChevronRight } from "lucide-react";
+
+import { ALL_CLUBS, toBookClubCard } from "@/lib/clubsData";
 
 // ─── Static fallback data ─────────────────────────────────────
-const STATIC_CLUBS = [
-  {
-    id: "1", slug: "다정함의-발명", title: "다정함의 발명", author: "허지영",
-    color: "cream", genre: "에세이 · 산문", tag: "#관계 #사랑",
-    host_name: "정해린", host_intro: "질문을 통해 사람의 마음을 읽습니다",
-    schedule: "2026년 6월 14일 (토) 오후 3시", location: "서초구 서초동",
-    max_participants: 8, current_participants: 5, status: "active",
-    description: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 우리가 일상에서 놓치고 있는 다정함의 순간들을 함께 발견합니다.",
-    session_dates: [{ date: "2026-06-14", topic: "다정함의 정의" }],
-    why_this_book: "사랑을 거창하게 생각해온 우리에게 필요한 책입니다.",
-    key_questions: ["당신이 가장 다정했던 순간은?", "받은 다정함 중 가장 오래 남은 것은?"],
-    emotion_tags: ["#다정함", "#일상", "#연결"],
-  },
-  {
-    id: "2", slug: "혼자라는-감각", title: "혼자라는 감각", author: "주성원",
-    color: "rust", genre: "철학 · 에세이", tag: "#외로움 #인생전환",
-    host_name: "서민준", host_intro: "조용한 목소리에 귀를 기울입니다",
-    schedule: "2026년 6월 21일 (토) 오후 2시", location: "마포구 상수동",
-    max_participants: 6, current_participants: 4, status: "active",
-    description: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자 있는 것이 부끄럽지 않아진 첫 책.",
-    session_dates: [{ date: "2026-06-21", topic: "고독의 의미" }],
-    why_this_book: "혼자이기 때문에 더 깊어지는 것들이 있습니다.",
-    key_questions: ["혼자 있을 때 당신은 무엇을 느끼나요?", "외로움과 고독의 차이는?"],
-    emotion_tags: ["#고독", "#성장", "#사유"],
-  },
-  {
-    id: "3", slug: "아무도-보지-않는-오후", title: "아무도 보지 않는 오후", author: "김범",
-    color: "olive", genre: "회고 · 에세이", tag: "#창업 #번아웃",
-    host_name: "유은재", host_intro: "대화는 답을 찾는 일이 아니라 함께 머무는 일",
-    schedule: "2026년 6월 28일 (토) 오후 4시", location: "용산구 한남동",
-    max_participants: 10, current_participants: 3, status: "active",
-    description: "실패한 사람이 아니라, 멈춰본 적 있는 사람의 문장. 무너졌던 시기에 챕터 7이 저를 일으켰습니다.",
-    session_dates: [{ date: "2026-06-28", topic: "멈춤의 의미" }],
-    why_this_book: "번아웃 이후를 어떻게 살아야 하는지 묻는 책.",
-    key_questions: ["당신이 가장 지쳤던 순간은?", "멈추는 것이 용기일 때는 언제인가?"],
-    emotion_tags: ["#회복", "#쉼", "#용기"],
-  },
-  {
-    id: "4", slug: "외로움-시즌-위크4", title: "외로움 시즌 · Week 4", author: "큐레이션",
-    color: "navy", genre: "시즌 북토크", tag: "#외로움 #연결",
-    host_name: "정해린", host_intro: "Season 04 진행 리더",
-    schedule: "2026년 7월 5일 (토) 오후 3시", location: "서초구 교대역",
-    max_participants: 12, current_participants: 9, status: "active",
-    description: "외로움 시즌의 네 번째 모임. 혼자 있어도 외롭지 않은 사람과, 함께 있어도 외로운 사람 사이의 거리.",
-    session_dates: [{ date: "2026-07-05", topic: "함께 있는 외로움" }],
-    why_this_book: "이번 시즌의 핵심 질문을 탐구합니다.",
-    key_questions: ["함께 있어도 외로운 경험이 있나요?", "외로움을 치유하는 방법은?"],
-    emotion_tags: ["#외로움", "#연결", "#시즌04"],
-  },
-  {
-    id: "5", slug: "오늘-저녁-당신께", title: "오늘 저녁, 당신께", author: "박상현",
-    color: "dusk", genre: "시집", tag: "#사랑 #이별",
-    host_name: "서민준", host_intro: "느린 독서를 권합니다",
-    schedule: "2026년 7월 12일 (토) 오후 6시", location: "종로구 부암동",
-    max_participants: 8, current_participants: 8, status: "closed",
-    description: "시집은 빠르게 읽지 않는 것이라고 가르쳐준 책. 한 페이지에서 일주일을 머문 적이 있어요.",
-    session_dates: [{ date: "2026-07-12", topic: "시와 이별" }],
-    why_this_book: "느리게 읽는 것의 가치를 느끼게 해주는 시집.",
-    key_questions: ["당신이 가장 오래 머문 문장은?", "이별을 어떻게 기억하나요?"],
-    emotion_tags: ["#느림", "#이별", "#기억"],
-  },
-  {
-    id: "6", slug: "인간이라는-풍경", title: "인간이라는 풍경", author: "한강",
-    color: "sage", genre: "논픽션 · 산문", tag: "#인간 #사유",
-    host_name: "유은재", host_intro: "대화는 함께 머무는 일입니다",
-    schedule: "2026년 7월 19일 (토) 오후 2시", location: "마포구 망원동",
-    max_participants: 10, current_participants: 2, status: "upcoming",
-    description: "인간을 풍경처럼 멀리서 바라보는 시선. 미워하던 사람을 다시 사람으로 보게 만드는 책.",
-    session_dates: [{ date: "2026-07-19", topic: "인간이란 무엇인가" }],
-    why_this_book: "타인을 새롭게 보는 눈을 갖게 해주는 책입니다.",
-    key_questions: ["당신이 가장 이해하기 힘들었던 사람은?", "미워함이 연민으로 바뀐 경험은?"],
-    emotion_tags: ["#관계", "#용서", "#거리"],
-  },
-];
+const STATIC_CLUBS = ALL_CLUBS.map(toBookClubCard);
 
 const COLOR_MAP: Record<string, string> = {
   navy: "#1B2536",
@@ -106,7 +35,7 @@ type FilterType = typeof FILTERS[number];
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default function BookClubClient({ initialClubs }: { initialClubs: any[] }) {
-  const clubs = initialClubs.length > 0 ? initialClubs : STATIC_CLUBS;
+  const clubs = STATIC_CLUBS;
   const [activeFilter, setActiveFilter] = useState<FilterType>("전체");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 

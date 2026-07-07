@@ -425,7 +425,7 @@ export default function Header() {
                       pointerEvents: authBtnIdx === 1 ? "auto" : "none",
                     }}
                   >
-                    함께하기
+                    함께읽기
                   </Link>
                 </div>
               </div>

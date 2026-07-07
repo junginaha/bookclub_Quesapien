@@ -753,7 +753,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
         <div style={{ position: "relative", width: 90, height: 38, overflow: "hidden" }}>
           {[
             { href: "/login", label: "로그인", filled: false },
-            { href: "/signup", label: "함께하기", filled: true },
+            { href: "/signup", label: "함께읽기", filled: true },
           ].map((btn, i) => (
             <a
               key={btn.href}
@@ -790,7 +790,18 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           </div>
           <h1 className="lp-h-display">
             <span className="lp-reveal"><span>좋은 <span className="lp-em">질문</span>은</span></span>
-            <span className="lp-reveal"><span>좋은 사람을 데려옵니다.</span></span>
+            <span className="lp-reveal"><span>좋은 사람을</span></span>
+            <span className="lp-reveal lp-reveal-last">
+              <span style={{ display: "flex", alignItems: "flex-end", gap: "clamp(8px, 1.2vw, 16px)", flexWrap: "wrap",
+                /* 버튼 그림자(상하)를 위한 여백: overflow:visible 과 함께 작동 */
+                paddingBottom: "28px", paddingTop: "12px",
+                marginBottom: "-28px", marginTop: "-12px" }}>
+                <span>데려옵니다</span>
+                <a href="/bookclub" className="btn-keycap lp-hero-bookclub-btn">
+                  북클럽<br />둘러보기
+                </a>
+              </span>
+            </span>
           </h1>
           <div className="lp-hero-sub">
             <p>
@@ -801,76 +812,14 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             </p>
           </div>
 
-          {/* Subtle accent dots */}
-          {([
-            { cls: "dot d1", idx: 0 },
-            { cls: "dot d2", idx: 1 },
-          ] as const).map(({ cls, idx }) => (
-            <div
-              key={idx}
-              className={`lp-float ${cls} lp-float-secret`}
-              onMouseEnter={() => openFloat(idx)}
-              onMouseLeave={() => closeFloat(idx)}
-            >
-              {activeFloat === idx && (
-                <FloatPopup
-                  {...floatItems[idx]}
-                  onOpen={() => handleFloatOpen(idx)}
-                />
-              )}
-            </div>
-          ))}
         </div>
         <div className="lp-scroll-cue">
-          <span>scroll</span>
           <span className="sc-line" />
         </div>
       </section>
 
       {/* 내 근처 다음 모임 — Quesapience 2.0 §C1 구조적 귀결① (홈 = 내 근처 다음 모임 피드) */}
       <NearbyMeetingsFeed items={upcomingMeetings} />
-
-      {/* ② 질문 남겨보기 — 화면 중앙 */}
-      <section className="lp-ask-center-section" id="questions">
-        <div className="lp-ask-center-inner">
-          {/* ?! 로고 애니메이션 */}
-          <div className="lp-ask-center-logo" aria-hidden="true">
-            <span className="lac-q">?</span><span className="lac-b">!</span>
-          </div>
-          <h2 className="lp-ask-center-title">
-            당신 마음속에<br />
-            <span className="lp-em">오래 남아 있던</span> 질문은
-          </h2>
-          <p className="lp-ask-center-sub">
-            부끄러운 질문일수록 환영해요.
-          </p>
-          <div className="lp-ask-center-cta">
-            {/* 가까운 북클럽 찾기와 동일 구조 pill */}
-            <div className="lask-wrap">
-              <span className="lask-sp sp1" aria-hidden="true">✦</span>
-              <span className="lask-sp sp2" aria-hidden="true">✦</span>
-              <span className="lask-sp sp3" aria-hidden="true">·</span>
-              <span className="lask-sp sp4" aria-hidden="true">✦</span>
-              <span className="lask-sp sp5" aria-hidden="true">·</span>
-              <span className="lask-sp sp6" aria-hidden="true">✦</span>
-              <span className="lask-sp sp7" aria-hidden="true">·</span>
-              <span className="lask-sp sp8" aria-hidden="true">✦</span>
-              <a href="/questions" className="lask-pill">
-                <span className="lask-shimmer" aria-hidden="true" />
-                <span className="lask-glow" aria-hidden="true" />
-                <span className="lask-icon" aria-hidden="true">
-                  <span className="lask-q">?</span><span className="lask-b">!</span>
-                </span>
-                <span className="lask-text">질문 남겨보기</span>
-                <svg className="lask-arrow" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </a>
-            </div>
-            <span className="lp-ask-center-note">— 생각보다 따뜻합니다.</span>
-          </div>
-        </div>
-      </section>
 
       {/* ③ BOOKLOVER */}
       <section className="lp-section lp-books" id="books">

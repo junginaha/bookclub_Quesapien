@@ -185,7 +185,9 @@ export default function HeroSection() {
               </em>
               은
               <br />
-              좋은 사람을 데려옵니다.
+              좋은 사람을
+              <br />
+              데려옵니다
             </h1>
 
             <p
@@ -201,6 +203,14 @@ export default function HeroSection() {
               <span className="kw">질문</span>으로 연결되는 미래혁신형 북클럽.{" "}
               조용한 사람들이 가장 깊은 이야기를 시작합니다.
             </p>
+
+            <a
+              href="/bookclub"
+              className="btn-primary-dark"
+              style={{ display: "inline-block", marginTop: "36px", fontSize: "15px", padding: "14px 32px" }}
+            >
+              북클럽 둘러보기
+            </a>
           </div>
 
           {/* Right: CTA block */}
