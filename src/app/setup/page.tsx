@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 
 const ADMIN_EMAIL = "junginaha@gmail.com";
-const ADMIN_PASSWORD = "QSAdmin2026!#";
 
 const card: React.CSSProperties = {
   background: "rgba(255,255,255,0.05)",
@@ -31,28 +30,15 @@ export default function SetupPage() {
   const [forceMsg, setForceMsg] = useState("");
 
   // ── 관리자 계정 생성/재설정 ──────────────────────────────────
-  const handleAccount = async () => {
-    setAccountStatus("loading"); setAccountMsg("");
-    try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD, name: "절대자" }),
-      });
-      const data = await res.json() as { ok?: boolean; error?: string };
-      if (res.status === 409) {
-        // 이미 존재 → 비밀번호 재설정
-        const r2 = await fetch("/api/admin/setup", { method: "POST" });
-        const d2 = await r2.json() as { ok?: boolean; error?: string };
-        if (d2.ok) { setAccountStatus("done"); setAccountMsg("비밀번호가 재설정됐어요."); }
-        else { setAccountStatus("error"); setAccountMsg(d2.error ?? "재설정 실패"); }
-        return;
-      }
-      if (!res.ok) { setAccountStatus("error"); setAccountMsg(data.error ?? "생성 실패"); return; }
-      setAccountStatus("done"); setAccountMsg("계정이 생성됐어요!");
-    } catch (e) {
-      setAccountStatus("error"); setAccountMsg(e instanceof Error ? e.message : "오류");
-    }
+  // EMERGENCY HOTFIX(docs/PROJECT_AUDIT.md 참고): 이 페이지가 하드코딩된 비밀번호로
+  // 공개 /api/auth/signup을 자동 호출하던 방식은 보안 취약점이었다(누구나 브라우저
+  // 번들에서 비밀번호를 읽어 동일 계정을 직접 생성/탈취할 수 있었음). 이제 계정
+  // 부트스트랩/재설정은 서버에서 x-admin-key(SUPABASE_SERVICE_ROLE_KEY)를 아는
+  // 사람만 curl 등으로 /api/admin/setup을 호출해야 한다 — 브라우저 버튼으로는
+  // 안전하게 재현할 수 없으므로 의도적으로 제거했다.
+  const handleAccount = () => {
+    setAccountStatus("error");
+    setAccountMsg("보안 강화로 이 버튼은 비활성화됐어요. 서버에서 x-admin-key 헤더로 /api/admin/setup을 직접 호출하세요.");
   };
 
   // ── 스팸 데이터 정리 ─────────────────────────────────────────
@@ -122,12 +108,14 @@ export default function SetupPage() {
             <span style={{ fontSize:12, color:"rgba(236,227,207,0.4)" }}>이메일</span>
             <code style={{ fontSize:12, color:"#ECE3CF", userSelect:"all" }}>{ADMIN_EMAIL}</code>
           </div>
-          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:14, padding:"10px 14px", background:"rgba(0,0,0,0.25)", borderRadius:8 }}>
-            <span style={{ fontSize:12, color:"rgba(236,227,206,0.4)" }}>비밀번호</span>
-            <code style={{ fontSize:12, color:"#ECE3CF", userSelect:"all" }}>{ADMIN_PASSWORD}</code>
-          </div>
+          <p style={{ fontSize:12, color:"rgba(236,227,207,0.5)", lineHeight:1.7, marginBottom:14, padding:"10px 14px", background:"rgba(0,0,0,0.25)", borderRadius:8 }}>
+            보안 강화로 비밀번호는 이 페이지에 표시되지 않습니다. 서버에서
+            <code style={{ margin: "0 4px" }}>ADMIN_BOOTSTRAP_PASSWORD</code>
+            환경변수를 임시로 설정한 뒤, <code style={{ margin: "0 4px" }}>x-admin-key</code> 헤더(서비스 롤 키)를 포함해
+            <code style={{ margin: "0 4px" }}>/api/admin/setup</code>을 직접 호출하세요.
+          </p>
           <button style={btn("#B08A4A")} onClick={handleAccount} disabled={accountStatus==="loading"}>
-            {accountStatus==="loading" ? "처리 중…" : accountStatus==="done" ? "✓ 완료" : "계정 생성 / 비밀번호 재설정"}
+            {accountStatus==="loading" ? "처리 중…" : accountStatus==="done" ? "✓ 완료" : "계정 생성 / 비밀번호 재설정 안내 보기"}
           </button>
           <StatusBadge s={accountStatus} msg={accountMsg} />
           {accountStatus==="done" && (

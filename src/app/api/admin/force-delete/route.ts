@@ -1,9 +1,11 @@
 /**
- * 강제 삭제 — Supabase ilike로 내용 검색 후 즉시 삭제
+ * 강제 삭제 — Supabase ilike로 내용 검색 후 즉시 삭제 (운영자 전용, EMERGENCY HOTFIX로
+ * 인증 추가됨, docs/PROJECT_AUDIT.md 참고)
  * GET /api/admin/force-delete  → 스팸 내용 DB에서 즉시 삭제
  */
 import { NextResponse } from "next/server";
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { isOperator } from "@/lib/admin";
 
 // DB 레벨 ilike 패턴 (content ILIKE '%pattern%')
 const FORCE_PATTERNS = [
@@ -24,6 +26,10 @@ const FORCE_PATTERNS = [
 ];
 
 export async function GET() {
+  if (!(await isOperator(await createClient()))) {
+    return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = createServiceClient() as any;
 

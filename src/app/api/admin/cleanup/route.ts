@@ -1,10 +1,11 @@
 /**
- * 스팸/중복 데이터 정리 (서비스 롤 사용 — 로그인 불필요)
+ * 스팸/중복 데이터 정리 (운영자 전용 — EMERGENCY HOTFIX로 인증 추가됨, docs/PROJECT_AUDIT.md 참고)
  * GET  /api/admin/cleanup         → 스팸 질문·답변 일괄 삭제
  * POST /api/admin/cleanup         → 중복 질문·답변 정리
  */
 import { NextRequest, NextResponse } from "next/server";
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { isOperator } from "@/lib/admin";
 
 // ── 스팸 키워드 ────────────────────────────────────────────────
 const SPAM_KEYWORDS = [
@@ -17,6 +18,10 @@ const SPAM_EXACT   = ["사랑이란... 인생의 반짝이는 별과 같은 것 
 
 // ── GET: 스팸 삭제 ─────────────────────────────────────────────
 export async function GET() {
+  if (!(await isOperator(await createClient()))) {
+    return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = createServiceClient() as any;
 
@@ -45,8 +50,12 @@ export async function GET() {
   return NextResponse.json({ message: `스팸 ${toDelete.length}개 삭제됐습니다.`, deleted: toDelete.length });
 }
 
-// ── POST: 중복 정리 (서비스 롤 — 인증 불필요) ──────────────────
+// ── POST: 중복 정리 (운영자 전용) ──────────────────────────────
 export async function POST(req: NextRequest) {
+  if (!(await isOperator(await createClient()))) {
+    return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = createServiceClient() as any;
   const body = await req.json().catch(() => ({})) as { action?: string };
