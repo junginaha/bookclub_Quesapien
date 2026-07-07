@@ -566,10 +566,11 @@ export interface LandingQuestion {
 interface LandingPageProps {
   todayQuestion?: LandingQuestion | null;
   recentQuestions?: LandingQuestion[];
+  upcomingMeetings?: UpcomingMeetingFeedItem[];
 }
 
 // ─── Main component ───────────────────────────────────────────
-export default function LandingPage({ todayQuestion, recentQuestions }: LandingPageProps) {
+export default function LandingPage({ todayQuestion, recentQuestions, upcomingMeetings = [] }: LandingPageProps) {
   const [modalBook, setModalBook] = useState<BookClub | null>(null);
   const [activeFloat, setActiveFloat] = useState<number | null>(null);
   const [askContent, setAskContent] = useState("");
