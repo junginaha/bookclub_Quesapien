@@ -238,25 +238,25 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-hero h1 .lp-reveal:nth-child(2) > span { animation-delay: .35s; }
 .lp-hero h1 .lp-reveal:nth-child(3) > span { animation-delay: .55s; }
 @keyframes lp-rise { to { transform: translateY(0); opacity: 1; } }
-/* 히어로 북클럽 버튼 — 뉴모피즘(soft UI), 크림 배경에 파묻힌 형태 */
+/* 히어로 북클럽 버튼 — 뉴모피즘(soft UI) 바 형태, 글자 길이에 맞춘 알약형 */
 .lp-hero-bookclub-btn {
   display: inline-flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0;
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
 
-  width: 44px;
-  height: 42px;
-  padding: 3px 4px;
+  width: auto;
+  padding: 10px 20px;
   border: none;
-  border-radius: 13px;
+  border-radius: 999px;
   background: var(--lp-bg);
   color: var(--lp-ink);
 
   font-family: var(--lp-serif-ko);
-  font-size: 9px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.3;
@@ -266,37 +266,57 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   user-select: none;
 
   opacity: 0;
-  animation: lp-fade .6s ease .7s forwards;
+  animation: lp-fade .6s ease .7s forwards, lp-heroBtnGlow 3.6s ease-in-out 1.3s infinite;
   box-shadow:
     5px 5px 10px rgba(94,70,50,0.16),
     -5px -5px 10px rgba(255,255,255,0.85);
   transition: box-shadow .18s ease, transform .18s ease;
 }
+.lp-hero-bookclub-btn > span { position: relative; z-index: 2; }
+.lp-hero-bookclub-btn::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: -100%; width: 60%;
+  background: linear-gradient(100deg, transparent 0%, rgba(94,70,50,0.22) 50%, transparent 100%);
+  animation: lp-btnShimmer 4.4s ease-in-out 1.6s infinite;
+  pointer-events: none;
+}
 .lp-hero-bookclub-btn:hover {
+  transform: translateY(-2px);
   box-shadow:
     3px 3px 7px rgba(94,70,50,0.18),
     -3px -3px 7px rgba(255,255,255,0.9);
 }
 .lp-hero-bookclub-btn:active {
+  transform: translateY(0);
   box-shadow:
     inset 3px 3px 7px rgba(94,70,50,0.22),
     inset -3px -3px 7px rgba(255,255,255,0.7);
 }
+@keyframes lp-heroBtnGlow {
+  0%, 100% {
+    box-shadow:
+      5px 5px 10px rgba(94,70,50,0.16),
+      -5px -5px 10px rgba(255,255,255,0.85);
+  }
+  50% {
+    box-shadow:
+      5px 5px 14px rgba(94,70,50,0.24),
+      -5px -5px 14px rgba(255,255,255,0.95),
+      0 0 20px -4px rgba(176,138,74,0.35);
+  }
+}
 /* 히어로 버튼 반응형 — 헤딩 크기에 비례 */
 @media (min-width: 640px) {
   .lp-hero-bookclub-btn {
-    width: 50px;
-    height: 48px;
-    font-size: 10.5px;
-    border-radius: 14px;
+    padding: 12px 26px;
+    font-size: 14.5px;
   }
 }
 @media (min-width: 1024px) {
   .lp-hero-bookclub-btn {
-    width: 58px;
-    height: 56px;
-    font-size: 11px;
-    border-radius: 15px;
+    padding: 14px 30px;
+    font-size: 15.5px;
   }
 }
 .lp-hero-sub { margin-top: var(--lp-sp5); display: grid; grid-template-columns: 1fr auto; align-items: end; gap: clamp(32px, 5vw, 72px); }

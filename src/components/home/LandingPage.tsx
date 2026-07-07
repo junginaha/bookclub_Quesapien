@@ -798,7 +798,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
                 marginBottom: "-28px", marginTop: "-12px" }}>
                 <span>데려옵니다</span>
                 <a href="/bookclub" className="lp-hero-bookclub-btn">
-                  북클럽<br />둘러보기
+                  <span>북클럽 둘러보기</span>
                 </a>
               </span>
             </span>
