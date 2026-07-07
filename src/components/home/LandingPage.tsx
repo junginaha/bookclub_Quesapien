@@ -828,12 +828,13 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             <a href="/bookclub" className="lp-eyebrow lp-section-title-link">BOOK LOVERS — 책을 건네는 마음</a>
             <a href="/bookclub" className="lp-section-title-link" style={{ textDecoration: "none" }}>
               <h2 className="lp-h-section">
-                이 책을 누군가에게<br /><span className="lp-em">꼭 건네고</span> 싶었던 이유.
+                이 책을 누군가에게<br /><span className="lp-em">꼭 건네고</span> 싶은 이유.
               </h2>
             </a>
           </div>
           <p className="lp-lede">
-            우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다. 이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.
+            우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다.<br />
+            이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.
           </p>
         </div>
 
@@ -939,7 +940,56 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
 
       </section>
 
-      {/* ④ 오늘의 질문 */}
+      {/* ④ ARCHIVING — 후기 섹션 */}
+      <section className="lp-section lp-testify" id="testify">
+        <div className="lp-section-head">
+          <div className="lp-left">
+            <a href="/archive" className="lp-eyebrow lp-section-title-link">ARCHIVING — 사람, 변화, 기록</a>
+            <a href="/archive" className="lp-section-title-link" style={{ textDecoration: "none" }}>
+              <h2 className="lp-h-section">
+                한 시즌이 지나면<br /><span className="lp-em">한 사람이</span> 바뀝니다.
+              </h2>
+            </a>
+          </div>
+          <p className="lp-lede">
+            가장 아끼는, 작고 단단한 목소리들이에요.<br />
+            <a href="/archive" style={{ fontSize: 13, color: "var(--lp-accent)", fontFamily: "var(--lp-serif)", letterSpacing: "0.04em", opacity: 0.8 }}>
+              전체 아카이브 보기 →
+            </a>
+          </p>
+        </div>
+        <div className="lp-test-list">
+          {testimonials.map((t) => (
+            <div key={t.who} className="lp-test-item">
+              <div className="ti-who">— {t.who}<span className="ti-sub">{t.sub}</span></div>
+              <div className="ti-said">{t.said}</div>
+              <div className="ti-when">{t.when}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* 아카이빙 더 보기 */}
+        <div style={{ maxWidth: 1020, margin: "32px auto 0", display: "flex", justifyContent: "flex-end" }}>
+          <a
+            href="/archive"
+            style={{
+              fontFamily: "var(--lp-serif)", fontSize: 13.5, letterSpacing: "0.06em",
+              color: "var(--lp-accent)", textDecoration: "none",
+              display: "inline-flex", alignItems: "center", gap: 6,
+              opacity: 0.85, transition: "opacity .2s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.85")}
+          >
+            더 많은 기록 보기 — 아카이빙 →
+          </a>
+        </div>
+
+        {/* 후기 남기기 폼 */}
+        <ArchiveReviewForm />
+      </section>
+
+      {/* ⑤ 오늘의 질문 */}
       <section className="lp-section lp-question-hub" id="today-q" style={{ background: "var(--lp-bg-soft)" }}>
         <div className="lp-section-head">
           <div className="lp-left">
@@ -1026,55 +1076,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             ))}
           </div>
         </div>
-      </section>
-
-      {/* ⑤ ARCHIVING — 후기 섹션 */}
-      <section className="lp-section lp-testify" id="testify">
-        <div className="lp-section-head">
-          <div className="lp-left">
-            <a href="/archive" className="lp-eyebrow lp-section-title-link">ARCHIVING — 사람, 변화, 기록</a>
-            <a href="/archive" className="lp-section-title-link" style={{ textDecoration: "none" }}>
-              <h2 className="lp-h-section">
-                한 시즌이 지나면<br /><span className="lp-em">한 사람이</span> 바뀝니다.
-              </h2>
-            </a>
-          </div>
-          <p className="lp-lede">
-            가장 아끼는, 작고 단단한 목소리들이에요.<br />
-            <a href="/archive" style={{ fontSize: 13, color: "var(--lp-accent)", fontFamily: "var(--lp-serif)", letterSpacing: "0.04em", opacity: 0.8 }}>
-              전체 아카이브 보기 →
-            </a>
-          </p>
-        </div>
-        <div className="lp-test-list">
-          {testimonials.map((t) => (
-            <div key={t.who} className="lp-test-item">
-              <div className="ti-who">— {t.who}<span className="ti-sub">{t.sub}</span></div>
-              <div className="ti-said">{t.said}</div>
-              <div className="ti-when">{t.when}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* 아카이빙 더 보기 */}
-        <div style={{ maxWidth: 1020, margin: "32px auto 0", display: "flex", justifyContent: "flex-end" }}>
-          <a
-            href="/archive"
-            style={{
-              fontFamily: "var(--lp-serif)", fontSize: 13.5, letterSpacing: "0.06em",
-              color: "var(--lp-accent)", textDecoration: "none",
-              display: "inline-flex", alignItems: "center", gap: 6,
-              opacity: 0.85, transition: "opacity .2s ease",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.85")}
-          >
-            더 많은 기록 보기 — 아카이빙 →
-          </a>
-        </div>
-
-        {/* 후기 남기기 폼 */}
-        <ArchiveReviewForm />
       </section>
 
 
