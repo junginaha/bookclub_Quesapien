@@ -7,6 +7,7 @@ const SECTIONS = [
     title: "탐색",
     links: [
       { href: "/questions", label: "질문" },
+      { href: "/clubs", label: "내 근처 북클럽" },
       { href: "/bookclub", label: "북클럽" },
       { href: "/archive", label: "아카이빙" },
       { href: "/giants", label: "거인의 어깨" },
@@ -128,6 +129,10 @@ export default function Footer() {
             <p style={{ fontSize: 12, color: "rgba(163,154,140,0.4)" }}>
               © 2026 <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>질문하는 사람들 · Quesapience</Link>. All rights reserved.
             </p>
+            <div style={{ display: "flex", gap: 14 }}>
+              <Link href="/privacy" style={{ fontSize: 12, color: "rgba(163,154,140,0.5)", textDecoration: "none" }}>개인정보처리방침</Link>
+              <Link href="/terms" style={{ fontSize: 12, color: "rgba(163,154,140,0.5)", textDecoration: "none" }}>이용약관</Link>
+            </div>
             <p style={{ fontSize: 12, color: "rgba(163,154,140,0.3)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>
               <span aria-hidden="true" style={{ position: "absolute", opacity: 0, pointerEvents: "none", fontSize: 0 }}>질문 → 책 → 대화 → 사람 → 성장</span>
             </p>

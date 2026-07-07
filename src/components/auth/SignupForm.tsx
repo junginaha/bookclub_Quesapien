@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import PrivacyConsentGate from "./PrivacyConsentGate";
 
 const inp: React.CSSProperties = {
   width: "100%", padding: "12px 16px", borderRadius: 10, fontSize: 15,
@@ -24,6 +25,18 @@ function GoogleIcon() {
   );
 }
 
+function KakaoIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path
+        d="M9 1.5C4.31 1.5.5 4.51.5 8.22c0 2.4 1.58 4.5 3.96 5.7-.17.63-.63 2.31-.72 2.67-.11.44.16.44.34.32.14-.09 2.25-1.53 3.16-2.15.55.08 1.13.12 1.76.12 4.69 0 8.5-3.01 8.5-6.72S13.69 1.5 9 1.5z"
+        fill="#000000"
+        fillOpacity="0.85"
+      />
+    </svg>
+  );
+}
+
 export default function SignupForm() {
   const [tab, setTab] = useState<"google" | "email">("google");
   const [name, setName] = useState("");
@@ -32,7 +45,9 @@ export default function SignupForm() {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [kakaoLoading, setKakaoLoading] = useState(false);
   const [error, setError] = useState("");
+  const [consented, setConsented] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/";
@@ -43,12 +58,13 @@ export default function SignupForm() {
     : "strong";
 
   const handleGoogle = async () => {
+    if (!consented) { setError("개인정보처리방침 및 이용약관에 동의해주세요."); return; }
     setGoogleLoading(true);
     setError("");
     const supabase = createClient();
     const { error: oauthErr } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?consent=1` },
     });
     if (oauthErr) {
       setError("Google 로그인을 사용할 수 없어요. 이메일로 가입해주세요.");
@@ -56,9 +72,25 @@ export default function SignupForm() {
     }
   };
 
+  const handleKakao = async () => {
+    if (!consented) { setError("개인정보처리방침 및 이용약관에 동의해주세요."); return; }
+    setKakaoLoading(true);
+    setError("");
+    const supabase = createClient();
+    const { error: oauthErr } = await supabase.auth.signInWithOAuth({
+      provider: "kakao",
+      options: { redirectTo: `${window.location.origin}/auth/callback?consent=1` },
+    });
+    if (oauthErr) {
+      setError("카카오 로그인을 사용할 수 없어요. Supabase 대시보드에서 카카오 공급자를 활성화해주세요.");
+      setKakaoLoading(false);
+    }
+  };
+
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!consented) { setError("개인정보처리방침 및 이용약관에 동의해주세요."); return; }
     if (password.length < 8) { setError("비밀번호는 8자 이상이어야 해요."); return; }
     setLoading(true);
     try {
@@ -66,7 +98,7 @@ export default function SignupForm() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ email, password, name, consent: true }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -79,7 +111,8 @@ export default function SignupForm() {
         email: email.trim().toLowerCase(), password,
       });
       if (loginErr) { setError("가입은 됐어요. 이제 로그인해주세요."); router.push("/login"); return; }
-      router.push(next.startsWith("/") ? next : "/");
+      // 신규 가입은 프로필 온보딩(닉네임/전화번호/관심지역)부터 — Kakao/Google 흐름과 동일하게 맞춘다
+      router.push(`/onboarding/profile?next=${encodeURIComponent(next.startsWith("/") ? next : "/")}&nickname=${encodeURIComponent(name || email.split("@")[0])}`);
       router.refresh();
     } catch {
       setError("가입 중 오류가 발생했어요.");
@@ -88,23 +121,48 @@ export default function SignupForm() {
     }
   };
 
+  const oauthDisabled = !consented;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <PrivacyConsentGate checked={consented} onChange={setConsented} />
+
+      {/* 카카오 버튼 — Quesapience 2.0 M0 기본 가입 수단 */}
+      <button
+        onClick={handleKakao}
+        disabled={kakaoLoading || oauthDisabled}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+          width: "100%", padding: "12px 0", borderRadius: 10, fontSize: 15,
+          background: "#FEE500", border: "1.5px solid #FEE500",
+          cursor: kakaoLoading || oauthDisabled ? "not-allowed" : "pointer",
+          color: "rgba(0,0,0,0.85)", fontFamily: "var(--font-noto-sans-kr), sans-serif",
+          fontWeight: 600, transition: "box-shadow .2s, filter .2s",
+          boxShadow: "0 1px 4px rgba(0,0,0,.06)",
+          opacity: kakaoLoading || oauthDisabled ? 0.5 : 1,
+        }}
+        onMouseEnter={(e) => { if (!oauthDisabled) (e.currentTarget as HTMLElement).style.filter = "brightness(0.96)"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.filter = "none"; }}
+      >
+        <KakaoIcon />
+        {kakaoLoading ? "연결 중…" : "카카오로 계속하기"}
+      </button>
+
       {/* 구글 버튼 (항상 표시) */}
       <button
         onClick={handleGoogle}
-        disabled={googleLoading}
+        disabled={googleLoading || oauthDisabled}
         style={{
           display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
           width: "100%", padding: "12px 0", borderRadius: 10, fontSize: 15,
           background: "white", border: "1.5px solid var(--line)",
-          cursor: googleLoading ? "not-allowed" : "pointer",
+          cursor: googleLoading || oauthDisabled ? "not-allowed" : "pointer",
           color: "var(--ink)", fontFamily: "var(--font-noto-sans-kr), sans-serif",
           fontWeight: 500, transition: "box-shadow .2s, border-color .2s",
           boxShadow: "0 1px 4px rgba(0,0,0,.06)",
-          opacity: googleLoading ? 0.7 : 1,
+          opacity: googleLoading || oauthDisabled ? 0.5 : 1,
         }}
-        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 8px rgba(0,0,0,.12)"; (e.currentTarget as HTMLElement).style.borderColor = "#ccc"; }}
+        onMouseEnter={(e) => { if (!oauthDisabled) { (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 8px rgba(0,0,0,.12)"; (e.currentTarget as HTMLElement).style.borderColor = "#ccc"; } }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 1px 4px rgba(0,0,0,.06)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; }}
       >
         <GoogleIcon />
@@ -178,12 +236,12 @@ export default function SignupForm() {
             </div>
           )}
 
-          <button type="submit" disabled={loading || !email || password.length < 8}
+          <button type="submit" disabled={loading || !email || password.length < 8 || oauthDisabled}
             style={{
               padding: "12px 0", borderRadius: 10, fontSize: 15, fontWeight: 600,
-              background: loading || !email || password.length < 8 ? "var(--line-soft)" : "var(--ink)",
-              color: loading || !email || password.length < 8 ? "var(--muted)" : "var(--cream-on-dark)",
-              border: "none", cursor: loading || !email || password.length < 8 ? "not-allowed" : "pointer",
+              background: loading || !email || password.length < 8 || oauthDisabled ? "var(--line-soft)" : "var(--ink)",
+              color: loading || !email || password.length < 8 || oauthDisabled ? "var(--muted)" : "var(--cream-on-dark)",
+              border: "none", cursor: loading || !email || password.length < 8 || oauthDisabled ? "not-allowed" : "pointer",
               fontFamily: "var(--font-noto-serif-kr), Georgia, serif", transition: "all .2s",
             }}>
             {loading ? "가입 중…" : "시작하기"}

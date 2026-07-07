@@ -49,9 +49,26 @@ type TabType = "overview" | "questions" | "reviews" | "bookclubs" | "membership"
 
 export default function MyPageClient({ profile, myReviews, mySessions, onboardingAnswers }: Props) {
   const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [deactivating, setDeactivating] = useState(false);
 
   const handleLogout = async () => {
     await logoutAction();
+  };
+
+  const handleDeactivate = async () => {
+    if (!window.confirm("정말 탈퇴하시겠어요? 작성하신 질문·후기는 '탈퇴한 회원'으로 남고, 계정은 삭제됩니다.")) return;
+    setDeactivating(true);
+    try {
+      const res = await fetch("/api/account/deactivate", { method: "POST" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        window.alert(data.error ?? "탈퇴 처리에 실패했어요.");
+        return;
+      }
+      window.location.href = "/";
+    } finally {
+      setDeactivating(false);
+    }
   };
 
   const upcomingSessions = mySessions.filter((s) => s.status === "upcoming");
@@ -108,20 +125,31 @@ export default function MyPageClient({ profile, myReviews, mySessions, onboardin
               </div>
             </div>
 
-            <form action={handleLogout}>
-              <button type="submit" style={{
-                display: "flex", alignItems: "center", gap: 6,
-                padding: "9px 18px", borderRadius: 8,
-                border: "1px solid var(--line)", background: "none",
-                fontSize: 13, color: "var(--muted)", cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-                onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.color = "#EF4444"; el.style.borderColor = "#FECACA"; }}
-                onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.color = "var(--muted)"; el.style.borderColor = "var(--line)"; }}
-              >
-                <LogOut size={14} /> 로그아웃
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+              <form action={handleLogout}>
+                <button type="submit" style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  padding: "9px 18px", borderRadius: 8,
+                  border: "1px solid var(--line)", background: "none",
+                  fontSize: 13, color: "var(--muted)", cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+                  onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.color = "#EF4444"; el.style.borderColor = "#FECACA"; }}
+                  onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.color = "var(--muted)"; el.style.borderColor = "var(--line)"; }}
+                >
+                  <LogOut size={14} /> 로그아웃
+                </button>
+              </form>
+              {/* 원탭 나가기 원칙(§C1 여정⑥)의 계정 버전 — 탈퇴는 쉬워야 한다 */}
+              <button type="button" onClick={handleDeactivate} disabled={deactivating}
+                style={{
+                  fontSize: 11.5, color: "var(--muted-2)", background: "none", border: "none",
+                  cursor: deactivating ? "not-allowed" : "pointer", padding: "2px 4px",
+                  textDecoration: "underline", opacity: deactivating ? 0.6 : 1,
+                }}>
+                {deactivating ? "처리 중…" : "회원 탈퇴"}
               </button>
-            </form>
+            </div>
           </div>
         </div>
       </section>

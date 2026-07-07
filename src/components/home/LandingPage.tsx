@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { josa } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import NearbyMeetingsFeed, { type UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
 import "./landing.css";
 
 // ─── 거리 계산 (Haversine) ────────────────────────────────────
@@ -824,6 +825,9 @@ export default function LandingPage({ todayQuestion, recentQuestions }: LandingP
           <span className="sc-line" />
         </div>
       </section>
+
+      {/* 내 근처 다음 모임 — Quesapience 2.0 §C1 구조적 귀결① (홈 = 내 근처 다음 모임 피드) */}
+      <NearbyMeetingsFeed items={upcomingMeetings} />
 
       {/* ② 질문 남겨보기 — 화면 중앙 */}
       <section className="lp-ask-center-section" id="questions">

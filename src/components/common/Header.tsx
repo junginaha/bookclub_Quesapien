@@ -23,6 +23,7 @@ const navItems = [
     label: "북클럽",
     desc: "리더와 함께하는 오프라인 북토크",
     sub: [
+      { href: "/clubs", label: "내 근처 북클럽" },
       { href: "/bookclub", label: "북토크 일정" },
       { href: "/bookclub/leaders", label: "리더 소개" },
     ],

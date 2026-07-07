@@ -19,6 +19,7 @@ export interface ProfileRow {
   privacy_consented_at: string | null;
   phone_consented_at: string | null;
   deactivated_at: string | null;
+  onboarding_completed_at: string | null;
 }
 
 export interface EventRow {
@@ -26,6 +27,55 @@ export interface EventRow {
   user_id: string | null;
   name: string;
   props: Json | null;
+  created_at: string;
+}
+
+// ─── Quesapience 2.0 M1 — 010_clubs_meetings.sql ─────────────
+export interface ClubVibe {
+  faq?: { q: string; a: string }[];
+  review_excerpts?: string[];
+  format_note?: string;
+}
+
+export interface ClubRow {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  location: string | null;                // geography(point,4326)
+  location_name: string | null;
+  schedule_note: string | null;
+  capacity: number | null;
+  join_policy: "open" | "approval";
+  vibe: ClubVibe | null;
+  owner_id: string | null;
+  created_at: string;
+}
+
+export interface MembershipRow {
+  club_id: string;
+  user_id: string;
+  role: "owner" | "host" | "member";
+  status: "active" | "pending" | "waitlist" | "left";
+  joined_at: string;
+}
+
+export interface MeetingRow {
+  id: string;
+  club_id: string;
+  book_title: string | null;
+  book_isbn: string | null;
+  starts_at: string;
+  place_name: string | null;
+  capacity: number | null;
+  status: "scheduled" | "done" | "canceled";
+  created_at: string;
+}
+
+export interface MeetingAttendanceRow {
+  meeting_id: string;
+  user_id: string;
+  status: "applied" | "pending" | "waitlist" | "attended" | "no_show" | "canceled";
   created_at: string;
 }
 export interface QuestionRow {
@@ -151,6 +201,26 @@ export interface Database {
         Row: EventRow;
         Insert: { id?: number; user_id?: string | null; name: string; props?: Json | null; created_at?: string; };
         Update: Partial<EventRow>;
+      };
+      clubs: {
+        Row: ClubRow;
+        Insert: Omit<ClubRow, "id" | "created_at" | "join_policy"> & { id?: string; created_at?: string; join_policy?: "open" | "approval"; };
+        Update: Partial<ClubRow>;
+      };
+      memberships: {
+        Row: MembershipRow;
+        Insert: Omit<MembershipRow, "role" | "status" | "joined_at"> & { role?: "owner" | "host" | "member"; status?: "active" | "pending" | "waitlist" | "left"; joined_at?: string; };
+        Update: Partial<MembershipRow>;
+      };
+      meetings: {
+        Row: MeetingRow;
+        Insert: Omit<MeetingRow, "id" | "created_at" | "status"> & { id?: string; created_at?: string; status?: "scheduled" | "done" | "canceled"; };
+        Update: Partial<MeetingRow>;
+      };
+      meeting_attendances: {
+        Row: MeetingAttendanceRow;
+        Insert: Omit<MeetingAttendanceRow, "status" | "created_at"> & { status?: MeetingAttendanceRow["status"]; created_at?: string; };
+        Update: Partial<MeetingAttendanceRow>;
       };
       questions: {
         Row: QuestionRow;

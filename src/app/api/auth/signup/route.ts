@@ -3,8 +3,8 @@ import { createServiceClient } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, name } = await req.json() as {
-      email: string; password: string; name?: string;
+    const { email, password, name, consent } = await req.json() as {
+      email: string; password: string; name?: string; consent?: boolean;
     };
 
     if (!email?.trim() || !password) {
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: createErr.message }, { status: 400 });
     }
 
-    // profiles 행 생성
+    // profiles 행 생성 (트리거 public.handle_new_user()가 이미 만들었을 nickname 등은 건드리지 않음)
     if (created?.user) {
       await admin.from("profiles").upsert({
         id: created.user.id,
@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
         bio: null,
         joined_at: new Date().toISOString(),
         session_count: 0,
+        privacy_consented_at: consent ? new Date().toISOString() : null,
       });
     }
 
