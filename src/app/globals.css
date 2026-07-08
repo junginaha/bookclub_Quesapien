@@ -534,26 +534,11 @@
   }
 }
 
-/* 대비가 더 필요한 primary CTA용 다크 변형 (예: 헤더 "함께 읽기") */
-.btn-pill-neu-solid {
-  background: var(--ink);
-  color: var(--cream-on-dark);
-  box-shadow:
-    5px 5px 10px rgba(0,0,0,0.28),
-    -5px -5px 10px rgba(255,255,255,0.06);
-}
-.btn-pill-neu-solid::before {
-  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.16) 50%, transparent 100%);
-}
-.btn-pill-neu-solid:hover {
-  box-shadow:
-    3px 3px 7px rgba(0,0,0,0.3),
-    -3px -3px 7px rgba(255,255,255,0.08);
-}
-.btn-pill-neu-solid:active {
-  box-shadow:
-    inset 3px 3px 7px rgba(0,0,0,0.35),
-    inset -3px -3px 7px rgba(255,255,255,0.05);
+/* primary CTA 강조 변형 — 배경/그림자는 기본형과 동일, 텍스트만 accent 톤으로 구분
+   (로그인 ↔ 함께 읽기 전환 시 배경색이 뒤바뀌는 것처럼 보이지 않도록 통일) */
+.btn-pill-neu-accent {
+  color: var(--accent);
+  font-weight: 700;
 }
 
 /* ─── Tailwind Utilities ──────────────────────────────────────── */

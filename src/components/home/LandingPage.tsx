@@ -758,7 +758,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             <a
               key={btn.href}
               href={btn.href}
-              className={btn.filled ? "btn-pill-neu btn-pill-neu-solid" : "btn-pill-neu"}
+              className={btn.filled ? "btn-pill-neu btn-pill-neu-accent" : "btn-pill-neu"}
               style={{
                 position: "absolute", inset: 0,
                 display: "flex",

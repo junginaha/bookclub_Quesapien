@@ -406,7 +406,7 @@ export default function Header() {
                   {/* 함께 읽기 버튼 */}
                   <Link
                     href="/signup"
-                    className="btn-pill-neu btn-pill-neu-solid"
+                    className="btn-pill-neu btn-pill-neu-accent"
                     style={{
                       position: "absolute", inset: 0,
                       display: "flex",
