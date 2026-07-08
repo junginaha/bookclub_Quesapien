@@ -830,7 +830,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             <a href="/bookclub" className="lp-eyebrow lp-section-title-link">BOOK LOVERS — 책을 건네는 마음</a>
             <a href="/bookclub" className="lp-section-title-link" style={{ textDecoration: "none" }}>
               <h2 className="lp-h-section">
-                이 책을 누군가에게<br /><span className="lp-em">꼭 건네고</span> 싶은 이유.
+                이 책을 누군가에게<br /><span className="lp-em">꼭 건네고</span> 싶은 이유
               </h2>
             </a>
           </div>
@@ -951,7 +951,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             <a href="/archive" className="lp-eyebrow lp-section-title-link">ARCHIVING — 사람, 변화, 기록</a>
             <a href="/archive" className="lp-section-title-link" style={{ textDecoration: "none" }}>
               <h2 className="lp-h-section">
-                한 시즌이 지나면<br /><span className="lp-em">한 사람이</span> 바뀝니다.
+                한 시즌이 지나면<br /><span className="lp-em">한 사람이</span> 바뀝니다
               </h2>
             </a>
           </div>
@@ -1001,7 +1001,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             <a href="/questions" className="lp-section-title-link" style={{ textDecoration: "none" }}>
               <h2 className="lp-h-section">
                 하루에 한 번,<br />
-                <span className="lp-em">마음을 흔드는</span> 질문.
+                <span className="lp-em">마음을 흔드는</span> 질문
               </h2>
             </a>
           </div>
@@ -1088,7 +1088,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
         {/* AT HEART 상단 */}
         <div className="lp-eyebrow">AT HEART</div>
         <p className="lp-final-quote">
-          <span className="lp-em">질문</span>은<br />가장 <span className="lp-em">인간적인</span><br />대화의 시작이에요.
+          <span className="lp-em">질문</span>은<br />가장 <span className="lp-em">인간적인</span><br />대화의 시작이에요
         </p>
         <div className="lp-final-divider" />
 
