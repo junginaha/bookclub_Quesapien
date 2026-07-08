@@ -682,125 +682,8 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-section-title-link:hover .lp-h-section { transform: translateX(4px); }
 
 /* ══════════════════════════════════════════
-   NEARBY PILL — 가까운 북클럽 찾기
+   NEARBY PILL — 내 근처 북클럽 찾기
    ══════════════════════════════════════════ */
-
-/* 래퍼: 파티클 기준점, overflow visible 필수 */
-.lnd-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  overflow: visible;
-}
-
-/* ── 공통 파티클 기반 스타일 ── */
-.lnd-sp {
-  position: absolute;
-  font-family: var(--lp-serif);
-  color: var(--lp-gold);
-  pointer-events: none;
-  opacity: 0;
-  z-index: 10;
-  line-height: 1;
-  select: none;
-}
-
-/* ── 8방향 파티클: 고정값 개별 keyframes ── */
-/* sp1 ↖ 위-왼 */
-.lnd-sp.sp1 {
-  top: -8px; left: 20%; font-size: 9px;
-  animation: lnd-sp1 3.2s ease-out 0s infinite;
-}
-@keyframes lnd-sp1 {
-  0%   { opacity: 0;   transform: scale(0.3) translate(0,0); }
-  14%  { opacity: 1; }
-  55%  { opacity: 0.75; transform: scale(1.2) translate(-5px,-9px); }
-  100% { opacity: 0;   transform: scale(0.4) translate(-9px,-16px); }
-}
-
-/* sp2 ↑ 위 */
-.lnd-sp.sp2 {
-  top: -9px; left: 50%; font-size: 7px; color: rgba(176,138,74,0.8);
-  animation: lnd-sp2 3.2s ease-out 0.5s infinite;
-}
-@keyframes lnd-sp2 {
-  0%   { opacity: 0;   transform: scale(0.3) translateY(0); }
-  14%  { opacity: 1; }
-  55%  { opacity: 0.8; transform: scale(1.3) translateY(-10px); }
-  100% { opacity: 0;   transform: scale(0.4) translateY(-18px); }
-}
-
-/* sp3 ↗ 위-오른 */
-.lnd-sp.sp3 {
-  top: -8px; right: 18%; font-size: 10px; color: rgba(176,138,74,0.65);
-  animation: lnd-sp3 3.2s ease-out 1.05s infinite;
-}
-@keyframes lnd-sp3 {
-  0%   { opacity: 0;   transform: scale(0.3) translate(0,0); }
-  14%  { opacity: 1; }
-  55%  { opacity: 0.7; transform: scale(1.15) translate(5px,-9px); }
-  100% { opacity: 0;   transform: scale(0.4) translate(9px,-16px); }
-}
-
-/* sp4 → 오른 */
-.lnd-sp.sp4 {
-  top: calc(50% - 5px); right: -9px; font-size: 8px;
-  animation: lnd-sp4 3.2s ease-out 0.75s infinite;
-}
-@keyframes lnd-sp4 {
-  0%   { opacity: 0;   transform: scale(0.3) translateX(0); }
-  14%  { opacity: 1; }
-  55%  { opacity: 0.8; transform: scale(1.25) translateX(11px); }
-  100% { opacity: 0;   transform: scale(0.4) translateX(20px); }
-}
-
-/* sp5 ← 왼 */
-.lnd-sp.sp5 {
-  top: calc(50% - 5px); left: -9px; font-size: 11px;
-  animation: lnd-sp5 3.2s ease-out 1.6s infinite;
-}
-@keyframes lnd-sp5 {
-  0%   { opacity: 0;   transform: scale(0.3) translateX(0); }
-  14%  { opacity: 1; }
-  55%  { opacity: 0.8; transform: scale(1.2) translateX(-11px); }
-  100% { opacity: 0;   transform: scale(0.4) translateX(-20px); }
-}
-
-/* sp6 ↙ 아래-왼 */
-.lnd-sp.sp6 {
-  bottom: -7px; left: 22%; font-size: 8px; color: rgba(176,138,74,0.7);
-  animation: lnd-sp6 3.2s ease-out 1.25s infinite;
-}
-@keyframes lnd-sp6 {
-  0%   { opacity: 0;   transform: scale(0.3) translate(0,0); }
-  14%  { opacity: 1; }
-  55%  { opacity: 0.7; transform: scale(1.15) translate(-5px,9px); }
-  100% { opacity: 0;   transform: scale(0.4) translate(-9px,16px); }
-}
-
-/* sp7 ↓ 아래 */
-.lnd-sp.sp7 {
-  bottom: -8px; left: 52%; font-size: 12px;
-  animation: lnd-sp7 3.2s ease-out 2.0s infinite;
-}
-@keyframes lnd-sp7 {
-  0%   { opacity: 0;   transform: scale(0.3) translateY(0); }
-  14%  { opacity: 1; }
-  55%  { opacity: 0.75; transform: scale(1.2) translateY(10px); }
-  100% { opacity: 0;   transform: scale(0.4) translateY(18px); }
-}
-
-/* sp8 ↘ 아래-오른 */
-.lnd-sp.sp8 {
-  bottom: -7px; right: 16%; font-size: 7px;
-  animation: lnd-sp8 3.2s ease-out 0.3s infinite;
-}
-@keyframes lnd-sp8 {
-  0%   { opacity: 0;   transform: scale(0.3) translate(0,0); }
-  14%  { opacity: 1; }
-  55%  { opacity: 0.75; transform: scale(1.2) translate(5px,9px); }
-  100% { opacity: 0;   transform: scale(0.4) translate(9px,16px); }
-}
 
 /* ── 메인 pill 버튼 — 히어로 "북클럽 둘러보기"와 모양·크기 동일(아이콘 없는 텍스트 전용 알약형) ── */
 .lnd-pill {
@@ -868,19 +751,6 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   background-size: 300% 100%;
   animation: lp-btnShimmer 4s ease-in-out 0.4s infinite;
   border-radius: 9999px;
-}
-
-/* 내부 골드 glow */
-.lnd-pill-glow {
-  position: absolute; inset: 0;
-  border-radius: 9999px;
-  background: radial-gradient(ellipse 70% 55% at 30% 50%, rgba(176,138,74,0.1), transparent 65%);
-  pointer-events: none;
-  animation: lnd-glow 3.5s ease-in-out infinite;
-}
-@keyframes lnd-glow {
-  0%, 100% { opacity: 0.5; }
-  50%       { opacity: 1; }
 }
 
 /* 텍스트 */

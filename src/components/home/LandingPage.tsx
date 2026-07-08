@@ -170,23 +170,10 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
 
   if (status === "idle") {
     return (
-      <div className="lnd-wrap">
-        {/* 방사형 빛 입자 */}
-        <span className="lnd-sp sp1" aria-hidden="true">✦</span>
-        <span className="lnd-sp sp2" aria-hidden="true">✦</span>
-        <span className="lnd-sp sp3" aria-hidden="true">·</span>
-        <span className="lnd-sp sp4" aria-hidden="true">✦</span>
-        <span className="lnd-sp sp5" aria-hidden="true">·</span>
-        <span className="lnd-sp sp6" aria-hidden="true">✦</span>
-        <span className="lnd-sp sp7" aria-hidden="true">·</span>
-        <span className="lnd-sp sp8" aria-hidden="true">✦</span>
-
-        <button className="lnd-pill" onClick={detect} type="button">
-          <span className="lnd-pill-glow" aria-hidden="true" />
-          <span className="lnd-pill-shimmer" aria-hidden="true" />
-          <span className="lnd-pill-text">내 근처 북클럽 찾기</span>
-        </button>
-      </div>
+      <button className="lnd-pill" onClick={detect} type="button">
+        <span className="lnd-pill-shimmer" aria-hidden="true" />
+        <span className="lnd-pill-text">내 근처 북클럽 찾기</span>
+      </button>
     );
   }
 
