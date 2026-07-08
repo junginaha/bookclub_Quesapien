@@ -921,19 +921,6 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   .lnd-pill { font-size: 11px; padding: 7px 13px 7px 10px; }
 }
 
-/* ── NEARBY ROW — 내 근처 북클럽 (books 섹션 상단) ── */
-.lp-nearby-row {
-  max-width: var(--lp-max);
-  margin: 0 auto clamp(40px, 5vw, 64px);
-}
-/* 로딩/거부 상태 */
-.lp-nearby-row .lp-nearby-trigger {
-  margin-bottom: 0;
-}
-/* found 패널 상태 */
-.lp-nearby-row .lp-nearby-panel { margin-bottom: 0; }
-.lp-nearby-row .lp-nearby-header { background: rgba(255,255,255,0.35); }
-.lp-nearby-row .lp-nearby-item:first-child { border-top: 1px solid rgba(229,221,203,0.5); }
 
 /* ── BOOK COVER GENRE LABEL ── */
 .bc-genre {
@@ -1542,8 +1529,9 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 @keyframes lp-spin { to { transform: rotate(360deg); } }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* 결과 패널 */
+/* 결과 패널 — 문장 옆에 인라인으로 배치되므로 카드 폭을 고정 */
 .lp-nearby-panel {
+  width: min(380px, 100%);
   margin-bottom: 40px;
   border-radius: 16px;
   border: 1px solid var(--lp-line-soft);
@@ -1560,6 +1548,31 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   padding: 14px 20px;
   border-bottom: 1px solid var(--lp-line-soft);
   background: rgba(255,255,255,0.35);
+}
+
+/* 지도 — 마커 클릭 시 onOpen, Leaflet 팝업은 브랜드 톤으로 오버라이드 */
+.lp-nearby-map {
+  width: 100%;
+  height: 220px;
+  border-bottom: 1px solid var(--lp-line-soft);
+  background: var(--lp-bg-soft);
+}
+.lp-nearby-map.lp-nearby-map-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--lp-serif-ko);
+  font-size: 13px;
+  color: var(--lp-muted);
+}
+.lp-nearby-map .leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  box-shadow: 0 6px 20px -4px rgba(28,31,38,0.25);
+}
+.lp-nearby-map .leaflet-popup-tip { background: #fff; }
+.lp-nearby-map .leaflet-control-zoom a {
+  color: var(--lp-ink);
+  font-family: var(--lp-sans);
 }
 .lp-nearby-title {
   font-size: 12.5px;

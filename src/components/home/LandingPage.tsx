@@ -1,11 +1,18 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import dynamic from "next/dynamic";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { josa } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import NearbyMeetingsFeed, { type UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
 import "./landing.css";
+
+// Leaflet은 window/DOM에 의존하므로 클라이언트에서만 로드
+const NearbyClubsMap = dynamic(() => import("./NearbyClubsMap"), {
+  ssr: false,
+  loading: () => <div className="lp-nearby-map lp-nearby-map-loading">지도를 불러오는 중…</div>,
+});
 
 // ─── 거리 계산 (Haversine) ────────────────────────────────────
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -120,6 +127,7 @@ interface NearbyBook extends BookClub { distKm: number }
 function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onOpen: (b: BookClub) => void }) {
   const [status, setStatus] = useState<"idle" | "loading" | "found" | "denied" | "unsupported">("idle");
   const [nearby, setNearby] = useState<NearbyBook[]>([]);
+  const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null);
 
   const detect = () => {
     if (!navigator.geolocation) { setStatus("unsupported"); return; }
@@ -127,6 +135,7 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude, longitude } = pos.coords;
+        setUserLoc({ lat: latitude, lng: longitude });
         try {
           // PostGIS 지오쿼리 우선 시도
           const res = await fetch(
@@ -232,8 +241,19 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
           </span>
           <span className="lp-nearby-title">내 근처 북클럽</span>
         </div>
-        <button className="lp-nearby-reset" onClick={() => { setStatus("idle"); setNearby([]); }} aria-label="닫기">×</button>
+        <button className="lp-nearby-reset" onClick={() => { setStatus("idle"); setNearby([]); setUserLoc(null); }} aria-label="닫기">×</button>
       </div>
+      {userLoc && (
+        <NearbyClubsMap
+          userLat={userLoc.lat}
+          userLng={userLoc.lng}
+          clubs={nearby.filter((b) => b.lat !== undefined && b.lng !== undefined) as (NearbyBook & { lat: number; lng: number })[]}
+          onOpen={(slug) => {
+            const club = nearby.find((b) => b.slug === slug);
+            if (club) onOpen(club);
+          }}
+        />
+      )}
       <div className="lp-nearby-list">
         {nearby.map((b) => (
           <button key={b.slug} className="lp-nearby-item" onClick={() => onOpen(b)}>
