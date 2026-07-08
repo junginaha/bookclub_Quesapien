@@ -802,47 +802,12 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   100% { opacity: 0;   transform: scale(0.4) translate(9px,16px); }
 }
 
-/* ── 핀 아이콘 — 다크 배지 위 화이트 핀. em 단위로 버튼 font-size(=북클럽 둘러보기와 동일
-   반응형 브레이크포인트)를 그대로 따라가서, 배지가 버튼 높이를 강제로 키우지 않도록 함 ── */
-.lnd-pin-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 2;
-  width: 1.7em;
-  height: 1.7em;
-  border-radius: 9999px;
-  background: var(--lp-ink);
-}
-.lnd-pin-icon {
-  width: 0.8em;
-  height: 1em;
-  flex-shrink: 0;
-  /* 화이트 + 반짝 글로우 */
-  color: #ffffff;
-  filter: drop-shadow(0 0 3px rgba(255,255,255,0.8)) drop-shadow(0 0 6px rgba(255,255,255,0.4));
-  animation: lnd-pin-shine 2s ease-in-out infinite;
-}
-
-@keyframes lnd-pin-shine {
-  0%, 100% {
-    filter: drop-shadow(0 0 2px rgba(255,255,255,0.7)) drop-shadow(0 0 5px rgba(255,255,255,0.35));
-    transform: scale(1);
-  }
-  50% {
-    filter: drop-shadow(0 0 6px rgba(255,255,255,1)) drop-shadow(0 0 14px rgba(255,255,255,0.6)) drop-shadow(0 0 24px rgba(255,255,255,0.3));
-    transform: scale(1.15);
-  }
-}
-
-/* ── 메인 pill 버튼 — 뉴모피즘(soft UI), 히어로 "북클럽 둘러보기"와 크기 통일 ── */
+/* ── 메인 pill 버튼 — 히어로 "북클럽 둘러보기"와 모양·크기 동일(아이콘 없는 텍스트 전용 알약형) ── */
 .lnd-pill {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  justify-content: center;
   padding: 6px 13px;
   background: var(--lp-bg);
   border: none;
@@ -851,6 +816,8 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   font-family: var(--lp-serif-ko);
   font-size: 10px;
   font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
   color: var(--lp-ink);
   letter-spacing: -0.01em;
   white-space: nowrap;

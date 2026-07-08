@@ -184,14 +184,6 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
         <button className="lnd-pill" onClick={detect} type="button">
           <span className="lnd-pill-glow" aria-hidden="true" />
           <span className="lnd-pill-shimmer" aria-hidden="true" />
-
-          {/* 위치 핀 — 화이트 아이콘이 크림 배경에서도 보이도록 다크 배지 위에 표시 */}
-          <span className="lnd-pin-badge" aria-hidden="true">
-            <svg className="lnd-pin-icon" viewBox="0 0 12 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 0C2.686 0 0 2.686 0 6C0 10.5 6 15 6 15C6 15 12 10.5 12 6C12 2.686 9.314 0 6 0ZM6 8.25C4.757 8.25 3.75 7.243 3.75 6C3.75 4.757 4.757 3.75 6 3.75C7.243 3.75 8.25 4.757 8.25 6C8.25 7.243 7.243 8.25 6 8.25Z" fill="currentColor"/>
-            </svg>
-          </span>
-
           <span className="lnd-pill-text">내 근처 북클럽 찾기</span>
         </button>
       </div>
