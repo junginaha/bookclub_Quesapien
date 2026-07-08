@@ -906,16 +906,8 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   50%       { opacity: 1; }
 }
 
-/* 텍스트 + 화살표 */
+/* 텍스트 */
 .lnd-pill-text { position: relative; z-index: 2; }
-.lnd-pill-arrow {
-  width: 14px; height: 14px;
-  flex-shrink: 0;
-  position: relative; z-index: 2;
-  opacity: 0.7;
-  transition: transform 0.35s cubic-bezier(.2,.8,.2,1), opacity 0.3s;
-}
-.lnd-pill:hover .lnd-pill-arrow { transform: translateX(3px); opacity: 1; }
 
 @media (max-width: 480px) {
   .lnd-pill { font-size: 11px; padding: 7px 13px 7px 10px; }
