@@ -831,14 +831,14 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 10px 20px 10px 16px;
+  gap: 6px;
+  padding: 8px 16px 8px 13px;
   background: var(--lp-bg);
   border: none;
   border-radius: 9999px;
   cursor: pointer;
   font-family: var(--lp-serif-ko);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--lp-ink);
   letter-spacing: -0.01em;
@@ -918,7 +918,7 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lnd-pill:hover .lnd-pill-arrow { transform: translateX(3px); opacity: 1; }
 
 @media (max-width: 480px) {
-  .lnd-pill { font-size: 12px; padding: 8px 13px 8px 11px; }
+  .lnd-pill { font-size: 11px; padding: 7px 13px 7px 10px; }
 }
 
 /* ── NEARBY ROW — 내 근처 북클럽 (books 섹션 상단) ── */

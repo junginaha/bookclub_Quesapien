@@ -181,7 +181,7 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
             <path d="M6 0C2.686 0 0 2.686 0 6C0 10.5 6 15 6 15C6 15 12 10.5 12 6C12 2.686 9.314 0 6 0ZM6 8.25C4.757 8.25 3.75 7.243 3.75 6C3.75 4.757 4.757 3.75 6 3.75C7.243 3.75 8.25 4.757 8.25 6C8.25 7.243 7.243 8.25 6 8.25Z" fill="currentColor"/>
           </svg>
 
-          <span className="lnd-pill-text">가까운 북클럽 찾기</span>
+          <span className="lnd-pill-text">내 근처 북클럽 찾기</span>
 
           {/* 화살표 */}
           <svg className="lnd-pill-arrow" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -750,7 +750,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           <a href="/giants">거인의 어깨</a>
         </div>
         {/* 로그인/회원가입 순환 버튼 */}
-        <div style={{ position: "relative", width: 100, height: 40, overflow: "hidden" }}>
+        <div style={{ position: "relative", width: 100, height: 40, overflow: "visible" }}>
           {[
             { href: "/login", label: "로그인", filled: false },
             { href: "/signup", label: "함께 읽기", filled: true },
@@ -825,15 +825,16 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
               </h2>
             </a>
           </div>
-          <p className="lp-lede">
-            우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다.<br />
-            이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.
-          </p>
-        </div>
-
-        {/* 위치 기반 근처 북클럽 — 섹션 상단 노출 */}
-        <div className="lp-nearby-row">
-          <NearbyClubsBanner books={dbBooks.length > 0 ? dbBooks : books} onOpen={(b) => setModalBook(b)} />
+          <div className="lp-lede">
+            <p style={{ margin: 0 }}>
+              우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다.
+            </p>
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "10px", marginTop: "2px" }}>
+              <span>이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.</span>
+              {/* 위치 기반 근처 북클럽 — 문장 옆에 나란히 배치 */}
+              <NearbyClubsBanner books={dbBooks.length > 0 ? dbBooks : books} onOpen={(b) => setModalBook(b)} />
+            </div>
+          </div>
         </div>
 
         <div className="lp-books-grid">

@@ -385,7 +385,7 @@ export default function Header() {
             ) : (
               /* 비로그인 — 순환 애니메이션 버튼 */
               <div className="hidden md:flex" style={{ alignItems: "center" }}>
-                <div style={{ position: "relative", height: 36, width: 110, overflow: "hidden" }}>
+                <div style={{ position: "relative", height: 36, width: 110, overflow: "visible" }}>
                   {/* 로그인 버튼 */}
                   <Link
                     href="/login"
