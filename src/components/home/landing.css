@@ -802,7 +802,8 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   100% { opacity: 0;   transform: scale(0.4) translate(9px,16px); }
 }
 
-/* ── 핀 아이콘 — 다크 배지 위 화이트 핀 ── */
+/* ── 핀 아이콘 — 다크 배지 위 화이트 핀. em 단위로 버튼 font-size(=북클럽 둘러보기와 동일
+   반응형 브레이크포인트)를 그대로 따라가서, 배지가 버튼 높이를 강제로 키우지 않도록 함 ── */
 .lnd-pin-badge {
   display: inline-flex;
   align-items: center;
@@ -810,14 +811,14 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   flex-shrink: 0;
   position: relative;
   z-index: 2;
-  width: 18px;
-  height: 18px;
+  width: 1.7em;
+  height: 1.7em;
   border-radius: 9999px;
   background: var(--lp-ink);
 }
 .lnd-pin-icon {
-  width: 9px;
-  height: 11.5px;
+  width: 0.8em;
+  height: 1em;
   flex-shrink: 0;
   /* 화이트 + 반짝 글로우 */
   color: #ffffff;
