@@ -802,43 +802,53 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   100% { opacity: 0;   transform: scale(0.4) translate(9px,16px); }
 }
 
-/* ── 핀 아이콘 ── */
-.lnd-pin-icon {
-  width: 11px;
-  height: 14px;
+/* ── 핀 아이콘 — 다크 배지 위 화이트 핀 ── */
+.lnd-pin-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   position: relative;
   z-index: 2;
-  /* 골드 톤 + 반짝 글로우 — 뉴모피즘 버튼 톤과 통일 */
-  color: var(--lp-gold);
-  filter: drop-shadow(0 0 3px rgba(176,138,74,0.7)) drop-shadow(0 0 6px rgba(176,138,74,0.35));
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--lp-ink);
+}
+.lnd-pin-icon {
+  width: 9px;
+  height: 11.5px;
+  flex-shrink: 0;
+  /* 화이트 + 반짝 글로우 */
+  color: #ffffff;
+  filter: drop-shadow(0 0 3px rgba(255,255,255,0.8)) drop-shadow(0 0 6px rgba(255,255,255,0.4));
   animation: lnd-pin-shine 2s ease-in-out infinite;
 }
 
 @keyframes lnd-pin-shine {
   0%, 100% {
-    filter: drop-shadow(0 0 2px rgba(176,138,74,0.6)) drop-shadow(0 0 5px rgba(176,138,74,0.3));
+    filter: drop-shadow(0 0 2px rgba(255,255,255,0.7)) drop-shadow(0 0 5px rgba(255,255,255,0.35));
     transform: scale(1);
   }
   50% {
-    filter: drop-shadow(0 0 5px rgba(200,165,100,0.9)) drop-shadow(0 0 12px rgba(176,138,74,0.55)) drop-shadow(0 0 22px rgba(94,70,50,0.3));
+    filter: drop-shadow(0 0 6px rgba(255,255,255,1)) drop-shadow(0 0 14px rgba(255,255,255,0.6)) drop-shadow(0 0 24px rgba(255,255,255,0.3));
     transform: scale(1.15);
   }
 }
 
-/* ── 메인 pill 버튼 — 뉴모피즘(soft UI), 히어로/헤더 버튼과 통일 ── */
+/* ── 메인 pill 버튼 — 뉴모피즘(soft UI), 히어로 "북클럽 둘러보기"와 크기 통일 ── */
 .lnd-pill {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px 8px 13px;
+  gap: 5px;
+  padding: 6px 13px;
   background: var(--lp-bg);
   border: none;
   border-radius: 9999px;
   cursor: pointer;
   font-family: var(--lp-serif-ko);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--lp-ink);
   letter-spacing: -0.01em;
@@ -878,14 +888,13 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   }
 }
 
-/* 내부 shimmer */
+/* 내부 shimmer — 화이트 빛반사 */
 .lnd-pill-shimmer {
   position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(
     105deg,
     transparent 20%,
-    rgba(94,70,50,0.1) 44%,
-    rgba(255,255,255,0.4) 50%,
+    rgba(255,255,255,0.55) 50%,
     transparent 72%
   );
   background-size: 300% 100%;
@@ -909,8 +918,18 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 /* 텍스트 */
 .lnd-pill-text { position: relative; z-index: 2; }
 
-@media (max-width: 480px) {
-  .lnd-pill { font-size: 11px; padding: 7px 13px 7px 10px; }
+/* 북클럽 둘러보기 버튼(.lp-hero-bookclub-btn)과 동일한 반응형 크기 */
+@media (max-width: 359px) {
+  .lnd-pill { padding: 5px 10px; font-size: 8.5px; }
+}
+@media (min-width: 480px) {
+  .lnd-pill { padding: 8px 17px; font-size: 11.5px; }
+}
+@media (min-width: 640px) {
+  .lnd-pill { padding: 12px 26px; font-size: 14.5px; }
+}
+@media (min-width: 1024px) {
+  .lnd-pill { padding: 14px 30px; font-size: 15.5px; }
 }
 
 

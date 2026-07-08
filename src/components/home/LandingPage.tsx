@@ -185,10 +185,12 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
           <span className="lnd-pill-glow" aria-hidden="true" />
           <span className="lnd-pill-shimmer" aria-hidden="true" />
 
-          {/* 위치 핀 */}
-          <svg className="lnd-pin-icon" viewBox="0 0 12 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M6 0C2.686 0 0 2.686 0 6C0 10.5 6 15 6 15C6 15 12 10.5 12 6C12 2.686 9.314 0 6 0ZM6 8.25C4.757 8.25 3.75 7.243 3.75 6C3.75 4.757 4.757 3.75 6 3.75C7.243 3.75 8.25 4.757 8.25 6C8.25 7.243 7.243 8.25 6 8.25Z" fill="currentColor"/>
-          </svg>
+          {/* 위치 핀 — 화이트 아이콘이 크림 배경에서도 보이도록 다크 배지 위에 표시 */}
+          <span className="lnd-pin-badge" aria-hidden="true">
+            <svg className="lnd-pin-icon" viewBox="0 0 12 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 0C2.686 0 0 2.686 0 6C0 10.5 6 15 6 15C6 15 12 10.5 12 6C12 2.686 9.314 0 6 0ZM6 8.25C4.757 8.25 3.75 7.243 3.75 6C3.75 4.757 4.757 3.75 6 3.75C7.243 3.75 8.25 4.757 8.25 6C8.25 7.243 7.243 8.25 6 8.25Z" fill="currentColor"/>
+            </svg>
+          </span>
 
           <span className="lnd-pill-text">내 근처 북클럽 찾기</span>
         </button>
@@ -842,11 +844,12 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           </div>
           <div className="lp-lede">
             <p style={{ margin: 0 }}>
-              우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다.
+              우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다.<br />
+              이 책이 한 사람에게 어떻게 스며들었는지를 함께
             </p>
-            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "10px", marginTop: "2px" }}>
-              <span>이 책이 한 사람에게 어떻게 스며들었는지를 함께 기록합니다.</span>
-              {/* 위치 기반 근처 북클럽 — 문장 옆에 나란히 배치 */}
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px", marginTop: "2px" }}>
+              <span>기록합니다.</span>
+              {/* 위치 기반 근처 북클럽 — 문장 옆에 나란히 배치, 절대 줄바꿈되지 않음 */}
               <NearbyClubsBanner books={dbBooks.length > 0 ? dbBooks : books} onOpen={(b) => setModalBook(b)} />
             </div>
           </div>
