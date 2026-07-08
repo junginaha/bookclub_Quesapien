@@ -389,15 +389,11 @@ export default function Header() {
                   {/* 로그인 버튼 */}
                   <Link
                     href="/login"
+                    className="btn-pill-neu"
                     style={{
                       position: "absolute", inset: 0,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 13.5, fontWeight: 500, textDecoration: "none",
-                      borderRadius: 9999, padding: "0 20px",
-                      border: "1.5px solid var(--line)",
-                      color: "var(--ink-soft)",
-                      fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-                      transition: "opacity .3s ease, transform .3s ease",
+                      display: "flex",
+                      transition: "opacity .3s ease, transform .3s ease, box-shadow .18s ease",
                       opacity: authBtnIdx === 0 && !authBtnFading ? 1 : 0,
                       transform: authBtnIdx === 0 && !authBtnFading
                         ? "translateY(0)"
@@ -405,19 +401,16 @@ export default function Header() {
                       pointerEvents: authBtnIdx === 0 ? "auto" : "none",
                     }}
                   >
-                    로그인
+                    <span>로그인</span>
                   </Link>
-                  {/* 함께하기 버튼 */}
+                  {/* 함께 읽기 버튼 */}
                   <Link
                     href="/signup"
+                    className="btn-pill-neu btn-pill-neu-solid"
                     style={{
                       position: "absolute", inset: 0,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 13.5, fontWeight: 600, textDecoration: "none",
-                      borderRadius: 9999, padding: "0 16px",
-                      background: "var(--ink)", color: "var(--cream-on-dark)",
-                      fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-                      transition: "opacity .3s ease, transform .3s ease",
+                      display: "flex",
+                      transition: "opacity .3s ease, transform .3s ease, box-shadow .18s ease",
                       opacity: authBtnIdx === 1 && !authBtnFading ? 1 : 0,
                       transform: authBtnIdx === 1 && !authBtnFading
                         ? "translateY(0)"
@@ -425,7 +418,7 @@ export default function Header() {
                       pointerEvents: authBtnIdx === 1 ? "auto" : "none",
                     }}
                   >
-                    함께읽기
+                    <span>함께 읽기</span>
                   </Link>
                 </div>
               </div>

@@ -750,26 +750,19 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           <a href="/giants">거인의 어깨</a>
         </div>
         {/* 로그인/회원가입 순환 버튼 */}
-        <div style={{ position: "relative", width: 90, height: 38, overflow: "hidden" }}>
+        <div style={{ position: "relative", width: 100, height: 40, overflow: "hidden" }}>
           {[
             { href: "/login", label: "로그인", filled: false },
-            { href: "/signup", label: "함께읽기", filled: true },
+            { href: "/signup", label: "함께 읽기", filled: true },
           ].map((btn, i) => (
             <a
               key={btn.href}
               href={btn.href}
-              className={btn.filled ? "lp-nav-cta" : ""}
+              className={btn.filled ? "btn-pill-neu btn-pill-neu-solid" : "btn-pill-neu"}
               style={{
                 position: "absolute", inset: 0,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "var(--lp-sm)", fontWeight: 500,
-                textDecoration: "none",
-                ...(btn.filled ? {} : {
-                  border: "1px solid var(--lp-line)",
-                  borderRadius: 9999,
-                  color: "var(--lp-ink-soft)",
-                }),
-                transition: "opacity .3s ease, transform .3s ease",
+                display: "flex",
+                transition: "opacity .3s ease, transform .3s ease, box-shadow .18s ease",
                 opacity: navBtnIdx === i && !navBtnFading ? 1 : 0,
                 transform: navBtnIdx === i && !navBtnFading ? "translateY(0)" : navBtnIdx === i ? "translateY(-5px)" : "translateY(5px)",
                 pointerEvents: navBtnIdx === i ? "auto" : "none",
@@ -792,7 +785,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             <span className="lp-reveal"><span>좋은 <span className="lp-em">질문</span>은</span></span>
             <span className="lp-reveal"><span>좋은 사람을</span></span>
             <span className="lp-reveal lp-reveal-last">
-              <span style={{ display: "flex", alignItems: "flex-end", gap: "clamp(8px, 1.2vw, 16px)", flexWrap: "wrap",
+              <span style={{ display: "flex", alignItems: "flex-end", gap: "clamp(6px, 1.2vw, 16px)", flexWrap: "nowrap",
                 /* 버튼 그림자(상하)를 위한 여백: overflow:visible 과 함께 작동 */
                 paddingBottom: "28px", paddingTop: "12px",
                 marginBottom: "-28px", marginTop: "-12px" }}>

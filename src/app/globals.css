@@ -464,6 +464,98 @@
   }
 }
 
+/* ─── Neumorphic Pill Button — 크림 배경에 파묻힌 소프트 UI, 사이트 공통 ─── */
+.btn-pill-neu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+
+  padding: 10px 20px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--bg);
+  color: var(--ink);
+
+  font-family: var(--font-noto-serif-kr), Georgia, serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none !important;
+  cursor: pointer;
+  user-select: none;
+
+  box-shadow:
+    5px 5px 10px rgba(94,70,50,0.16),
+    -5px -5px 10px rgba(255,255,255,0.85);
+  transition: box-shadow .18s ease, transform .18s ease;
+  animation: btnPillNeuGlow 3.6s ease-in-out infinite;
+}
+.btn-pill-neu > span,
+.btn-pill-neu > svg {
+  position: relative;
+  z-index: 2;
+}
+.btn-pill-neu::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: -100%; width: 60%;
+  background: linear-gradient(100deg, transparent 0%, rgba(94,70,50,0.22) 50%, transparent 100%);
+  animation: btnPillNeuShimmer 4.4s ease-in-out infinite;
+  pointer-events: none;
+}
+.btn-pill-neu:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    3px 3px 7px rgba(94,70,50,0.18),
+    -3px -3px 7px rgba(255,255,255,0.9);
+}
+.btn-pill-neu:active {
+  transform: translateY(0);
+  box-shadow:
+    inset 3px 3px 7px rgba(94,70,50,0.22),
+    inset -3px -3px 7px rgba(255,255,255,0.7);
+}
+@keyframes btnPillNeuShimmer { 0%, 20% { left: -100%; } 70%, 100% { left: 180%; } }
+@keyframes btnPillNeuGlow {
+  0%, 100% {
+    box-shadow:
+      5px 5px 10px rgba(94,70,50,0.16),
+      -5px -5px 10px rgba(255,255,255,0.85);
+  }
+  50% {
+    box-shadow:
+      5px 5px 14px rgba(94,70,50,0.24),
+      -5px -5px 14px rgba(255,255,255,0.95),
+      0 0 20px -4px rgba(176,138,74,0.35);
+  }
+}
+
+/* 대비가 더 필요한 primary CTA용 다크 변형 (예: 헤더 "함께 읽기") */
+.btn-pill-neu-solid {
+  background: var(--ink);
+  color: var(--cream-on-dark);
+  box-shadow:
+    5px 5px 10px rgba(0,0,0,0.28),
+    -5px -5px 10px rgba(255,255,255,0.06);
+}
+.btn-pill-neu-solid::before {
+  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.16) 50%, transparent 100%);
+}
+.btn-pill-neu-solid:hover {
+  box-shadow:
+    3px 3px 7px rgba(0,0,0,0.3),
+    -3px -3px 7px rgba(255,255,255,0.08);
+}
+.btn-pill-neu-solid:active {
+  box-shadow:
+    inset 3px 3px 7px rgba(0,0,0,0.35),
+    inset -3px -3px 7px rgba(255,255,255,0.05);
+}
+
 /* ─── Tailwind Utilities ──────────────────────────────────────── */
 @layer utilities {
   .text-balance {
