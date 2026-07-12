@@ -71,7 +71,7 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-btn-primary > span { color: var(--lp-cream); }
 .lp-btn-cream > span { color: var(--lp-bg-ink); }
 .lp img { display: block; max-width: 100%; }
-.lp button { font: inherit; cursor: pointer; border: 0; background: transparent; color: inherit; }
+.lp button:not(.lnd-pill) { font: inherit; cursor: pointer; border: 0; background: transparent; color: inherit; }
 
 /* ── TYPE ── */
 .lp-eyebrow {
@@ -1488,3 +1488,40 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-nearby-dist { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
 .lp-nearby-km   { font-size: 13.5px; font-weight: 600; color: var(--lp-accent); font-family: var(--lp-serif); }
 .lp-nearby-seats { font-size: 11px; color: var(--lp-muted); font-family: var(--lp-sans); letter-spacing: 0.02em; }
+
+/* ══════════════════════════════════════════
+   INTRO SPLASH — 홈 진입 화면
+   ══════════════════════════════════════════ */
+.lp-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: var(--lp-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lp-sp3);
+  padding: var(--lp-gutter);
+  text-align: center;
+  animation: lp-introFadeIn .6s ease both;
+}
+.lp-intro-leaving {
+  animation: lp-introFadeOut .45s ease both;
+}
+.lp-intro-mark { margin-bottom: var(--lp-sp1); }
+.lp-intro-eyebrow { margin-bottom: var(--lp-sp3); }
+/* 히어로 섹션의 순차 등장(opacity:0 → .7s 지연 페이드인)은 스플래시 단독 노출에는 맞지 않아 즉시 표시로 오버라이드 */
+.lp-intro .lp-hero-bookclub-btn {
+  opacity: 1;
+  animation: lp-heroBtnGlow 3.6s ease-in-out infinite;
+}
+
+@keyframes lp-introFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes lp-introFadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(1.02); }
+}

@@ -6,6 +6,7 @@ import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { josa } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import NearbyMeetingsFeed, { type UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
+import IntroSplash from "./IntroSplash";
 import "./landing.css";
 
 // Leaflet은 window/DOM에 의존하므로 클라이언트에서만 로드
@@ -567,6 +568,7 @@ interface LandingPageProps {
 
 // ─── Main component ───────────────────────────────────────────
 export default function LandingPage({ todayQuestion, recentQuestions, upcomingMeetings = [] }: LandingPageProps) {
+  const [introDone, setIntroDone] = useState(false);
   const [modalBook, setModalBook] = useState<BookClub | null>(null);
   const [activeFloat, setActiveFloat] = useState<number | null>(null);
   const [askContent, setAskContent] = useState("");
@@ -713,6 +715,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
 
   return (
     <div className="lp">
+      {!introDone && <IntroSplash onEnter={() => setIntroDone(true)} />}
       <div className="lp-grain" aria-hidden="true" />
       <div className="lp-grain-light" aria-hidden="true" />
 
