@@ -11,13 +11,16 @@ import RelatedLinks from "@/components/seo/RelatedLinks";
 import type { RelatedItem } from "@/components/seo/RelatedLinks";
 import { useAppStore } from "@/lib/store";
 import { isAdminEmail } from "@/lib/admin";
-
-const COLOR_MAP: Record<string, string> = {
-  navy: "#1B2536", cream: "#8B7A5E", rust: "#9B4A2E",
-  olive: "#5C6B3A", dusk: "#4A5568", sage: "#7A9E7E",
-  terra: "#8B5E3C", smoke: "#6B7280", mauve: "#7E6B8F",
-  fog: "#9CA3AF", ochre: "#C68B2B", ink: "#1C1F26",
-};
+import {
+  CLUB_COLOR_MAP,
+  classifyClub,
+  getEventStart,
+  isFull,
+  isNearFull,
+  remainingSeats,
+} from "@/lib/bookclub";
+import { formatSeoulDate, formatSeoulTime } from "@/lib/time";
+import EncoreRequestButton from "@/components/bookclub/EncoreRequestButton";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default function BookClubDetailClient({ club: initialClub }: { club: any; isAdmin?: boolean }) {
@@ -41,15 +44,24 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
   const [saving, setSaving]   = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
 
-  const bgColor = COLOR_MAP[club.color as string] ?? "#1B2536";
-  const remaining = (club.max_participants ?? 8) - (club.current_participants ?? 0);
-  const isClosed = club.status === "closed" || remaining <= 0;
+  const bgColor = CLUB_COLOR_MAP[club.color as string] ?? "#1B2536";
+  // 지금 함께 읽어요 / 다시 함께 읽어요 — 리스트·홈과 동일한 분류 규칙을 재사용한다.
+  const view = classifyClub(club);
+  const isAgain = view === "again";
+  const remainingRaw = remainingSeats(club); // null이면 자리 수를 표시하지 않는다
+  const remaining = remainingRaw ?? 0;
+  const nearFull = isNearFull(club);
+  const full = isFull(club);
+  const isClosed = isAgain || full;
   const hasJoinLink = !!(club.join_url?.startsWith("http")) || !!club.has_join_url;
-  const fillPct = Math.round(((club.current_participants ?? 0) / (club.max_participants ?? 8)) * 100);
+  const fillPct = club.max_participants ? Math.round(((club.current_participants ?? 0) / club.max_participants) * 100) : 0;
   const reviews: any[] = club.reviews ?? [];
-  const avgRating = reviews.length > 0
+  const hasReviews = reviews.length > 0;
+  const avgRating = hasReviews
     ? reviews.reduce((s: number, r: any) => s + (r.rating ?? 5), 0) / reviews.length
-    : 5;
+    : 0;
+  const eventStart = getEventStart(club);
+  const authorHosts = !!club.author_hosts;
 
   // ── 참여 신청 — 서버 리다이렉트 (URL 비노출) ──────────────────
   const handleJoin = async () => {
@@ -164,10 +176,24 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                   {club.title}
                 </h1>
 
-                {club.author && (
-                  <p style={{ fontSize: 16, color: "rgba(255,255,255,0.6)", marginBottom: 20 }}>
-                    — {club.author}
-                  </p>
+                {(club.author || club.host_name) && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 20 }}>
+                    {club.author && (
+                      <p style={{ fontSize: 15, color: "rgba(255,255,255,0.75)" }}>
+                        함께 읽는 작가 · {club.author}
+                        {authorHosts && (
+                          <span style={{ marginLeft: 8, fontSize: 12, color: "#FFD98A", fontWeight: 500 }}>
+                            {club.author === club.host_name ? "저자 직접 진행" : "저자와의 만남"}
+                          </span>
+                        )}
+                      </p>
+                    )}
+                    {club.host_name && (
+                      <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)" }}>
+                        북클럽 리더 · {club.host_name}
+                      </p>
+                    )}
+                  </div>
                 )}
 
                 <p style={{ fontSize: 16, color: "rgba(255,255,255,0.75)", lineHeight: 1.75, maxWidth: 520, marginBottom: 36 }}>
@@ -175,41 +201,47 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                 </p>
 
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-                  <button
-                    onClick={handleJoin}
-                    disabled={isClosed || joining}
-                    style={{
-                      display: "inline-flex", alignItems: "center", gap: 8,
-                      padding: "14px 28px", borderRadius: 9999,
-                      background: isClosed ? "rgba(255,255,255,0.1)" : joinStep==="done" ? "#10B981" : "white",
-                      color: isClosed ? "rgba(255,255,255,0.5)" : joinStep==="done" ? "white" : bgColor,
-                      fontSize: 15, fontWeight: 600,
-                      border: "none", cursor: isClosed ? "not-allowed" : "pointer",
-                      transition: "all 0.2s",
-                    }}
-                    onMouseEnter={(e) => { if (!isClosed && joinStep!=="done") (e.currentTarget as HTMLElement).style.opacity = "0.88"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
-                  >
-                    {isClosed ? "마감됐어요" : joinStep==="done" ? "신청 완료 ✓" : joining ? "연결 중…" : "참여 신청하기"}
-                    {!isClosed && joinStep==="idle" && <ChevronRight size={16} />}
-                  </button>
+                  {isAgain ? (
+                    <EncoreRequestButton clubSlug={club.slug} />
+                  ) : (
+                    <>
+                      <button
+                        onClick={handleJoin}
+                        disabled={full || joining}
+                        style={{
+                          display: "inline-flex", alignItems: "center", gap: 8,
+                          padding: "14px 28px", borderRadius: 9999,
+                          background: full ? "rgba(255,255,255,0.1)" : joinStep==="done" ? "#10B981" : "white",
+                          color: full ? "rgba(255,255,255,0.5)" : joinStep==="done" ? "white" : bgColor,
+                          fontSize: 15, fontWeight: 600,
+                          border: "none", cursor: full ? "not-allowed" : "pointer",
+                          transition: "all 0.2s",
+                        }}
+                        onMouseEnter={(e) => { if (!full && joinStep!=="done") (e.currentTarget as HTMLElement).style.opacity = "0.88"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
+                      >
+                        {full ? "신청 마감" : joinStep==="done" ? "신청 완료 ✓" : joining ? "연결 중…" : "참여 신청"}
+                        {!full && joinStep==="idle" && <ChevronRight size={16} />}
+                      </button>
 
-                  {joinStep==="no-link" && (
-                    <span style={{ fontSize:13, color:"rgba(255,255,255,0.6)" }}>참여 링크가 준비 중입니다.</span>
-                  )}
-
-                  {!isClosed && (
-                    <div style={{
-                      display: "inline-flex", alignItems: "center", gap: 6,
-                      padding: "14px 20px",
-                      color: "rgba(255,255,255,0.7)", fontSize: 14,
-                    }}>
-                      <Users size={14} />
-                      {remaining}자리 남음
-                      {remaining <= 2 && (
-                        <span style={{ color: "#FF8A8A", fontWeight: 500 }}>· 마감 임박</span>
+                      {joinStep==="no-link" && (
+                        <span style={{ fontSize:13, color:"rgba(255,255,255,0.6)" }}>참여 링크가 준비 중입니다.</span>
                       )}
-                    </div>
+
+                      {!full && remainingRaw !== null && (
+                        <div style={{
+                          display: "inline-flex", alignItems: "center", gap: 6,
+                          padding: "14px 20px",
+                          color: "rgba(255,255,255,0.7)", fontSize: 14,
+                        }}>
+                          <Users size={14} />
+                          {remaining}자리 남음
+                          {nearFull && (
+                            <span style={{ color: "#FF8A8A", fontWeight: 500 }}>· 마감 임박</span>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
 
                   {/* 리더 관리 버튼 (리더만 표시 — 클라이언트에서 auth 체크 안 함, 링크 자체가 서버에서 보호됨) */}
@@ -241,22 +273,28 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                 minWidth: 180,
                 border: "1px solid rgba(255,255,255,0.15)",
               }} className="hidden md:block">
-                <div style={{ marginBottom: 20 }}>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>참여 현황</div>
-                  <div style={{ fontSize: 32, fontFamily: "var(--font-noto-serif-kr), Georgia, serif", color: "white", fontWeight: 400 }}>
-                    {club.current_participants ?? 0}
-                    <span style={{ fontSize: 16, opacity: 0.5 }}>/{club.max_participants ?? 8}</span>
+                {!isAgain && (
+                  <>
+                    <div style={{ marginBottom: 20 }}>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>참여 현황</div>
+                      <div style={{ fontSize: 32, fontFamily: "var(--font-noto-serif-kr), Georgia, serif", color: "white", fontWeight: 400 }}>
+                        {club.current_participants ?? 0}
+                        <span style={{ fontSize: 16, opacity: 0.5 }}>/{club.max_participants ?? 8}</span>
+                      </div>
+                    </div>
+                    <div style={{ height: 4, borderRadius: 9999, background: "rgba(255,255,255,0.2)", marginBottom: 20 }}>
+                      <div style={{ height: "100%", width: `${fillPct}%`, borderRadius: 9999, background: nearFull ? "#FF8A8A" : "rgba(255,255,255,0.75)", transition: "width 0.3s" }} />
+                    </div>
+                  </>
+                )}
+                {hasReviews && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <Star size={12} style={{ color: "#FFD700", fill: "#FFD700" }} />
+                    <span style={{ fontSize: 14, color: "rgba(255,255,255,0.8)" }}>
+                      {avgRating.toFixed(1)} ({reviews.length}개 후기)
+                    </span>
                   </div>
-                </div>
-                <div style={{ height: 4, borderRadius: 9999, background: "rgba(255,255,255,0.2)", marginBottom: 20 }}>
-                  <div style={{ height: "100%", width: `${fillPct}%`, borderRadius: 9999, background: remaining <= 2 ? "#FF8A8A" : "rgba(255,255,255,0.75)", transition: "width 0.3s" }} />
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <Star size={12} style={{ color: "#FFD700", fill: "#FFD700" }} />
-                  <span style={{ fontSize: 14, color: "rgba(255,255,255,0.8)" }}>
-                    {avgRating.toFixed(1)} ({reviews.length}개 후기)
-                  </span>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -455,12 +493,14 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
               }}>
                 <div>
                   <div style={{ fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 16 }}>
-                    일정 & 장소
+                    {isAgain ? "지난 일정 & 장소" : "일정 & 장소"}
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     <div style={{ display: "flex", gap: 10, fontSize: 14, color: "var(--ink-soft)", alignItems: "flex-start" }}>
                       <Calendar size={15} style={{ flexShrink: 0, marginTop: 1 }} />
-                      <span>{club.schedule ?? "일정 협의 중"}</span>
+                      <span>
+                        {eventStart ? `${formatSeoulDate(eventStart)} ${formatSeoulTime(eventStart)}` : (club.schedule || "일정 협의 중")}
+                      </span>
                     </div>
                     <div style={{ display: "flex", gap: 10, fontSize: 14, color: "var(--ink-soft)", alignItems: "flex-start" }}>
                       <Clock size={15} style={{ flexShrink: 0, marginTop: 1 }} />
@@ -469,66 +509,76 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                     <div style={{ display: "flex", gap: 10, fontSize: 14, color: "var(--ink-soft)", alignItems: "flex-start" }}>
                       <MapPin size={15} style={{ flexShrink: 0, marginTop: 1 }} />
                       <div>
-                        <div>{club.location}</div>
+                        <div>{[club.area, club.location].filter(Boolean).join(" · ") || "장소 미정"}</div>
                         {club.location_detail && (
                           <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>{club.location_detail}</div>
                         )}
                       </div>
                     </div>
-                    <div style={{ display: "flex", gap: 10, fontSize: 14, color: "var(--ink-soft)", alignItems: "center" }}>
-                      <Users size={15} style={{ flexShrink: 0 }} />
-                      <span>{club.current_participants ?? 0}명 / {club.max_participants ?? 8}명</span>
-                    </div>
+                    {!isAgain && (
+                      <div style={{ display: "flex", gap: 10, fontSize: 14, color: "var(--ink-soft)", alignItems: "center" }}>
+                        <Users size={15} style={{ flexShrink: 0 }} />
+                        <span>{club.current_participants ?? 0}명 / {club.max_participants ?? 8}명</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Participation bar */}
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>
-                    <span>참여 현황</span>
-                    <span>{fillPct}%</span>
-                  </div>
-                  <div style={{ height: 6, borderRadius: 9999, background: "var(--line-soft)" }}>
-                    <div style={{
-                      height: "100%", borderRadius: 9999,
-                      width: `${fillPct}%`,
-                      background: remaining <= 2 ? "#EF4444" : bgColor,
-                      transition: "width 0.3s",
-                    }} />
-                  </div>
-                  {remaining <= 2 && !isClosed && (
-                    <div style={{ fontSize: 12, color: "#EF4444", marginTop: 6, fontWeight: 500 }}>
-                      잔여 {remaining}석 — 마감 임박
+                {/* Participation bar — 과거/앵콜 카드에는 자리 수를 표시하지 않는다 */}
+                {!isAgain && (
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>
+                      <span>참여 현황</span>
+                      <span>{fillPct}%</span>
                     </div>
-                  )}
-                </div>
+                    <div style={{ height: 6, borderRadius: 9999, background: "var(--line-soft)" }}>
+                      <div style={{
+                        height: "100%", borderRadius: 9999,
+                        width: `${fillPct}%`,
+                        background: nearFull ? "#EF4444" : bgColor,
+                        transition: "width 0.3s",
+                      }} />
+                    </div>
+                    {nearFull && (
+                      <div style={{ fontSize: 12, color: "#EF4444", marginTop: 6, fontWeight: 500 }}>
+                        잔여 {remaining}석 — 마감 임박
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* CTA */}
-                <button
-                  onClick={handleJoin}
-                  disabled={isClosed}
-                  style={{
-                    width: "100%", padding: "15px 0",
-                    borderRadius: 12,
-                    background: isClosed ? "var(--line-soft)" : bgColor,
-                    color: isClosed ? "var(--muted)" : "white",
-                    fontSize: 15, fontWeight: 600,
-                    border: "none", cursor: isClosed ? "not-allowed" : "pointer",
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                    transition: "opacity 0.2s",
-                  }}
-                  onMouseEnter={(e) => { if (!isClosed) (e.currentTarget as HTMLElement).style.opacity = "0.85"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
-                >
-                  {isClosed ? "마감" : "참가 신청하기"}
-                  {!isClosed && <ExternalLink size={15} />}
-                </button>
+                {isAgain ? (
+                  <EncoreRequestButton clubSlug={club.slug} />
+                ) : (
+                  <>
+                    <button
+                      onClick={handleJoin}
+                      disabled={full}
+                      style={{
+                        width: "100%", padding: "15px 0",
+                        borderRadius: 12,
+                        background: full ? "var(--line-soft)" : bgColor,
+                        color: full ? "var(--muted)" : "white",
+                        fontSize: 15, fontWeight: 600,
+                        border: "none", cursor: full ? "not-allowed" : "pointer",
+                        display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                        transition: "opacity 0.2s",
+                      }}
+                      onMouseEnter={(e) => { if (!full) (e.currentTarget as HTMLElement).style.opacity = "0.85"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
+                    >
+                      {full ? "신청 마감" : "참여 신청"}
+                      {!full && <ExternalLink size={15} />}
+                    </button>
 
-                {!isClosed && (
-                  <p style={{ fontSize: 12, color: "var(--muted)", textAlign: "center", lineHeight: 1.6 }}>
-                    확정 후 이메일로 알려드릴게요.<br />
-                    참가비는 확정 후 알려드릴게요.
-                  </p>
+                    {!full && (
+                      <p style={{ fontSize: 12, color: "var(--muted)", textAlign: "center", lineHeight: 1.6 }}>
+                        확정 후 이메일로 알려드릴게요.<br />
+                        참가비는 확정 후 알려드릴게요.
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
 

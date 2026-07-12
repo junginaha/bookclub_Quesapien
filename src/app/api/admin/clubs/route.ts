@@ -43,6 +43,10 @@ export async function PATCH(request: NextRequest) {
       "description", "host_name", "host_intro",
       "max_participants", "current_participants",
       "session_dates", "season_number", "status",
+      // 011 마이그레이션 — 지금/앵콜 재구조화 컬럼 (마이그레이션 미적용 시 update는 컬럼 없음 에러로 실패한다)
+      "event_starts_at", "event_ends_at", "registration_closes_at",
+      "area", "price", "author_hosts",
+      "encore_eligible", "encore_threshold", "archived_at",
     ];
     const update: Record<string, unknown> = {};
     for (const key of allowed) {

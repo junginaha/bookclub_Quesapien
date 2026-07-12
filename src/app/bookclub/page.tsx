@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import BookClubClient from "./BookClubClient";
 import DefinitionBlock from "@/components/seo/DefinitionBlock";
 import { createClient } from "@/lib/supabase/server";
+import { attachEncoreCounts } from "@/lib/bookclub-server";
+import type { BookClubRecord } from "@/lib/bookclub";
 import { breadcrumbSchema } from "@/lib/schema";
 import { buildMetadata } from "@/lib/metadata";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -20,14 +23,14 @@ export const metadata: Metadata = buildMetadata({
 export const revalidate = 60;
 
 export default async function BookClubPage() {
-  let clubs: unknown[] = [];
+  let clubs: BookClubRecord[] = [];
   try {
     const supabase = await createClient();
     const { data } = await supabase
       .from("landing_book_clubs")
       .select("*")
       .order("sort_order", { ascending: true });
-    clubs = data ?? [];
+    clubs = await attachEncoreCounts(supabase, (data ?? []) as BookClubRecord[]);
   } catch { /* static fallback */ }
 
   const crumbLd = breadcrumbSchema([
@@ -49,9 +52,30 @@ export default async function BookClubPage() {
       />
 
       <main style={{ flex: 1 }}>
-        <BookClubClient initialClubs={clubs} />
+        <Suspense fallback={<BookClubSkeleton />}>
+          <BookClubClient initialClubs={clubs} />
+        </Suspense>
       </main>
       <Footer />
+    </div>
+  );
+}
+
+function BookClubSkeleton() {
+  return (
+    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "72px clamp(20px, 4vw, 48px)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 24 }}>
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} style={{ borderRadius: 16, overflow: "hidden", border: "1px solid var(--line-soft)" }}>
+            <div style={{ height: 180, background: "var(--bg-soft)" }} />
+            <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ height: 12, width: "70%", background: "var(--line-soft)", borderRadius: 4 }} />
+              <div style={{ height: 12, width: "50%", background: "var(--line-soft)", borderRadius: 4 }} />
+              <div style={{ height: 12, width: "40%", background: "var(--line-soft)", borderRadius: 4 }} />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

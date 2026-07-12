@@ -1541,6 +1541,14 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   font-style: italic;
   letter-spacing: 0.06em;
 }
+.lp-intro-notice {
+  font-family: var(--lp-serif);
+  font-style: italic;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--lp-muted);
+  margin-bottom: var(--lp-sp3);
+}
 /* 히어로 섹션의 순차 등장(opacity:0 → .7s 지연 페이드인)은 스플래시 단독 노출에는 맞지 않아 즉시 표시로 오버라이드.
    버튼은 스플래시의 유일한 액션이라 음영도 더 강하게 준다(전용 glow 키프레임 사용, 기존 히어로 버튼은 그대로 둠). */
 .lp-intro .lp-hero-bookclub-btn {

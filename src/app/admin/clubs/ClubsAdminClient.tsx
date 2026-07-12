@@ -54,9 +54,18 @@ type ClubRow = typeof SEED_CLUBS[0] & {
   max_participants?: number;
   current_participants?: number;
   status?: string;
+  // 011 마이그레이션 — 지금/앵콜 재구조화
+  event_starts_at?: string;
+  event_ends_at?: string;
+  area?: string;
+  author_hosts?: boolean;
+  encore_eligible?: boolean;
+  encore_threshold?: number;
 };
 
 type EditForm = Omit<ClubRow, "slug" | "title" | "is_mini">;
+
+const AREA_CHOICES = ["강남·서초", "마포·홍대", "종로·광화문", "성수·건대", "온라인", "지역 무관"];
 
 function emptyForm(club: ClubRow): EditForm {
   return {
@@ -70,6 +79,12 @@ function emptyForm(club: ClubRow): EditForm {
     max_participants: club.max_participants,
     current_participants: club.current_participants,
     status: club.status ?? "active",
+    event_starts_at: club.event_starts_at ?? "",
+    event_ends_at: club.event_ends_at ?? "",
+    area: club.area ?? "",
+    author_hosts: club.author_hosts ?? false,
+    encore_eligible: club.encore_eligible ?? false,
+    encore_threshold: club.encore_threshold ?? 8,
   };
 }
 
@@ -271,6 +286,35 @@ export default function ClubsAdminClient() {
                       <div>
                         <label style={labelStyle}>현재 인원</label>
                         <input style={inputStyle} type="number" min={0} max={100} value={form.current_participants ?? ""} onChange={(e) => setForm((f) => ({ ...f, current_participants: parseInt(e.target.value) || undefined }))} placeholder="0" />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>모임 시작 일시 (구조화 — 요일·마감 자동 계산에 사용)</label>
+                        <input style={inputStyle} type="datetime-local" value={form.event_starts_at ?? ""} onChange={(e) => setForm((f) => ({ ...f, event_starts_at: e.target.value }))} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>모임 종료 일시</label>
+                        <input style={inputStyle} type="datetime-local" value={form.event_ends_at ?? ""} onChange={(e) => setForm((f) => ({ ...f, event_ends_at: e.target.value }))} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>지역 그룹</label>
+                        <select style={inputStyle} value={form.area ?? ""} onChange={(e) => setForm((f) => ({ ...f, area: e.target.value }))}>
+                          <option value="">선택 안 함</option>
+                          {AREA_CHOICES.map((a) => <option key={a} value={a}>{a}</option>)}
+                        </select>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "16px", paddingTop: "22px" }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#5E4632", cursor: "pointer" }}>
+                          <input type="checkbox" checked={form.author_hosts ?? false} onChange={(e) => setForm((f) => ({ ...f, author_hosts: e.target.checked }))} />
+                          저자 직접 진행
+                        </label>
+                        <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#5E4632", cursor: "pointer" }}>
+                          <input type="checkbox" checked={form.encore_eligible ?? false} onChange={(e) => setForm((f) => ({ ...f, encore_eligible: e.target.checked }))} />
+                          앵콜 대상
+                        </label>
+                      </div>
+                      <div>
+                        <label style={labelStyle}>앵콜 재오픈 기준 인원</label>
+                        <input style={inputStyle} type="number" min={1} max={100} value={form.encore_threshold ?? 8} onChange={(e) => setForm((f) => ({ ...f, encore_threshold: parseInt(e.target.value) || 8 }))} />
                       </div>
                       <div style={{ gridColumn: "1 / -1" }}>
                         <label style={labelStyle}>모임 소개</label>

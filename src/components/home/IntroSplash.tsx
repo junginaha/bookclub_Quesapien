@@ -98,6 +98,8 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
         ))}
       </span>
 
+      <p className="lp-intro-notice">괜찮은 북클럽 베타 테스트 중...</p>
+
       <a
         href="#"
         className="lp-hero-bookclub-btn"

@@ -3,10 +3,11 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
-import { josa } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import NearbyMeetingsFeed, { type UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
 import IntroSplash from "./IntroSplash";
+import { type BookClubRecord, FALLBACK_CLUBS, classifyClub, sortAgain, sortNow } from "@/lib/bookclub";
+import { CurrentClubCard, EncoreClubCard } from "@/components/bookclub/ClubCards";
 import "./landing.css";
 
 // Leaflet은 window/DOM에 의존하므로 클라이언트에서만 로드
@@ -250,32 +251,6 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
   );
 }
 
-const miniBooks: BookClub[] = [
-  { color: "terra", slug: "제자리로-돌아오는-밤에", title: "제자리로 돌아오는 밤에", recommender: "서연", tag: "#귀환", currentParticipants: 8, isMini: true },
-  { color: "smoke", slug: "느리게-읽는-일", title: "느리게 읽는 일", recommender: "진호", tag: "#느림", currentParticipants: 11, isMini: true },
-  { color: "mauve", slug: "어머니의-문장들", title: "어머니의 문장들", recommender: "지우", tag: "#가족", currentParticipants: 9, isMini: true },
-  { color: "fog", slug: "흐린-날의-사유", title: "흐린 날의 사유", recommender: "민재", tag: "#우울", currentParticipants: 14, isMini: true },
-  { color: "ochre", slug: "아무것도-하지-않는-연습", title: "아무것도 하지 않는 연습", recommender: "은지", tag: "#쉬이", currentParticipants: 16, isMini: true },
-  { color: "navy", slug: "일을-사랑하면서", title: "일을 사랑하면서 일에 지지 않는 법", recommender: "태우", tag: "#번아웃", currentParticipants: 22, isMini: true },
-  { color: "cream", slug: "이름-없는-감정들에게", title: "이름 없는 감정들에게", recommender: "은재", tag: "#감정", currentParticipants: 10, isMini: true },
-  { color: "olive", slug: "수요일-저녁-낭독회", title: "수요일 저녁 낭독회", recommender: "현우", tag: "#시", currentParticipants: 7, isMini: true },
-  { color: "rust", slug: "아버지라는-낯선-사람", title: "아버지라는 낯선 사람", recommender: "도현", tag: "#가족", currentParticipants: 13, isMini: true },
-  { color: "sage", slug: "쓰이지-않는-시간이-있다", title: "쓰이지 않는 시간이 있다", recommender: "하은", tag: "#시간", currentParticipants: 9, isMini: true },
-  { color: "dusk", slug: "어둠-속의-밝은-한-줄", title: "어둠 속의 밝은 한 줄", recommender: "제이", tag: "#시", currentParticipants: 6, isMini: true },
-  { color: "terra", slug: "온전하지-않은-시절", title: "온전하지 않은 시절", recommender: "안녕", tag: "#청춘", currentParticipants: 12, isMini: true },
-  { color: "mauve", slug: "헤어진-이들의-재회", title: "헤어진 이들의 재회", recommender: "다연", tag: "#관계", currentParticipants: 8, isMini: true },
-  { color: "smoke", slug: "도시의-올랜-해", title: "도시의 올랜 해", recommender: "우재", tag: "#도시", currentParticipants: 11, isMini: true },
-  { color: "ink", slug: "죽음을-읽는-일곱-가지", title: "죽음을 읽는 일곱 가지 시선", recommender: "혁", tag: "#생경", currentParticipants: 15, isMini: true },
-  { color: "cream", slug: "난-당신을-잘-모릅니다", title: "난 당신을 잘 모릅니다", recommender: "재희", tag: "#대화", currentParticipants: 10, isMini: true },
-  { color: "olive", slug: "돈이-말해주지-않는", title: "돈이 말해주지 않는 것들", recommender: "지훈", tag: "#삶", currentParticipants: 17, isMini: true },
-  { color: "fog", slug: "높은-곳의-창가에서", title: "높은 곳의 창가에서", recommender: "세아", tag: "#고독", currentParticipants: 9, isMini: true },
-  { color: "rust", slug: "다시-걸을-수-있는-사람들", title: "다시 걸을 수 있는 사람들", recommender: "혜원", tag: "#회복", currentParticipants: 13, isMini: true },
-  { color: "ochre", slug: "외국어로-읽는-한국-소설", title: "외국어로 읽는 한국 소설", recommender: "명희", tag: "#언어", currentParticipants: 6, isMini: true },
-  { color: "mauve", slug: "넘어진-자리에서", title: "넘어진 자리에서 주워 든 것들", recommender: "연우", tag: "#실패", currentParticipants: 11, isMini: true },
-  { color: "dusk", slug: "밤에만-편지를-씁니다", title: "밤에만 편지를 씁니다", recommender: "레이", tag: "#서신", currentParticipants: 8, isMini: true },
-  { color: "sage", slug: "자연을-읽는-일요일", title: "자연을 읽는 일요일", recommender: "소희", tag: "#생태", currentParticipants: 14, isMini: true },
-  { color: "navy", slug: "철학이-필요한-저녁", title: "철학이 필요한 저녁", recommender: "윤", tag: "#사유", currentParticipants: 18, isMini: true },
-];
 
 const testimonials = [
   { who: "채현", sub: "UX 디자이너 · 30", said: "처음으로 모르는 사람 앞에서 솔직한 대화를 했어요. 그 밤이 한 달 동안 저를 흔들고 있었습니다.", when: "외로움 시즌 · Week 04" },
@@ -576,11 +551,11 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
   const [navBtnFading, setNavBtnFading] = useState(false);
   const [askAuthor, setAskAuthor] = useState("");
   const [askStatus, setAskStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [miniExpanded, setMiniExpanded] = useState(false);
   const [questionLikes, setQuestionLikes] = useState<number | null>(null);
   const [questionSaves, setQuestionSaves] = useState<number | null>(null);
   const [questionReacted, setQuestionReacted] = useState<{ like: boolean; save: boolean }>({ like: false, save: false });
   const [dbBooks, setDbBooks] = useState<BookClub[]>([]);
+  const [clubRecords, setClubRecords] = useState<BookClubRecord[]>([]);
   const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
   const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
@@ -611,7 +586,10 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
     fetch("/api/book-clubs?mini=false")
       .then((r) => r.json())
       .then((d) => {
-        if (d.clubs?.length > 0) setDbBooks(d.clubs);
+        if (d.clubs?.length > 0) {
+          setDbBooks(d.clubs);
+          setClubRecords(d.clubs); // 같은 응답, 지금/다시 섹션은 snake_case 원본 그대로 사용
+        }
       })
       .catch(() => {});
   }, []);
@@ -837,101 +815,58 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           </div>
         </div>
 
-        <div className="lp-books-grid">
-          {books.slice(0, 4).map((b) => (
-            <article
-              key={b.title}
-              className="lp-book lp-reveal"
-              onClick={() => setModalBook(b)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === "Enter" && setModalBook(b)}
-            >
-              <div className={`lp-book-cover ${b.color}`}>
-                <span className="bc-spine" />
-                <div className="bc-top">
-                  <span className="bc-genre">{b.genre}</span>
-                </div>
-                <div className="bc-bot">
-                  <h3>{b.title}</h3>
-                  <p className="bc-author">— {b.author}</p>
-                </div>
-                <div className="bc-hover-hint">모임 상세 보기</div>
-              </div>
-              <div className="lp-book-info">
-                <div className="bi-tag">{b.tag}</div>
-                <p className="bi-rec">— {josa(b.recommender ?? "", "이가")} 건넵니다</p>
-                <p className="bi-reason">{b.reason}</p>
-                <div className="lp-emotion-tags">
-                  {b.emotionTags?.map((t) => <span key={t}>{t}</span>)}
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        {/* Mini books — collapsible */}
-        <div className="lp-books-more">
-          <div className="lp-books-more-head">
-            <div className="bm-rule" />
-            <button
-              className="lp-books-more-toggle"
-              onClick={() => setMiniExpanded((v) => !v)}
-              aria-expanded={miniExpanded}
-            >
-              <span>더 많은 북클럽</span>
-              <span className="bmt-count">24개</span>
-              <span className="bmt-chev" aria-hidden="true" />
-            </button>
-            <div className="bm-rule" />
-          </div>
-          <p className="lp-books-more-help">
-            {miniExpanded
-              ? "— 지금 바로 참여할 수 있는 모임들이에요."
-              : "— 마음에 드는 모임이 있을지도 모르니까요."}
-          </p>
-          <div className={`lp-books-more-body${miniExpanded ? " open" : ""}`}>
-            <div className="lp-mini-grid">
-              {/* 메인 그리드에서 넘친 북클럽 (5번~) 먼저 표시 */}
-              {books.slice(4).map((b) => (
-                <div key={b.slug} className="lp-mini-book" onClick={() => setModalBook(b)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && setModalBook(b)}>
-                  <div className={`lp-mini-spine ${b.color}`} />
-                  <div className="lp-mini-body">
-                    <div className="lp-mini-title">{b.title}</div>
-                    <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어요</div>
-                    <div className="lp-mini-meta">
-                      <span className="lp-mini-tag">{b.tag}</span>
-                      <span className="lp-mini-members"><span className="mem-dot" />{b.currentParticipants}명 참여 중</span>
-                    </div>
+        {(() => {
+          const records = clubRecords.length > 0 ? clubRecords : FALLBACK_CLUBS;
+          const nowClubs = records.filter((c) => classifyClub(c) === "now").sort(sortNow).slice(0, 4);
+          const againClubs = records.filter((c) => classifyClub(c) === "again").sort(sortAgain).slice(0, 4);
+          return (
+            <>
+              {/* 지금 함께 읽어요 */}
+              <div style={{ marginTop: 56 }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+                  <div>
+                    <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
+                      지금 함께 읽어요
+                    </h3>
+                    <p style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 4 }}>현재 신청 가능한 북클럽</p>
                   </div>
+                  <a href="/bookclub?view=now" style={{ fontSize: 13.5, color: "var(--accent)", textDecoration: "none", fontWeight: 500, whiteSpace: "nowrap" }}>
+                    지금 함께 읽어요 전체 보기 →
+                  </a>
                 </div>
-              ))}
-              {miniBooks.map((b) => (
-                <div
-                  key={b.title}
-                  className="lp-mini-book"
-                  onClick={() => setModalBook(b)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === "Enter" && setModalBook(b)}
-                >
-                  <div className={`lp-mini-spine ${b.color}`} />
-                  <div className="lp-mini-body">
-                    <div className="lp-mini-title">{b.title}</div>
-                    <div className="lp-mini-rec">— {josa(b.recommender ?? "", "이가")} 이끌어요</div>
-                    <div className="lp-mini-meta">
-                      <span className="lp-mini-tag">{b.tag}</span>
-                      <span className="lp-mini-members">
-                        <span className="mem-dot" />{b.currentParticipants}명 참여 중
-                      </span>
-                    </div>
+                {nowClubs.length > 0 ? (
+                  <div className="lp-books-grid">
+                    {nowClubs.map((c) => <CurrentClubCard key={c.id} club={c} />)}
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+                ) : (
+                  <p style={{ fontSize: 14, color: "var(--muted)", padding: "24px 0" }}>지금은 신청 가능한 북클럽이 없어요. 곧 새 일정이 열려요.</p>
+                )}
+              </div>
 
+              {/* 다시 함께 읽어요 */}
+              <div style={{ marginTop: 72 }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+                  <div>
+                    <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
+                      다시 함께 읽어요
+                    </h3>
+                    <p style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 4 }}>앵콜을 기다리는 북클럽</p>
+                  </div>
+                  <a href="/bookclub?view=again" style={{ fontSize: 13.5, color: "var(--accent)", textDecoration: "none", fontWeight: 500, whiteSpace: "nowrap" }}>
+                    다시 함께 읽어요 전체 보기 →
+                  </a>
+                </div>
+                {againClubs.length > 0 ? (
+                  <div className="lp-books-grid">
+                    {againClubs.map((c) => <EncoreClubCard key={c.id} club={c} />)}
+                  </div>
+                ) : (
+                  <p style={{ fontSize: 14, color: "var(--muted)", padding: "24px 0" }}>아직 앵콜을 기다리는 북클럽이 없어요.</p>
+                )}
+              </div>
+            </>
+          );
+        })()}
       </section>
 
       {/* ④ ARCHIVING — 후기 섹션 */}

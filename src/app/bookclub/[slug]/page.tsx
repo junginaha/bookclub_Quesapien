@@ -4,94 +4,15 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import BookClubDetailClient from "./BookClubDetailClient";
 import { createClient } from "@/lib/supabase/server";
+import { attachEncoreCounts } from "@/lib/bookclub-server";
+import { getFallbackClub } from "@/lib/bookclub";
 import { bookTalkEventSchema, bookSchema, reviewsSchema, breadcrumbSchema } from "@/lib/schema";
 import { buildMetadata } from "@/lib/metadata";
 import { JsonLd } from "@/components/seo/JsonLd";
 
-// ─── Static fallback data ─────────────────────────────────────
-const STATIC_CLUBS: Record<string, object> = {
-  "다정함의-발명": {
-    id: "1", slug: "다정함의-발명", title: "다정함의 발명", author: "허지영",
-    color: "cream", genre: "에세이 · 산문", tag: "#관계 #사랑",
-    host_name: "정해린", host_intro: "정답보다 진심을 믿습니다. 우리는 결론을 미루는 연습 중입니다.",
-    host_books_read: 28, host_sessions_count: 12, host_rating: 4.9,
-    host_philosophy: "대화는 답을 찾는 과정이 아니라, 함께 머무는 과정입니다. 이 공간에서 당신은 옳은 대답을 할 필요가 없어요.",
-    schedule: "2026년 6월 14일 (토) 오후 3시 — 5시 30분", location: "서울시 서초구 서초동",
-    location_detail: "강남 교보문고 근처 (참여 확정 후 정확한 장소 안내)",
-    
-    max_participants: 8, current_participants: 5, status: "active",
-    description: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 우리가 일상에서 놓치고 있는 다정함의 순간들을 함께 발견합니다.",
-    why_this_book: "사랑을 거창하게 생각해온 우리에게 필요한 책입니다. 거대한 로맨스보다 매일의 작은 행동들이 우리를 연결한다는 것을 이 책은 조용히, 하지만 분명하게 말합니다.",
-    key_questions: [
-      "당신이 가장 다정했던 순간은 언제인가요?",
-      "받은 다정함 중 가장 오래 남은 것은 무엇인가요?",
-      "다정함과 의존의 차이는 무엇일까요?",
-      "당신은 다정한 사람인가요, 아니면 다정함을 받기를 원하는 사람인가요?",
-    ],
-    recommended_for: ["관계에서 지쳐 있는 분", "일상의 작은 것들을 놓치고 있는 분", "다정함이 무엇인지 다시 생각해보고 싶은 분"],
-    session_format: "자유로운 원형 대화 / 질문 카드 방식 / 음료 제공 / 사진 촬영 가능",
-    session_dates: [{ date: "2026-06-14", topic: "다정함의 정의와 발명" }],
-    reviews: [
-      { id: "r1", author_name: "채현", content: "처음으로 모르는 사람 앞에서 솔직한 대화를 했어요. 그 밤이 한 달 동안 저를 흔들고 있었습니다.", rating: 5, created_at: "2026-05-15" },
-      { id: "r2", author_name: "진우", content: "리더 정해린님이 질문을 정말 잘 던지세요. 강요하지 않는데 자연스럽게 마음을 열게 됩니다.", rating: 5, created_at: "2026-05-16" },
-      { id: "r3", author_name: "윤서", content: "다시 신청할 것 같아요. 2시간이 금방 지나갔고, 집에 오는 길에 오래 생각했습니다.", rating: 4, created_at: "2026-05-20" },
-    ],
-    emotion_tags: ["#다정함", "#일상", "#연결"],
-  },
-  "혼자라는-감각": {
-    id: "2", slug: "혼자라는-감각", title: "혼자라는 감각", author: "주성원",
-    color: "rust", genre: "철학 · 에세이", tag: "#외로움 #인생전환",
-    host_name: "서민준", host_intro: "조용한 사람의 한 문장은 시끄러운 사람의 한 시간보다 길게 남습니다.",
-    schedule: "2026년 6월 21일 (토) 오후 2시 — 4시 30분", location: "서울시 마포구 합정동",
-    max_participants: 6, current_participants: 4, status: "active",
-    description: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자 있는 것이 부끄럽지 않아진 첫 번째 모임입니다.",
-    key_questions: ["혼자 있을 때 당신은 무엇을 느끼나요?", "외로움과 고독의 차이는 무엇이라 생각하나요?", "혼자인 시간이 당신에게 준 것은?"],
-    recommended_for: ["혼자 있는 시간이 불편한 분", "고독을 두려워하는 분", "내면의 소리를 듣고 싶은 분"],
-    session_dates: [{ date: "2026-06-21", topic: "고독의 의미와 힘" }],
-    reviews: [{ id: "r4", author_name: "도연", content: "대답을 잘 하려 애쓰지 않게 된 첫 번째 자리였어요.", rating: 5, created_at: "2026-05-10" }],
-    emotion_tags: ["#고독", "#성장", "#사유"],
-  },
-  "최신간-북토크": {
-    id: "3", slug: "최신간-북토크", title: "최신간 북토크, 핫한 문장들", author: "Quesapience",
-    color: "navy", genre: "NEW · 신간", tag: "#신간 #트렌드",
-    host_name: "정해린", host_intro: "새로운 문장들과 함께 시대를 읽습니다.",
-    schedule: "2026년 6월 28일 (토) 오후 3시", location: "서울시 서초구 교대역 인근",
-    max_participants: 8, current_participants: 3, status: "active",
-    description: "새로 출간된 책들 중 가장 뜨거운 문장들을 함께 읽습니다. 매 회 다른 책, 같은 깊이의 질문.",
-    key_questions: ["왜 지금 이 문장인가?", "이 책이 지금 출간된 이유는 무엇일까요?", "당신이 올해 읽은 문장 중 가장 오래 남은 것은?"],
-    emotion_tags: ["#불면", "#회복", "#고요"],
-  },
-  "아무도-보지-않는-오후": {
-    id: "4", slug: "아무도-보지-않는-오후", title: "아무도 보지 않는 오후", author: "김범",
-    color: "olive", genre: "회고 · 에세이", tag: "#창업 #번아웃",
-    host_name: "유은재", host_intro: "대화는 답을 찾는 일이 아니라, 함께 머무는 일입니다.",
-    schedule: "2026년 6월 28일 (토) 오후 4시 — 6시 30분", location: "서울시 용산구 한남동",
-    max_participants: 10, current_participants: 3, status: "active",
-    description: "실패한 사람이 아니라 멈춰본 적 있는 사람의 문장. 번아웃 이후를 살아가는 법을 함께 이야기합니다.",
-    key_questions: ["멈춤이 당신에게 준 것은 무엇인가요?", "다시 시작하는 것이 두렵지 않았나요?", "번아웃은 어떤 신호였나요?"],
-    emotion_tags: ["#회복", "#쉼", "#용기"],
-  },
-  "오늘-저녁-당신께": {
-    id: "5", slug: "오늘-저녁-당신께", title: "오늘 저녁, 당신께", author: "박상현",
-    color: "dusk", genre: "시 · 산문", tag: "#사랑 #이별",
-    host_name: "서민준", host_intro: "느리게 읽는 것의 가치를 믿습니다.",
-    schedule: "2026년 7월 12일 (토) 오후 6시 — 8시", location: "서울시 종로구 부암동",
-    max_participants: 8, current_participants: 8, status: "closed",
-    description: "시집은 빠르게 읽지 않는 것이라고 가르쳐준 책. 한 줄의 시로 한 시간을 이야기하는 모임입니다.",
-    key_questions: ["이 시에서 가장 오래 머문 행은 어디인가요?", "이별을 기억하는 방식은 사람마다 다르지 않을까요?"],
-    emotion_tags: ["#느림", "#이별", "#기억"],
-  },
-  "인간이라는-풍경": {
-    id: "6", slug: "인간이라는-풍경", title: "인간이라는 풍경", author: "한강",
-    color: "sage", genre: "논픽션 · 에세이", tag: "#인간 #사유",
-    host_name: "유은재", host_intro: "모든 사람은 이해받아야 할 이유가 있습니다.",
-    schedule: "2026년 7월 19일 (토) 오후 2시 — 4시 30분", location: "서울시 마포구 망원동",
-    max_participants: 10, current_participants: 2, status: "active",
-    description: "인간을 풍경처럼 멀리서 바라보는 시선. 미워하던 사람을 다시 사람으로 보게 만드는 책을 함께 읽습니다.",
-    key_questions: ["당신이 가장 이해하기 어려운 사람은 어떤 사람인가요?", "거리를 두고 바라볼 때 더 잘 보이는 것이 있나요?"],
-    emotion_tags: ["#관계", "#용서", "#거리"],
-  },
-};
+// 예전 이 파일에 있던 6개 항목짜리 STATIC_CLUBS 하드코딩 폴백은
+// src/lib/bookclub.ts의 FALLBACK_CLUBS(getFallbackClub)로 통합했다 —
+// 리스트 페이지(clubsData.ts)가 쓰던 30개짜리 별도 폴백과 값이 어긋나던 문제를 없앤다.
 
 interface Props { params: Promise<{ slug: string }>; }
 
@@ -99,7 +20,7 @@ interface Props { params: Promise<{ slug: string }>; }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug: rawSlug } = await params;
   const slug = decodeURIComponent(rawSlug);
-  const club = (STATIC_CLUBS[slug] ?? {}) as any;
+  const club = (getFallbackClub(slug) ?? {}) as any;
   const title = club.title ?? "북클럽";
   const author = club.author ? ` — ${club.author}` : "";
   return buildMetadata({
@@ -140,10 +61,12 @@ export default async function BookClubDetailPage({ params }: Props) {
       } else {
         club = data;
       }
+      const [withCount] = await attachEncoreCounts(db, [club]);
+      club = withCount;
     }
   } catch { /* fallback */ }
 
-  if (!club) club = STATIC_CLUBS[slug] ?? null;
+  if (!club) club = getFallbackClub(slug) ?? null;
   if (!club) notFound();
 
   const eventLd = bookTalkEventSchema(club);
