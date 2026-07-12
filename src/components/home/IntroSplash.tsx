@@ -1,25 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { QIMark } from "@/components/common/QIMark";
+import { useEffect, useRef, useState } from "react";
 
 const SEEN_KEY = "qp-intro-seen";
+const WORDMARKS = ["질문하는 사람들", "Quesapience"] as const;
+const AUTO_ADVANCE_MS = 500;
 
 export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
   const [visible, setVisible] = useState(true);
   const [leaving, setLeaving] = useState(false);
-
-  useEffect(() => {
-    if (sessionStorage.getItem(SEEN_KEY)) {
-      setVisible(false);
-      onEnter();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  if (!visible) return null;
+  const [wordmarkIdx, setWordmarkIdx] = useState(0);
+  const [wordmarkFading, setWordmarkFading] = useState(false);
+  const dismissedRef = useRef(false);
 
   const dismiss = () => {
+    if (dismissedRef.current) return;
+    dismissedRef.current = true;
     setLeaving(true);
     setTimeout(() => {
       sessionStorage.setItem(SEEN_KEY, "1");
@@ -27,16 +23,81 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
     }, 450);
   };
 
+  useEffect(() => {
+    if (sessionStorage.getItem(SEEN_KEY)) {
+      setVisible(false);
+      onEnter();
+      return;
+    }
+    // 헤더와 동일한 워드마크 자동 전환(질문하는 사람들 ↔ Quesapience)
+    const wordmarkInterval = setInterval(() => {
+      setWordmarkFading(true);
+      setTimeout(() => {
+        setWordmarkIdx((i) => (i + 1) % WORDMARKS.length);
+        setWordmarkFading(false);
+      }, 350);
+    }, 3200);
+    // 0.5초 내 버튼 반응이 없으면 자동으로 메인 전환
+    const autoAdvance = setTimeout(dismiss, AUTO_ADVANCE_MS);
+    return () => {
+      clearInterval(wordmarkInterval);
+      clearTimeout(autoAdvance);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!visible) return null;
+
   return (
     <div
       className={`lp-intro${leaving ? " lp-intro-leaving" : ""}`}
       role="dialog"
       aria-label="질문하는 사람들 인트로"
     >
+      {/* 헤더 로고와 동일한 ?/! 마크 + 워드마크 교차 애니메이션 (확대) */}
       <div className="lp-intro-mark">
-        <QIMark size="xl" />
+        <span
+          style={{
+            color: "var(--accent)",
+            fontFamily: '"EB Garamond", Georgia, serif',
+            fontStyle: "normal",
+            animation: "markBreathe 3.8s ease-in-out infinite",
+            transformOrigin: "center",
+          }}
+        >
+          ?
+        </span>
+        <span
+          style={{
+            color: "var(--ink)",
+            fontFamily: '"EB Garamond", Georgia, serif',
+            fontStyle: "normal",
+            animation: "markBob 2.6s ease-in-out infinite",
+            transformOrigin: "center",
+          }}
+        >
+          !
+        </span>
       </div>
-      <span className="eyebrow lp-intro-eyebrow">질문하는 사람들</span>
+
+      <span className="lp-intro-wordmark">
+        {WORDMARKS.map((wm, i) => (
+          <span
+            key={wm}
+            className={i === 1 ? "lp-intro-wordmark-en" : "lp-intro-wordmark-ko"}
+            style={{
+              gridArea: "1 / 1",
+              opacity: wordmarkIdx === i && !wordmarkFading ? 1 : 0,
+              transform: wordmarkIdx === i && !wordmarkFading
+                ? "translateY(0)"
+                : wordmarkIdx === i ? "translateY(-4px)" : "translateY(4px)",
+            }}
+          >
+            {wm}
+          </span>
+        ))}
+      </span>
+
       <a
         href="#"
         className="lp-hero-bookclub-btn"
