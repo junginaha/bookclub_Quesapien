@@ -828,10 +828,9 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
                     <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
                       지금 함께 읽어요
                     </h3>
-                    <p style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 4 }}>현재 신청 가능한 북클럽</p>
                   </div>
-                  <a href="/bookclub?view=now" style={{ fontSize: 13.5, color: "var(--accent)", textDecoration: "none", fontWeight: 500, whiteSpace: "nowrap" }}>
-                    지금 함께 읽어요 전체 보기 →
+                  <a href="/bookclub?view=now" className="btn-pill-neu" style={{ marginTop: 4 }}>
+                    현재 신청 가능한 북클럽
                   </a>
                 </div>
                 {nowClubs.length > 0 ? (
@@ -850,10 +849,9 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
                     <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
                       다시 함께 읽어요
                     </h3>
-                    <p style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 4 }}>앵콜을 기다리는 북클럽</p>
                   </div>
-                  <a href="/bookclub?view=again" style={{ fontSize: 13.5, color: "var(--accent)", textDecoration: "none", fontWeight: 500, whiteSpace: "nowrap" }}>
-                    다시 함께 읽어요 전체 보기 →
+                  <a href="/bookclub?view=again" className="btn-pill-neu" style={{ marginTop: 4 }}>
+                    앵콜을 기다리는 북클럽
                   </a>
                 </div>
                 {againClubs.length > 0 ? (

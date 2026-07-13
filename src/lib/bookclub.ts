@@ -234,7 +234,7 @@ export function sortByRecent(a: BookClubRecord, b: BookClubRecord): number {
 }
 
 export function encoreCopy(count: number, threshold: number = DEFAULT_ENCORE_THRESHOLD): string {
-  if (count <= 0) return "앵콜 요청을 남겨주세요.\n함께 읽을 사람들이 모이면 새 일정을 엽니다.";
+  if (count <= 0) return "함께 읽을 사람들이 모이면 새 일정을 엽니다.";
   if (count >= threshold) return "함께 읽을 사람들이 모였습니다.\n새 일정을 준비하고 있어요.";
   return `현재 ${count}명이 기다리고 있어요.\n${threshold}명이 모이면 다시 열립니다.`;
 }

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 const SEEN_KEY = "qp-intro-seen";
 const WORDMARKS = ["질문하는 사람들", "Quesapience"] as const;
-const AUTO_ADVANCE_MS = 500;
+const AUTO_ADVANCE_MS = 15000;
 
 export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
   const [visible, setVisible] = useState(true);
@@ -37,7 +37,7 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
         setWordmarkFading(false);
       }, 350);
     }, 3200);
-    // 0.5초 내 버튼 반응이 없으면 자동으로 메인 전환
+    // 15초 내 버튼 반응이 없으면 자동으로 메인 전환
     const autoAdvance = setTimeout(dismiss, AUTO_ADVANCE_MS);
     return () => {
       clearInterval(wordmarkInterval);

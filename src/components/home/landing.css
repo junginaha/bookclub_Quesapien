@@ -691,7 +691,7 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 13px;
+  padding: 4px 13px;
   background: var(--lp-bg);
   border: none;
   border-radius: 9999px;
@@ -756,18 +756,18 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 /* 텍스트 */
 .lnd-pill-text { position: relative; z-index: 2; }
 
-/* 북클럽 둘러보기 버튼(.lp-hero-bookclub-btn)과 동일한 반응형 크기 */
+/* 북클럽 둘러보기 버튼(.lp-hero-bookclub-btn)과 동일한 반응형 크기 — 세로만 약 1mm(~2px씩) 더 낮게 */
 @media (max-width: 359px) {
-  .lnd-pill { padding: 5px 10px; font-size: 8.5px; }
+  .lnd-pill { padding: 3px 10px; font-size: 8.5px; }
 }
 @media (min-width: 480px) {
-  .lnd-pill { padding: 8px 17px; font-size: 11.5px; }
+  .lnd-pill { padding: 6px 17px; font-size: 11.5px; }
 }
 @media (min-width: 640px) {
-  .lnd-pill { padding: 12px 26px; font-size: 14.5px; }
+  .lnd-pill { padding: 10px 26px; font-size: 14.5px; }
 }
 @media (min-width: 1024px) {
-  .lnd-pill { padding: 14px 30px; font-size: 15.5px; }
+  .lnd-pill { padding: 12px 30px; font-size: 15.5px; }
 }
 
 
