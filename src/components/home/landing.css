@@ -1584,10 +1584,27 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 }
 
 @keyframes lp-introFadeIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to   { opacity: 1; transform: scale(1); }
+  0%   { opacity: 0; transform: scale(0.9); }
+  60%  { opacity: 1; transform: scale(1.035); }
+  80%  { transform: scale(0.985); }
+  100% { opacity: 1; transform: scale(1); }
 }
 @keyframes lp-introFadeOut {
   from { opacity: 1; transform: scale(1); }
   to   { opacity: 0; transform: scale(1.02); }
 }
+
+/* 배경 떠다니는 점 — 모바일에서도 항상 보이도록 .lp-float와 별도로 정의 */
+.lp-intro-float {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--lp-accent);
+  pointer-events: none;
+  opacity: 0;
+  animation: lp-floaty 9s ease-in-out infinite;
+}
+.lp-intro-float-1 { width: 10px; height: 10px; top: 18%;  left: 12%; animation-delay: 0s;    box-shadow: 0 0 0 4px rgba(94,70,50,0.1); }
+.lp-intro-float-2 { width: 7px;  height: 7px;  top: 68%;  left: 18%; animation-delay: 1.4s;  background: var(--lp-gold); }
+.lp-intro-float-3 { width: 8px;  height: 8px;  top: 24%;  right: 14%; animation-delay: 2.6s; box-shadow: 0 0 0 4px rgba(94,70,50,0.1); }
+.lp-intro-float-4 { width: 12px; height: 12px; top: 72%;  right: 10%; animation-delay: 0.8s; background: var(--lp-gold); opacity: 0.5; }
+.lp-intro-float-5 { width: 6px;  height: 6px;  top: 46%;  left: 6%;  animation-delay: 3.6s; }

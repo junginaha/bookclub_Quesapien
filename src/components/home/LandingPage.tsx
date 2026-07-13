@@ -293,6 +293,9 @@ function FloatPopup({ color, title, sub, type, onOpen }: {
 }
 
 // ─── Archive Review Form 컴포넌트 ─────────────────────────────
+const VIDEO_MAX_SIZE = 50 * 1024 * 1024; // 50MB — 서버 프록시가 아니라 브라우저에서 Supabase Storage로 직접 업로드하므로 Vercel 요청 크기 제한과 무관
+const VIDEO_ALLOWED_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
+
 function ArchiveReviewForm() {
   const [tab, setTab] = useState<"text" | "photo" | "video">("text");
   const [content, setContent] = useState("");
@@ -300,10 +303,13 @@ function ArchiveReviewForm() {
   const [photoUrl, setPhotoUrl] = useState("");
   const [photoPreview, setPhotoPreview] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
+  const [videoIsFile, setVideoIsFile] = useState(false);
+  const [videoError, setVideoError] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "done" | "error">("idle");
   const fileRef = useRef<HTMLInputElement>(null);
+  const videoFileRef = useRef<HTMLInputElement>(null);
 
   const handlePhotoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -325,10 +331,44 @@ function ArchiveReviewForm() {
     }
   };
 
+  // 영상 파일은 서버를 거치지 않고 브라우저에서 Supabase Storage로 바로 올린다
+  // (10~수십MB짜리 영상을 Next.js API 라우트로 프록시하면 Vercel 서버리스 함수의
+  // 요청 크기 제한에 걸리기 쉽다).
+  const handleVideoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setVideoError("");
+    if (file.size > VIDEO_MAX_SIZE) {
+      setVideoError("영상 파일은 50MB 이하여야 해요.");
+      return;
+    }
+    if (!VIDEO_ALLOWED_TYPES.includes(file.type)) {
+      setVideoError("MP4, WEBM, MOV 파일만 올릴 수 있어요.");
+      return;
+    }
+    setUploadStatus("uploading");
+    try {
+      const supabase = createClient();
+      const ext = file.name.split(".").pop()?.toLowerCase() ?? "mp4";
+      const path = `reviews/video-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { data, error } = await supabase.storage
+        .from("reviews")
+        .upload(path, file, { contentType: file.type, cacheControl: "3600", upsert: false });
+      if (error) throw error;
+      const { data: urlData } = supabase.storage.from("reviews").getPublicUrl(data.path);
+      setVideoUrl(urlData.publicUrl);
+      setVideoIsFile(true);
+      setUploadStatus("done");
+    } catch {
+      setUploadStatus("error");
+      setVideoError("업로드에 실패했어요. 링크로 입력해 주실 수 있어요.");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (content.trim().length < 20) return;
-    if (tab === "photo" && uploadStatus === "uploading") return;
+    if ((tab === "photo" || tab === "video") && uploadStatus === "uploading") return;
     setStatus("sending");
     try {
       const res = await fetch("/api/archive/review", {
@@ -346,6 +386,7 @@ function ArchiveReviewForm() {
       if (!res.ok) throw new Error("fail");
       setStatus("sent");
       setContent(""); setAuthorName(""); setPhotoUrl(""); setPhotoPreview(""); setVideoUrl("");
+      setVideoIsFile(false); setVideoError("");
       setUploadStatus("idle");
     } catch {
       setStatus("error");
@@ -462,16 +503,55 @@ function ArchiveReviewForm() {
           )}
           {tab === "video" && (
             <div style={{ marginBottom: 16 }}>
-              <input type="url" placeholder="YouTube · Vimeo 링크를 붙여넣어 주세요" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} style={inputStyle} />
-              {videoUrl && (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) && (
-                <div style={{ marginTop: 8, borderRadius: 10, overflow: "hidden", background: "#000" }}>
-                  <iframe
-                    src={videoUrl.replace("watch?v=", "embed/").replace("youtu.be/", "www.youtube.com/embed/")}
-                    style={{ width: "100%", height: 180, border: "none" }}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media"
-                    allowFullScreen
-                  />
+              {videoUrl && videoIsFile ? (
+                <div style={{ position: "relative", marginBottom: 8 }}>
+                  <video src={videoUrl} controls style={{ width: "100%", maxHeight: 220, borderRadius: 10, display: "block", background: "#000" }} />
+                  <button
+                    type="button"
+                    onClick={() => { setVideoUrl(""); setVideoIsFile(false); setUploadStatus("idle"); if (videoFileRef.current) videoFileRef.current.value = ""; }}
+                    style={{ position: "absolute", top: 8, right: 8, width: 28, height: 28, borderRadius: "50%", background: "rgba(0,0,0,0.6)", color: "#fff", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}
+                  >×</button>
+                  {uploadStatus === "uploading" && (
+                    <div style={{ position: "absolute", inset: 0, borderRadius: 10, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, gap: 8 }}>
+                      <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
+                      올리는 중이에요…
+                    </div>
+                  )}
                 </div>
+              ) : (
+                <label
+                  style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: "28px 16px", marginBottom: 8, borderRadius: 10, border: "2px dashed var(--lp-line-soft)", cursor: "pointer", transition: "background .2s ease", background: "rgba(255,255,255,0.3)" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.6)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.3)")}
+                >
+                  <input ref={videoFileRef} type="file" accept="video/mp4,video/webm,video/quicktime" hidden onChange={handleVideoFile} />
+                  <span style={{ fontSize: 14, color: "var(--lp-ink-soft)", fontFamily: "var(--lp-serif-ko)" }}>
+                    {uploadStatus === "uploading" ? "올리는 중이에요…" : "영상 파일 고르기 (최대 50MB)"}
+                  </span>
+                  <span style={{ fontSize: 12, color: "var(--lp-muted)", fontFamily: "var(--lp-serif-ko)" }}>또는 아래에 링크로 올릴 수 있어요</span>
+                </label>
+              )}
+              {videoError && <p style={{ fontSize: 12, color: "rgba(239,68,68,0.9)", marginBottom: 8 }}>{videoError}</p>}
+              {!videoIsFile && (
+                <>
+                  <input
+                    type="url"
+                    placeholder="YouTube · Vimeo 링크를 붙여넣어 주세요"
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    style={inputStyle}
+                  />
+                  {videoUrl && (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) && (
+                    <div style={{ marginTop: 8, borderRadius: 10, overflow: "hidden", background: "#000" }}>
+                      <iframe
+                        src={videoUrl.replace("watch?v=", "embed/").replace("youtu.be/", "www.youtube.com/embed/")}
+                        style={{ width: "100%", height: 180, border: "none" }}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media"
+                        allowFullScreen
+                      />
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -829,7 +909,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
                       지금 함께 읽어요
                     </h3>
                   </div>
-                  <a href="/bookclub?view=now" className="btn-pill-neu" style={{ marginTop: 4 }}>
+                  <a href="/bookclub?view=now" className="btn-pill-neu" style={{ marginTop: 4, padding: "6px 14px", fontSize: 11.5 }}>
                     현재 신청 가능한 북클럽
                   </a>
                 </div>
@@ -850,7 +930,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
                       다시 함께 읽어요
                     </h3>
                   </div>
-                  <a href="/bookclub?view=again" className="btn-pill-neu" style={{ marginTop: 4 }}>
+                  <a href="/bookclub?view=again" className="btn-pill-neu" style={{ marginTop: 4, padding: "6px 14px", fontSize: 11.5 }}>
                     앵콜을 기다리는 북클럽
                   </a>
                 </div>
