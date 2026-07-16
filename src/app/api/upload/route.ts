@@ -36,9 +36,8 @@ export async function POST(req: NextRequest) {
       });
 
     if (error) {
-      // Bucket may not exist — return a placeholder success so the form still works
       console.error("Storage upload error:", error.message);
-      return NextResponse.json({ url: null, error: error.message }, { status: 200 });
+      return NextResponse.json({ error: "업로드 실패" }, { status: 502 });
     }
 
     const { data: urlData } = supabase.storage.from("reviews").getPublicUrl(data.path);

@@ -903,15 +903,10 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             <>
               {/* 지금 함께 읽어요 */}
               <div style={{ marginTop: 56 }}>
-                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
-                  <div>
-                    <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
-                      지금 함께 읽어요
-                    </h3>
-                  </div>
-                  <a href="/bookclub?view=now" className="btn-pill-neu" style={{ marginTop: 4, padding: "6px 14px", fontSize: 11.5 }}>
-                    현재 신청 가능한 북클럽
-                  </a>
+                <div style={{ marginBottom: 24 }}>
+                  <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
+                    지금 함께 읽어요
+                  </h3>
                 </div>
                 {nowClubs.length > 0 ? (
                   <div className="lp-books-grid">
@@ -920,19 +915,19 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
                 ) : (
                   <p style={{ fontSize: 14, color: "var(--muted)", padding: "24px 0" }}>지금은 신청 가능한 북클럽이 없어요. 곧 새 일정이 열려요.</p>
                 )}
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+                  <a href="/bookclub?view=now" className="btn-pill-neu" style={{ padding: "6px 14px", fontSize: 11.5 }}>
+                    현재 신청 가능한 북클럽
+                  </a>
+                </div>
               </div>
 
               {/* 다시 함께 읽어요 */}
               <div style={{ marginTop: 72 }}>
-                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
-                  <div>
-                    <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
-                      다시 함께 읽어요
-                    </h3>
-                  </div>
-                  <a href="/bookclub?view=again" className="btn-pill-neu" style={{ marginTop: 4, padding: "6px 14px", fontSize: 11.5 }}>
-                    앵콜을 기다리는 북클럽
-                  </a>
+                <div style={{ marginBottom: 24 }}>
+                  <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
+                    다시 함께 읽어요
+                  </h3>
                 </div>
                 {againClubs.length > 0 ? (
                   <div className="lp-books-grid">
@@ -941,6 +936,11 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
                 ) : (
                   <p style={{ fontSize: 14, color: "var(--muted)", padding: "24px 0" }}>아직 앵콜을 기다리는 북클럽이 없어요.</p>
                 )}
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+                  <a href="/bookclub?view=again" className="btn-pill-neu" style={{ padding: "6px 14px", fontSize: 11.5 }}>
+                    앵콜을 기다리는 북클럽
+                  </a>
+                </div>
               </div>
             </>
           );

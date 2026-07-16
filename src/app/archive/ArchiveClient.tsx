@@ -22,11 +22,6 @@ const STATIC_QUESTIONS = [
   { id: "aq5", content: "실패를 얼마나 오래 기억하시나요?", author_name: "지우", likes: 634, answers_count: 48, created_at: "2026-05-10" },
 ];
 
-const STATIC_DISCUSSIONS = [
-  { id: "d1", title: "다정함의 발명 발제문", book: "다정함의 발명 (허지영)", host: "정해린", date: "2026-05-14", questions: ["다정함이란 무엇인가?", "받은 다정함 중 가장 오래 남은 것은?", "다정함과 의존의 차이는?"] },
-  { id: "d2", title: "혼자라는 감각 발제문", book: "혼자라는 감각 (주성원)", host: "서민준", date: "2026-04-28", questions: ["혼자 있을 때 무엇을 느끼나요?", "외로움과 고독의 차이는?", "혼자인 시간이 준 것은?"] },
-  { id: "d3", title: "외로움 시즌 Week 3 발제문", book: "Season 04 큐레이션", host: "정해린", date: "2026-05-21", questions: ["함께 있어도 외로운 경험?", "외로움을 치유하는 방법?", "혼자이기에 가능한 것은?"] },
-];
 
 const STATIC_TALKS = [
   { id: "t1", title: "관계 회복 시즌 · 종료 보고", season: "Season 03", participants: 38, date: "2026-03-15", summary: "멀어진 사람에게 다시 다가가는 일에 대한 12주간의 기록." },
@@ -82,6 +77,10 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
   const [myLoading, setMyLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
+  const [discussions, setDiscussions] = useState<Review[]>([]);
+  const [discussionsLoaded, setDiscussionsLoaded] = useState(false);
+  const [discussionsLoading, setDiscussionsLoading] = useState(false);
+  const [discussionQuery, setDiscussionQuery] = useState("");
 
   useEffect(() => {
     const tab = searchParams.get("tab") as TabType | null;
@@ -99,6 +98,21 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
         .finally(() => setMyLoading(false));
     }
   }, [activeTab, myReviews.length, myLoading]);
+
+  useEffect(() => {
+    if (activeTab !== "discussions") return;
+    setDiscussionsLoading(true);
+    const params = new URLSearchParams();
+    if (discussionQuery.trim()) params.set("q", discussionQuery.trim());
+    const t = setTimeout(() => {
+      fetch(`/api/giants/discussions?${params.toString()}`)
+        .then((r) => r.json())
+        .then((d) => { setDiscussions(d.discussions ?? []); setDiscussionsLoaded(true); })
+        .catch(() => setDiscussionsLoaded(true))
+        .finally(() => setDiscussionsLoading(false));
+    }, discussionQuery ? 300 : 0);
+    return () => clearTimeout(t);
+  }, [activeTab, discussionQuery]);
 
   const handleDeleteReview = async (id: string) => {
     if (!confirm("기록을 삭제할까요?")) return;
@@ -126,7 +140,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
     { key: "mine" as const, label: "내 아카이브", icon: <Heart size={14} />, count: myReviews.length || undefined },
     { key: "cases" as const, label: "진행자 사례", icon: <MessageSquare size={14} />, count: LEADER_CASES.length },
     { key: "questions" as const, label: "질문 아카이브", icon: <MessageSquare size={14} />, count: STATIC_QUESTIONS.length },
-    { key: "discussions" as const, label: "발제문 아카이브", icon: <FileText size={14} />, count: STATIC_DISCUSSIONS.length },
+    { key: "discussions" as const, label: "발제문 아카이브", icon: <FileText size={14} />, count: discussionsLoaded ? discussions.length : undefined },
     { key: "talks" as const, label: "북토크 기록", icon: <BookOpen size={14} />, count: STATIC_TALKS.length },
   ];
 
@@ -498,43 +512,75 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
 
         {/* ─ 발제문 아카이브 ─ */}
         {activeTab === "discussions" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            {STATIC_DISCUSSIONS.map((d) => (
-              <div key={d.id} style={{
-                borderRadius: 16, overflow: "hidden",
-                border: "1px solid var(--line-soft)",
-                background: "rgba(255,255,255,0.4)",
-              }}>
-                <div style={{ padding: "24px 28px 0" }}>
-                  <div style={{ fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 8 }}>
-                    발제문 · {d.date}
-                  </div>
-                  <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 20, fontWeight: 400, color: "var(--ink)", marginBottom: 4 }}>
-                    {d.title}
-                  </h3>
-                  <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 20 }}>
-                    {d.book} · 리더: {d.host}
-                  </p>
-                </div>
-                <div style={{ padding: "0 28px 24px" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {d.questions.map((q, i) => (
-                      <div key={i} style={{
-                        display: "flex", gap: 14, alignItems: "flex-start",
-                        padding: "14px 16px", borderRadius: 10,
-                        background: "rgba(255,255,255,0.5)",
-                        border: "1px solid var(--line-soft)",
-                      }}>
-                        <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 22, fontStyle: "normal", color: "var(--accent)", opacity: 0.4, lineHeight: 1, flexShrink: 0, minWidth: 20 }}>
-                          {String(i + 1)}
-                        </span>
-                        <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.6 }}>{q}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+          <div>
+            <p style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.75, maxWidth: 560, marginBottom: 24 }}>
+              거인의 어깨에서 생성된 발제문 모음이에요. 책 제목, 주제, 인물명으로 검색해보세요.
+            </p>
+            <div style={{
+              display: "flex", alignItems: "center", gap: 10,
+              border: "1px solid var(--line-soft)", borderRadius: 9999, padding: "10px 18px",
+              background: "rgba(255,255,255,0.6)", maxWidth: 480, marginBottom: 32,
+            }}>
+              <input
+                value={discussionQuery}
+                onChange={(e) => setDiscussionQuery(e.target.value)}
+                placeholder="책 제목 · 주제 · 인물 검색"
+                style={{ flex: 1, background: "none", border: "none", outline: "none", fontSize: 14, color: "var(--ink)" }}
+              />
+            </div>
+
+            {discussionsLoading ? (
+              <div style={{ textAlign: "center", padding: "60px 0", color: "var(--muted)" }}>불러오는 중…</div>
+            ) : discussions.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "80px 0", color: "var(--muted)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif", lineHeight: 1.75 }}>
+                {discussionQuery
+                  ? "검색 결과가 없어요."
+                  : <>아직 저장된 발제가 없어요.<br /><Link href="/giants" style={{ color: "var(--accent)" }}>거인의 어깨에서 발제 만들어보기 →</Link></>}
               </div>
-            ))}
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                {discussions.map((d: Review) => (
+                  <div key={d.id} style={{
+                    borderRadius: 16, overflow: "hidden",
+                    border: "1px solid var(--line-soft)",
+                    background: "rgba(255,255,255,0.4)",
+                  }}>
+                    <div style={{ padding: "24px 28px 0" }}>
+                      <div style={{ fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 8 }}>
+                        발제문 · {formatDate(d.created_at)}
+                      </div>
+                      <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 20, fontWeight: 400, color: "var(--ink)", marginBottom: 4 }}>
+                        {d.book_title || d.topic || `${d.giant_name}의 발제`}
+                      </h3>
+                      <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12 }}>
+                        <Link href={`/giants/${d.giant_slug}`} style={{ color: "var(--accent)", textDecoration: "none" }}>{d.giant_name}</Link>
+                        {d.book_title && d.topic ? ` · ${d.topic}` : ""} · {d.author_name}
+                      </p>
+                      <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 14.5, color: "var(--ink-soft)", lineHeight: 1.8, marginBottom: 20 }}>
+                        {d.statement}
+                      </p>
+                    </div>
+                    <div style={{ padding: "0 28px 24px" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        {(d.discussion_questions ?? []).map((q: string, i: number) => (
+                          <div key={i} style={{
+                            display: "flex", gap: 14, alignItems: "flex-start",
+                            padding: "14px 16px", borderRadius: 10,
+                            background: "rgba(255,255,255,0.5)",
+                            border: "1px solid var(--line-soft)",
+                          }}>
+                            <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 22, fontStyle: "normal", color: "var(--accent)", opacity: 0.4, lineHeight: 1, flexShrink: 0, minWidth: 20 }}>
+                              {String(i + 1)}
+                            </span>
+                            <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.6 }}>{q}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

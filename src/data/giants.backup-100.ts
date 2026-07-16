@@ -1,14 +1,13 @@
 /**
- * Giants data — 위대한 사유자·창조자들의 철학과 지혜를 탐구하는 플랫폼
+ * ⚠ 백업 전용 — 서비스 코드에서 import하지 않는다.
  *
- * ⚠ CLAUDE.md 절대 원칙 7 / MASTER.md D1.5: 거인의 어깨 콘텐츠는 인물 DB 전수
- * 법적 검증(사망 70년 규칙)이 끝나기 전까지 신규 노출 금지. 2026-07-15 세션에서
- * 사망연도 기준 1차 기계 스크리닝으로 생존 인물 및 사후 70년 미경과 인물 13명
- * (카뮈·러셀·헤세·헤밍웨이·T.S.엘리엇·슈뢰딩거·월트 디즈니·스티브 잡스·
- * 엘리너 루스벨트·보부아르·아렌트·만델라·마틴 루터 킹)을 제외했다. 원본 100명
- * 전체는 src/data/giants.backup-100.ts에 보관돼 있다. 이건 정식 법률 검토가
- * 아니라 사망연도 기준 자동 스크리닝이므로, 여기 남은 87명에 대해서도 운영자의
- * 최종 법적 확인 전까지는 잠정 상태로 취급할 것.
+ * 2026-07-15 세션에서 M4(거인의 어깨 재편) 착수 전, CLAUDE.md 절대 원칙 7 /
+ * MASTER.md D1.5 "거인의 어깨 법적 검증(사망 70년 규칙) 완료 전 신규 노출 금지"에
+ * 따라 사후 70년 미경과·생존 인물 13명을 서비스용 src/data/giants.ts에서 제외했다.
+ * 이 파일은 필터링 전 원본 100명 전체를 그대로 보관한 백업이다. 법적 검증이
+ * 끝나면 이 파일을 참고해 자격을 얻은 인물을 서비스 데이터로 다시 승격한다.
+ *
+ * Giants data — 위대한 사유자·창조자들의 철학과 지혜를 탐구하는 플랫폼
  */
 
 export type GiantCategory = "all" | "philosopher" | "author" | "scientist" | "thinker" | "entrepreneur";
@@ -612,6 +611,28 @@ export const GIANTS: Giant[] = [
     related_questions: ["나의 노동은 나를 표현하는가, 소외시키는가?", "경제적 구조는 우리의 생각을 얼마나 결정하는가?"],
   },
   {
+    id: "53", slug: "albert-camus", name: "알베르 카뮈", name_en: "Albert Camus",
+    birth_year: 1913, death_year: 1960, nationality: "프랑스",
+    category: "philosopher",
+    tagline: "삶에는 의미가 없다. 그러나 우리는 반드시 살아야 한다.",
+    core_idea: "부조리(absurd)의 철학을 전개했다. 의미를 갈망하는 인간과 침묵하는 세계 사이의 충돌이 부조리이며, 그럼에도 불구하고 반항하며 살아야 한다고 주장했다.",
+    key_works: ["이방인", "시지프 신화", "페스트", "반항하는 인간"],
+    color: "#3A5C4A",
+    signature_quote: "시지프는 행복했다고 상상해야 한다.",
+    related_questions: ["의미 없는 세상에서 어떻게 살아야 하는가?", "반항이 삶의 방식이 될 수 있는가?"],
+  },
+  {
+    id: "54", slug: "bertrand-russell", name: "버트런드 러셀", name_en: "Bertrand Russell",
+    birth_year: 1872, death_year: 1970, nationality: "영국",
+    category: "philosopher",
+    tagline: "진정한 행복의 비결은 열정이다.",
+    core_idea: "논리학과 수학의 기초를 탐구하면서도 평화주의·교육·행복에 관한 실천적 철학을 펼쳤다. 게으름에 대한 찬양으로 일 중심 사회를 비판하고, 비판적 사고를 최고의 덕목으로 삼았다.",
+    key_works: ["행복의 정복", "게으름에 대한 찬양", "교육과 사회질서", "서양철학사"],
+    color: "#3A4A3A",
+    signature_quote: "행복한 삶의 비결은 가능한 한 많은 것에 관심을 갖는 것이다.",
+    related_questions: ["나는 충분히 게으른가?", "비판적으로 생각하는 것이 왜 두렵게 느껴지는가?"],
+  },
+  {
     id: "55", slug: "francis-bacon", name: "프랜시스 베이컨", name_en: "Francis Bacon",
     birth_year: 1561, death_year: 1626, nationality: "영국",
     category: "philosopher",
@@ -702,6 +723,17 @@ export const GIANTS: Giant[] = [
     related_questions: ["나는 자연과 얼마나 연결되어 있는가?", "동양의 지혜와 서양의 이성은 어떻게 만날 수 있는가?"],
   },
   {
+    id: "63", slug: "hermann-hesse", name: "헤르만 헤세", name_en: "Hermann Hesse",
+    birth_year: 1877, death_year: 1962, nationality: "독일/스위스",
+    category: "author",
+    tagline: "자기 자신에게 이르는 길은 가장 멀고 가장 어렵다.",
+    core_idea: "자아를 찾는 여정을 문학으로 표현했다. 싯다르타에서 불교와 힌두 사상을, 데미안에서 융 심리학의 영향을 받아 내면의 어둠을 통한 자기 실현을 탐구했다.",
+    key_works: ["싯다르타", "데미안", "황야의 이리", "유리알 유희", "수레바퀴 아래서"],
+    color: "#3A4A6B",
+    signature_quote: "나는 내 속에 있는 것만을 살려고 했다. 왜 그것이 그토록 어려웠을까?",
+    related_questions: ["나는 진정한 내 모습으로 살고 있는가?", "내면의 어두운 면을 받아들이는 것이 성장인가?"],
+  },
+  {
     id: "64", slug: "stefan-zweig", name: "슈테판 츠바이크", name_en: "Stefan Zweig",
     birth_year: 1881, death_year: 1942, nationality: "오스트리아",
     category: "author",
@@ -735,6 +767,17 @@ export const GIANTS: Giant[] = [
     related_questions: ["고독을 피하지 않고 그 안에 머물면 무엇이 보이는가?", "미완성이 아름다울 수 있는가?"],
   },
   {
+    id: "67", slug: "ernest-hemingway", name: "어니스트 헤밍웨이", name_en: "Ernest Hemingway",
+    birth_year: 1899, death_year: 1961, nationality: "미국",
+    category: "author",
+    tagline: "용기란 우아함으로 압박을 견디는 것이다.",
+    core_idea: "빙산 이론(iceberg theory)으로 표면 아래의 거대한 의미를 숨긴 간결한 문체를 구현했다. 전쟁과 죽음, 남성성과 패배를 통해 인간의 존엄성을 탐구했다.",
+    key_works: ["노인과 바다", "누구를 위하여 종은 울리나", "무기여 잘있거라", "태양은 다시 떠오른다"],
+    color: "#3A5C3A",
+    signature_quote: "세상은 모두를 망가뜨린다. 그 후에도 많은 사람들이 부서진 부분에서 더 강해진다.",
+    related_questions: ["용기는 타고나는 것인가, 훈련되는 것인가?", "말하지 않는 것이 오히려 더 많은 것을 말할 수 있는가?"],
+  },
+  {
     id: "68", slug: "f-scott-fitzgerald", name: "F. 스콧 피츠제럴드", name_en: "F. Scott Fitzgerald",
     birth_year: 1896, death_year: 1940, nationality: "미국",
     category: "author",
@@ -744,6 +787,17 @@ export const GIANTS: Giant[] = [
     color: "#6B3A2C",
     signature_quote: "1류 지성의 시험은 두 가지 상반된 생각을 동시에 품고도 제 기능을 하는 능력이다.",
     related_questions: ["우리는 모두 초록 불빛을 향해 손을 뻗고 있지 않은가?", "성공 뒤에 오는 공허함을 어떻게 대해야 하는가?"],
+  },
+  {
+    id: "69", slug: "ts-eliot", name: "T.S. 엘리엇", name_en: "T.S. Eliot",
+    birth_year: 1888, death_year: 1965, nationality: "미국/영국",
+    category: "author",
+    tagline: "4월은 가장 잔인한 달이다.",
+    core_idea: "황무지로 1차 세계대전 이후 현대 문명의 정신적 공허함을 묘사했다. 전통과 개인 재능의 긴장 관계를 탐구하며, 개인의 감정이 아닌 객관적 상관물로 시를 써야 한다고 주장했다.",
+    key_works: ["황무지", "네 개의 사중주", "프루프록의 연가", "전통과 개인의 재능"],
+    color: "#3A2C4A",
+    signature_quote: "우리는 탐험을 멈추지 않을 것이다. 그리고 우리 탐험의 끝은 처음 출발했던 곳에 도착하여 그 장소를 처음으로 알게 되는 것이다.",
+    related_questions: ["전통은 창조를 억압하는가, 가능하게 하는가?", "무질서한 시대에 예술은 무엇을 해야 하는가?"],
   },
   {
     id: "70", slug: "thomas-mann", name: "토마스 만", name_en: "Thomas Mann",
@@ -768,6 +822,17 @@ export const GIANTS: Giant[] = [
     color: "#2C4A5C",
     signature_quote: "새로운 과학적 진리는 반대자들을 설득함으로써 승리하지 않는다. 반대자들이 결국 죽고 그것에 익숙한 새 세대가 자라남으로써 승리한다.",
     related_questions: ["패러다임이 바뀔 때 우리의 정체성은 어떻게 되는가?", "과학적 혁명은 개인의 용기에서 시작되는가?"],
+  },
+  {
+    id: "72", slug: "erwin-schrodinger", name: "에르빈 슈뢰딩거", name_en: "Erwin Schrödinger",
+    birth_year: 1887, death_year: 1961, nationality: "오스트리아",
+    category: "scientist",
+    tagline: "관측하지 않으면 고양이는 살아있으면서 동시에 죽어있다.",
+    core_idea: "양자역학의 파동 방정식을 확립하고, 유명한 슈뢰딩거의 고양이 사고 실험으로 양자 중첩의 역설을 드러냈다. 생명이란 무엇인가에서 생물학과 물리학을 연결했다.",
+    key_works: ["생명이란 무엇인가", "자연과 그리스인", "마음과 물질"],
+    color: "#3A5C5C",
+    signature_quote: "진리의 다양성은 그것을 논하는 사람만큼이나 많다.",
+    related_questions: ["관측하는 행위가 현실을 바꿀 수 있는가?", "살아있음과 죽어있음의 경계는 어디인가?"],
   },
   {
     id: "73", slug: "louis-pasteur", name: "루이 파스퇴르", name_en: "Louis Pasteur",
@@ -836,6 +901,28 @@ export const GIANTS: Giant[] = [
     color: "#3A2C2C",
     signature_quote: "아침에 일어나 돈 버는 방법을 생각하고 저녁에 어떻게 선을 행할지 생각하라.",
     related_questions: ["독점과 혁신은 양립할 수 있는가?", "어떻게 버느냐보다 어떻게 쓰느냐가 더 중요한가?"],
+  },
+  {
+    id: "79", slug: "walt-disney", name: "월트 디즈니", name_en: "Walt Disney",
+    birth_year: 1901, death_year: 1966, nationality: "미국",
+    category: "entrepreneur",
+    tagline: "꿈꿀 수 있다면 이룰 수 있다.",
+    core_idea: "애니메이션과 테마파크를 통해 이야기와 상상력으로 전 세계를 감동시켰다. 끊임없는 혁신과 실패에도 포기하지 않는 창의적 경영으로 엔터테인먼트 산업을 창조했다.",
+    key_works: ["백설공주", "판타지아", "디즈니랜드 창설"],
+    color: "#3A5C6B",
+    signature_quote: "모든 꿈은 한 사람이 그것을 실현하려는 용기를 가질 때 시작된다.",
+    related_questions: ["어린 시절의 꿈을 어른이 되어서도 추구하는 것이 옳은가?", "상상력은 어떻게 비즈니스가 되는가?"],
+  },
+  {
+    id: "80", slug: "steve-jobs", name: "스티브 잡스", name_en: "Steve Jobs",
+    birth_year: 1955, death_year: 2011, nationality: "미국",
+    category: "entrepreneur",
+    tagline: "배고픔을 유지하라. 어리석음을 유지하라.",
+    core_idea: "기술과 인문학의 교차점에서 아이폰·맥·픽사 등 세상을 바꾼 제품들을 창조했다. 완벽주의와 독창성, 그리고 '현실 왜곡장'으로 불가능을 가능하게 만들었다.",
+    key_works: ["스탠퍼드 졸업 연설", "맥·아이팟·아이폰·아이패드 창조"],
+    color: "#2C2C2C",
+    signature_quote: "당신의 시간은 한정되어 있다. 그러므로 다른 사람의 삶을 사는 데 낭비하지 마라.",
+    related_questions: ["완벽을 추구하는 것이 주변 사람들을 괴롭히는 것을 정당화하는가?", "열정을 직업으로 만드는 것이 항상 좋은 일인가?"],
   },
 
   // ── 동양 사상가 ─────────────────────────────────────────────────
@@ -983,6 +1070,17 @@ export const GIANTS: Giant[] = [
     related_questions: ["개인의 희생이 역사를 바꿀 수 있는가?", "평화를 위해 폭력을 사용하는 것이 정당한가?"],
   },
   {
+    id: "94", slug: "eleanor-roosevelt", name: "엘리너 루스벨트", name_en: "Eleanor Roosevelt",
+    birth_year: 1884, death_year: 1962, nationality: "미국",
+    category: "thinker",
+    tagline: "매일 당신을 두렵게 하는 일을 하나씩 하라.",
+    core_idea: "세계인권선언 작성을 주도하고 여성 권리와 인종 평등을 위해 싸웠다. 퍼스트 레이디를 넘어 독립적인 활동가로서 사회적 약자의 목소리가 됐다.",
+    key_works: ["세계인권선언(기여)", "나의 이야기", "내일은 지금이다"],
+    color: "#6B3A5C",
+    signature_quote: "아무도 당신의 동의 없이 당신을 열등하게 만들 수 없다.",
+    related_questions: ["두려움을 이기는 가장 좋은 방법은 무엇인가?", "진정한 용기는 어디서 오는가?"],
+  },
+  {
     id: "95", slug: "ibn-khaldun", name: "이븐 할둔", name_en: "Ibn Khaldun",
     birth_year: 1332, death_year: 1406, nationality: "튀니지/북아프리카",
     category: "thinker",
@@ -1003,5 +1101,49 @@ export const GIANTS: Giant[] = [
     color: "#5C4A2C",
     signature_quote: "성공은 다른 사람을 짓밟는 것이 아니라 자신을 올리는 것이다.",
     related_questions: ["교육이 불평등을 해결할 수 있는가?", "점진적 변화와 급진적 변화 중 어느 것이 더 효과적인가?"],
+  },
+  {
+    id: "97", slug: "simone-de-beauvoir", name: "시몬 드 보부아르", name_en: "Simone de Beauvoir",
+    birth_year: 1908, death_year: 1986, nationality: "프랑스",
+    category: "philosopher",
+    tagline: "여성으로 태어나는 것이 아니라 여성이 되는 것이다.",
+    core_idea: "실존주의 철학을 바탕으로 여성의 타자화를 분석했다. 자유는 주어지는 것이 아니라 쟁취하는 것이며, 여성도 자신의 존재 프로젝트를 스스로 선택해야 한다고 주장했다.",
+    key_works: ["제2의 성", "회상록", "초대받은 여자"],
+    color: "#6B3A4A",
+    signature_quote: "자유는 두려운 것이다. 하지만 부자유는 더 두렵다.",
+    related_questions: ["나는 사회가 부여한 역할을 그대로 살고 있는가?", "진정한 자유는 책임과 어떻게 연결되는가?"],
+  },
+  {
+    id: "98", slug: "hannah-arendt", name: "한나 아렌트", name_en: "Hannah Arendt",
+    birth_year: 1906, death_year: 1975, nationality: "독일/미국",
+    category: "philosopher",
+    tagline: "악의 평범성 — 악은 특별한 괴물이 아닌 평범한 사람에 의해 저질러진다.",
+    core_idea: "전체주의의 기원을 분석하고 '악의 평범성'을 통해 인간의 사유 포기가 얼마나 위험한지 경고했다. 공적 영역에서의 행위와 복수성이 민주주의의 핵심이라고 봤다.",
+    key_works: ["전체주의의 기원", "인간의 조건", "예루살렘의 아이히만", "어두운 시대의 사람들"],
+    color: "#3A3A4A",
+    signature_quote: "가장 근본적인 형태의 인간 자유는 무엇을 생각하느냐가 아니라 생각하느냐 그 자체다.",
+    related_questions: ["생각하기를 멈출 때 우리는 어떤 위험에 처하는가?", "평범한 사람이 악에 가담하는 것을 어떻게 막을 수 있는가?"],
+  },
+  {
+    id: "99", slug: "nelson-mandela", name: "넬슨 만델라", name_en: "Nelson Mandela",
+    birth_year: 1918, death_year: 2013, nationality: "남아프리카",
+    category: "thinker",
+    tagline: "용기란 두려움이 없는 것이 아니라 두려움을 극복하는 것이다.",
+    core_idea: "27년의 감옥 생활 끝에 분노 대신 화해를 선택했다. 인종차별에 맞선 투쟁과 함께 용서와 화해 없이는 진정한 자유가 없다는 것을 삶으로 보여줬다.",
+    key_works: ["자유를 향한 머나먼 길(자서전)"],
+    color: "#5C3A3A",
+    signature_quote: "나는 패배를 모른다. 나는 그것을 아직 끝나지 않은 성공이라 부른다.",
+    related_questions: ["용서는 약함인가, 가장 큰 용기인가?", "27년의 고통 끝에 화해를 선택할 수 있는 힘은 어디서 오는가?"],
+  },
+  {
+    id: "100", slug: "martin-luther-king", name: "마틴 루터 킹", name_en: "Martin Luther King Jr.",
+    birth_year: 1929, death_year: 1968, nationality: "미국",
+    category: "thinker",
+    tagline: "나에게는 꿈이 있습니다.",
+    core_idea: "간디의 비폭력 저항을 계승하여 미국 흑인 민권 운동을 이끌었다. 사랑과 정의가 결합될 때 사회 변혁이 가능하다고 믿었으며, 꿈을 말하는 것이 현실을 바꾼다고 봤다.",
+    key_works: ["나에게는 꿈이 있습니다(연설)", "버밍엄 교도소에서의 편지", "자유를 향해 나아가며"],
+    color: "#4A3A2C",
+    signature_quote: "어둠이 어둠을 몰아낼 수 없다. 오직 빛만이 할 수 있다. 증오가 증오를 몰아낼 수 없다. 오직 사랑만이 할 수 있다.",
+    related_questions: ["꿈을 말하는 것이 현실을 어떻게 바꾸는가?", "사랑은 정치적 행위가 될 수 있는가?"],
   },
 ];

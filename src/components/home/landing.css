@@ -1496,7 +1496,7 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   position: fixed;
   inset: 0;
   z-index: 500;
-  background: var(--lp-bg);
+  background: #FFFFFF;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1509,37 +1509,65 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-intro-leaving {
   animation: lp-introFadeOut .45s ease both;
 }
-/* 헤더 로고(?!  + 워드마크 교차)와 동일한 마크·타이포를 확대 사용 */
-.lp-intro-mark {
+/* 메인 비주얼 — 파란 키캡만 떠 있고, 뒤에는 순백 화면 외에 아무것도 두지 않는다 */
+.lp-intro-keycap-wrap {
+  width: clamp(220px, 50vw, 380px);
+  animation: lp-introImgFloat 3.8s ease-in-out infinite;
+}
+.lp-intro-keycap-wrap-pressed {
+  animation-play-state: paused;
+}
+.lp-intro-keycap-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: transform .16s cubic-bezier(.2,.8,.2,1), filter .16s ease;
+}
+.lp-intro-keycap-btn img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+.lp-intro-keycap-btn:hover {
+  transform: translateY(-6px) scale(1.02);
+}
+.lp-intro-keycap-btn:active,
+.lp-intro-keycap-btn.is-pressed {
+  transform: translateY(8px) scale(0.93);
+  filter: brightness(0.9);
+}
+@keyframes lp-introImgFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+/* 나머지(안내문구 + 로고)는 하단에 작게, 서로 촘촘히 묶어서 */
+.lp-intro-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lp-sp1);
+  margin-top: var(--lp-sp1);
+  opacity: 0.88;
+}
+/* 헤더 로고와 동일한 크기의 ?! 마크 + 워드마크 (확대 없이 그대로) */
+.lp-intro-logo {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: clamp(48px, 8vw, 72px);
+  gap: 10px;
+}
+.lp-intro-logo-mark {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  font-size: 20px;
   line-height: 1;
-  margin-bottom: var(--lp-sp2);
 }
-.lp-intro-wordmark {
+.lp-intro-logo-wordmark {
   display: inline-grid;
-  margin-bottom: var(--lp-sp4);
-}
-.lp-intro-wordmark-ko,
-.lp-intro-wordmark-en {
-  white-space: nowrap;
-  color: var(--lp-ink);
-  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(.2,.8,.2,1);
-}
-.lp-intro-wordmark-ko {
-  font-family: var(--lp-serif-ko);
-  font-size: clamp(22px, 3.4vw, 30px);
-  font-weight: 500;
-  letter-spacing: 0.03em;
-}
-.lp-intro-wordmark-en {
-  font-family: var(--lp-serif);
-  font-size: clamp(24px, 3.6vw, 32px);
-  font-weight: 400;
-  font-style: italic;
-  letter-spacing: 0.06em;
 }
 .lp-intro-notice {
   font-family: var(--lp-serif);
@@ -1547,7 +1575,6 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   font-size: 12.5px;
   letter-spacing: 0.04em;
   color: var(--lp-muted);
-  margin-bottom: var(--lp-sp3);
 }
 /* 히어로 섹션의 순차 등장(opacity:0 → .7s 지연 페이드인)은 스플래시 단독 노출에는 맞지 않아 즉시 표시로 오버라이드.
    버튼은 스플래시의 유일한 액션이라 음영도 더 강하게 준다(전용 glow 키프레임 사용, 기존 히어로 버튼은 그대로 둠). */
@@ -1593,18 +1620,3 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   from { opacity: 1; transform: scale(1); }
   to   { opacity: 0; transform: scale(1.02); }
 }
-
-/* 배경 떠다니는 점 — 모바일에서도 항상 보이도록 .lp-float와 별도로 정의 */
-.lp-intro-float {
-  position: absolute;
-  border-radius: 50%;
-  background: var(--lp-accent);
-  pointer-events: none;
-  opacity: 0;
-  animation: lp-floaty 9s ease-in-out infinite;
-}
-.lp-intro-float-1 { width: 10px; height: 10px; top: 18%;  left: 12%; animation-delay: 0s;    box-shadow: 0 0 0 4px rgba(94,70,50,0.1); }
-.lp-intro-float-2 { width: 7px;  height: 7px;  top: 68%;  left: 18%; animation-delay: 1.4s;  background: var(--lp-gold); }
-.lp-intro-float-3 { width: 8px;  height: 8px;  top: 24%;  right: 14%; animation-delay: 2.6s; box-shadow: 0 0 0 4px rgba(94,70,50,0.1); }
-.lp-intro-float-4 { width: 12px; height: 12px; top: 72%;  right: 10%; animation-delay: 0.8s; background: var(--lp-gold); opacity: 0.5; }
-.lp-intro-float-5 { width: 6px;  height: 6px;  top: 46%;  left: 6%;  animation-delay: 3.6s; }

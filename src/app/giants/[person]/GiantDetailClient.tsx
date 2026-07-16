@@ -85,6 +85,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"about" | "chat" | "discuss">("about");
+  const [discussBook, setDiscussBook] = useState("");
   const [discussKeyword, setDiscussKeyword] = useState("");
   const [discussResult, setDiscussResult] = useState<{
     statement: string;
@@ -93,6 +94,10 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
     recommended_books: { title: string; author: string; description: string }[];
   } | null>(null);
   const [discussStatus, setDiscussStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [discussSaveStatus, setDiscussSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [savedDiscussions, setSavedDiscussions] = useState<Array<{
+    id: string; book_title: string | null; topic: string | null; statement: string; created_at: string;
+  }>>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -144,6 +149,12 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
         setHistoryLoaded(true);
       })
       .catch(() => setHistoryLoaded(true));
+
+    // 이 인물의 저장된 발제 아카이브
+    fetch(`/api/giants/discussions?giant=${giant.slug}&limit=10`)
+      .then((r) => r.json())
+      .then((d) => setSavedDiscussions(d.discussions ?? []))
+      .catch(() => {});
   }, [giant.slug]);
 
   const [discResult, setDiscResult] = useState<{
@@ -159,12 +170,16 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
     setDiscStatus("loading");
     setDiscResult(null);
     try {
-      const context = messages.map((m) => `${m.role === "user" ? "Q" : giant.name}: ${m.content}`).join("\n");
-      const keyword = giant.name + " " + (messages[0]?.content?.slice(0, 30) ?? "");
-      const res = await fetch("/api/ai", {
+      const res = await fetch("/api/giant/discussion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ keyword, context }),
+        body: JSON.stringify({
+          giantName: giant.name,
+          giantCoreIdea: giant.core_idea,
+          giantKeyWorks: giant.key_works,
+          topic: messages[0]?.content?.slice(0, 60) ?? "",
+          context: messages,
+        }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
@@ -177,15 +192,21 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
 
   const generateFromKeyword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!discussKeyword.trim()) return;
+    if (!discussBook.trim() && !discussKeyword.trim()) return;
     setDiscussStatus("loading");
     setDiscussResult(null);
+    setDiscussSaveStatus("idle");
     try {
-      const keyword = `${giant.name} ${discussKeyword.trim()}`;
-      const res = await fetch("/api/ai", {
+      const res = await fetch("/api/giant/discussion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ keyword }),
+        body: JSON.stringify({
+          giantName: giant.name,
+          giantCoreIdea: giant.core_idea,
+          giantKeyWorks: giant.key_works,
+          bookTitle: discussBook.trim(),
+          topic: discussKeyword.trim(),
+        }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
@@ -193,6 +214,38 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
       setDiscussStatus("done");
     } catch {
       setDiscussStatus("error");
+    }
+  };
+
+  const saveDiscussion = async (isPublic: boolean) => {
+    if (!discussResult) return;
+    setDiscussSaveStatus("saving");
+    try {
+      const res = await fetch("/api/giants/discussions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          giant_slug: giant.slug,
+          giant_name: giant.name,
+          book_title: discussBook.trim() || null,
+          topic: discussKeyword.trim() || null,
+          statement: discussResult.statement,
+          discussion_questions: discussResult.discussion_questions,
+          icebreaker_questions: discussResult.icebreaker_questions,
+          recommended_books: discussResult.recommended_books,
+          is_public: isPublic,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setDiscussSaveStatus("saved");
+      if (isPublic) {
+        setSavedDiscussions((prev) => [
+          { id: crypto.randomUUID(), book_title: discussBook.trim() || null, topic: discussKeyword.trim() || null, statement: discussResult.statement, created_at: new Date().toISOString() },
+          ...prev,
+        ]);
+      }
+    } catch {
+      setDiscussSaveStatus("error");
     }
   };
 
@@ -581,9 +634,25 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
           {activeTab === "discuss" && (
             <div style={{ maxWidth: 760, margin: "0 auto" }}>
               <p style={{ fontSize: 15, color: "var(--ink-soft)", marginBottom: 28, lineHeight: 1.7 }}>
-                {giant.name}의 관점으로 발제를 만들어요.
+                {giant.name}의 관점으로, 함께 읽는 책과 주제에 맞춘 발제를 만들어요.
               </p>
-              <form onSubmit={generateFromKeyword} style={{ marginBottom: 32 }}>
+              <form onSubmit={generateFromKeyword} style={{ marginBottom: 32, display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{
+                  display: "flex", gap: 10, alignItems: "stretch",
+                  border: "1px solid var(--line-soft)", borderRadius: 12, padding: "12px 16px",
+                  background: "rgba(255,255,255,0.6)",
+                }}>
+                  <input
+                    value={discussBook}
+                    onChange={(e) => setDiscussBook(e.target.value)}
+                    placeholder="함께 읽는 책 제목 (예: 이방인)"
+                    style={{
+                      flex: 1, background: "none", border: "none", outline: "none",
+                      fontSize: 15, color: "var(--ink)",
+                      fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                    }}
+                  />
+                </div>
                 <div style={{
                   display: "flex", gap: 10, alignItems: "stretch",
                   border: "1px solid var(--line-soft)", borderRadius: 12, padding: "12px 16px",
@@ -592,7 +661,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                   <input
                     value={discussKeyword}
                     onChange={(e) => setDiscussKeyword(e.target.value)}
-                    placeholder="예: 고독, 도덕, 의미, 자유"
+                    placeholder="다루고 싶은 주제 (예: 고독, 도덕, 의미, 자유)"
                     style={{
                       flex: 1, background: "none", border: "none", outline: "none",
                       fontSize: 15, color: "var(--ink)",
@@ -601,13 +670,13 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                   />
                   <button
                     type="submit"
-                    disabled={!discussKeyword.trim() || discussStatus === "loading"}
+                    disabled={(!discussBook.trim() && !discussKeyword.trim()) || discussStatus === "loading"}
                     style={{
                       padding: "10px 22px", borderRadius: 9, flexShrink: 0,
-                      background: discussKeyword.trim() ? giant.color : "var(--line-soft)",
-                      color: discussKeyword.trim() ? "white" : "var(--muted)",
+                      background: (discussBook.trim() || discussKeyword.trim()) ? giant.color : "var(--line-soft)",
+                      color: (discussBook.trim() || discussKeyword.trim()) ? "white" : "var(--muted)",
                       fontSize: 14, fontWeight: 500, border: "none",
-                      cursor: discussKeyword.trim() ? "pointer" : "not-allowed",
+                      cursor: (discussBook.trim() || discussKeyword.trim()) ? "pointer" : "not-allowed",
                       whiteSpace: "nowrap", transition: "all 0.2s",
                       display: "flex", alignItems: "center", gap: 8,
                     }}
@@ -667,26 +736,83 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                       </div>
                     </div>
                   )}
-                  {/* 대화로 이동 버튼 */}
-                  <button
-                    onClick={() => {
-                      setActiveTab("chat");
-                      if (discussResult.statement) {
-                        sendMessage(discussResult.statement);
-                      }
-                    }}
-                    style={{
-                      alignSelf: "flex-start", padding: "12px 24px", borderRadius: 9999,
-                      background: giant.color, color: "white",
-                      border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500,
-                      display: "flex", alignItems: "center", gap: 8, transition: "opacity 0.2s",
-                    }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.85"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
-                  >
-                    <MessageSquare size={15} />
-                    이 발제로 {giant.name}와 대화하기
-                  </button>
+                  {/* 저장 + 대화로 이동 버튼 */}
+                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+                    <button
+                      onClick={() => {
+                        setActiveTab("chat");
+                        if (discussResult.statement) {
+                          sendMessage(discussResult.statement);
+                        }
+                      }}
+                      style={{
+                        padding: "12px 24px", borderRadius: 9999,
+                        background: giant.color, color: "white",
+                        border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500,
+                        display: "flex", alignItems: "center", gap: 8, transition: "opacity 0.2s",
+                      }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.85"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
+                    >
+                      <MessageSquare size={15} />
+                      이 발제로 {giant.name}와 대화하기
+                    </button>
+                    {discussSaveStatus === "saved" ? (
+                      <span style={{ fontSize: 13.5, color: giant.color }}>발제 아카이브에 저장됐어요.</span>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => saveDiscussion(true)}
+                          disabled={discussSaveStatus === "saving"}
+                          style={{
+                            padding: "12px 20px", borderRadius: 9999,
+                            background: "transparent", color: "var(--ink)",
+                            border: "1px solid var(--line-soft)", cursor: "pointer", fontSize: 14, fontWeight: 500,
+                          }}
+                        >
+                          {discussSaveStatus === "saving" ? "저장 중…" : "발제 아카이브에 저장"}
+                        </button>
+                        <button
+                          onClick={() => saveDiscussion(false)}
+                          disabled={discussSaveStatus === "saving"}
+                          style={{
+                            padding: "12px 16px", borderRadius: 9999,
+                            background: "transparent", color: "var(--muted)",
+                            border: "1px solid var(--line-soft)", cursor: "pointer", fontSize: 13,
+                          }}
+                        >
+                          나만 저장
+                        </button>
+                      </>
+                    )}
+                    {discussSaveStatus === "error" && (
+                      <span style={{ fontSize: 12.5, color: "#EF4444" }}>저장에 실패했어요. 다시 시도해주세요.</span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 이 인물의 저장된 발제 아카이브 */}
+              {savedDiscussions.length > 0 && (
+                <div style={{ marginTop: 48 }}>
+                  <div style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 16 }}>
+                    {giant.name}의 발제 아카이브
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {savedDiscussions.map((d) => (
+                      <div key={d.id} style={{ padding: "14px 18px", borderRadius: 10, background: "rgba(255,255,255,0.5)", border: "1px solid var(--line-soft)" }}>
+                        {(d.book_title || d.topic) && (
+                          <div style={{ fontSize: 12, color: giant.color, marginBottom: 6 }}>
+                            {[d.book_title, d.topic].filter(Boolean).join(" · ")}
+                          </div>
+                        )}
+                        <p style={{ fontSize: 13.5, color: "var(--ink-soft)", lineHeight: 1.6 }}>{d.statement}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <Link href="/archive?tab=discussions" style={{ display: "inline-block", marginTop: 12, fontSize: 13, color: giant.color }}>
+                    발제문 아카이브 전체 보기 →
+                  </Link>
                 </div>
               )}
             </div>
