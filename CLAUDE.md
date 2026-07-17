@@ -8,6 +8,38 @@
 
 ## 세션 로그
 
+### 2026-07-17 — 거인의 어깨 → 발제 생성기(계산기 모드) 전환
+
+**범위 결정 (운영자 지시)**
+1. 홈 "AT HEART" 섹션과 `/giants`의 철학자 인물 그리드/개별 상세(AI 대화·명언·위키)를 전부
+   내리고, 책/문장 입력 → 발제 10개 생성하는 단일 목적 "계산기 모드" 생성기로 전환.
+2. `/giants/[person]`은 삭제가 아니라 `/giants`로 블라인드 리다이렉트(코드는
+   `GiantDetailClient.tsx`로 git에 남아있으나 unimport 상태 — 절대 원칙 7과도 부합, 인물
+   개별 노출이 사라져 사망 70년 규칙 리스크도 줄어듦).
+3. 발제 프롬프트가 책의 구체적 요소(anchors)를 먼저 짚게 하고, 매 요청마다 GIANTS 87명
+   로스터 순서를 셔플해 반복/일반론 문제를 완화(`src/app/api/discussion/generate/route.ts`).
+4. 발제 생성 성공 시 `giant_discussions`에 자동 저장(발제 데이터화), 응답에 `discussionId`
+   추가.
+5. 복사 기능은 "서비스 피드백 원탭(Smile/Meh/Frown) 이후에만" 노출 — 비활성 버튼이 아니라
+   피드백 전엔 복사 버튼 자체를 숨기는 "보상형 노출" 패턴. 브라우저당 1회만 요구
+   (localStorage), 이후 생성부터는 바로 복사 가능. 피드백은 `discussion_feedback` 신규
+   테이블에 저장(`supabase/migrations/015_discussion_feedback.sql`).
+6. `GiantsClient.tsx`/`LandingPage.tsx` 두 곳에 중복 구현하던 폼/결과 UI를
+   `src/components/discussion/DiscussionGenerator.tsx` 공용 컴포넌트로 추출
+   (`variant="giants"|"landing"`), 네이비/골드 톤앤매너는 그대로 유지.
+
+**⚠ 미검증 — 다음 세션에서 반드시 확인**
+
+이 실행 환경은 라이브 Supabase에 네트워크 접근이 없어(008~014와 동일 제약)
+`015_discussion_feedback.sql`이 아직 실제 DB에 적용되지 않았다. `npm run build`는
+전체 통과했고 `/api/discussion/generate`·`/api/discussion/feedback`은 DB insert 실패를
+삼키고 200을 반환하도록 짜여 있어 마이그레이션 미적용 상태에서도 UI 자체는 깨지지 않지만,
+발제 데이터화·피드백 저장·아카이브 반영은 운영자가 015를 Supabase 대시보드 SQL 에디터에
+적용한 뒤에만 실제로 동작한다. 적용 후 `/archive`의 "발제문 아카이브" 탭에 생성기발 발제가
+정상적으로 쌓이는지, `discussion_feedback`에 반응/코멘트가 실제로 들어가는지 확인 필요.
+
+---
+
 ### 2026-07-04~07 — M0(인증·회원) + M1(오프라인 북클럽 연계)
 
 **범위 결정 (운영자 승인 완료)**

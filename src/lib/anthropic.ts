@@ -33,6 +33,7 @@ export async function callClaude(params: {
   messages: { role: "user" | "assistant"; content: string }[];
   maxTokens?: number;
   model?: string;
+  temperature?: number;
 }): Promise<string> {
   const key = process.env.ANTHROPIC_API_KEY ?? "";
   if (!key) throw new Error("ANTHROPIC_API_KEY not set");
@@ -56,6 +57,7 @@ export async function callClaude(params: {
     messages: params.messages,
   };
   if (params.system) body.system = params.system;
+  if (params.temperature !== undefined) body.temperature = params.temperature;
 
   const res = await fetch(`${baseURL}/messages`, {
     method: "POST",

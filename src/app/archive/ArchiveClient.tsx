@@ -553,7 +553,11 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                         {d.book_title || d.topic || `${d.giant_name}의 발제`}
                       </h3>
                       <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12 }}>
-                        <Link href={`/giants/${d.giant_slug}`} style={{ color: "var(--accent)", textDecoration: "none" }}>{d.giant_name}</Link>
+                        {d.giant_slug ? (
+                          <Link href={`/giants/${d.giant_slug}`} style={{ color: "var(--accent)", textDecoration: "none" }}>{d.giant_name}</Link>
+                        ) : (
+                          <span style={{ color: "var(--accent)" }}>{d.giant_name}</span>
+                        )}
                         {d.book_title && d.topic ? ` · ${d.topic}` : ""} · {d.author_name}
                       </p>
                       <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 14.5, color: "var(--ink-soft)", lineHeight: 1.8, marginBottom: 20 }}>

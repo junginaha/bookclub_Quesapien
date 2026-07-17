@@ -8,6 +8,7 @@ import NearbyMeetingsFeed, { type UpcomingMeetingFeedItem } from "./NearbyMeetin
 import IntroSplash from "./IntroSplash";
 import { type BookClubRecord, FALLBACK_CLUBS, classifyClub, sortAgain, sortNow } from "@/lib/bookclub";
 import { CurrentClubCard, EncoreClubCard } from "@/components/bookclub/ClubCards";
+import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import "./landing.css";
 
 // Leaflet은 window/DOM에 의존하므로 클라이언트에서만 로드
@@ -636,9 +637,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
   const [questionReacted, setQuestionReacted] = useState<{ like: boolean; save: boolean }>({ like: false, save: false });
   const [dbBooks, setDbBooks] = useState<BookClub[]>([]);
   const [clubRecords, setClubRecords] = useState<BookClubRecord[]>([]);
-  const [dialogueInput, setDialogueInput] = useState("");
-  const [dialogueTopics, setDialogueTopics] = useState<string[]>([]);
-  const [dialogueStatus, setDialogueStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
   const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
@@ -772,26 +770,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
       setAskStatus("error");
     }
     setTimeout(() => setAskStatus("idle"), 3000);
-  };
-
-  const handleDialogueGenerate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!dialogueInput.trim() || dialogueStatus === "loading") return;
-    setDialogueStatus("loading");
-    try {
-      const res = await fetch("/api/discussion/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: dialogueInput.trim() }),
-      });
-      if (!res.ok) throw new Error("fail");
-      const data = await res.json();
-      if (!Array.isArray(data.topics) || data.topics.length === 0) throw new Error("empty");
-      setDialogueTopics(data.topics);
-      setDialogueStatus("done");
-    } catch {
-      setDialogueStatus("error");
-    }
   };
 
   return (
@@ -1141,41 +1119,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           함께 나눌 발제 10개를 만들어드릴게요.
         </p>
 
-        <form className="lp-dialogue-form" onSubmit={handleDialogueGenerate}>
-          <textarea
-            className="lp-dialogue-input"
-            placeholder="책 제목이나 마음에 걸리는 문장을 적어주세요"
-            value={dialogueInput}
-            onChange={(e) => setDialogueInput(e.target.value)}
-            maxLength={300}
-            rows={2}
-          />
-          <button
-            type="submit"
-            className="lp-btn-cream"
-            disabled={!dialogueInput.trim() || dialogueStatus === "loading"}
-          >
-            {dialogueStatus === "loading" ? (
-              <><span className="lp-nearby-spin" /> 발제 만드는 중…</>
-            ) : (
-              "발제 10개 생성하기"
-            )}
-          </button>
-          {dialogueStatus === "error" && (
-            <p className="lp-dialogue-error">발제를 만드는 중 문제가 생겼어요. 다시 시도해주세요.</p>
-          )}
-        </form>
-
-        {dialogueStatus === "done" && dialogueTopics.length > 0 && (
-          <ol className="lp-dialogue-topics">
-            {dialogueTopics.map((topic, idx) => (
-              <li key={idx} className="lp-dialogue-topic">
-                <span className="lp-dialogue-topic-num">{String(idx + 1).padStart(2, "0")}</span>
-                <span>{topic}</span>
-              </li>
-            ))}
-          </ol>
-        )}
+        <DiscussionGenerator variant="landing" />
       </section>
 
       {/* ── 실시간 활동 알림 뱃지 ── */}
