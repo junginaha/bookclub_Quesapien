@@ -636,6 +636,9 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
   const [questionReacted, setQuestionReacted] = useState<{ like: boolean; save: boolean }>({ like: false, save: false });
   const [dbBooks, setDbBooks] = useState<BookClub[]>([]);
   const [clubRecords, setClubRecords] = useState<BookClubRecord[]>([]);
+  const [dialogueInput, setDialogueInput] = useState("");
+  const [dialogueTopics, setDialogueTopics] = useState<string[]>([]);
+  const [dialogueStatus, setDialogueStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
   const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
@@ -769,6 +772,26 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
       setAskStatus("error");
     }
     setTimeout(() => setAskStatus("idle"), 3000);
+  };
+
+  const handleDialogueGenerate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!dialogueInput.trim() || dialogueStatus === "loading") return;
+    setDialogueStatus("loading");
+    try {
+      const res = await fetch("/api/discussion/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input: dialogueInput.trim() }),
+      });
+      if (!res.ok) throw new Error("fail");
+      const data = await res.json();
+      if (!Array.isArray(data.topics) || data.topics.length === 0) throw new Error("empty");
+      setDialogueTopics(data.topics);
+      setDialogueStatus("done");
+    } catch {
+      setDialogueStatus("error");
+    }
   };
 
   return (
@@ -1095,28 +1118,64 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
         </p>
         <div className="lp-final-divider" />
 
-        {/* GIANTS 인물 카드 */}
-        <div className="lp-final-giants-label">GIANTS — 거인의 어깨 · 위대한 지성들과 나누는 대화</div>
-        <div className="lp-final-giants-grid">
-          {[
+        {/*
+          거인의 어깨 인물 카드/탐색 CTA는 2026-07-17 운영자 지시로 홈 노출을 껐다(코드는 보존, 삭제 아님).
+          이 섹션을 "대화가 필요해" 발제 생성기로 교체하면서 함께 내림 — /giants 라우트 자체와 푸터 링크는
+          손대지 않았음(범위: 이 섹션만). 참고: CLAUDE.md 절대 원칙 7(거인의 어깨 = 사망 70년 규칙 검증
+          전까지 신규 노출 금지)과도 부합. 나중에 "거인의 어깨가 왜 안 보이냐"는 문제가 생기면 이 주석과
+          CLAUDE.md 세션 로그를 참고할 것 — 버그가 아니라 의도적으로 숨긴 것.
+        {[
             { slug: "friedrich-nietzsche", name: "니체", color: "#2D3748" },
             { slug: "immanuel-kant", name: "칸트", color: "#4A5568" },
             { slug: "socrates", name: "소크라테스", color: "#5B4A35" },
             { slug: "fyodor-dostoevsky", name: "도스토옙스키", color: "#4A3728" },
             { slug: "virginia-woolf", name: "버지니아 울프", color: "#4A3A5C" },
             { slug: "albert-einstein", name: "아인슈타인", color: "#1A3A5C" },
-          ].map((g) => (
-            <a key={g.slug} href={`/giants/${g.slug}`} className="lp-final-giant-chip">
-              <span className="lfgc-dot" style={{ background: g.color }} />
-              {g.name}
-            </a>
-          ))}
-        </div>
+          ]
+        */}
 
-        {/* CTA 작게 */}
-        <a href="/giants" className="lp-final-giants-link">
-          거인의 어깨 탐색하기 →
-        </a>
+        {/* 대화가 필요해 — 거인의 어깨 기반 발제 생성기 */}
+        <h3 className="lp-dialogue-title">대화가 필요해</h3>
+        <p className="lp-dialogue-desc">
+          책이나 문장을 남겨보세요. 위대한 사유자들의 시선을 빌려,
+          함께 나눌 발제 10개를 만들어드릴게요.
+        </p>
+
+        <form className="lp-dialogue-form" onSubmit={handleDialogueGenerate}>
+          <textarea
+            className="lp-dialogue-input"
+            placeholder="책 제목이나 마음에 걸리는 문장을 적어주세요"
+            value={dialogueInput}
+            onChange={(e) => setDialogueInput(e.target.value)}
+            maxLength={300}
+            rows={2}
+          />
+          <button
+            type="submit"
+            className="lp-btn-cream"
+            disabled={!dialogueInput.trim() || dialogueStatus === "loading"}
+          >
+            {dialogueStatus === "loading" ? (
+              <><span className="lp-nearby-spin" /> 발제 만드는 중…</>
+            ) : (
+              "발제 10개 생성하기"
+            )}
+          </button>
+          {dialogueStatus === "error" && (
+            <p className="lp-dialogue-error">발제를 만드는 중 문제가 생겼어요. 다시 시도해주세요.</p>
+          )}
+        </form>
+
+        {dialogueStatus === "done" && dialogueTopics.length > 0 && (
+          <ol className="lp-dialogue-topics">
+            {dialogueTopics.map((topic, idx) => (
+              <li key={idx} className="lp-dialogue-topic">
+                <span className="lp-dialogue-topic-num">{String(idx + 1).padStart(2, "0")}</span>
+                <span>{topic}</span>
+              </li>
+            ))}
+          </ol>
+        )}
       </section>
 
       {/* ── 실시간 활동 알림 뱃지 ── */}

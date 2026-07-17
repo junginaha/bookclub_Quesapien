@@ -1241,6 +1241,82 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   color: rgba(176,138,74,1);
 }
 
+/* ── 대화가 필요해 (거인의 어깨 기반 발제 생성기) ─── */
+.lp-dialogue-title {
+  font-family: var(--lp-serif-ko);
+  font-weight: 600;
+  font-size: clamp(24px, 3vw, 34px);
+  color: var(--lp-cream);
+  margin-bottom: 10px;
+}
+.lp-dialogue-desc {
+  font-size: 14px;
+  line-height: var(--lp-lh-base);
+  color: rgba(236,227,207,0.6);
+  max-width: 34ch;
+  margin: 0 auto var(--lp-sp4);
+}
+.lp-dialogue-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.lp-dialogue-input {
+  width: 100%;
+  min-height: 72px;
+  resize: none;
+  background: rgba(236,227,207,0.04);
+  border: 1px solid rgba(236,227,207,0.15);
+  border-radius: 8px;
+  padding: 16px 18px;
+  color: var(--lp-cream);
+  font-family: var(--lp-serif-ko);
+  font-size: 15px;
+  outline: none;
+  transition: border-color .3s ease, background .3s ease;
+}
+.lp-dialogue-input:focus {
+  border-color: rgba(221,190,133,0.55);
+  background: rgba(236,227,207,0.06);
+}
+.lp-dialogue-input::placeholder {
+  color: rgba(236,227,207,0.35);
+}
+.lp-dialogue-error {
+  font-size: 13px;
+  color: #E08A6B;
+}
+.lp-dialogue-topics {
+  list-style: none;
+  margin: var(--lp-sp5) auto 0;
+  max-width: 620px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.lp-dialogue-topic {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(236,227,207,0.12);
+  font-family: var(--lp-serif-ko);
+  font-size: 15.5px;
+  line-height: var(--lp-lh-base);
+  color: rgba(236,227,207,0.9);
+}
+.lp-dialogue-topic-num {
+  font-family: var(--lp-serif);
+  font-size: 13px;
+  color: #DDBE85;
+  flex-shrink: 0;
+  min-width: 22px;
+}
+
 /* ── 관리자 참여링크 설정 (BookDetailModal 내부) ─── */
 .bdm-admin-url {
   margin: 16px 0 0;
