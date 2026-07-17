@@ -247,7 +247,7 @@ export default function MyPageClient({ profile, myReviews, mySessions, onboardin
                   {[
                     { href: "/questions/create", icon: <MessageSquare size={16} />, label: "질문 작성하기", color: "var(--ink)" },
                     { href: "/bookclub", icon: <BookOpen size={16} />, label: "북클럽 참여하기", color: "var(--accent)" },
-                    { href: "/giants", icon: "?", label: "거인과 대화하기", color: "var(--bg-navy)" },
+                    { href: "/giants", icon: "?", label: "발제 생성기", color: "var(--bg-navy)" },
                     { href: "/onboarding", icon: <Sparkles size={16} />, label: "프로필 업데이트", color: "#5C6B3A" },
                   ].map((action) => (
                     <Link key={action.href} href={action.href} style={{ textDecoration: "none" }}>

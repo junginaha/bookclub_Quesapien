@@ -1,5 +1,4 @@
 import type { MetadataRoute } from "next";
-import { GIANTS } from "@/data/giants";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jilmunhaneun-saramdeul.vercel.app";
 
@@ -70,14 +69,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // Giants — one page per thinker (high content value)
-  const giantPages: MetadataRoute.Sitemap = GIANTS.map((giant) => ({
-    url: `${SITE_URL}/giants/${giant.slug}`,
-    lastModified: now,
-    changeFrequency: "monthly" as const,
-    priority: 0.85,
-  }));
-
   // BookClub slugs — static known slugs
   const bookclubSlugs = [
     "다정함의-발명",
@@ -94,5 +85,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...giantPages, ...bookclubPages];
+  return [...staticPages, ...bookclubPages];
 }

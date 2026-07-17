@@ -1,59 +1,10 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Header from "@/components/common/Header";
-import Footer from "@/components/common/Footer";
-import GiantDetailClient from "./GiantDetailClient";
-import { GIANTS } from "@/data/giants";
-import { personSchema, breadcrumbSchema, faqSchema } from "@/lib/schema";
-import { buildMetadata } from "@/lib/metadata";
-import { JsonLd } from "@/components/seo/JsonLd";
+import { redirect } from "next/navigation";
 
-interface Props { params: Promise<{ person: string }>; }
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { person } = await params;
-  const giant = GIANTS.find((g) => g.slug === person);
-  if (!giant) return { title: "거인의 어깨" };
-
-  return buildMetadata({
-    title: `${giant.name} (${giant.name_en}) — 거인의 어깨`,
-    description: `${giant.name}의 핵심 사상과 AI 대화. ${giant.tagline} 대표 저서: ${giant.key_works.slice(0, 2).join(", ")}.`,
-    path: `/giants/${giant.slug}`,
-    type: "profile",
-    keywords: [giant.name, giant.name_en, ...giant.key_works, giant.nationality, "철학", "AI대화"],
-    author: giant.name,
-  });
-}
-
-export default async function GiantDetailPage({ params }: Props) {
-  const { person } = await params;
-  const giant = GIANTS.find((g) => g.slug === person);
-  if (!giant) notFound();
-
-  // Stage 1: Person + FAQ + Breadcrumb JSON-LD
-  const personLd = personSchema(giant);
-  const faqLd = faqSchema(
-    giant.related_questions.map((q) => ({
-      question: q,
-      answer: `${giant.name}의 관점에서 이 질문을 탐구할 수 있습니다. 대표 저서 ${giant.key_works[0]}를 참고하세요.`,
-    }))
-  );
-  const crumbLd = breadcrumbSchema([
-    { name: "홈", href: "/" },
-    { name: "거인의 어깨", href: "/giants" },
-    { name: giant.name, href: `/giants/${giant.slug}` },
-  ]);
-
-  return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
-      {/* Stage 1: Structured data */}
-      <JsonLd data={personLd} />
-      <JsonLd data={faqLd} />
-      <JsonLd data={crumbLd} />
-
-      <Header />
-      <GiantDetailClient giant={giant} />
-      <Footer />
-    </div>
-  );
+// 2026-07-17 운영자 지시: 철학자 개별 상세 페이지(AI 대화·명언·위키 요약)는
+// "발제 생성기(계산기 모드)"로 제품 방향이 바뀌면서 노출을 껐다. 코드는
+// GiantDetailClient.tsx 등 git 히스토리에 남아있으나 라우트는 /giants(발제
+// 생성기)로 리다이렉트한다. CLAUDE.md 절대 원칙 7(사망 70년 규칙 검증 전
+// 신규 노출 금지)과도 부합 — 개별 인물 노출이 아예 사라졌으므로 리스크도 준다.
+export default function GiantDetailPage() {
+  redirect("/giants");
 }

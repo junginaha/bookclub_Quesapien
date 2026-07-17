@@ -8,28 +8,22 @@ import { JsonLd } from "@/components/seo/JsonLd";
 ;
 
 export const metadata: Metadata = buildMetadata({
-  title: "거인의 어깨 — 위대한 사유자와 대화",
+  title: "거인의 어깨 — 발제 생성기",
   description:
-    "거인의 어깨는 니체, 칸트, 소크라테스, 도스토옙스키 등 사후 70년 이상 지난 위대한 지성들의 저서와 사상을 탐구하고 AI로 대화하는 지식 공간이에요.",
+    "거인의 어깨는 책이나 문장을 입력하면 위대한 사유자들의 통찰을 빌려 북클럽 발제 10개를 만들어주는 생성기예요.",
   path: "/giants",
   type: "website",
-  keywords: ["니체", "칸트", "한강", "유발하라리", "피터드러커", "철학자", "사상가", "AI대화", "거인의어깨"],
+  keywords: ["발제 생성기", "북클럽 발제", "철학자", "사상가", "거인의어깨"],
 });
 
 const collectionLd = {
   "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  name: "거인의 어깨 — 질문하는 사람들",
+  "@type": "WebApplication",
+  name: "거인의 어깨 — 발제 생성기",
+  applicationCategory: "UtilitiesApplication",
   description:
-    "니체, 칸트, 한강, 유발 하라리 등 위대한 저자와 사상가의 저서와 사상을 바탕으로 그들의 관점을 탐구하는 지식 공간",
+    "책이나 문장을 입력하면 위대한 사유자들의 통찰을 빌려 북클럽 발제 10개를 만들어주는 생성기",
   url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://quesapience.com"}/giants`,
-  about: [
-    { "@type": "Person", name: "프리드리히 니체", alternateName: "Friedrich Nietzsche" },
-    { "@type": "Person", name: "임마누엘 칸트", alternateName: "Immanuel Kant" },
-    { "@type": "Person", name: "한강", alternateName: "Han Kang" },
-    { "@type": "Person", name: "유발 하라리", alternateName: "Yuval Noah Harari" },
-    { "@type": "Person", name: "피터 드러커", alternateName: "Peter Drucker" },
-  ],
 };
 
 export default function GiantsPage() {
@@ -42,7 +36,7 @@ export default function GiantsPage() {
 
       {/* Stage 4: AI Friendly Definition Block */}
       <DefinitionBlock
-        definition="거인의 어깨는 발제 생성, 지성들과의 대화, 무엇이든 이야기해볼 수 있는 공간이에요."
+        definition="거인의 어깨는 책이나 문장을 입력하면 위대한 사유자들의 통찰을 빌려 발제 10개를 만들어주는 생성기예요."
         entityType="KnowledgeExplorer"
       />
 

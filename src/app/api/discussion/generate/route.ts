@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { callClaude } from "@/lib/anthropic";
+import { GIANTS } from "@/data/giants";
 
 interface DiscussionGenerateResult {
   topics: string[];
@@ -19,8 +20,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const systemPrompt = `당신은 니체, 칸트, 소크라테스, 도스토옙스키, 버지니아 울프, 아인슈타인을 비롯한 역사 속 위대한 사유자들의 사상에 정통한 북클럽 발제 전문가입니다.
-사용자가 입력한 책 제목이나 문장을 바탕으로, 그 안에 담긴 위대한 사유자들의 통찰과 교차시킨 지적으로 깊이 있는 발제 질문 10개를 만드세요.
+    const roster = GIANTS.map((g) => g.name).join(", ");
+
+    const systemPrompt = `당신은 다음 위대한 사유자·창조자들의 사상에 정통한 북클럽 발제 전문가입니다: ${roster}.
+사용자가 입력한 책 제목이나 문장을 바탕으로, 이 인물들 중 실제로 그 내용과 가장 날카롭게 맞닿는 몇 명을 골라, 그들의 통찰과 교차시킨 지적으로 깊이 있는 발제 질문 10개를 만드세요.
 
 원칙:
 - 각 질문은 서로 다른 사유자의 관점이나 사상을 자연스럽게 녹여내되, 매 질문마다 특정 인물 이름을 나열하지 말고 통찰 자체를 질문에 녹이세요.
