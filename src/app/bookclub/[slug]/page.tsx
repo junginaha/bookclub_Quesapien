@@ -52,7 +52,7 @@ export default async function BookClubDetailPage({ params }: Props) {
       .select("*")
       .eq("slug", slug)
       .maybeSingle();
-    if (data) {
+    if (data && !data.is_seed) {
       // 비관리자에게는 join_url 숨김 (has_join_url 플래그만 전달)
       if (!isAdmin && data.join_url) {
         const { join_url, ...rest } = data;

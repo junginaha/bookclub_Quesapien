@@ -30,7 +30,10 @@ export default async function BookClubPage() {
       .from("landing_book_clubs")
       .select("*")
       .order("sort_order", { ascending: true });
-    clubs = await attachEncoreCounts(supabase, (data ?? []) as BookClubRecord[]);
+    // is_seed 컬럼이 아직 없는 DB(마이그레이션 016 적용 전)에서도 안전하도록
+    // SQL 필터 대신 애플리케이션 레벨에서 걸러낸다 — undefined는 시드가 아닌 것으로 취급.
+    const rows = ((data ?? []) as (BookClubRecord & { is_seed?: boolean })[]).filter((c) => !c.is_seed);
+    clubs = await attachEncoreCounts(supabase, rows);
   } catch { /* static fallback */ }
 
   const crumbLd = breadcrumbSchema([

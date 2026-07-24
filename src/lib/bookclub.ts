@@ -110,6 +110,9 @@ export interface BookClubRecord {
   encore_threshold?: number;
   encore_request_count?: number;
   archived_at?: string;
+
+  // 시드(목업) 데이터 여부 — true면 실제 서비스 화면에서 숨긴다(삭제는 아님).
+  is_seed?: boolean;
 }
 
 export type ClubView = "now" | "again";
@@ -312,11 +315,112 @@ function toFallbackRecord(c: (typeof ALL_CLUBS)[number]): BookClubRecord {
     lat: c.lat,
     lng: c.lng,
     ...DETAIL_ENRICHMENT[c.slug],
+    is_seed: true, // ALL_CLUBS는 전부 목업 시드 데이터 — 실제 화면에서는 숨긴다.
   };
 }
 
-export const FALLBACK_CLUBS: BookClubRecord[] = ALL_CLUBS.map(toFallbackRecord);
+// ─── 실제 등록 북클럽(is_seed: false) ──────────────────────────
+// 2026년 8~10월 실제 모임 3건 + 지난 실제 진행 2건. DB(landing_book_clubs)가
+// 비어 있거나 접근 불가할 때 로컬/폴백 화면에도 실데이터가 보이도록 여기 유지한다.
+// 운영자가 Supabase에 동일 내용을 실제 행으로도 등록해야 한다(마이그레이션 016 참고).
+export const REAL_CLUBS: BookClubRecord[] = [
+  {
+    id: "real-202608-democracies-die",
+    slug: "어떻게-민주주의는-무너지는가",
+    title: "어떻게 민주주의는 무너지는가",
+    author: "스티븐 레비츠키 · 대니얼 지블랫",
+    color: "navy",
+    genre: "POLITICAL SCIENCE",
+    tag: "#정치 #사회",
+    host_name: "루하",
+    event_starts_at: "2026-08-15T10:00:00+09:00",
+    location: "에피소드 강남 262",
+    max_participants: 8,
+    current_participants: 0,
+    price: 20000,
+    reason: "광복절 아침, 여덟 명이\n둘러앉아 묻습니다.\n\"우리는 무엇을 지키고 있을까.\"",
+    description:
+      "토요일 아침 열 시,\n에피소드 강남 262.\n커피 향이 도는 테이블에\n여덟 명이 둘러앉아요.\n\n하필 광복절 아침에\n이 책을 폅니다.\n민주주의는 광장에서 태어나\n식탁에서, 일터에서,\n우리의 말 속에서\n매일 이어지니까요.\n81년 전 누군가 되찾은 것을,\n지금 우리는 어떻게\n지키고 있는지 —\n그 질문에 잠시 머물러 봅니다.\n\n두 시간의 대화가 끝나고\n돌아가는 길,\n같은 뉴스가 조금 다르게\n보일 거예요.",
+    recommended_for: [
+      "요즘 뉴스가 자꾸 마음에 걸리는 분",
+      "주말 아침을 근사하게 열고 싶은 분",
+      "책 이야기 나눌 사람이 그리웠던 분",
+    ],
+    session_format: "준비물은 책, 그리고 질문 하나. 나머지는 저희가 전부 준비해 둘게요.",
+    is_seed: false,
+  },
+  {
+    id: "real-202609-dangerous-leaders",
+    slug: "위험한-리더는-어떻게-만들어지는가",
+    title: "위험한 리더는 어떻게 만들어지는가",
+    author: "스티브 테일러",
+    color: "rust",
+    genre: "PSYCHOLOGY",
+    tag: "#리더십 #심리",
+    host_name: "서결",
+    event_starts_at: "2026-09-19T10:00:00+09:00",
+    location: "에피소드 강남 262",
+    max_participants: 8,
+    current_participants: 0,
+    price: 20000,
+    reason: "자리가 사람을 만들고,\n추종이 리더를 만듭니다.",
+    description:
+      "권력은 사람을 시험합니다.\n그리고 그 시험은\n멀리 있지 않아요.\n회의실에서, 단톡방에서,\n우리가 고개를 끄덕이는\n순간마다 조용히 일어납니다.\n\n이 책을 사이에 두고\n서로에게 물어봅니다.\n좋은 자리는 사람을\n어떻게 바꾸는지.\n나는 어떤 리더 곁에\n서고 싶은지.\n\n당신의 일터에도 있는\n이야기예요.\n함께 꺼내 봐요.",
+    is_seed: false,
+  },
+  {
+    id: "real-202610-met-guard",
+    slug: "나는-메트로폴리탄-미술관의-경비원입니다",
+    title: "나는 메트로폴리탄 미술관의 경비원입니다",
+    author: "패트릭 브링리",
+    color: "olive",
+    genre: "MEMOIR",
+    tag: "#상실 #회복",
+    host_name: "온새",
+    event_starts_at: "2026-10-17T10:00:00+09:00",
+    location: "에피소드 강남 262",
+    max_participants: 8,
+    current_participants: 0,
+    price: 20000,
+    reason: "그림 앞에 서 있던\n10년의 기록.\n조용히, 오래 남는 책이에요.",
+    description:
+      "형을 잃은 남자가\n세계에서 가장 큰 미술관의\n경비원이 되었습니다.\n10년 동안 그림 앞에\n서 있었어요.\n그리고 천천히, 회복했습니다.\n\n깊어지는 가을,\n상실과 회복에 대해\n이야기 나눠요.\n슬픔을 지나온 분도,\n지나는 중인 분도,\n그 곁에 있고 싶은 분도\n환영합니다.\n\n조용한 책이에요.\n그래서 오래 남습니다.",
+    is_seed: false,
+  },
+  // ── 지난 실제 진행 (다시 함께 읽어요) ──────────────────────────
+  {
+    id: "real-202606-museum-for-me",
+    slug: "오직-나를-위한-미술관",
+    title: "오직 나를 위한 미술관",
+    author: "정여울",
+    color: "dusk",
+    event_starts_at: "2026-06-20T10:00:00+09:00",
+    location: "에피소드 강남 262",
+    reason: "그림 앞에서 멈췄던 날.\n나를 위한 시간이었어요.",
+    description: "그림 앞에서 멈췄던 날.\n나를 위한 시간이었어요.",
+    is_seed: false,
+  },
+  {
+    id: "real-202607-praise-of-idleness",
+    slug: "게으름에-대한-찬양",
+    title: "게으름에 대한 찬양",
+    author: "버트런드 러셀",
+    color: "sage",
+    event_starts_at: "2026-07-18T10:00:00+09:00",
+    location: "에피소드 강남 262",
+    reason: "90여 년 전 철학자가 물었어요.\n왜 그렇게 바쁘게 사느냐고.\n우리는 그날,\n함께 대답을 찾았습니다.\n투표에서 가장 많은 표를\n받은 책이었어요.",
+    description: "90여 년 전 철학자가 물었어요.\n왜 그렇게 바쁘게 사느냐고.\n우리는 그날,\n함께 대답을 찾았습니다.\n투표에서 가장 많은 표를\n받은 책이었어요.",
+    is_seed: false,
+  },
+];
+
+export const FALLBACK_CLUBS: BookClubRecord[] = [...REAL_CLUBS, ...ALL_CLUBS.map(toFallbackRecord)];
 
 export function getFallbackClub(slug: string): BookClubRecord | undefined {
-  return FALLBACK_CLUBS.find((c) => c.slug === slug);
+  return FALLBACK_CLUBS.find((c) => c.slug === slug && !c.is_seed);
+}
+
+/** 시드(목업) 레코드를 걸러낸다 — 삭제가 아니라 노출만 차단(작업1). */
+export function visibleClubs(records: BookClubRecord[]): BookClubRecord[] {
+  return records.filter((c) => !c.is_seed);
 }

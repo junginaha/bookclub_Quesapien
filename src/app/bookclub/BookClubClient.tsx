@@ -11,6 +11,7 @@ import {
   sortAgain,
   sortByRecent,
   sortNow,
+  visibleClubs,
 } from "@/lib/bookclub";
 import { CurrentClubCard, EncoreClubCard } from "@/components/bookclub/ClubCards";
 
@@ -33,7 +34,7 @@ function matchesSearch(club: BookClubRecord, q: string): boolean {
 }
 
 export default function BookClubClient({ initialClubs }: { initialClubs: BookClubRecord[] }) {
-  const clubs = initialClubs.length > 0 ? initialClubs : FALLBACK_CLUBS;
+  const clubs = visibleClubs(initialClubs.length > 0 ? initialClubs : FALLBACK_CLUBS);
   const router = useRouter();
   const searchParams = useSearchParams();
   const view: ClubView = searchParams.get("view") === "again" ? "again" : "now";

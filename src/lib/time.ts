@@ -18,12 +18,14 @@ const dateTimeFormatter = new Intl.DateTimeFormat("ko-KR", {
   weekday: "short",
   hour: "numeric",
   minute: "2-digit",
+  dayPeriod: "short", // dayPeriod 명시 없이는 일부 Node/ICU 버전이 "오전/오후" 대신 "AM/PM"을 출력한다.
 });
 
 const timeFormatter = new Intl.DateTimeFormat("ko-KR", {
   timeZone: SEOUL_TZ,
   hour: "numeric",
   minute: "2-digit",
+  dayPeriod: "short",
 });
 
 export function formatSeoulDate(input: string | Date): string {

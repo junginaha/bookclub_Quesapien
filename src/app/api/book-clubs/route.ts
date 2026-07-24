@@ -17,7 +17,10 @@ export async function GET(request: NextRequest) {
     else if (mini === "false") query = query.eq("is_mini", false);
     const { data, error } = await query;
     if (error) throw error;
-    const clubs = await attachEncoreCounts(sb, data ?? []);
+    // is_seed 컬럼이 아직 없는 DB에서도 안전하도록 애플리케이션 레벨에서 필터한다.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = ((data ?? []) as any[]).filter((c) => !c.is_seed);
+    const clubs = await attachEncoreCounts(sb, rows);
     return NextResponse.json({ clubs });
   } catch {
     return NextResponse.json({ clubs: [] });

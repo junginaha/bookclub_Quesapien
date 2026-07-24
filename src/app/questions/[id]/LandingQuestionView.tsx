@@ -133,6 +133,20 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
           </span>
           <span>— {question.author_name}</span>
         </div>
+
+        {/* 연결된 북클럽 모임 — 운영자가 지정한 경우에만 노출 */}
+        {question.linked_slug && question.linked_label && (
+          <Link
+            href={`/bookclub/${question.linked_slug}`}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 6, marginTop: 20,
+              fontSize: 13.5, color: "rgba(255,255,255,0.75)", textDecoration: "none",
+              position: "relative", borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: 16, width: "100%",
+            }}
+          >
+            {question.linked_label}
+          </Link>
+        )}
       </div>
 
       {/* 답변 입력 */}

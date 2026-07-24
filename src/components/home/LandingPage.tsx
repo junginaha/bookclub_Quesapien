@@ -6,7 +6,7 @@ import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { createClient } from "@/lib/supabase/client";
 import NearbyMeetingsFeed, { type UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
 import IntroSplash from "./IntroSplash";
-import { type BookClubRecord, FALLBACK_CLUBS, classifyClub, sortAgain, sortNow } from "@/lib/bookclub";
+import { type BookClubRecord, FALLBACK_CLUBS, classifyClub, sortAgain, sortNow, visibleClubs } from "@/lib/bookclub";
 import { CurrentClubCard, EncoreClubCard } from "@/components/bookclub/ClubCards";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import "./landing.css";
@@ -253,13 +253,15 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
 }
 
 
-const testimonials = [
-  { who: "채현", sub: "UX 디자이너 · 30", said: "처음으로 모르는 사람 앞에서 솔직한 대화를 했어요. 그 밤이 한 달 동안 저를 흔들고 있었습니다.", when: "외로움 시즌 · Week 04" },
-  { who: "진우", sub: "개발자 · 34", said: "'사람은 아직 믿을 만하다'는 감각을 4년 만에 다시 느꼈습니다. 그게 가장 큰 회복이었어요.", when: "관계 시즌 · 종료 후" },
-  { who: "윤서", sub: "에디터 · 28", said: "질문 하나가 삶을 흔들었습니다. 그 후로 일을 그만두고 6개월을 쉬었어요. 후회하지 않습니다.", when: "사랑 시즌 · Week 02" },
-  { who: "도연", sub: "대학원생 · 26", said: "대답을 잘 하려 애쓰지 않게 된 첫 번째 자리였어요. 정답 없이 머무는 법을 배웠습니다.", when: "인간 시즌" },
-  { who: "하린", sub: "교사 · 39", said: "우리 반 아이들에게도 이런 자리를 만들어주고 싶다고 생각했습니다. 그게 변화의 시작이었어요.", when: "AI와 인간 시즌" },
+// 전부 시드(목업) 후기 — 삭제 대신 is_seed로 노출만 차단한다(작업1).
+const SEED_TESTIMONIALS = [
+  { who: "채현", sub: "UX 디자이너 · 30", said: "처음으로 모르는 사람 앞에서 솔직한 대화를 했어요. 그 밤이 한 달 동안 저를 흔들고 있었습니다.", when: "외로움 시즌 · Week 04", is_seed: true },
+  { who: "진우", sub: "개발자 · 34", said: "'사람은 아직 믿을 만하다'는 감각을 4년 만에 다시 느꼈습니다. 그게 가장 큰 회복이었어요.", when: "관계 시즌 · 종료 후", is_seed: true },
+  { who: "윤서", sub: "에디터 · 28", said: "질문 하나가 삶을 흔들었습니다. 그 후로 일을 그만두고 6개월을 쉬었어요. 후회하지 않습니다.", when: "사랑 시즌 · Week 02", is_seed: true },
+  { who: "도연", sub: "대학원생 · 26", said: "대답을 잘 하려 애쓰지 않게 된 첫 번째 자리였어요. 정답 없이 머무는 법을 배웠습니다.", when: "인간 시즌", is_seed: true },
+  { who: "하린", sub: "교사 · 39", said: "우리 반 아이들에게도 이런 자리를 만들어주고 싶다고 생각했습니다. 그게 변화의 시작이었어요.", when: "AI와 인간 시즌", is_seed: true },
 ];
+const testimonials = SEED_TESTIMONIALS.filter((t) => !t.is_seed);
 
 const leaders = [
   { initial: "J", name: "정해린", role: "시즌 04 진행", philosophy: "정답보다 진심을 믿습니다. 우리는 결론을 미루는 연습 중입니다.", q: "\"당신이 가장 오래 미뤄둔 감정은 무엇인가요?\"" },
@@ -872,6 +874,46 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
       {/* 내 근처 다음 모임 — Quesapience 2.0 §C1 구조적 귀결① (홈 = 내 근처 다음 모임 피드) */}
       <NearbyMeetingsFeed items={upcomingMeetings} />
 
+      {/* 참여는 세 걸음 — 히어로와 북클럽 목록 사이 */}
+      <section className="lp-section" id="how-it-works">
+        <div className="lp-section-head">
+          <div className="lp-left">
+            <h2 className="lp-h-section">참여는 세 걸음이면 돼요</h2>
+          </div>
+        </div>
+        <div className="lp-leaders-grid" style={{ marginTop: 40 }}>
+          {[
+            { n: "1", title: "신청해요.", body: "이번 달 책을 보고 신청하세요." },
+            { n: "2", title: "질문 하나를 보내요.", body: "모임 전날 질문 카드가 도착해요.\n답으로 당신의 질문 하나를\n적어 보내주세요.\n한 줄이면 충분해요." },
+            { n: "3", title: "모임 날 아침, 오세요.", body: "발제는 저희가 준비합니다.\n당신은 책과 질문 하나만\n들고 오시면 돼요." },
+          ].map((step) => (
+            <div key={step.n} style={{
+              background: "var(--lp-bg-soft, rgba(255,255,255,0.5))",
+              border: "1px solid var(--lp-line, var(--line-soft))",
+              borderRadius: 12, padding: "clamp(24px, 4vw, 34px)",
+            }}>
+              <div style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 28, color: "var(--lp-accent, var(--accent))", opacity: 0.55, lineHeight: 1, marginBottom: 12 }}>
+                {step.n}
+              </div>
+              <div style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 18, fontWeight: 500, color: "var(--ink)", marginBottom: 10 }}>
+                {step.title}
+              </div>
+              <div style={{ fontSize: 14.5, color: "var(--ink-soft)", lineHeight: 1.75, whiteSpace: "pre-line" }}>
+                {step.body}
+              </div>
+            </div>
+          ))}
+        </div>
+        <p style={{
+          maxWidth: 640, margin: "32px auto 0", textAlign: "center",
+          fontSize: 14.5, color: "var(--muted)", lineHeight: 1.85,
+        }}>
+          혼자 오셔도 됩니다. 대부분 혼자 와요.<br />
+          처음이셔도 됩니다. 모두에게 처음이 있었어요.<br />
+          다 읽고 오시면 대화가 깊어지고, 문장 하나만 품고 오셔도 충분합니다.
+        </p>
+      </section>
+
       {/* ③ BOOKLOVER */}
       <section className="lp-section lp-books" id="books">
         <div className="lp-section-head">
@@ -897,7 +939,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
         </div>
 
         {(() => {
-          const records = clubRecords.length > 0 ? clubRecords : FALLBACK_CLUBS;
+          const records = visibleClubs(clubRecords.length > 0 ? clubRecords : FALLBACK_CLUBS);
           const nowClubs = records.filter((c) => classifyClub(c) === "now").sort(sortNow).slice(0, 4);
           const againClubs = records.filter((c) => classifyClub(c) === "again").sort(sortAgain).slice(0, 4);
           return (
@@ -943,6 +985,19 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
                   </a>
                 </div>
               </div>
+
+              {/* 선정 배경 */}
+              <p style={{
+                marginTop: 56, textAlign: "center", maxWidth: 560, marginLeft: "auto", marginRight: "auto",
+                fontSize: 13.5, color: "var(--muted)", lineHeight: 1.85,
+              }}>
+                이 다섯 권, 24명의 투표로<br />
+                함께 정했어요.<br />
+                (2026년 5월 31일 일 종료)<br />
+                책을 고르는 일부터<br />
+                전부 여러분의 질문에서<br />
+                시작됩니다.
+              </p>
             </>
           );
         })()}
@@ -966,15 +1021,17 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             </a>
           </p>
         </div>
-        <div className="lp-test-list">
-          {testimonials.map((t) => (
-            <div key={t.who} className="lp-test-item">
-              <div className="ti-who">— {t.who}<span className="ti-sub">{t.sub}</span></div>
-              <div className="ti-said">{t.said}</div>
-              <div className="ti-when">{t.when}</div>
-            </div>
-          ))}
-        </div>
+        {testimonials.length > 0 && (
+          <div className="lp-test-list">
+            {testimonials.map((t) => (
+              <div key={t.who} className="lp-test-item">
+                <div className="ti-who">— {t.who}<span className="ti-sub">{t.sub}</span></div>
+                <div className="ti-said">{t.said}</div>
+                <div className="ti-when">{t.when}</div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* 아카이빙 더 보기 */}
         <div style={{ maxWidth: 1020, margin: "32px auto 0", display: "flex", justifyContent: "flex-end" }}>
@@ -1023,7 +1080,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
               <span className="qm-pulse" /> Today
             </div>
             <p className="lp-q-text">
-              {todayQuestion?.content ?? "당신은 마지막으로 언제,\n진심으로 울었나요?"}
+              {todayQuestion?.content ?? "당신이 요즘\n지키고 있는 것은 무엇인가요?"}
             </p>
             <div className="lp-q-meta">
               <span>
