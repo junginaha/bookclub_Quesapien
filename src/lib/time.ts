@@ -18,26 +18,31 @@ const dateTimeFormatter = new Intl.DateTimeFormat("ko-KR", {
   weekday: "short",
   hour: "numeric",
   minute: "2-digit",
-  dayPeriod: "short", // dayPeriod 명시 없이는 일부 Node/ICU 버전이 "오전/오후" 대신 "AM/PM"을 출력한다.
 });
 
 const timeFormatter = new Intl.DateTimeFormat("ko-KR", {
   timeZone: SEOUL_TZ,
   hour: "numeric",
   minute: "2-digit",
-  dayPeriod: "short",
 });
+
+// 일부 Node/브라우저 ICU 버전은 hour12 표기 시 "오전/오후" 대신 "AM/PM"을 출력한다.
+// dayPeriod 옵션은 구형 엔진에서 생성자 자체가 던질 수 있어(RangeError) 쓰지 않고,
+// 포맷된 결과 문자열을 치환하는 방식으로 모든 환경에서 안전하게 맞춘다.
+function koreanizeAmPm(formatted: string): string {
+  return formatted.replace(/AM/i, "오전").replace(/PM/i, "오후");
+}
 
 export function formatSeoulDate(input: string | Date): string {
   return dateFormatter.format(new Date(input));
 }
 
 export function formatSeoulDateTime(input: string | Date): string {
-  return dateTimeFormatter.format(new Date(input));
+  return koreanizeAmPm(dateTimeFormatter.format(new Date(input)));
 }
 
 export function formatSeoulTime(input: string | Date): string {
-  return timeFormatter.format(new Date(input));
+  return koreanizeAmPm(timeFormatter.format(new Date(input)));
 }
 
 export function isPast(input: string | Date): boolean {
