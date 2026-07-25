@@ -873,79 +873,82 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
         </div>
       </section>
 
-      {/* 내 근처 다음 모임 — Quesapience 2.0 §C1 구조적 귀결① (홈 = 내 근처 다음 모임 피드) */}
-      <NearbyMeetingsFeed items={upcomingMeetings} />
+      {/* 처음 온 당신에게 — 히어로 스크롤 큐 바로 아래, 타이트하게 붙임. 기본은 접혀있고 버튼으로 펼침 */}
+      <div style={{ padding: "18px var(--lp-gutter) 8px", display: "flex", justifyContent: "center" }}>
+        <button
+          type="button"
+          onClick={() => setHowToOpen((v) => !v)}
+          aria-expanded={howToOpen}
+          aria-controls="how-it-works-panel"
+          className="btn-pill-neu"
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            padding: "10px 20px", fontSize: 14, cursor: "pointer",
+          }}
+        >
+          <span>처음 온 당신에게</span>
+          <ChevronDown
+            size={15}
+            style={{ transform: howToOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s ease" }}
+          />
+        </button>
+      </div>
 
-      {/* 참여요령 — 히어로와 북클럽 목록 사이, 기본은 접혀있고 버튼으로 펼침 */}
-      <section className="lp-section" id="how-it-works">
-        <div className="lp-section-head">
-          <div className="lp-left">
-            <button
-              type="button"
-              onClick={() => setHowToOpen((v) => !v)}
-              aria-expanded={howToOpen}
-              aria-controls="how-it-works-panel"
-              className="btn-pill-neu"
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "10px 20px", fontSize: 14, cursor: "pointer",
-              }}
+      {howToOpen && (
+        <div id="how-it-works-panel" style={{ padding: "0 var(--lp-gutter) 32px" }}>
+          <h2 className="lp-h-section" style={{ textAlign: "center" }}>참여는 세 걸음이면 돼요</h2>
+          <div className="lp-leaders-grid" style={{ marginTop: 40 }}>
+            {[
+              { n: "1", title: "신청해요.", body: "책을 보고 신청하세요." },
+              { n: "2", title: "질문 하나를 보내요.", body: "모임 전, 질문 카드가 도착해요.\n답으로 당신의 질문 하나를\n적어 보내주세요.\n한 줄이면 충분해요." },
+              { n: "3", title: "모임 오세요.", body: "발제는 저희가 준비합니다.\n당신은 책과 질문 하나만\n들고 오시면 돼요." },
+            ].map((step) => (
+              <div key={step.n} style={{
+                background: "var(--lp-bg-soft, rgba(255,255,255,0.5))",
+                border: "1px solid var(--lp-line, var(--line-soft))",
+                borderRadius: 12, padding: "clamp(24px, 4vw, 34px)",
+              }}>
+                <div style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 28, color: "var(--lp-accent, var(--accent))", opacity: 0.55, lineHeight: 1, marginBottom: 12 }}>
+                  {step.n}
+                </div>
+                <div style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 18, fontWeight: 500, color: "var(--ink)", marginBottom: 10 }}>
+                  {step.title}
+                </div>
+                <div style={{ fontSize: 14.5, color: "var(--ink-soft)", lineHeight: 1.75, whiteSpace: "pre-line" }}>
+                  {step.body}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p style={{
+            maxWidth: 640, margin: "32px auto 0", textAlign: "center",
+            fontSize: 14.5, color: "var(--muted)", lineHeight: 1.85,
+          }}>
+            혼자 오셔도 됩니다. 대부분 혼자 와요.<br />
+            처음이셔도 됩니다. 모두에게 처음이 있었어요.<br />
+            다 읽고 오시면 대화가 깊어지고, 문장 하나만 품고 오셔도 충분합니다.
+          </p>
+          <p style={{
+            marginTop: 20, textAlign: "center",
+            fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+            fontSize: 17, fontWeight: 600, color: "var(--lp-accent, var(--accent))",
+          }}>
+            북클럽에 나가면, 기분이 좋아져요!
+          </p>
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
+            <a
+              href="/bookclub?view=now"
+              className="btn-pill-neu btn-pill-neu-accent"
+              style={{ padding: "12px 28px", fontSize: 15 }}
             >
-              <span>참여요령</span>
-              <ChevronDown
-                size={15}
-                style={{ transform: howToOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s ease" }}
-              />
-            </button>
+              <span>참여하기</span>
+            </a>
           </div>
         </div>
+      )}
 
-        {howToOpen && (
-          <div id="how-it-works-panel">
-            <h2 className="lp-h-section" style={{ marginTop: 28 }}>참여는 세 걸음이면 돼요</h2>
-            <div className="lp-leaders-grid" style={{ marginTop: 40 }}>
-              {[
-                { n: "1", title: "신청해요.", body: "이번 달 책을 보고 신청하세요." },
-                { n: "2", title: "질문 하나를 보내요.", body: "모임 전날 질문 카드가 도착해요.\n답으로 당신의 질문 하나를\n적어 보내주세요.\n한 줄이면 충분해요." },
-                { n: "3", title: "모임 날 아침, 오세요.", body: "발제는 저희가 준비합니다.\n당신은 책과 질문 하나만\n들고 오시면 돼요." },
-              ].map((step) => (
-                <div key={step.n} style={{
-                  background: "var(--lp-bg-soft, rgba(255,255,255,0.5))",
-                  border: "1px solid var(--lp-line, var(--line-soft))",
-                  borderRadius: 12, padding: "clamp(24px, 4vw, 34px)",
-                }}>
-                  <div style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 28, color: "var(--lp-accent, var(--accent))", opacity: 0.55, lineHeight: 1, marginBottom: 12 }}>
-                    {step.n}
-                  </div>
-                  <div style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 18, fontWeight: 500, color: "var(--ink)", marginBottom: 10 }}>
-                    {step.title}
-                  </div>
-                  <div style={{ fontSize: 14.5, color: "var(--ink-soft)", lineHeight: 1.75, whiteSpace: "pre-line" }}>
-                    {step.body}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <p style={{
-              maxWidth: 640, margin: "32px auto 0", textAlign: "center",
-              fontSize: 14.5, color: "var(--muted)", lineHeight: 1.85,
-            }}>
-              혼자 오셔도 됩니다. 대부분 혼자 와요.<br />
-              처음이셔도 됩니다. 모두에게 처음이 있었어요.<br />
-              다 읽고 오시면 대화가 깊어지고, 문장 하나만 품고 오셔도 충분합니다.
-            </p>
-            <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
-              <a
-                href="/bookclub?view=now"
-                className="btn-pill-neu btn-pill-neu-accent"
-                style={{ padding: "12px 28px", fontSize: 15 }}
-              >
-                <span>참여하기</span>
-              </a>
-            </div>
-          </div>
-        )}
-      </section>
+      {/* 내 근처 다음 모임 — Quesapience 2.0 §C1 구조적 귀결① (홈 = 내 근처 다음 모임 피드) */}
+      <NearbyMeetingsFeed items={upcomingMeetings} />
 
       {/* ③ BOOKLOVER */}
       <section className="lp-section lp-books" id="books">
@@ -1018,19 +1021,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
                   </a>
                 </div>
               </div>
-
-              {/* 선정 배경 */}
-              <p style={{
-                marginTop: 56, textAlign: "center", maxWidth: 560, marginLeft: "auto", marginRight: "auto",
-                fontSize: 13.5, color: "var(--muted)", lineHeight: 1.85,
-              }}>
-                이 다섯 권, 24명의 투표로<br />
-                함께 정했어요.<br />
-                (2026년 5월 31일 일 종료)<br />
-                책을 고르는 일부터<br />
-                전부 여러분의 질문에서<br />
-                시작됩니다.
-              </p>
             </>
           );
         })()}
