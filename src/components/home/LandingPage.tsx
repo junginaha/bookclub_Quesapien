@@ -9,6 +9,7 @@ import IntroSplash from "./IntroSplash";
 import { type BookClubRecord, FALLBACK_CLUBS, classifyClub, sortAgain, sortNow, visibleClubs } from "@/lib/bookclub";
 import { CurrentClubCard, EncoreClubCard } from "@/components/bookclub/ClubCards";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
+import { ChevronDown } from "lucide-react";
 import "./landing.css";
 
 // Leaflet은 window/DOM에 의존하므로 클라이언트에서만 로드
@@ -639,6 +640,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
   const [questionReacted, setQuestionReacted] = useState<{ like: boolean; save: boolean }>({ like: false, save: false });
   const [dbBooks, setDbBooks] = useState<BookClub[]>([]);
   const [clubRecords, setClubRecords] = useState<BookClubRecord[]>([]);
+  const [howToOpen, setHowToOpen] = useState(false);
   const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
   const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
@@ -874,44 +876,75 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
       {/* 내 근처 다음 모임 — Quesapience 2.0 §C1 구조적 귀결① (홈 = 내 근처 다음 모임 피드) */}
       <NearbyMeetingsFeed items={upcomingMeetings} />
 
-      {/* 참여는 세 걸음 — 히어로와 북클럽 목록 사이 */}
+      {/* 참여요령 — 히어로와 북클럽 목록 사이, 기본은 접혀있고 버튼으로 펼침 */}
       <section className="lp-section" id="how-it-works">
         <div className="lp-section-head">
           <div className="lp-left">
-            <h2 className="lp-h-section">참여는 세 걸음이면 돼요</h2>
+            <button
+              type="button"
+              onClick={() => setHowToOpen((v) => !v)}
+              aria-expanded={howToOpen}
+              aria-controls="how-it-works-panel"
+              className="btn-pill-neu"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "10px 20px", fontSize: 14, cursor: "pointer",
+              }}
+            >
+              <span>참여요령</span>
+              <ChevronDown
+                size={15}
+                style={{ transform: howToOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s ease" }}
+              />
+            </button>
           </div>
         </div>
-        <div className="lp-leaders-grid" style={{ marginTop: 40 }}>
-          {[
-            { n: "1", title: "신청해요.", body: "이번 달 책을 보고 신청하세요." },
-            { n: "2", title: "질문 하나를 보내요.", body: "모임 전날 질문 카드가 도착해요.\n답으로 당신의 질문 하나를\n적어 보내주세요.\n한 줄이면 충분해요." },
-            { n: "3", title: "모임 날 아침, 오세요.", body: "발제는 저희가 준비합니다.\n당신은 책과 질문 하나만\n들고 오시면 돼요." },
-          ].map((step) => (
-            <div key={step.n} style={{
-              background: "var(--lp-bg-soft, rgba(255,255,255,0.5))",
-              border: "1px solid var(--lp-line, var(--line-soft))",
-              borderRadius: 12, padding: "clamp(24px, 4vw, 34px)",
-            }}>
-              <div style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 28, color: "var(--lp-accent, var(--accent))", opacity: 0.55, lineHeight: 1, marginBottom: 12 }}>
-                {step.n}
-              </div>
-              <div style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 18, fontWeight: 500, color: "var(--ink)", marginBottom: 10 }}>
-                {step.title}
-              </div>
-              <div style={{ fontSize: 14.5, color: "var(--ink-soft)", lineHeight: 1.75, whiteSpace: "pre-line" }}>
-                {step.body}
-              </div>
+
+        {howToOpen && (
+          <div id="how-it-works-panel">
+            <h2 className="lp-h-section" style={{ marginTop: 28 }}>참여는 세 걸음이면 돼요</h2>
+            <div className="lp-leaders-grid" style={{ marginTop: 40 }}>
+              {[
+                { n: "1", title: "신청해요.", body: "이번 달 책을 보고 신청하세요." },
+                { n: "2", title: "질문 하나를 보내요.", body: "모임 전날 질문 카드가 도착해요.\n답으로 당신의 질문 하나를\n적어 보내주세요.\n한 줄이면 충분해요." },
+                { n: "3", title: "모임 날 아침, 오세요.", body: "발제는 저희가 준비합니다.\n당신은 책과 질문 하나만\n들고 오시면 돼요." },
+              ].map((step) => (
+                <div key={step.n} style={{
+                  background: "var(--lp-bg-soft, rgba(255,255,255,0.5))",
+                  border: "1px solid var(--lp-line, var(--line-soft))",
+                  borderRadius: 12, padding: "clamp(24px, 4vw, 34px)",
+                }}>
+                  <div style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 28, color: "var(--lp-accent, var(--accent))", opacity: 0.55, lineHeight: 1, marginBottom: 12 }}>
+                    {step.n}
+                  </div>
+                  <div style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 18, fontWeight: 500, color: "var(--ink)", marginBottom: 10 }}>
+                    {step.title}
+                  </div>
+                  <div style={{ fontSize: 14.5, color: "var(--ink-soft)", lineHeight: 1.75, whiteSpace: "pre-line" }}>
+                    {step.body}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <p style={{
-          maxWidth: 640, margin: "32px auto 0", textAlign: "center",
-          fontSize: 14.5, color: "var(--muted)", lineHeight: 1.85,
-        }}>
-          혼자 오셔도 됩니다. 대부분 혼자 와요.<br />
-          처음이셔도 됩니다. 모두에게 처음이 있었어요.<br />
-          다 읽고 오시면 대화가 깊어지고, 문장 하나만 품고 오셔도 충분합니다.
-        </p>
+            <p style={{
+              maxWidth: 640, margin: "32px auto 0", textAlign: "center",
+              fontSize: 14.5, color: "var(--muted)", lineHeight: 1.85,
+            }}>
+              혼자 오셔도 됩니다. 대부분 혼자 와요.<br />
+              처음이셔도 됩니다. 모두에게 처음이 있었어요.<br />
+              다 읽고 오시면 대화가 깊어지고, 문장 하나만 품고 오셔도 충분합니다.
+            </p>
+            <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
+              <a
+                href="/bookclub?view=now"
+                className="btn-pill-neu btn-pill-neu-accent"
+                style={{ padding: "12px 28px", fontSize: 15 }}
+              >
+                <span>참여하기</span>
+              </a>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* ③ BOOKLOVER */}
