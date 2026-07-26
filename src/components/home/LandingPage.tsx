@@ -872,23 +872,19 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           <span className="sc-line" />
         </div>
 
-        {/* 처음 온 당신에게 — 스크롤 큐 세로선 옆에 나란히, 같은 높이에 고정 */}
+        {/* 처음 온 당신에게 — 버튼처럼 보이지 않는 문장형 진입점, 스크롤 큐 세로선 옆에 나란히 */}
         <div className="lp-hero-entry-cta">
           <button
             type="button"
             onClick={() => setHowToOpen((v) => !v)}
             aria-expanded={howToOpen}
             aria-controls="how-it-works-panel"
-            className="btn-pill-neu"
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "10px 20px", fontSize: 14, cursor: "pointer",
-            }}
+            className="lp-hero-entry-btn"
           >
-            <span>처음 온 당신에게</span>
+            <span className="lp-hero-entry-text">처음 온 당신에게</span>
             <ChevronDown
               size={15}
-              style={{ transform: howToOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s ease" }}
+              className={`lp-hero-entry-arrow${howToOpen ? " lp-hero-entry-arrow--open" : ""}`}
             />
           </button>
         </div>
