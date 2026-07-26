@@ -8,6 +8,81 @@
 
 ## 세션 로그
 
+### 2026-07-25~26 — 배포 파이프라인 복구 + 발제 생성기 2단계 엔진 전환 + MASTER.md PART B0
+
+**배포 파이프라인 (2026-07-25)**
+
+- 운영자가 "작업한 게 실반영 안 된다"고 보고. 원인: 최근 6개 커밋이
+  `quesapience-auth-offline-club` 브랜치에만 있었고 Vercel 프로덕션이 추적하는
+  `main`은 그보다 4개 더 뒤처져 있었음(둘 다 병합 안 됨). `main`을 fast-forward
+  머지 후 push해 프로덕션 배포 트리거 — 해결.
+- **⚠ 별도로 발견한 심각한 문제 (미해결)**: Vercel Production 환경변수
+  (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`, `ADMIN_KEY`, `ADMIN_EMAILS`,
+  `NEXT_PUBLIC_SITE_URL`)이 전부 빈 문자열(`""`)로 설정돼 있음(`vercel env pull`로
+  확인). 이 상태로는 배포가 성공해도 Supabase/Claude API 연동이 전부 죽어있다.
+  로컬 `.env.local`의 Supabase 프로젝트 호스트(`smoehxmgnnaulrxjkqvm.supabase.co`)도
+  현재 DNS 자체가 해석되지 않음(NXDOMAIN) — 프로젝트가 삭제/변경됐을 가능성.
+  **운영자가 Supabase 대시보드에서 프로젝트 상태를 확인하고, Vercel Production
+  환경변수를 실제 값으로 재설정해야 한다.** 이것이 지금 프로덕션에서 발제
+  생성기가 항상 "닮은 인물/10년 전의 나" 같은 제네릭 fallback만 내놓던 근본 원인이었다
+  (`ANTHROPIC_API_KEY`가 빈 문자열 → falsy → 항상 fallback 분기로 빠짐).
+- 홈 "참여는 세 걸음이면 돼요" 섹션을 "처음 온 당신에게" 토글 버튼 뒤로 접고 히어로
+  스크롤 큐 바로 아래로 이동(간격 타이트하게), 문구 갱신 + 마무리 문장 추가.
+  "이 다섯 권, 24명의 투표로…" 선정 배경 문구 삭제.
+
+**발제 생성기 2단계 엔진 전환 (2026-07-26)**
+
+운영자가 발제 품질 문제(범용 질문 반복, 책 핵심 개념 미반영, 거인의 어깨가 장식화)를
+지적하며 상세 스펙을 전달 — 아래처럼 구현했다.
+
+- `src/lib/discussionEngine.ts` 신규: 1단계 `analyzeBook()`(책 분석 — 핵심주장/
+  핵심개념 3~5/내부긴장 3/전제/반론/현대적 연결/confidence), 2단계
+  `generateDiscussion()`(분석 결과 + 관점카드 로스터를 근거로 발제 10개 —
+  대화시작2/심화5/거인의 시선2/마무리1, 각 질문에 concept·intent·followup·
+  thinker 필드). `validateDiscussion()`으로 범용 질문·예/아니오 질문·중복·개념
+  미연결·거인 시선 다양성 부족을 휴리스틱 검사하고, 실패한 항목만
+  `regenerateFailedQuestions()`로 1회 재생성(전체 재생성 안 함). 기존
+  `getFallback()`(고정 템플릿) 완전 삭제 — AI 실패 시 명확한 에러 코드
+  (`config_missing`/`insufficient_description`/`timeout`/`rate_limited`/
+  `invalid_json`/`network_error`/`api_error`)만 반환, 더미 질문 없음.
+- `src/data/giantPerspectives.ts` 신규: 발제 전용 "관점카드" 12명(소크라테스·
+  플라톤·아리스토텔레스·공자·노자·몽테뉴·칸트·밀·키르케고르·도스토옙스키·
+  니체·톨스토이). 몽테뉴 외 11명은 `giants.ts`(87명, 사망 70년 1차 스크리닝
+  통과)의 core_idea/key_works를 재정리한 것이고, 몽테뉴(1592년 몰)는 사후 430년
+  이상이라 사망 70년 규칙과 무관해 신규 추가. 인용은 quotable=true인 인물만,
+  안전하게 검증 가능한 짧은 문장만 넣었다.
+- `/api/discussion/generate` 전면 재작성: `mode: "book"`(제목/작가 필수+설명
+  선택, 기본 모드) / `mode: "free"`(기존 문장 입력, 보조 모드) 둘 다 같은 엔진
+  사용. 결과는 `giant_discussions.discussion_questions`(문자열 배열, 기존
+  아카이브 탭 호환용 flatten)와 `source_messages`(analysis/giants/opening_lines/
+  questions 전체 구조, JSONB) 양쪽에 저장.
+- `DiscussionGenerator.tsx` 전면 재작성: 기본 입력을 책 제목/작가/설명으로
+  단순화하고 "세부 설정"(발제 방향 4종, 모임 깊이 3종)은 접이식 패널로. 기존
+  자유 문장 입력은 보조 모드로 유지. 랜딩(`variant="landing"`)은 발제 3개
+  미리보기 + `/giants?handoff=1`로 이동(전체 결과는 `sessionStorage`로 핸드오프,
+  새 API 라우트 없이 클라이언트에서만 처리). `/giants`(`variant="giants"`)는
+  전체 결과(오프닝 3문장/핵심 긴장 3/거인의 시선 배지/발제 10개 stage 표시/
+  진행자 메모) + 복사·재생성·수정.
+- `GiantsClient.tsx`의 "니체, 칸트, 소크라테스, 도스토옙스키의 통찰을 빌려" 고정
+  문구를 "12명의 사상가 중 이 책과 맞닿는 지지·비판 관점 2명을 골라"로 정정
+  (실제 동작과 문구가 다르다는 지적을 반영).
+
+**⚠ 미검증 — 다음 세션에서 반드시 확인**
+
+이번 세션은 **로컬 `.env.local`에도 `ANTHROPIC_API_KEY`가 아예 없고, 프로덕션도
+빈 문자열**이라 실제 책 3권(『소크라테스의 변명』·『어떻게 민주주의는 무너지는가』·
+『나는 메트로폴리탄 미술관의 경비원입니다』)으로 살아있는 API 호출 테스트를 한 번도
+하지 못했다. `validateDiscussion()` 휴리스틱은 손으로 만든 샘플 질문 세트로만
+단위 검증했다(`npx tsx`로 즉석 스크립트 실행, 통과 확인 후 삭제). `npm run build`
+전체 통과, 타입체크 통과. **운영자가 실제 `ANTHROPIC_API_KEY`를 로컬/Vercel에
+넣어준 뒤, 위 3권으로 실제 생성 결과의 질문 구조·개념 반영·거인의 시선 다양성을
+직접 확인해야 완료로 볼 수 있다.** 헤드리스 브라우저(모바일 360px 시각 검증)도
+이 샌드박스에 root 권한이 없어 Chromium 구동 라이브러리(libnspr4 등) 설치가
+불가능해 실행하지 못했다 — CSS clamp/media query 리뷰로만 대체했다.
+
+---
+
 ### 2026-07-17 — 거인의 어깨 → 발제 생성기(계산기 모드) 전환
 
 **범위 결정 (운영자 지시)**

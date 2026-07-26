@@ -34,13 +34,13 @@ export default function GiantsClient() {
           color: "rgba(255,255,255,0.95)",
           marginBottom: 16,
         }}>
-          책이나 문장을 남겨보세요.<br />
+          책 제목과 작가를 남겨보세요.<br />
           위대한 사유자들의 <span style={{ color: "var(--gold)", fontWeight: 600 }}>시선</span>으로
           발제 10개를 만들어드릴게요.
         </h1>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.75, marginBottom: 48 }}>
-          니체, 칸트, 소크라테스, 도스토옙스키의 통찰을 빌려,<br />
-          단순한 감상이 아니라 서로 다른 대답이 나올 수밖에 없는 질문을 만듭니다.
+          책의 핵심 개념·갈등을 먼저 분석한 뒤, 12명의 사상가 중 이 책과 가장 날카롭게<br />
+          맞닿는 지지·비판 관점 2명을 골라 서로 다른 대답이 나올 수밖에 없는 질문을 만듭니다.
         </p>
 
         <DiscussionGenerator variant="giants" />
