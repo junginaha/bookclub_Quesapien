@@ -305,7 +305,19 @@ export async function regenerateFailedQuestions(
     });
     const raw = extractJson<{ replacements: DiscussionQuestion[] }>(text);
     const byNumber = new Map(raw.replacements.map((r) => [r.number, r]));
-    return questions.map((q) => byNumber.get(q.number) ?? q);
+    // number/stage/thinker는 원본 질문 것을 강제로 유지한다 — 모델이 프롬프트 지시를
+    // 어기고 이 필드들까지 바꿔 보내는 경우에도 순서·역할 구조가 깨지지 않도록 방어.
+    return questions.map((q) => {
+      const replacement = byNumber.get(q.number);
+      if (!replacement) return q;
+      return {
+        ...q,
+        question: replacement.question,
+        intent: replacement.intent,
+        followup: replacement.followup,
+        concept: replacement.concept,
+      };
+    });
   } catch {
     // 재생성 1회 시도까지 실패하면 원본을 그대로 반환 — 전체 재생성은 하지 않는다
     return questions;
