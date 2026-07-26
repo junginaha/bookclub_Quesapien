@@ -389,6 +389,17 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-scroll-cue { position: absolute; bottom: 36px; left: var(--lp-gutter); display: flex; align-items: center; gap: 14px; color: var(--lp-muted); font-family: var(--lp-serif); font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0; animation: lp-fade 1s ease 1.6s forwards; }
 .lp-scroll-cue .sc-line { width: 1px; height: 56px; background: currentColor; position: relative; overflow: hidden; }
 .lp-scroll-cue .sc-line::after { content: ""; position: absolute; top: -50%; left: 0; right: 0; height: 50%; background: var(--lp-bg); animation: lp-slideDown 2.2s ease-in-out infinite; }
+
+/* 처음 온 당신에게 진입 버튼 — 스크롤 큐 세로선과 같은 높이·같은 bottom 기준, 선 옆에 나란히.
+   .lp-scroll-cue 자체는 760px 이하에서 숨지만(장식 요소), 이 버튼은 유일한 진입점이라 항상 노출한다. */
+.lp-hero-entry-cta {
+  position: absolute; bottom: 36px; left: calc(var(--lp-gutter) + 15px);
+  height: 56px; display: flex; align-items: center;
+  opacity: 0; animation: lp-fade 1s ease 1.6s forwards;
+}
+@media (max-width: 760px) {
+  .lp-hero-entry-cta { left: var(--lp-gutter); bottom: 24px; }
+}
 @keyframes lp-slideDown { 0% { top: -50%; } 100% { top: 100%; } }
 
 /* ── TODAY QUESTION ── */

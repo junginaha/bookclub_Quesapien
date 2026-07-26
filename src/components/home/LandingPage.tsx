@@ -871,31 +871,31 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
         <div className="lp-scroll-cue">
           <span className="sc-line" />
         </div>
+
+        {/* 처음 온 당신에게 — 스크롤 큐 세로선 옆에 나란히, 같은 높이에 고정 */}
+        <div className="lp-hero-entry-cta">
+          <button
+            type="button"
+            onClick={() => setHowToOpen((v) => !v)}
+            aria-expanded={howToOpen}
+            aria-controls="how-it-works-panel"
+            className="btn-pill-neu"
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "10px 20px", fontSize: 14, cursor: "pointer",
+            }}
+          >
+            <span>처음 온 당신에게</span>
+            <ChevronDown
+              size={15}
+              style={{ transform: howToOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s ease" }}
+            />
+          </button>
+        </div>
       </section>
 
-      {/* 처음 온 당신에게 — 히어로 스크롤 큐 바로 아래, 타이트하게 붙임. 기본은 접혀있고 버튼으로 펼침 */}
-      <div style={{ padding: "18px var(--lp-gutter) 8px", display: "flex", justifyContent: "center" }}>
-        <button
-          type="button"
-          onClick={() => setHowToOpen((v) => !v)}
-          aria-expanded={howToOpen}
-          aria-controls="how-it-works-panel"
-          className="btn-pill-neu"
-          style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            padding: "10px 20px", fontSize: 14, cursor: "pointer",
-          }}
-        >
-          <span>처음 온 당신에게</span>
-          <ChevronDown
-            size={15}
-            style={{ transform: howToOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s ease" }}
-          />
-        </button>
-      </div>
-
       {howToOpen && (
-        <div id="how-it-works-panel" style={{ padding: "0 var(--lp-gutter) 32px" }}>
+        <div id="how-it-works-panel" style={{ padding: "24px var(--lp-gutter) 32px" }}>
           <h2 className="lp-h-section" style={{ textAlign: "center" }}>참여는 세 걸음이면 돼요</h2>
           <div className="lp-leaders-grid" style={{ marginTop: 40 }}>
             {[
