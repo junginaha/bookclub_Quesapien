@@ -627,7 +627,11 @@ interface LandingPageProps {
 
 // ─── Main component ───────────────────────────────────────────
 export default function LandingPage({ todayQuestion, recentQuestions, upcomingMeetings = [] }: LandingPageProps) {
-  const [introDone, setIntroDone] = useState(false);
+  // 기본값을 "이미 봤음"(true)으로 둔다 — 인트로를 먼저 그렸다가 마운트 후
+  // sessionStorage 확인 결과로 즉시 숨기면(구 로직) 재방문 때마다 인트로가
+  // 팝업처럼 한 프레임 번쩍였다 사라지는 현상이 생긴다. 처음 방문자만 아래
+  // useEffect에서 명시적으로 false로 뒤집어 인트로를 띄운다.
+  const [introDone, setIntroDone] = useState(true);
   const [modalBook, setModalBook] = useState<BookClub | null>(null);
   const [activeFloat, setActiveFloat] = useState<number | null>(null);
   const [askContent, setAskContent] = useState("");
@@ -643,6 +647,12 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
   const [howToOpen, setHowToOpen] = useState(false);
   const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
   const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+
+  // 처음 방문자만 인트로를 띄운다(IntroSplash.tsx의 SEEN_KEY와 동일한 값).
+  // introDone 기본값이 true라 이 체크 전까지는 인트로가 아예 그려지지 않는다.
+  useEffect(() => {
+    if (!sessionStorage.getItem("qp-intro-seen")) setIntroDone(false);
+  }, []);
 
   // ── 실시간 활동 카운터 ──────────────────────────────────────
   const [newQuestions, setNewQuestions] = useState(0);
@@ -971,9 +981,19 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
         </div>
 
         {(() => {
-          const records = visibleClubs(clubRecords.length > 0 ? clubRecords : FALLBACK_CLUBS);
-          const nowClubs = records.filter((c) => classifyClub(c) === "now").sort(sortNow).slice(0, 4);
-          const againClubs = records.filter((c) => classifyClub(c) === "again").sort(sortAgain).slice(0, 4);
+          // DB fetch가 늦게 도착해 length>0인 응답을 주더라도, 그 응답이 실제로는
+          // "지금"/"다시" 어느 쪽에도 분류되는 게 없을 수 있다(예: is_mini 필터 등으로
+          // 걸러진 결과). 그 경우 통째로 폴백을 걷어내면 이미 보여주던 카드가 갑자기
+          // 사라지는 것처럼 보인다 — 섹션별로 실데이터가 실제로 뭔가 내놓을 때만
+          // 폴백을 대체한다.
+          const liveRecords = visibleClubs(clubRecords);
+          const fallbackRecords = visibleClubs(FALLBACK_CLUBS);
+          const liveNow = liveRecords.filter((c) => classifyClub(c) === "now");
+          const liveAgain = liveRecords.filter((c) => classifyClub(c) === "again");
+          const nowClubs = (liveNow.length > 0 ? liveNow : fallbackRecords.filter((c) => classifyClub(c) === "now"))
+            .sort(sortNow).slice(0, 4);
+          const againClubs = (liveAgain.length > 0 ? liveAgain : fallbackRecords.filter((c) => classifyClub(c) === "again"))
+            .sort(sortAgain).slice(0, 4);
           return (
             <>
               {/* 지금 함께 읽어요 */}
