@@ -20,7 +20,13 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
     dismissedRef.current = true;
     setLeaving(true);
     setTimeout(() => {
-      sessionStorage.setItem(SEEN_KEY, "1");
+      // sessionStorage는 탭 단위라 새 탭·브라우저 재시작마다 다시 떴다 —
+      // localStorage로 브라우저 단위(=한 번 보면 계속 안 봄)로 바꾼다.
+      // 저장이 막힌 브라우저(사파리 강한 프라이버시 모드 등)에서도 진입 자체는
+      // 막히면 안 되므로 에러는 무시한다.
+      try {
+        localStorage.setItem(SEEN_KEY, "1");
+      } catch {}
       onEnter();
     }, 450);
   };
@@ -33,7 +39,11 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
   };
 
   useEffect(() => {
-    if (sessionStorage.getItem(SEEN_KEY)) {
+    let seen = false;
+    try {
+      seen = !!localStorage.getItem(SEEN_KEY);
+    } catch {}
+    if (seen) {
       setVisible(false);
       onEnter();
       return;

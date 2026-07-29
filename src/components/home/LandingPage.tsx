@@ -650,8 +650,14 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
 
   // 처음 방문자만 인트로를 띄운다(IntroSplash.tsx의 SEEN_KEY와 동일한 값).
   // introDone 기본값이 true라 이 체크 전까지는 인트로가 아예 그려지지 않는다.
+  // sessionStorage(탭 단위)는 새 탭·브라우저 재시작마다 다시 인트로를 띄워
+  // "재접속하면 또 뜬다"는 원인이 됐다 — localStorage(브라우저 단위)로 통일.
   useEffect(() => {
-    if (!sessionStorage.getItem("qp-intro-seen")) setIntroDone(false);
+    let seen = false;
+    try {
+      seen = !!localStorage.getItem("qp-intro-seen");
+    } catch {}
+    if (!seen) setIntroDone(false);
   }, []);
 
   // ── 실시간 활동 카운터 ──────────────────────────────────────

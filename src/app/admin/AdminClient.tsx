@@ -43,6 +43,12 @@ export default function AdminClient({
   const [editingLQ, setEditingLQ] = useState<string | null>(null);
   const [editLQContent, setEditLQContent] = useState("");
   const [lqFilter, setLqFilter] = useState<"all" | "approved" | "pending">("all");
+  // 관리자 전체 콘텐츠 수정 프레임 — 발제 질문/후기 인라인 편집
+  const [editingQ, setEditingQ] = useState<string | null>(null);
+  const [editQTitle, setEditQTitle] = useState("");
+  const [editQDesc, setEditQDesc] = useState("");
+  const [editingReview, setEditingReview] = useState<string | null>(null);
+  const [editReviewContent, setEditReviewContent] = useState("");
 
   const filteredLQ = localAll.filter((q) => {
     if (lqFilter === "approved") return q.is_approved;
@@ -257,11 +263,31 @@ export default function AdminClient({
               </thead>
               <tbody className="divide-y divide-warm-50">
                 {questions.map((q: Row) => (
-                  <tr key={q.id} className="hover:bg-warm-50 transition-colors">
+                  <tr key={q.id} className="hover:bg-warm-50 transition-colors align-top">
                     <td className="px-4 py-3 max-w-xs">
-                      <Link href={`/questions/${q.id}`} className="font-medium text-warm-900 hover:text-warm-600 line-clamp-2">
-                        {q.title}
-                      </Link>
+                      {editingQ === q.id ? (
+                        <div className="flex flex-col gap-2">
+                          <input value={editQTitle} onChange={(e) => setEditQTitle(e.target.value)}
+                            className="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:border-warm-400" autoFocus />
+                          <textarea value={editQDesc} onChange={(e) => setEditQDesc(e.target.value)} rows={3}
+                            className="w-full border border-warm-200 rounded-lg p-2 text-xs text-warm-600 resize-none outline-none focus:border-warm-400" />
+                          <div className="flex gap-2">
+                            <Button size="sm" className="gap-1 bg-warm-900 text-white h-7 text-xs" disabled={pending}
+                              onClick={() => handle(async () => {
+                                const ok = await callAdmin("update_content", q.id, { contentType: "question", fields: { title: editQTitle, description: editQDesc } });
+                                if (ok) setEditingQ(null);
+                                return ok;
+                              })}>
+                              저장
+                            </Button>
+                            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setEditingQ(null)}>취소</Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Link href={`/questions/${q.id}`} className="font-medium text-warm-900 hover:text-warm-600 line-clamp-2">
+                          {q.title}
+                        </Link>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-warm-500">{q.author?.name}</td>
                     <td className="px-4 py-3"><Badge variant="secondary" className="text-xs">{q.category}</Badge></td>
@@ -272,7 +298,12 @@ export default function AdminClient({
                         : <span className="text-xs text-warm-400">일반</span>}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <Button size="sm" variant="outline" disabled={pending}
+                          className="gap-1 h-7 text-xs"
+                          onClick={() => { setEditingQ(q.id); setEditQTitle(q.title); setEditQDesc(q.description ?? ""); }}>
+                          ✏️ 수정
+                        </Button>
                         <Button size="sm" variant="outline" disabled={pending}
                           className="gap-1 h-7 text-xs"
                           onClick={() => handle(() => callAdmin("toggle_featured", q.id, { current: q.is_featured }))}>
@@ -368,20 +399,45 @@ export default function AdminClient({
               </thead>
               <tbody className="divide-y divide-warm-50">
                 {reviews.map((r: Row) => (
-                  <tr key={r.id} className="hover:bg-warm-50 transition-colors">
+                  <tr key={r.id} className="hover:bg-warm-50 transition-colors align-top">
                     <td className="px-4 py-3 font-medium text-warm-900">{r.author?.name}</td>
                     <td className="px-4 py-3 max-w-xs">
-                      <p className="text-warm-500 line-clamp-2 text-xs">{r.content}</p>
+                      {editingReview === r.id ? (
+                        <div className="flex flex-col gap-2">
+                          <textarea value={editReviewContent} onChange={(e) => setEditReviewContent(e.target.value)} rows={3}
+                            className="w-full border border-warm-200 rounded-lg p-2 text-xs text-warm-900 resize-none outline-none focus:border-warm-400" autoFocus />
+                          <div className="flex gap-2">
+                            <Button size="sm" className="gap-1 bg-warm-900 text-white h-7 text-xs" disabled={pending}
+                              onClick={() => handle(async () => {
+                                const ok = await callAdmin("update_content", r.id, { contentType: "review", fields: { content: editReviewContent } });
+                                if (ok) setEditingReview(null);
+                                return ok;
+                              })}>
+                              저장
+                            </Button>
+                            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setEditingReview(null)}>취소</Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-warm-500 line-clamp-2 text-xs">{r.content}</p>
+                      )}
                     </td>
                     <td className="px-4 py-3"><Badge variant="secondary" className="text-xs">{r.type}</Badge></td>
                     <td className="px-4 py-3 text-warm-600">♥ {r.likes}</td>
                     <td className="px-4 py-3 text-warm-400">{formatDate(r.created_at)}</td>
                     <td className="px-4 py-3">
-                      <Button size="sm" variant="outline" disabled={pending}
-                        className="text-red-500 border-red-200 hover:bg-red-50 gap-1 h-7 text-xs"
-                        onClick={() => handle(() => callAdmin("delete_review", r.id))}>
-                        <Trash2 className="h-3 w-3" />삭제
-                      </Button>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <Button size="sm" variant="outline" disabled={pending}
+                          className="gap-1 h-7 text-xs"
+                          onClick={() => { setEditingReview(r.id); setEditReviewContent(r.content ?? ""); }}>
+                          ✏️ 수정
+                        </Button>
+                        <Button size="sm" variant="outline" disabled={pending}
+                          className="text-red-500 border-red-200 hover:bg-red-50 gap-1 h-7 text-xs"
+                          onClick={() => handle(() => callAdmin("delete_review", r.id))}>
+                          <Trash2 className="h-3 w-3" />삭제
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}

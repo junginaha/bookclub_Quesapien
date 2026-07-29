@@ -17,6 +17,8 @@ export async function POST(request: NextRequest) {
     status?: string;
     current?: boolean;
     content?: string;
+    contentType?: string;
+    fields?: Record<string, string>;
   };
   const { action, id } = body;
 
@@ -24,6 +26,38 @@ export async function POST(request: NextRequest) {
   const db = supabase as any;
 
   switch (action) {
+
+    // ── 관리자 전용 콘텐츠 수정 프레임 ──────────────────────────
+    // "글" 종류가 늘어날 때마다 케이스를 새로 안 만들고 여기 한 줄만 추가하면
+    // 된다. table/editable은 화이트리스트라 클라이언트가 임의 테이블·컬럼을
+    // 넘겨도 여기 없는 조합은 절대 실행되지 않는다.
+    case "update_content": {
+      const EDITABLE_CONTENT: Record<string, { table: string; editable: string[] }> = {
+        landing_question: { table: "landing_questions", editable: ["content"] },
+        question: { table: "questions", editable: ["title", "description"] },
+        review: { table: "reviews", editable: ["content"] },
+        landing_answer: { table: "landing_question_answers", editable: ["content"] },
+      };
+      const config = body.contentType ? EDITABLE_CONTENT[body.contentType] : undefined;
+      if (!config) return NextResponse.json({ error: "지원하지 않는 콘텐츠 종류입니다." }, { status: 400 });
+
+      const fields = body.fields ?? {};
+      const payload: Record<string, string> = {};
+      for (const key of config.editable) {
+        if (key in fields) {
+          const value = fields[key]?.trim();
+          if (!value) return NextResponse.json({ error: `${key}을(를) 입력해주세요.` }, { status: 400 });
+          payload[key] = value;
+        }
+      }
+      if (Object.keys(payload).length === 0) {
+        return NextResponse.json({ error: "수정할 내용이 없습니다." }, { status: 400 });
+      }
+
+      const { error } = await db.from(config.table).update(payload).eq("id", id);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: true });
+    }
 
     // ── 사용자 ──────────────────────────────────────────────────
     case "delete_user": {
