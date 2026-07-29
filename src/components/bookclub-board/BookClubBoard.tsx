@@ -20,8 +20,6 @@ export default function BookClubBoard({
   return (
     <div className="qb-board">
       <div className="qb-board-inner">
-        <h1 className="qb-heading">북클럽</h1>
-
         {sorted.length > 0 && (
           <div className="qb-toolbar">
             <select

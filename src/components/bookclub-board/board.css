@@ -37,14 +37,6 @@
   margin: 0 auto;
 }
 
-.qb-heading {
-  font-family: var(--qb-serif);
-  font-size: clamp(24px, 4vw, 32px);
-  font-weight: 400;
-  color: var(--ink);
-  margin: 0 0 24px;
-}
-
 /* ── 정렬 ─────────────────────────────────────────────────── */
 .qb-toolbar {
   display: flex;
@@ -85,6 +77,10 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
+  /* 그리드 기본값(stretch)은 옆 칸 카드가 펼쳐져 행이 길어지면 접힌 카드까지
+     그 높이로 늘려서, 내용 아래에 빈 여백만 남는다 — 각 카드가 자기 내용
+     높이만큼만 차지하게 한다. */
+  align-items: start;
 }
 
 @media (min-width: 900px) {
