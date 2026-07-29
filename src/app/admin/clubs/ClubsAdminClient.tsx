@@ -44,6 +44,7 @@ const SEED_CLUBS = [
 ];
 
 type ClubRow = typeof SEED_CLUBS[0] & {
+  author?: string;
   schedule?: string;
   location?: string;
   location_url?: string;
@@ -57,18 +58,37 @@ type ClubRow = typeof SEED_CLUBS[0] & {
   // 011 마이그레이션 — 지금/앵콜 재구조화
   event_starts_at?: string;
   event_ends_at?: string;
+  registration_closes_at?: string;
   area?: string;
+  price?: number;
   author_hosts?: boolean;
   encore_eligible?: boolean;
   encore_threshold?: number;
+  // 북클럽 참가 게시판(/bookclub) 전용 — 홈과 게시판이 같은 행을 읽으므로
+  // 여기서 같이 채워야 양쪽 다 반영된다.
+  reason?: string;
+  key_questions?: string[];
+  recommended_for?: string[];
+  price_note?: string;
+  bring?: string;
+  name_example?: string;
 };
 
-type EditForm = Omit<ClubRow, "slug" | "title" | "is_mini">;
+// key_questions/recommended_for는 배열이지만 폼에서는 줄바꿈으로 구분된
+// 텍스트 하나로 다룬다 — 저장 시에만 배열로 변환한다. title은 ClubRow에서
+// 필수 필드지만 폼 초기 상태({})는 비워둘 수 있어야 하므로 옵셔널로 다시 연다.
+type EditForm = Omit<ClubRow, "slug" | "is_mini" | "key_questions" | "recommended_for" | "title"> & {
+  title?: string;
+  key_questions: string;
+  recommended_for: string;
+};
 
 const AREA_CHOICES = ["강남·서초", "마포·홍대", "종로·광화문", "성수·건대", "온라인", "지역 무관"];
 
 function emptyForm(club: ClubRow): EditForm {
   return {
+    title: club.title ?? "",
+    author: club.author ?? "",
     schedule: club.schedule ?? "",
     location: club.location ?? "",
     location_url: club.location_url ?? "",
@@ -81,11 +101,23 @@ function emptyForm(club: ClubRow): EditForm {
     status: club.status ?? "active",
     event_starts_at: club.event_starts_at ?? "",
     event_ends_at: club.event_ends_at ?? "",
+    registration_closes_at: club.registration_closes_at ?? "",
     area: club.area ?? "",
+    price: club.price,
     author_hosts: club.author_hosts ?? false,
     encore_eligible: club.encore_eligible ?? false,
     encore_threshold: club.encore_threshold ?? 8,
+    reason: club.reason ?? "",
+    key_questions: (club.key_questions ?? []).join("\n"),
+    recommended_for: (club.recommended_for ?? []).join("\n"),
+    price_note: club.price_note ?? "",
+    bring: club.bring ?? "",
+    name_example: club.name_example ?? "",
   };
+}
+
+function splitLines(text: string): string[] {
+  return text.split("\n").map((l) => l.trim()).filter(Boolean);
 }
 
 export default function ClubsAdminClient() {
@@ -95,7 +127,10 @@ export default function ClubsAdminClient() {
   const [clubs, setClubs] = useState<ClubRow[]>(SEED_CLUBS);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [form, setForm] = useState<EditForm>({});
+  const [form, setForm] = useState<EditForm>({ key_questions: "", recommended_for: "" });
+  const [addingNew, setAddingNew] = useState(false);
+  const [newSlug, setNewSlug] = useState("");
+  const [newTitle, setNewTitle] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<Record<string, string>>({});
   const [tab, setTab] = useState<"main" | "mini">("main");
@@ -137,7 +172,13 @@ export default function ClubsAdminClient() {
 
   const handleSave = async (slug: string) => {
     setSaving(true);
-    const body = { slug, ...form };
+    const { key_questions, recommended_for, ...rest } = form;
+    const body = {
+      slug,
+      ...rest,
+      key_questions: splitLines(key_questions),
+      recommended_for: splitLines(recommended_for),
+    };
     try {
       const res = await fetch("/api/admin/clubs", {
         method: "PATCH",
@@ -149,16 +190,31 @@ export default function ClubsAdminClient() {
         setClubs((prev) => prev.map((c) => c.slug === slug ? { ...c, ...data.club } : c));
         setSaveMsg((m) => ({ ...m, [slug]: "저장됨 ✓" }));
       } else {
-        // Fallback: update local state
-        setClubs((prev) => prev.map((c) => c.slug === slug ? { ...c, ...form } : c));
-        setSaveMsg((m) => ({ ...m, [slug]: "로컬 저장됨 (DB 미연결)" }));
+        const errData = await res.json().catch(() => ({})) as { error?: string };
+        setSaveMsg((m) => ({ ...m, [slug]: `⚠ ${errData.error ?? "저장 실패"}` }));
       }
     } catch {
-      setClubs((prev) => prev.map((c) => c.slug === slug ? { ...c, ...form } : c));
-      setSaveMsg((m) => ({ ...m, [slug]: "로컬 저장됨 (DB 미연결)" }));
+      setSaveMsg((m) => ({ ...m, [slug]: "⚠ 네트워크 오류" }));
     }
     setSaving(false);
-    setTimeout(() => setSaveMsg((m) => { const n = { ...m }; delete n[slug]; return n; }), 3000);
+    setTimeout(() => setSaveMsg((m) => { const n = { ...m }; delete n[slug]; return n; }), 4000);
+  };
+
+  // 새 북클럽 추가 — 목록에 없던 새 slug로 첫 저장을 하면 서버가 upsert로
+  // 새 행을 만든다(api/admin/clubs PATCH 참고). 여기서는 로컬 목록에 먼저
+  // 반영해 바로 편집 폼을 열어준다.
+  const handleAddNew = () => {
+    const slug = newSlug.trim();
+    const title = newTitle.trim();
+    if (!slug || !title) { alert("슬러그와 제목을 모두 입력해주세요."); return; }
+    if (clubs.some((c) => c.slug === slug)) { alert("이미 있는 슬러그입니다."); return; }
+    const club: ClubRow = { slug, title, is_mini: false };
+    setClubs((prev) => [club, ...prev]);
+    setAddingNew(false);
+    setNewSlug("");
+    setNewTitle("");
+    setTab("main");
+    startEdit(club);
   };
 
   const visibleClubs = clubs.filter((c) => tab === "main" ? !c.is_mini : c.is_mini);
@@ -198,8 +254,8 @@ export default function ClubsAdminClient() {
           {loading && <span style={{ fontSize: "12px", color: "#8a7968" }}>불러오는 중…</span>}
         </div>
 
-        {/* Tabs */}
-        <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
+        {/* Tabs + 새 북클럽 추가 */}
+        <div style={{ display: "flex", gap: "8px", marginBottom: "24px", flexWrap: "wrap", alignItems: "center" }}>
           {(["main", "mini"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)} style={{
               padding: "8px 20px", borderRadius: "9999px", border: "1px solid #d8d0c4",
@@ -209,7 +265,35 @@ export default function ClubsAdminClient() {
               {t === "main" ? `메인 북클럽 (${clubs.filter(c => !c.is_mini).length})` : `미니 북클럽 (${clubs.filter(c => c.is_mini).length})`}
             </button>
           ))}
+          <button onClick={() => setAddingNew((v) => !v)} style={{
+            marginLeft: "auto", padding: "8px 20px", borderRadius: "9999px",
+            border: "1px solid #5E4632", background: addingNew ? "#5E4632" : "#fff",
+            color: addingNew ? "#fff" : "#5E4632", fontSize: "13px", fontWeight: 600, cursor: "pointer",
+          }}>
+            + 새 북클럽 추가
+          </button>
         </div>
+
+        {addingNew && (
+          <div style={{ background: "#fff", border: "1px solid #e0d9cc", borderRadius: "12px", padding: "20px", marginBottom: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div>
+                <label style={labelStyle}>제목</label>
+                <input style={inputStyle} value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="예: 어떻게 민주주의는 무너지는가" autoFocus />
+              </div>
+              <div>
+                <label style={labelStyle}>슬러그 (URL, 한글-하이픈)</label>
+                <input style={inputStyle} value={newSlug} onChange={(e) => setNewSlug(e.target.value)} placeholder="예: 어떻게-민주주의는-무너지는가" />
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+              <button onClick={() => setAddingNew(false)} style={{ padding: "9px 20px", border: "1px solid #d8d0c4", borderRadius: "8px", background: "none", fontSize: "13px", cursor: "pointer", color: "#5E4632" }}>취소</button>
+              <button onClick={handleAddNew} style={{ padding: "9px 24px", background: "#5E4632", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
+                만들고 세부내용 입력하기
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Club list */}
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -247,6 +331,46 @@ export default function ClubsAdminClient() {
                 {isOpen && (
                   <div style={{ padding: "0 20px 20px", borderTop: "1px solid #f0ebe3" }}>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "16px" }}>
+                      <div>
+                        <label style={labelStyle}>제목</label>
+                        <input style={inputStyle} value={form.title ?? ""} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="북클럽 제목" />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>작가</label>
+                        <input style={inputStyle} value={form.author ?? ""} onChange={(e) => setForm((f) => ({ ...f, author: e.target.value }))} placeholder="예: 스티븐 레비츠키 · 대니얼 지블랫" />
+                      </div>
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <label style={labelStyle}>카드 얼굴 질문 (홈·게시판 카드 상단에 큰 글씨로 노출)</label>
+                        <input style={inputStyle} value={form.reason ?? ""} onChange={(e) => setForm((f) => ({ ...f, reason: e.target.value }))} placeholder="예: 반대편을 '적'으로 보기 시작하면 어떤 일이 생길까요?" />
+                      </div>
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <label style={labelStyle}>핵심 질문 (한 줄에 하나씩, 게시판 "이 질문들로 시작해요")</label>
+                        <textarea style={{ ...inputStyle, resize: "vertical" }} rows={3} value={form.key_questions ?? ""} onChange={(e) => setForm((f) => ({ ...f, key_questions: e.target.value }))} placeholder={"질문 1\n질문 2\n질문 3"} />
+                      </div>
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <label style={labelStyle}>이런 분을 기다려요 (한 줄에 하나씩)</label>
+                        <textarea style={{ ...inputStyle, resize: "vertical" }} rows={3} value={form.recommended_for ?? ""} onChange={(e) => setForm((f) => ({ ...f, recommended_for: e.target.value }))} placeholder={"이런 분 1\n이런 분 2\n이런 분 3"} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>참가비 (원)</label>
+                        <input style={inputStyle} type="number" min={0} value={form.price ?? ""} onChange={(e) => setForm((f) => ({ ...f, price: parseInt(e.target.value) || undefined }))} placeholder="20000" />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>참가비 설명 (비우면 "커피와 대화, 전부 포함")</label>
+                        <input style={inputStyle} value={form.price_note ?? ""} onChange={(e) => setForm((f) => ({ ...f, price_note: e.target.value }))} placeholder="커피와 대화, 전부 포함" />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>준비물 (비우면 "준비물은 책, 그리고 질문 하나.")</label>
+                        <input style={inputStyle} value={form.bring ?? ""} onChange={(e) => setForm((f) => ({ ...f, bring: e.target.value }))} placeholder="준비물은 책, 그리고 질문 하나." />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>이름 입력란 예시 (신청 폼 placeholder)</label>
+                        <input style={inputStyle} value={form.name_example ?? ""} onChange={(e) => setForm((f) => ({ ...f, name_example: e.target.value }))} placeholder="예: 서결" />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>신청 마감 일시</label>
+                        <input style={inputStyle} type="datetime-local" value={form.registration_closes_at ?? ""} onChange={(e) => setForm((f) => ({ ...f, registration_closes_at: e.target.value }))} />
+                      </div>
                       <div style={{ gridColumn: "1 / -1" }}>
                         <label style={labelStyle}>모임 진행자</label>
                         <input style={inputStyle} value={form.host_name ?? ""} onChange={(e) => setForm((f) => ({ ...f, host_name: e.target.value }))} placeholder="이름" />
