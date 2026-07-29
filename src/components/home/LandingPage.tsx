@@ -975,25 +975,25 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px", marginTop: "2px" }}>
               <span>기록합니다.</span>
               {/* 위치 기반 근처 북클럽 — 문장 옆에 나란히 배치, 절대 줄바꿈되지 않음 */}
-              <NearbyClubsBanner books={dbBooks.length > 0 ? dbBooks : books} onOpen={(b) => setModalBook(b)} />
+              <NearbyClubsBanner books={dbBooks.length >= books.length ? dbBooks : books} onOpen={(b) => setModalBook(b)} />
             </div>
           </div>
         </div>
 
         {(() => {
           // DB fetch가 늦게 도착해 length>0인 응답을 주더라도, 그 응답이 실제로는
-          // "지금"/"다시" 어느 쪽에도 분류되는 게 없을 수 있다(예: is_mini 필터 등으로
-          // 걸러진 결과). 그 경우 통째로 폴백을 걷어내면 이미 보여주던 카드가 갑자기
-          // 사라지는 것처럼 보인다 — 섹션별로 실데이터가 실제로 뭔가 내놓을 때만
-          // 폴백을 대체한다.
+          // "지금"/"다시" 어느 쪽으로도 폴백보다 적게 분류될 수 있다(예: is_mini
+          // 필터 등으로 일부만 걸러진 부분 응답). ">0"만 보고 통째로 교체하면 이미
+          // 3장 보여주던 카드가 1~2장으로 줄어드는 것도 "떴다 사라지는" 것처럼
+          // 보인다 — 실데이터가 폴백보다 "같거나 더 많을 때"만 폴백을 대체한다.
           const liveRecords = visibleClubs(clubRecords);
           const fallbackRecords = visibleClubs(FALLBACK_CLUBS);
           const liveNow = liveRecords.filter((c) => classifyClub(c) === "now");
           const liveAgain = liveRecords.filter((c) => classifyClub(c) === "again");
-          const nowClubs = (liveNow.length > 0 ? liveNow : fallbackRecords.filter((c) => classifyClub(c) === "now"))
-            .sort(sortNow).slice(0, 4);
-          const againClubs = (liveAgain.length > 0 ? liveAgain : fallbackRecords.filter((c) => classifyClub(c) === "again"))
-            .sort(sortAgain).slice(0, 4);
+          const fallbackNow = fallbackRecords.filter((c) => classifyClub(c) === "now");
+          const fallbackAgain = fallbackRecords.filter((c) => classifyClub(c) === "again");
+          const nowClubs = (liveNow.length >= fallbackNow.length ? liveNow : fallbackNow).sort(sortNow).slice(0, 4);
+          const againClubs = (liveAgain.length >= fallbackAgain.length ? liveAgain : fallbackAgain).sort(sortAgain).slice(0, 4);
           return (
             <>
               {/* 지금 함께 읽어요 */}
