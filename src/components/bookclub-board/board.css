@@ -1,0 +1,416 @@
+/* 북클럽 참가 게시판(docs/bookclub-spec.md) 전용 스타일.
+   토큰은 전역 :root가 아니라 .qb-board 스코프에만 선언한다 — 사이트 전역에
+   이미 같은 이름(--card, --gold, --line 등)이 다른 값으로 존재하기 때문. */
+
+.qb-board {
+  --cream: #F0EADE;
+  --panel: #F5F2EB;
+  --card: #FBF9F4;
+  --ink: #1C1F26;
+  --ink-2: #5C554A;
+  --ink-3: #90887C;
+  --gold: #8E6E40;
+  --gold-soft: #C9B48A;
+  --brown: #5B4330;
+  --line: #DED5C4;
+  --fold: #E3D8C1;
+  --done-bg: #F2ECDF;
+  --focus: #EBDFC6;
+
+  --qb-serif: var(--font-noto-serif-kr), Georgia, serif;
+  --qb-sans: var(--font-noto-sans-kr), "Noto Sans KR", sans-serif;
+
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--qb-sans);
+  padding: 40px 28px 120px;
+}
+
+@media (max-width: 899px) {
+  .qb-board { padding: 28px 18px 96px; }
+}
+
+.qb-board * { box-sizing: border-box; }
+
+.qb-board-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.qb-heading {
+  font-family: var(--qb-serif);
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0 0 24px;
+}
+
+/* ── 정렬 ─────────────────────────────────────────────────── */
+.qb-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.qb-sort {
+  appearance: none;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-2);
+  font-family: var(--qb-sans);
+  font-size: 13.5px;
+  padding: 9px 32px 9px 16px;
+  cursor: pointer;
+  transition: border-color .3s cubic-bezier(.3,.8,.4,1), background .3s cubic-bezier(.3,.8,.4,1);
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-3) 50%), linear-gradient(135deg, var(--ink-3) 50%, transparent 50%);
+  background-position: calc(100% - 16px) center, calc(100% - 11px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.qb-sort:hover { border-color: var(--gold); }
+.qb-sort:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--focus); }
+
+/* ── 빈 상태 ──────────────────────────────────────────────── */
+.qb-empty {
+  text-align: center;
+  padding: 96px 20px;
+  color: var(--ink-3);
+  font-size: 15px;
+}
+
+/* ── 그리드 ───────────────────────────────────────────────── */
+.qb-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 900px) {
+  .qb-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── 카드 ─────────────────────────────────────────────────── */
+.qb-club {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: qb-card-in .5s cubic-bezier(.3,.8,.4,1) forwards;
+  animation-delay: var(--qb-delay, 0ms);
+}
+
+/* 자세히 버튼(footer)은 DOM상 펼침 영역보다 앞에 두어 Tab 포커스가
+   "자세히 → 신청 → 폼" 순서로 자연스럽게 이어지게 한다(Tab은 DOM 순서를
+   따르고 CSS order는 시각적 순서만 바꾼다). 시각적으로는 명세 그대로
+   top → 펼침 영역 → footer 순서로 보이도록 order로 재배치한다. */
+.qb-club-top { order: 0; }
+.qb-expand { order: 1; }
+
+@keyframes qb-card-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qb-club { animation: none; opacity: 1; transform: none; }
+  .qb-club.mine { transition: none; }
+}
+
+.qb-club.mine {
+  clip-path: polygon(38px 0, 100% 0, 100% 100%, 0 100%, 0 38px);
+  transition: clip-path .45s cubic-bezier(.3,.8,.4,1);
+}
+
+.qb-club.mine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 38px;
+  height: 38px;
+  background: var(--fold);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.qb-club-top { padding: 22px 22px 0; }
+.qb-club.mine .qb-club-top { padding-top: 34px; }
+
+.qb-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.qb-date {
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.qb-badge {
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.qb-place {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.qb-ask {
+  font-family: var(--qb-serif);
+  font-size: 1.24rem;
+  line-height: 1.62;
+  color: var(--ink);
+  margin: 20px 0;
+}
+
+@media (max-width: 599px) {
+  .qb-ask { font-size: 1.12rem; }
+}
+
+.qb-ask::before { content: "\201C"; color: var(--gold-soft); }
+.qb-ask::after { content: "\201D"; color: var(--gold-soft); }
+
+.qb-book-title {
+  font-family: var(--qb-serif);
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.qb-book-author {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+
+/* ── 펼침 영역 ────────────────────────────────────────────── */
+.qb-expand {
+  padding: 20px 22px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.qb-prose { display: flex; flex-direction: column; gap: 14px; }
+.qb-prose p { margin: 0; font-size: 14.5px; line-height: 1.8; color: var(--ink-2); white-space: pre-line; }
+
+.qb-section-title {
+  font-size: 13px;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+  margin: 0 0 14px;
+}
+
+.qb-questions-list { display: flex; flex-direction: column; }
+.qb-questions-list li {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+}
+.qb-questions-list li:first-child { border-top: none; }
+.qb-questions-list .qb-q-num {
+  font-family: var(--qb-serif);
+  color: var(--gold);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.qb-questions-list .qb-q-text {
+  font-family: var(--qb-serif);
+  font-size: 15px;
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+.qb-who-list { display: flex; flex-direction: column; gap: 10px; }
+.qb-who-list li {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.qb-who-list li::before { content: "\00B7"; color: var(--gold-soft); font-weight: 700; }
+
+.qb-steps p, .qb-subgroup p { margin: 0; font-size: 14px; line-height: 1.8; color: var(--ink-2); }
+.qb-steps .qb-steps-title { color: var(--ink); font-weight: 500; margin-bottom: 6px; }
+
+.qb-prep { display: flex; flex-direction: column; gap: 8px; }
+.qb-prep-row { display: flex; gap: 8px; font-size: 14px; color: var(--ink-2); }
+.qb-prep-row .qb-prep-label { color: var(--ink-3); flex-shrink: 0; }
+
+.qb-unfinished {
+  font-family: var(--qb-serif);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.qb-unfinished p { margin: 0; }
+
+/* ── 버튼 공통 ────────────────────────────────────────────── */
+.qb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--qb-sans);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 12px 22px;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.3,.8,.4,1);
+  border: 1px solid transparent;
+}
+.qb-btn:active { transform: scale(.98); }
+.qb-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--focus); }
+.qb-btn .qb-arrow { display: inline-block; transition: transform .3s cubic-bezier(.3,.8,.4,1); }
+.qb-btn:hover .qb-arrow { transform: translateX(4px); }
+
+.qb-btn--fill-ink { background: var(--ink); color: var(--cream); }
+.qb-btn--fill-ink:hover { background: var(--gold); border-color: var(--gold); }
+
+.qb-btn--fill-gold { background: var(--gold); color: var(--cream); }
+.qb-btn--fill-gold:hover { background: var(--brown); border-color: var(--brown); }
+
+.qb-btn--dim {
+  background: var(--line);
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+.qb-btn--dim:hover .qb-arrow { transform: none; }
+
+.qb-btn--outline {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink-2);
+}
+.qb-btn--outline:hover { background: var(--gold); border-color: var(--gold); color: var(--cream); }
+
+.qb-cta-row { display: flex; }
+
+/* ── 신청 폼 ──────────────────────────────────────────────── */
+.qb-wait-note { font-size: 13px; color: var(--gold); margin: 0 0 4px; }
+
+.qb-form { display: flex; flex-direction: column; gap: 16px; }
+
+.qb-field label { display: block; font-size: 13.5px; color: var(--ink); margin-bottom: 8px; }
+.qb-field label em { font-style: normal; color: var(--ink-3); font-size: .74rem; margin-left: 6px; }
+
+.qb-field input[type="text"],
+.qb-field input[type="tel"] {
+  width: 100%;
+  font-family: var(--qb-sans);
+  font-size: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  transition: border-color .3s cubic-bezier(.3,.8,.4,1);
+}
+.qb-field input:focus-visible { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--focus); }
+
+.qb-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.qb-checkbox-row input { width: 16px; height: 16px; accent-color: var(--gold); }
+.qb-checkbox-row input:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--focus); }
+
+/* ── 완료 안내 ────────────────────────────────────────────── */
+.qb-done {
+  font-family: var(--qb-serif);
+  background: var(--done-bg);
+  border-radius: 14px;
+  padding: 18px 20px;
+  color: var(--ink);
+  font-size: 14.5px;
+  line-height: 1.75;
+}
+.qb-done p { margin: 0 0 8px; }
+.qb-done p:last-child { margin-bottom: 0; }
+
+/* ── 카드 하단(리더 + 자세히) ─────────────────────────────── */
+.qb-club-footer {
+  order: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 22px 22px;
+  margin-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.qb-host { display: flex; align-items: center; gap: 10px; }
+
+.qb-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #EAE0CE;
+  color: var(--brown);
+  font-family: var(--qb-serif);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.qb-host-name { font-size: 13.5px; color: var(--ink-2); }
+
+/* ── 지난 모임 ────────────────────────────────────────────── */
+.qb-past-section { margin-top: 64px; }
+
+.qb-past-title {
+  font-family: var(--qb-serif);
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0 0 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.qb-past-list { display: flex; flex-direction: column; }
+
+.qb-past-row {
+  display: flex;
+  gap: 24px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+.qb-past-row:last-child { border-bottom: none; }
+
+@media (max-width: 599px) {
+  .qb-past-row { flex-direction: column; gap: 6px; }
+}
+
+.qb-past-date-col { width: 112px; flex-shrink: 0; }
+@media (max-width: 599px) { .qb-past-date-col { width: auto; } }
+
+.qb-past-date { font-size: 13px; color: var(--ink-3); }
+.qb-past-place { font-size: 12.5px; color: var(--gold-soft); margin-top: 2px; }
+
+.qb-past-content-col { flex: 1; min-width: 0; }
+.qb-past-book { font-family: var(--qb-serif); font-size: 15px; color: var(--ink); }
+.qb-past-author { font-size: 13px; color: var(--ink-3); margin-left: 6px; }
+.qb-past-note { font-size: 13.5px; color: var(--ink-2); line-height: 1.7; margin-top: 6px; }
