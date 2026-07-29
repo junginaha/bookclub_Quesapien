@@ -949,7 +949,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           </p>
           <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
             <a
-              href="/bookclub?view=now"
+              href="/bookclub"
               className="btn-pill-neu btn-pill-neu-accent"
               style={{ padding: "12px 28px", fontSize: 15 }}
             >
@@ -1017,7 +1017,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
                   <p style={{ fontSize: 14, color: "var(--muted)", padding: "24px 0" }}>지금은 신청 가능한 북클럽이 없어요. 곧 새 일정이 열려요.</p>
                 )}
                 <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
-                  <a href="/bookclub?view=now" className="btn-pill-neu" style={{ padding: "6px 14px", fontSize: 11.5 }}>
+                  <a href="/bookclub" className="btn-pill-neu" style={{ padding: "6px 14px", fontSize: 11.5 }}>
                     현재 신청 가능한 북클럽
                   </a>
                 </div>
@@ -1038,7 +1038,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
                   <p style={{ fontSize: 14, color: "var(--muted)", padding: "24px 0" }}>아직 앵콜을 기다리는 북클럽이 없어요.</p>
                 )}
                 <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
-                  <a href="/bookclub?view=again" className="btn-pill-neu" style={{ padding: "6px 14px", fontSize: 11.5 }}>
+                  <a href="/bookclub" className="btn-pill-neu" style={{ padding: "6px 14px", fontSize: 11.5 }}>
                     앵콜을 기다리는 북클럽
                   </a>
                 </div>
