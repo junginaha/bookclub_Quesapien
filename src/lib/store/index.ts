@@ -12,7 +12,6 @@ import {
 export interface StoreUser {
   id: string;
   email: string;
-  password: string; // 로컬 전용 (해시 없이 저장 — 데모용)
   name: string;
   avatar_url?: string;
   bio?: string;
@@ -67,7 +66,7 @@ export interface StoreReview {
 
 interface AppStore {
   // ── 상태 ──────────────────────────────────────────
-  currentUser: Omit<StoreUser, "password"> | null;
+  currentUser: StoreUser | null;
   users: StoreUser[];
   questions: StoreQuestion[];
   sessions: StoreSession[];
@@ -77,8 +76,6 @@ interface AppStore {
   hydrated: boolean;
 
   // ── Auth ──────────────────────────────────────────
-  login:  (email: string, password: string) => { error?: string };
-  signup: (name: string, email: string, password: string) => { error?: string };
   logout: () => void;
   setSupabaseUser: (user: {
     id: string; email: string; name: string;
@@ -119,7 +116,6 @@ interface AppStore {
 const seedUsers: StoreUser[] = mockUsers.map((u) => ({
   id: u.id,
   email: u.email,
-  password: "password123",
   name: u.name,
   avatar_url: u.avatar_url,
   bio: u.bio ?? undefined,
@@ -186,52 +182,6 @@ export const useAppStore = create<AppStore>()(
       hydrated: false,
 
       // ── Auth ────────────────────────────────────────
-      login: (email, password) => {
-        // 관리자 특수 계정
-        if (email === "kimjungin" && password === "kimjungin1") {
-          set((s) => {
-            s.currentUser = {
-              id: "admin-kimjungin",
-              email: "kimjungin@quesapience.com",
-              name: "kimjungin",
-              joined_at: new Date().toISOString(),
-              session_count: 0,
-            };
-          });
-          return {};
-        }
-        const user = get().users.find(
-          (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-        );
-        if (!user) return { error: "이메일 또는 비밀번호가 올바르지 않습니다." };
-        const { password: _pw, ...profile } = user;
-        set((s) => { s.currentUser = profile; });
-        return {};
-      },
-
-      signup: (name, email, password) => {
-        const exists = get().users.some(
-          (u) => u.email.toLowerCase() === email.toLowerCase()
-        );
-        if (exists) return { error: "이미 사용 중인 이메일입니다." };
-        if (password.length < 8) return { error: "비밀번호는 8자 이상이어야 합니다." };
-
-        const newUser: StoreUser = {
-          id: `u_${Date.now()}`,
-          email,
-          password,
-          name,
-          joined_at: new Date().toISOString(),
-          session_count: 0,
-        };
-        const { password: _pw, ...profile } = newUser;
-        set((s) => {
-          s.users.push(newUser);
-          s.currentUser = profile;
-        });
-        return {};
-      },
-
       logout: () => set((s) => { s.currentUser = null; }),
       setSupabaseUser: (user) => set((s) => {
         if (!user) { s.currentUser = null; return; }
@@ -475,6 +425,14 @@ export const useAppStore = create<AppStore>()(
     })),
     {
       name: "jilmunhaneun-store",
+      version: 2,
+      // v1은 사용하지 않는 로컬 로그인 비밀번호를 users에 평문으로 저장했다.
+      // Supabase 인증만 남긴 v2에서는 기존 브라우저 상태를 읽을 때 시드
+      // 프로필로 교체해 그 값을 영구적으로 제거한다.
+      migrate: (persistedState) => ({
+        ...(persistedState as Partial<AppStore>),
+        users: seedUsers,
+      }) as AppStore,
       storage: createJSONStorage(() =>
         typeof window !== "undefined" ? localStorage : { getItem: () => null, setItem: () => {}, removeItem: () => {} }
       ),

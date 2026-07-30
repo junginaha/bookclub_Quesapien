@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +13,6 @@ import type { AIGenerateResponse, QuestionCategory } from "@/types";
 const CATEGORIES: QuestionCategory[] = ["관계","자아","사회","감정","철학","일과삶","사랑","성장"];
 
 export default function AIGeneratePanel() {
-  const router = useRouter();
   const [keyword, setKeyword] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, startSaving] = useTransition();

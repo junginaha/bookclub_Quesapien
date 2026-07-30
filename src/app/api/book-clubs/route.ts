@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { attachEncoreCounts } from "@/lib/bookclub-server";
 
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "junginaha@gmail.com,kimjungin@quesapience.com").split(",");
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

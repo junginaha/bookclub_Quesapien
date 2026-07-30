@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 
-const ADMIN_KEY = process.env.ADMIN_KEY ?? "quesapience2024";
+const ADMIN_KEY = process.env.ADMIN_KEY;
 
 function checkKey(req: NextRequest) {
-  return req.headers.get("x-admin-key") === ADMIN_KEY;
+  return Boolean(ADMIN_KEY) && req.headers.get("x-admin-key") === ADMIN_KEY;
 }
 
 interface EncoreRow {
@@ -29,6 +29,9 @@ function toCsv(rows: EncoreRow[]): string {
 
 // 앵콜 요청 목록·통계·CSV 내보내기 — 운영자 전용. 연락처 원문/해시는 응답에 포함하지 않는다.
 export async function GET(request: NextRequest) {
+  if (!ADMIN_KEY) {
+    return NextResponse.json({ error: "관리자 키가 설정되지 않았습니다." }, { status: 503 });
+  }
   if (!checkKey(request)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }

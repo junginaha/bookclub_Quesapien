@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import type { BookMBTI } from "@/lib/supabase/types";
 import "./quiz.css";

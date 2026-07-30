@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { createClient } from "@/lib/supabase/client";
@@ -253,48 +253,6 @@ function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onO
   );
 }
 
-
-// 전부 시드(목업) 후기 — 삭제 대신 is_seed로 노출만 차단한다(작업1).
-const SEED_TESTIMONIALS = [
-  { who: "채현", sub: "UX 디자이너 · 30", said: "처음으로 모르는 사람 앞에서 솔직한 대화를 했어요. 그 밤이 한 달 동안 저를 흔들고 있었습니다.", when: "외로움 시즌 · Week 04", is_seed: true },
-  { who: "진우", sub: "개발자 · 34", said: "'사람은 아직 믿을 만하다'는 감각을 4년 만에 다시 느꼈습니다. 그게 가장 큰 회복이었어요.", when: "관계 시즌 · 종료 후", is_seed: true },
-  { who: "윤서", sub: "에디터 · 28", said: "질문 하나가 삶을 흔들었습니다. 그 후로 일을 그만두고 6개월을 쉬었어요. 후회하지 않습니다.", when: "사랑 시즌 · Week 02", is_seed: true },
-  { who: "도연", sub: "대학원생 · 26", said: "대답을 잘 하려 애쓰지 않게 된 첫 번째 자리였어요. 정답 없이 머무는 법을 배웠습니다.", when: "인간 시즌", is_seed: true },
-  { who: "하린", sub: "교사 · 39", said: "우리 반 아이들에게도 이런 자리를 만들어주고 싶다고 생각했습니다. 그게 변화의 시작이었어요.", when: "AI와 인간 시즌", is_seed: true },
-];
-const testimonials = SEED_TESTIMONIALS.filter((t) => !t.is_seed);
-
-const leaders = [
-  { initial: "J", name: "정해린", role: "시즌 04 진행", philosophy: "정답보다 진심을 믿습니다. 우리는 결론을 미루는 연습 중입니다.", q: "\"당신이 가장 오래 미뤄둔 감정은 무엇인가요?\"" },
-  { initial: "S", name: "서민준", role: "시즌 03 진행", philosophy: "조용한 사람의 한 문장은 시끄러운 사람의 한 시간보다 길게 남습니다.", q: "\"당신이 마지막으로 누군가에게 진심으로 사과한 건 언제였나요?\"" },
-  { initial: "Y", name: "유은재", role: "시즌 02 진행", philosophy: "대화는 답을 찾는 일이 아니라, 함께 머무는 일입니다.", q: "\"기계가 더 잘하는 시대에, 인간으로 남고 싶은 부분이 있나요?\"" },
-];
-
-// Random float popup content pool
-const floatPopupPool = [
-  ...books.map((b) => ({ type: "book" as const, title: b.title, sub: b.genre ?? "", color: b.color, slug: b.slug })),
-  ...leaders.map((l) => ({ type: "leader" as const, title: l.name, sub: l.role, color: "ink", slug: "" })),
-];
-
-// ─── Float popup component ─────────────────────────────────────
-function FloatPopup({ color, title, sub, type, onOpen }: {
-  color: string; title: string; sub: string; type: "book" | "leader"; onOpen: () => void;
-}) {
-  return (
-    <div className="fp-popup">
-      <div className={`fp-visual ${color}`}>
-        {type === "book" ? "📖" : "💬"}
-      </div>
-      <div className="fp-body">
-        <div className="fp-title">{title}</div>
-        <div className="fp-sub">{sub}</div>
-        <button className="fp-link" onClick={onOpen}>
-          {type === "book" ? "자세히 보기" : "만나보기"} →
-        </button>
-      </div>
-    </div>
-  );
-}
 
 // ─── Archive Review Form 컴포넌트 ─────────────────────────────
 const VIDEO_MAX_SIZE = 50 * 1024 * 1024; // 50MB — 서버 프록시가 아니라 브라우저에서 Supabase Storage로 직접 업로드하므로 Vercel 요청 크기 제한과 무관
@@ -633,20 +591,11 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
   // useEffect에서 명시적으로 false로 뒤집어 인트로를 띄운다.
   const [introDone, setIntroDone] = useState(true);
   const [modalBook, setModalBook] = useState<BookClub | null>(null);
-  const [activeFloat, setActiveFloat] = useState<number | null>(null);
-  const [askContent, setAskContent] = useState("");
   const [navBtnIdx, setNavBtnIdx] = useState(0); // 0=로그인, 1=회원가입
   const [navBtnFading, setNavBtnFading] = useState(false);
-  const [askAuthor, setAskAuthor] = useState("");
-  const [askStatus, setAskStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [questionLikes, setQuestionLikes] = useState<number | null>(null);
-  const [questionSaves, setQuestionSaves] = useState<number | null>(null);
-  const [questionReacted, setQuestionReacted] = useState<{ like: boolean; save: boolean }>({ like: false, save: false });
   const [dbBooks, setDbBooks] = useState<BookClub[]>([]);
   const [clubRecords, setClubRecords] = useState<BookClubRecord[]>([]);
   const [howToOpen, setHowToOpen] = useState(false);
-  const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
-  const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
   // 처음 방문자만 인트로를 띄운다(IntroSplash.tsx의 SEEN_KEY와 동일한 값).
   // introDone 기본값이 true라 이 체크 전까지는 인트로가 아예 그려지지 않는다.
@@ -695,11 +644,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
       .catch(() => {});
   }, []);
 
-  // Pick random popup items for each float element (stable per session)
-  const [floatItems] = useState(() =>
-    [0, 1, 2, 3, 4].map(() => floatPopupPool[Math.floor(Math.random() * floatPopupPool.length)])
-  );
-
   // 랜딩 nav 버튼 순환
   useEffect(() => {
     const interval = setInterval(() => {
@@ -736,61 +680,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
     ta.addEventListener("input", grow);
     return () => ta.removeEventListener("input", grow);
   }, []);
-
-  const openFloat = useCallback((idx: number) => {
-    const t = floatTimeouts.current.get(idx);
-    if (t) clearTimeout(t);
-    setActiveFloat(idx);
-  }, []);
-
-  const closeFloat = useCallback((idx: number) => {
-    const t = setTimeout(() => setActiveFloat(null), 200);
-    floatTimeouts.current.set(idx, t);
-  }, []);
-
-  const handleFloatOpen = useCallback((idx: number) => {
-    const item = floatItems[idx];
-    if (item.type === "book") {
-      const book = books.find((b) => b.slug === item.slug);
-      if (book) setModalBook(book);
-    }
-  }, [floatItems]);
-
-  const handleReact = async (type: "like" | "save") => {
-    if (!todayQuestion?.id) return;
-    try {
-      const res = await fetch(`/api/landing-questions/${todayQuestion.id}/react`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, session_key: sessionKeyRef.current }),
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      setQuestionReacted((prev) => ({ ...prev, [type]: data.reacted }));
-      if (type === "like" && data.likes !== undefined) setQuestionLikes(data.likes);
-      if (type === "save" && data.saves !== undefined) setQuestionSaves(data.saves);
-    } catch { /* ignore */ }
-  };
-
-  const handleAskSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!askContent.trim() || askContent.trim().length < 5) return;
-    setAskStatus("sending");
-    try {
-      const res = await fetch("/api/landing-questions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: askContent.trim(), author_name: askAuthor.trim() || "익명" }),
-      });
-      if (!res.ok) throw new Error("fail");
-      setAskStatus("sent");
-      setAskContent("");
-      setAskAuthor("");
-    } catch {
-      setAskStatus("error");
-    }
-    setTimeout(() => setAskStatus("idle"), 3000);
-  };
 
   return (
     <div className="lp">
@@ -1066,18 +955,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             </a>
           </p>
         </div>
-        {testimonials.length > 0 && (
-          <div className="lp-test-list">
-            {testimonials.map((t) => (
-              <div key={t.who} className="lp-test-item">
-                <div className="ti-who">— {t.who}<span className="ti-sub">{t.sub}</span></div>
-                <div className="ti-said">{t.said}</div>
-                <div className="ti-when">{t.when}</div>
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* 아카이빙 더 보기 */}
         <div style={{ maxWidth: 1020, margin: "32px auto 0", display: "flex", justifyContent: "flex-end" }}>
           <a

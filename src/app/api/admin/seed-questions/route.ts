@@ -21,8 +21,12 @@ const IDS = {
 const allIds = Object.values(IDS);
 
 export async function POST(req: NextRequest) {
+  const configuredSecret = process.env.SEED_SECRET;
+  if (!configuredSecret) {
+    return NextResponse.json({ error: "Seed API is disabled" }, { status: 503 });
+  }
   const secret = req.headers.get("x-seed-secret");
-  if (secret !== process.env.SEED_SECRET && secret !== "quesapience-seed-2026") {
+  if (secret !== configuredSecret) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

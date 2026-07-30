@@ -111,7 +111,6 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
   const [gutendexReady, setGutendexReady] = useState(false);
   const [agenda, setAgenda] = useState<{ agenda1: string; agenda2: string; advice: string } | null>(null);
   const [agendaLoading, setAgendaLoading] = useState(false);
-  const [streamingContent, setStreamingContent] = useState("");
   const sessionKeyRef2 = useRef<string>(
     typeof window !== "undefined"
       ? (localStorage.getItem(`gk_${giant.slug}`) ?? (() => {

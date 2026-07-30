@@ -13,8 +13,6 @@ function makeOgImageUrl(title: string, sub?: string): string {
   if (sub) params.set("sub", sub);
   return `${SITE_URL}/og?${params.toString()}`;
 }
-const DEFAULT_OG_IMAGE = makeOgImageUrl("질문하는 사람들", "좋은 질문은 좋은 사람을 데려옵니다.");
-
 interface PageMetaInput {
   title: string;
   description: string;

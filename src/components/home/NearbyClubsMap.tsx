@@ -125,7 +125,6 @@ export default function NearbyClubsMap({
       mapRef.current?.remove();
       mapRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userLat, userLng, clubs]);
 
   return <div ref={containerRef} className="lp-nearby-map" aria-label="내 근처 북클럽 지도" />;
