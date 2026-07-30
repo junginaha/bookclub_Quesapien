@@ -12,9 +12,7 @@ try {
 }
 
 const containsGitPush =
-  /(?:^|[\s;&|])(?:command\s+)?git(?:\s+-C\s+(?:"[^"]*"|'[^']*'|\S+))?\s+push(?:\s|$)/m.test(
-    command,
-  );
+  /\bgit(?:\s+-C\s+(?:"[^"]*"|'[^']*'|\S+))?\s+push(?:\s|$)/m.test(command);
 
 if (!containsGitPush) process.exit(0);
 
