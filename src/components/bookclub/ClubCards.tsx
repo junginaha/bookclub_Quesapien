@@ -58,7 +58,7 @@ export function CurrentClubCard({ club }: { club: BookClubRecord }) {
         <div style={{ height: 180, position: "relative", overflow: "hidden" }}>
           <CoverImage club={club} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.55), transparent 55%)" }} />
-          {badge && (
+          {status !== "open" && badge && (
             <span style={{ position: "absolute", top: 14, right: 14, fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 9999, background: "rgba(255,255,255,0.85)", color: "var(--ink)" }}>
               {badge}
             </span>
