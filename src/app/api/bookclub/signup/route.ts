@@ -6,6 +6,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
+import { REAL_CLUBS } from "@/lib/bookclub";
 
 export async function POST(req: NextRequest) {
   let body: { slug?: string; name?: string; contact?: string; subscribe?: boolean };
@@ -22,11 +23,51 @@ export async function POST(req: NextRequest) {
 
   const db = createServiceClient();
 
-  const { data: club, error: clubError } = await db
+  let { data: club, error: clubError } = await db
     .from("landing_book_clubs")
     .select("id")
     .eq("slug", slug)
     .maybeSingle();
+
+  // 보드 화면(/bookclub)은 landing_book_clubs가 비어 있어도 REAL_CLUBS 정적
+  // 폴백으로 카드를 보여준다 — 그런데 이 마이그레이션(016)이 라이브 DB에
+  // 아직 반영되지 않았으면 카드는 보이는데 신청은 항상 이 404로 막히는
+  // 상태가 된다. 실데이터(is_seed:false)에 한해 같은 내용을 지금 심어서
+  // 복구한다(가짜 데이터 아님 — 마이그레이션 016이 넣는 값과 동일).
+  if (!clubError && !club) {
+    const seed = REAL_CLUBS.find((c) => c.slug === slug && !c.is_seed);
+    if (seed) {
+      await db.from("landing_book_clubs").upsert(
+        {
+          slug: seed.slug,
+          title: seed.title,
+          author: seed.author,
+          color: seed.color,
+          genre: seed.genre,
+          tag: seed.tag,
+          is_seed: false,
+          host_name: seed.host_name,
+          event_starts_at: seed.event_starts_at,
+          location: seed.location,
+          price: seed.price,
+          max_participants: seed.max_participants,
+          current_participants: seed.current_participants ?? 0,
+          reason: seed.reason,
+          description: seed.description,
+          recommended_for: seed.recommended_for,
+          session_format: seed.session_format,
+          status: seed.status ?? "active",
+        },
+        { onConflict: "slug", ignoreDuplicates: true }
+      );
+
+      ({ data: club, error: clubError } = await db
+        .from("landing_book_clubs")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle());
+    }
+  }
 
   if (clubError || !club) {
     return NextResponse.json({ error: "북클럽을 찾을 수 없습니다." }, { status: 404 });
