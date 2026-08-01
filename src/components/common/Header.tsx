@@ -49,8 +49,6 @@ const navItems = [
   },
 ];
 
-const WORDMARKS = ["질문하는 사람들", "Quesapience"] as const;
-
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
@@ -58,8 +56,6 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [activeNav, setActiveNav] = useState<string | null>(null);
-  const [wordmarkIdx, setWordmarkIdx] = useState(0);
-  const [wordmarkFading, setWordmarkFading] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [authBtnIdx, setAuthBtnIdx] = useState(0); // 0=로그인, 1=회원가입
   const [authBtnFading, setAuthBtnFading] = useState(false);
@@ -81,18 +77,6 @@ export default function Header() {
     }, 2800);
     return () => clearInterval(interval);
   }, [currentUser]);
-
-  // 워드마크 자동 전환
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setWordmarkFading(true);
-      setTimeout(() => {
-        setWordmarkIdx((i) => (i + 1) % WORDMARKS.length);
-        setWordmarkFading(false);
-      }, 350);
-    }, 3200);
-    return () => clearInterval(interval);
-  }, []);
 
   const isLanding = pathname === "/";
 
@@ -174,7 +158,7 @@ export default function Header() {
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
         <div style={{ display: "flex", height: 64, alignItems: "center", justifyContent: "space-between" }}>
 
-          {/* Logo — 워드마크 자동 전환 */}
+          {/* Logo — ?! 질문하는 사람들 */}
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 1, fontSize: 20, lineHeight: 1 }}>
               <span style={{
@@ -192,32 +176,17 @@ export default function Header() {
                 transformOrigin: "center",
               }}>!</span>
             </div>
-            {/* 워드마크 교차 — 질문하는 사람들 ↔ Quesapience */}
-            <span style={{ display: "inline-grid" }}>
-              {WORDMARKS.map((wm, i) => (
-                <span
-                  key={wm}
-                  style={{
-                    gridArea: "1 / 1",
-                    whiteSpace: "nowrap",
-                    fontFamily: i === 1
-                      ? '"EB Garamond", Georgia, serif'
-                      : "var(--font-noto-serif-kr), Georgia, serif",
-                    fontSize: i === 1 ? 14.5 : 13.5,
-                    fontWeight: i === 1 ? 400 : 500,
-                    color: "var(--ink)",
-                    letterSpacing: i === 1 ? "0.06em" : "0.03em",
-                    fontStyle: i === 1 ? "italic" : "normal",
-                    transition: "opacity 0.4s ease, transform 0.4s cubic-bezier(.2,.8,.2,1)",
-                    opacity: wordmarkIdx === i && !wordmarkFading ? 1 : 0,
-                    transform: wordmarkIdx === i && !wordmarkFading
-                      ? "translateY(0)"
-                      : wordmarkIdx === i ? "translateY(-4px)" : "translateY(4px)",
-                  }}
-                >
-                  {wm}
-                </span>
-              ))}
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                fontSize: 13.5,
+                fontWeight: 500,
+                color: "var(--ink)",
+                letterSpacing: "0.03em",
+              }}
+            >
+              질문하는 사람들
             </span>
           </Link>
 
