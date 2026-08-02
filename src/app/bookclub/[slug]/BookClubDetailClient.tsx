@@ -176,23 +176,16 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                   {club.title}
                 </h1>
 
-                {(club.author || club.host_name) && (
+                {club.author && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 20 }}>
-                    {club.author && (
-                      <p style={{ fontSize: 15, color: "rgba(255,255,255,0.75)" }}>
-                        함께 읽는 작가 · {club.author}
-                        {authorHosts && (
-                          <span style={{ marginLeft: 8, fontSize: 12, color: "#FFD98A", fontWeight: 500 }}>
-                            {club.author === club.host_name ? "저자 직접 진행" : "저자와의 만남"}
-                          </span>
-                        )}
-                      </p>
-                    )}
-                    {club.host_name && (
-                      <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)" }}>
-                        북클럽 리더 · {club.host_name}
-                      </p>
-                    )}
+                    <p style={{ fontSize: 15, color: "rgba(255,255,255,0.75)" }}>
+                      함께 읽는 작가 · {club.author}
+                      {authorHosts && (
+                        <span style={{ marginLeft: 8, fontSize: 12, color: "#FFD98A", fontWeight: 500 }}>
+                          {club.author === club.host_name ? "저자 직접 진행" : "저자와의 만남"}
+                        </span>
+                      )}
+                    </p>
                   </div>
                 )}
 
@@ -324,14 +317,13 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 28, color: "white", fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
                   }}>
-                    {(club.host_name ?? "리")[0]}
+                    리
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 8 }}>
                       <h2 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 20, fontWeight: 500, color: "var(--ink)" }}>
-                        {club.host_name ?? "리더"}
+                        리더
                       </h2>
-                      <span style={{ fontSize: 13, color: "var(--muted)" }}>리더</span>
                     </div>
                     <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.75, marginBottom: 16 }}>
                       {club.host_philosophy ?? club.host_intro}
@@ -626,11 +618,10 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
       {/* ── Stage 3: AI Summary Block ── */}
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <AISummaryBlock
-          what={`${club.title ?? "이 북토크"}는 ${club.author ? `${club.author}의 ` : ""}${club.genre ?? "책"}을 중심으로 ${club.host_name ?? "리더"}가 진행하는 오프라인 북토크이다.`}
+          what={`${club.title ?? "이 북토크"}는 ${club.author ? `${club.author}의 ` : ""}${club.genre ?? "책"}을 중심으로 질문하는 사람들이 진행하는 오프라인 북토크이다.`}
           why={club.why_this_book ?? club.description ?? "책과 질문을 통해 사람과 사람이 연결되는 경험을 제공한다."}
           who={(club.recommended_for ?? ["독서를 좋아하는 분", "새로운 사람을 만나고 싶은 분"]).join(", ")}
           bullets={[
-            `리더: ${club.host_name ?? "—"}`,
             `장소: ${club.location ?? "서울"}`,
             `인원: 최대 ${club.max_participants ?? 8}명 소규모`,
             `방식: ${club.session_format ?? "원형 대화 방식"}`,

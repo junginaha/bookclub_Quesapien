@@ -1003,7 +1003,6 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .bdm-div { height: 1px; background: var(--lp-line); margin: 24px 0; }
 .bdm-section { margin-bottom: 22px; }
 .bdm-section-label { font-family: var(--lp-serif); font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--lp-muted); margin-bottom: 10px; }
-.bdm-host-name { font-family: var(--lp-serif-ko); font-size: 17px; font-weight: 500; color: var(--lp-ink); margin-bottom: 6px; }
 .bdm-host-intro { font-family: var(--lp-serif-ko); font-size: 14.5px; line-height: 1.6; color: var(--lp-ink-soft); }
 .bdm-info-val { font-family: var(--lp-serif-ko); font-size: 15px; color: var(--lp-ink); line-height: 1.55; margin-bottom: 6px; }
 .bdm-loc-link { color: var(--lp-accent); text-decoration: none; }

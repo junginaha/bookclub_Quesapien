@@ -286,11 +286,10 @@ export default function BookDetailModal({ book, onClose }: Props) {
               <div className="bdm-div" />
 
               {/* 진행자 */}
-              {detail?.hostName && (
+              {detail?.hostIntro && (
                 <div className="bdm-section">
                   <div className="bdm-section-label">모임 진행</div>
-                  <div className="bdm-host-name">{detail.hostName}</div>
-                  {detail.hostIntro && <p className="bdm-host-intro">{detail.hostIntro}</p>}
+                  <p className="bdm-host-intro">{detail.hostIntro}</p>
                 </div>
               )}
 
@@ -355,7 +354,7 @@ export default function BookDetailModal({ book, onClose }: Props) {
                 </div>
               )}
 
-              {!detail?.schedule && !detail?.hostName && !detail?.description && (
+              {!detail?.schedule && !detail?.hostIntro && !detail?.description && (
                 <div className="bdm-empty">
                   <p>모임 상세 정보가 아직 등록되지 않았습니다.</p>
                   {canEdit && <p>편집 버튼으로 내용을 추가해주세요.</p>}

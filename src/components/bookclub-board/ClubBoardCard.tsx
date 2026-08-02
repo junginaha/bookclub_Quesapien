@@ -102,9 +102,6 @@ export default function ClubBoardCard({ club, index }: { club: BoardCardData; in
     }
   };
 
-  const hostInitial = club.hostName ? club.hostName[0] : "?!";
-  const hostLabel = club.hostName ?? "질문하는 사람들";
-
   const paragraphs = club.prose.split(/\n\n+/).filter(Boolean);
   const submitLabel = isFull ? "기다릴게요 →" : "보낼게요 →";
 
@@ -133,8 +130,8 @@ export default function ClubBoardCard({ club, index }: { club: BoardCardData; in
           .qb-club-footer{order:2}/.qb-expand{order:1}로 명세와 동일하게 유지한다. */}
       <div className="qb-club-footer">
         <div className="qb-host">
-          <span className="qb-avatar">{hostInitial}</span>
-          <span className="qb-host-name">{hostLabel}</span>
+          <span className="qb-avatar">?!</span>
+          <span className="qb-host-name">질문하는 사람들</span>
         </div>
         <button type="button" className="qb-btn qb-btn--outline" onClick={toggleExpand}>
           {expanded ? "접기" : "자세히"}

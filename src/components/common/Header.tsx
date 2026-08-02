@@ -25,7 +25,6 @@ const navItems = [
     sub: [
       { href: "/clubs", label: "내 근처 북클럽" },
       { href: "/bookclub", label: "북토크 일정" },
-      { href: "/bookclub/leaders", label: "리더 소개" },
     ],
   },
   {

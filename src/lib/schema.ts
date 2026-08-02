@@ -97,9 +97,6 @@ export function bookTalkEventSchema(club: BookTalkSchemaInput) {
         }
       : undefined,
     organizer: { "@id": `${SITE_URL}/#organization` },
-    performer: club.host_name
-      ? { "@type": "Person", name: club.host_name }
-      : undefined,
     maximumAttendeeCapacity: club.max_participants,
     remainingAttendeeCapacity: club.max_participants && club.current_participants
       ? Math.max(0, club.max_participants - club.current_participants)

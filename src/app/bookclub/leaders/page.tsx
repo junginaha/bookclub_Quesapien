@@ -1,39 +1,9 @@
-import type { Metadata } from "next";
-import Header from "@/components/common/Header";
-import Footer from "@/components/common/Footer";
-import DefinitionBlock from "@/components/seo/DefinitionBlock";
-import { buildMetadata } from "@/lib/metadata";
-import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumbSchema } from "@/lib/schema";
-import LeadersClient from "./LeadersClient";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = buildMetadata({
-  title: "리더 소개 — 북클럽 리더들",
-  description: "질문하는 사람들의 북클럽 리더들. 각 리더의 운영 철학, 대표 질문, 진행한 북토크를 소개합니다.",
-  path: "/bookclub/leaders",
-  type: "website",
-  keywords: ["북클럽리더", "독서모임진행자", "독서토론리더", "Quesapience"],
-});
-
+// 2026-08-02 운영자 지시: 북클럽에서 리더 개인 이름 노출을 전면 중단하면서,
+// 존재 목적 자체가 "리더 이름·프로필 소개"였던 이 페이지는 노출을 껐다.
+// 코드는 LeadersClient.tsx에 git 히스토리로 남아있으나 라우트는 /bookclub로
+// 리다이렉트한다(/giants/[person] 블라인드 리다이렉트와 동일 패턴).
 export default function LeadersPage() {
-  const crumb = breadcrumbSchema([
-    { name: "홈", href: "/" },
-    { name: "북클럽", href: "/bookclub" },
-    { name: "리더 소개", href: "/bookclub/leaders" },
-  ]);
-
-  return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <JsonLd data={crumb} />
-      <Header />
-      <DefinitionBlock
-        definition="리더는 질문하는 사람들의 북토크를 진행하는 사람이다. 정답을 주지 않고 질문을 통해 대화를 이끈다."
-        entityType="Leader"
-      />
-      <main style={{ flex: 1 }}>
-        <LeadersClient />
-      </main>
-      <Footer />
-    </div>
-  );
+  redirect("/bookclub");
 }

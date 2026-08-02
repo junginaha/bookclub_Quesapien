@@ -81,10 +81,6 @@ export function CurrentClubCard({ club }: { club: BookClubRecord }) {
               )}
             </div>
           )}
-          {club.host_name && (
-            <div style={{ fontSize: 13, color: "var(--muted)" }}>북클럽 리더 · {club.host_name}</div>
-          )}
-
           <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)" }}>
             <Calendar size={12} />
             <span>{start ? `${formatSeoulDate(start)} ${formatSeoulTime(start)}` : "일정 조율 중"}</span>
@@ -126,7 +122,6 @@ export function EncoreClubCard({ club }: { club: BookClubRecord }) {
 
       <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
         {club.author && <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>함께 읽는 작가 · {club.author}</div>}
-        {club.host_name && <div style={{ fontSize: 13, color: "var(--muted)" }}>북클럽 리더 · {club.host_name}</div>}
 
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)" }}>
           <Calendar size={12} />
