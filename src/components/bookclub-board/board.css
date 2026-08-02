@@ -351,7 +351,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 28px;
+  border: 0;
   border-radius: 14px;
   background: var(--signature);
   color: #FFFFFF;
@@ -360,6 +360,24 @@
   text-decoration: none;
   transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
 }
+
+.qb-calendar-actions { display: grid; gap: 8px; margin-top: 28px; }
+
+.qb-calendar-detail-link {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease;
+}
+
+.qb-calendar-detail-link:hover { background: var(--cream); color: var(--ink); }
+.qb-calendar-detail-link:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
 .qb-calendar-action:hover {
   background: var(--brown);

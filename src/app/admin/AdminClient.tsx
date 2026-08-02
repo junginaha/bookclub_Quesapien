@@ -92,7 +92,7 @@ export default function AdminClient({
     { key: "questions", label: `발제질문 (${questions.length})` },
     { key: "sessions", label: `모임 (${sessions.length})` },
     { key: "reviews", label: `후기 (${reviews.length})` },
-    { key: "applications", label: "북클럽 신청", badge: applications.filter((a) => a.status === "pending").length },
+    { key: "applications", label: "북클럽 예약", badge: applications.filter((a) => a.status === "waiting").length },
   ];
 
   return (
@@ -451,8 +451,8 @@ export default function AdminClient({
         {tab === "applications" && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-serif text-lg font-semibold text-warm-900">북클럽 신청 ({applications.length})</h2>
-              <span className="text-xs text-warm-400">pending: {applications.filter((a) => a.status === "pending").length}건</span>
+              <h2 className="font-serif text-lg font-semibold text-warm-900">북클럽 예약 ({applications.length})</h2>
+              <span className="text-xs text-warm-400">대기 {applications.filter((a) => a.status === "waiting").length}건</span>
             </div>
             {applications.length === 0 ? (
               <p className="text-center py-12 text-warm-400 text-sm">신청이 없습니다.</p>
@@ -461,7 +461,7 @@ export default function AdminClient({
                 <table className="w-full text-sm">
                   <thead className="bg-warm-50 border-b border-warm-100">
                     <tr>
-                      {["신청일", "북클럽", "이름", "이메일", "메시지", "상태"].map((h) => (
+                      {["예약일", "북클럽", "이름", "연락처", "구분", "상태"].map((h) => (
                         <th key={h} className="text-left py-3 px-4 text-warm-500 font-medium">{h}</th>
                       ))}
                     </tr>
@@ -475,8 +475,8 @@ export default function AdminClient({
                         <td className="py-3 px-4 text-warm-500">{a.applicant_email}</td>
                         <td className="py-3 px-4 text-warm-400 max-w-xs truncate">{a.message ?? "—"}</td>
                         <td className="py-3 px-4">
-                          <Badge variant={a.status === "pending" ? "secondary" : "default"} className="text-xs">
-                            {a.status === "pending" ? "대기" : a.status === "confirmed" ? "확정" : "거절"}
+                          <Badge variant={a.status === "waiting" ? "secondary" : "default"} className="text-xs">
+                            {a.status === "waiting" ? "대기" : a.status === "confirmed" ? "확정" : "취소"}
                           </Badge>
                         </td>
                       </tr>

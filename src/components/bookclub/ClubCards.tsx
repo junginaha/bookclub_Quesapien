@@ -50,7 +50,7 @@ export function CurrentClubCard({ club }: { club: BookClubRecord }) {
   const badge = badgeText(status, left, 0);
 
   return (
-    <Link href="/bookclub" style={{ textDecoration: "none" }}>
+    <Link href={`/bookclub/${club.slug}`} style={{ textDecoration: "none" }}>
       <article
         className="card-base"
         style={{ background: "white", display: "flex", flexDirection: "column", opacity: full ? 0.75 : 1 }}
@@ -108,7 +108,7 @@ export function EncoreClubCard({ club }: { club: BookClubRecord }) {
 
   return (
     <article className="card-base" style={{ background: "white", display: "flex", flexDirection: "column" }}>
-      <Link href="/bookclub" style={{ textDecoration: "none" }}>
+      <Link href={`/bookclub/${club.slug}`} style={{ textDecoration: "none" }}>
         <div style={{ height: 180, position: "relative", overflow: "hidden" }}>
           <CoverImage club={club} />
           <div style={{ position: "absolute", inset: 0, background: "rgba(20,24,31,0.45)" }} />
@@ -132,7 +132,7 @@ export function EncoreClubCard({ club }: { club: BookClubRecord }) {
           <span>{[club.area, club.location].filter(Boolean).join(" · ") || "장소 미정"}</span>
         </div>
 
-        <Link href="/bookclub" style={{ fontSize: 12.5, color: "var(--accent)", textDecoration: "underline" }}>
+        <Link href={`/bookclub/${club.slug}`} style={{ fontSize: 12.5, color: "var(--accent)", textDecoration: "underline" }}>
           지난 모임 기록 보기
         </Link>
 

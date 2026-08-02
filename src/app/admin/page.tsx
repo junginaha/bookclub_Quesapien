@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import AdminClient from "./AdminClient";
 
 export default async function AdminPage() {
@@ -12,13 +12,14 @@ export default async function AdminPage() {
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const db = supabase as any;
+  const serviceDb = createServiceClient() as any;
 
   const [
     { data: profiles },
     { data: questions },
     { data: sessions },
     { data: reviews },
-    { data: applications },
+    { data: reservationRows },
     { data: pendingQuestions },
     { data: allLandingQuestions },
   ] = await Promise.all([
@@ -26,7 +27,11 @@ export default async function AdminPage() {
     db.from("questions").select("*, author:profiles(name,email)").order("created_at", { ascending: false }),
     db.from("sessions").select("*, question:questions(title), host:profiles(name)").order("created_at", { ascending: false }),
     db.from("reviews").select("*, author:profiles(name)").order("created_at", { ascending: false }),
-    db.from("bookclub_applications").select("*").order("created_at", { ascending: false }).then(
+    serviceDb
+      .from("landing_book_club_signups")
+      .select("id, name, contact, subscribe, kind, position, status, created_at, club:landing_book_clubs(slug, title)")
+      .order("created_at", { ascending: false })
+      .then(
       (r: any) => r,
       () => ({ data: [] })
     ),
@@ -35,6 +40,21 @@ export default async function AdminPage() {
     // 전체 랜딩 질문
     db.from("landing_questions").select("*").order("created_at", { ascending: false }).limit(200),
   ]);
+  const applications = (reservationRows ?? []).map((row: any) => ({
+    id: row.id,
+    created_at: row.created_at,
+    club_slug: row.club?.title ?? row.club?.slug ?? "북클럽",
+    applicant_name: row.name,
+    applicant_email: row.contact,
+    message: row.status === "canceled"
+      ? "취소"
+      : row.kind === "wait"
+        ? `대기 ${row.position ?? ""}번`
+        : row.subscribe
+          ? "확정 · 다음 모임 소식 수신"
+          : "확정",
+    status: row.status === "canceled" ? "canceled" : row.kind === "wait" ? "waiting" : "confirmed",
+  }));
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
   return (

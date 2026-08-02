@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { BoardCardData } from "./types";
+import BookClubReservation from "@/components/bookclub/BookClubReservation";
 import {
   badgeText,
-  buttonText,
   fillKind,
   formatCardDate,
   formatDeadline,
@@ -34,77 +34,52 @@ function persistMine(id: string) {
   }
 }
 
+function clearMine(id: string) {
+  try {
+    const set = readMineSet();
+    set.delete(id);
+    window.localStorage.setItem(MINE_STORAGE_KEY, JSON.stringify([...set]));
+  } catch {
+    /* 시각적 표시만 남을 수 있으며 서버 취소 결과에는 영향이 없다. */
+  }
+}
+
 type SubmitResult = { kind: "signup" | "wait"; position: number | null };
 
 export default function ClubBoardCard({ club, index }: { club: BoardCardData; index: number }) {
   const [expanded, setExpanded] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
   const [result, setResult] = useState<SubmitResult | null>(null);
   const [mine, setMine] = useState(false);
-  const [name, setName] = useState("");
-  const [contact, setContact] = useState("");
-  const [subscribe, setSubscribe] = useState(true);
 
   const articleRef = useRef<HTMLElement>(null);
-  const nameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (readMineSet().has(club.id)) setMine(true);
   }, [club.id]);
 
-  useEffect(() => {
-    if (formOpen) nameInputRef.current?.focus();
-  }, [formOpen]);
-
   const isClosed = club.status === "closed";
   const isFull = club.status === "full";
   const badge = badgeText(club.status, club.left, club.waiting);
-  const ctaLabel = buttonText(club.status);
   const fill = fillKind(club.status);
-
-  const openForm = () => {
-    if (isClosed) return;
-    setExpanded(true);
-    setFormOpen(true);
-  };
 
   const toggleExpand = () => setExpanded((v) => !v);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (submitting) return;
-    setSubmitting(true);
-    setError("");
-    try {
-      const res = await fetch("/api/bookclub/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: club.slug, name, contact, subscribe }),
-      });
-      const data = (await res.json()) as { kind?: "signup" | "wait"; position?: number | null; error?: string };
-      if (!res.ok || !data.kind) {
-        setError(data.error ?? "신청 처리 중 오류가 발생했습니다.");
-        setSubmitting(false);
-        return;
-      }
-      setResult({ kind: data.kind, position: data.position ?? null });
-      setFormOpen(false);
-      persistMine(club.id);
-      setMine(true);
-      requestAnimationFrame(() => {
-        articleRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      });
-    } catch {
-      setError("네트워크 오류가 발생했습니다.");
-      setSubmitting(false);
-    }
+  const handleReserved = (next: SubmitResult) => {
+    setResult(next);
+    persistMine(club.id);
+    setMine(true);
+    requestAnimationFrame(() => {
+      articleRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  };
+
+  const handleCanceled = () => {
+    setResult(null);
+    clearMine(club.id);
+    setMine(false);
   };
 
   const paragraphs = club.prose.split(/\n\n+/).filter(Boolean);
-  const submitLabel = isFull ? "기다릴게요 →" : "보낼게요 →";
-
   return (
     <article
       ref={articleRef}
@@ -174,18 +149,6 @@ export default function ClubBoardCard({ club, index }: { club: BoardCardData; in
             </div>
           )}
 
-          <div className="qb-steps">
-            <p className="qb-steps-title">참여는 세 걸음</p>
-            <p>하나 · 신청해요</p>
-            <p>둘 · 모임 전날, 질문 하나를 보내드려요</p>
-            <p>셋 · 그날 아침에 오세요</p>
-          </div>
-
-          <div className="qb-subgroup">
-            <p>인원에 따라 소그룹으로 나누어 이야기해요.</p>
-            <p>모두가 말할 수 있는 크기로 나눕니다.</p>
-          </div>
-
           <div>
             <p className="qb-section-title">준비</p>
             <div className="qb-prep">
@@ -199,7 +162,7 @@ export default function ClubBoardCard({ club, index }: { club: BoardCardData; in
               )}
               <div className="qb-prep-row">
                 <span className="qb-prep-label">준비물</span>
-                <span>{club.bring || "준비물은 책, 그리고 질문 하나."}</span>
+                <span>{club.bring || "책, 그리고 질문 하나"}</span>
               </div>
               <div className="qb-prep-row">
                 <span className="qb-prep-label">신청 마감</span>
@@ -208,103 +171,38 @@ export default function ClubBoardCard({ club, index }: { club: BoardCardData; in
             </div>
           </div>
 
-          <div className="qb-unfinished">
-            <p>다 읽지 못하셔도 괜찮아요.</p>
-            <p>밑줄 한 줄, 궁금증 하나면 충분합니다.</p>
-          </div>
-
-          {result ? (
+          {result && (
             <div className="qb-done">
               {result.kind === "signup" ? (
                 <>
-                  <p>
-                    {formatFullDateWeekday(club.startsAt)} {formatTimeOfDay(club.startsAt)},{" "}
-                    {club.place}에서 만나요.
-                  </p>
-                  <p>모임 전날 질문 하나를 보내드릴게요.</p>
+                  <p>예약이 확정됐어요.</p>
+                  <p>{formatFullDateWeekday(club.startsAt)} {formatTimeOfDay(club.startsAt)}, {club.place}에서 만나요.</p>
                 </>
               ) : (
                 <>
-                  <p>{result.position ?? ""}번째로 기다리고 계세요.</p>
-                  <p>자리가 나면 순서대로 문자를 드릴게요.</p>
-                  <p>하루 안에 답을 못 받으면 다음 분께 넘어가요.</p>
+                  <p>대기 {result.position ?? ""}번으로 접수됐어요.</p>
+                  <p>자리가 생기면 순서대로 확정됩니다.</p>
                 </>
               )}
             </div>
-          ) : (
-            <>
-              {!formOpen && (
-                <div className="qb-cta-row">
-                  <button
-                    type="button"
-                    className={`qb-btn ${fill === "dim" ? "qb-btn--dim" : `qb-btn--fill-${fill}`}`}
-                    disabled={isClosed}
-                    onClick={openForm}
-                  >
-                    {ctaLabel}
-                    {!isClosed && <span className="qb-arrow">→</span>}
-                  </button>
-                </div>
-              )}
-
-              {formOpen && (
-                <form className="qb-form" onSubmit={handleSubmit}>
-                  {isFull && <p className="qb-wait-note">자리가 나면 기다리신 순서대로 연락드려요.</p>}
-
-                  <div className="qb-field">
-                    <label htmlFor={`qb-name-${club.id}`}>
-                      어떻게 불러드릴까요? <em>실명도 별명도 좋아요</em>
-                    </label>
-                    <input
-                      id={`qb-name-${club.id}`}
-                      ref={nameInputRef}
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder={`예) ${club.nameExample}`}
-                    />
-                  </div>
-
-                  <div className="qb-field">
-                    <label htmlFor={`qb-contact-${club.id}`}>
-                      연락받으실 곳을 알려주세요 <em>문자로 안내드려요</em>
-                    </label>
-                    <input
-                      id={`qb-contact-${club.id}`}
-                      type="tel"
-                      required
-                      value={contact}
-                      onChange={(e) => setContact(e.target.value)}
-                      placeholder="010-1234-5678 또는 name@email.com"
-                    />
-                  </div>
-
-                  <label className="qb-checkbox-row">
-                    <input
-                      type="checkbox"
-                      checked={subscribe}
-                      onChange={(e) => setSubscribe(e.target.checked)}
-                    />
-                    다음 모임 소식도 먼저 받을게요
-                  </label>
-
-                  {error && <p style={{ color: "var(--gold)", fontSize: 13 }}>{error}</p>}
-
-                  <div className="qb-cta-row">
-                    <button
-                      type="submit"
-                      className={`qb-btn qb-btn--fill-${isFull ? "gold" : "ink"}`}
-                      disabled={submitting}
-                    >
-                      {submitting ? "보내는 중…" : submitLabel}
-                      <span className="qb-arrow">→</span>
-                    </button>
-                  </div>
-                </form>
-              )}
-            </>
           )}
+          <div className="qb-cta-row">
+            <BookClubReservation
+              event={{
+                slug: club.slug,
+                bookTitle: club.bookTitle,
+                startsAt: club.startsAt,
+                place: club.place,
+                status: club.status,
+                nameExample: club.nameExample,
+              }}
+              className={`qb-btn ${fill === "dim" ? "qb-btn--dim" : `qb-btn--fill-${fill}`}`}
+              label={result ? "예약 확인·취소" : isFull ? "대기 예약하기" : "참여 예약하기"}
+              disabled={isClosed}
+              onReserved={handleReserved}
+              onCanceled={handleCanceled}
+            />
+          </div>
         </div>
       )}
     </article>

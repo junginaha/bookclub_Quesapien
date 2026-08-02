@@ -61,6 +61,18 @@ export default async function BookClubDetailPage({ params }: Props) {
       } else {
         club = data;
       }
+      const { data: signupCounts } = await db
+        .from("landing_book_club_signup_counts")
+        .select("applied_count, waiting_count")
+        .eq("club_id", data.id)
+        .maybeSingle();
+      if (signupCounts) {
+        club = {
+          ...club,
+          current_participants: Number(signupCounts.applied_count ?? 0),
+          waiting_count: Number(signupCounts.waiting_count ?? 0),
+        };
+      }
       const [withCount] = await attachEncoreCounts(db, [club]);
       club = withCount;
     }

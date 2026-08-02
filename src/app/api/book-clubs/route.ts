@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { attachEncoreCounts } from "@/lib/bookclub-server";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "junginaha@gmail.com,kimjungin@quesapience.com").split(",");
@@ -22,8 +22,31 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
     // is_seed 컬럼이 아직 없는 DB에서도 안전하도록 애플리케이션 레벨에서 필터한다.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rows = ((data ?? []) as any[]).filter((c) => !c.is_seed);
+    const rows = ((data ?? []) as any[])
+      .filter((c) => !c.is_seed)
+      .map(({ join_url: _joinUrl, ...club }) => club);
     const clubs = await attachEncoreCounts(sb, rows);
+
+    // 홈 카드의 참여 현황도 실제 예약 테이블의 활성 확정 수를 기준으로 맞춘다.
+    // 집계 뷰는 service_role 전용이며 이름·연락처는 조회하지 않는다.
+    const ids = clubs.map((club: { id: string }) => club.id).filter(Boolean);
+    if (ids.length > 0 && process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) {
+      const { data: signupCounts } = await createServiceClient()
+        .from("landing_book_club_signup_counts")
+        .select("club_id, applied_count")
+        .in("club_id", ids);
+      const counts = new Map(
+        ((signupCounts ?? []) as { club_id: string; applied_count: number }[])
+          .map((row) => [row.club_id, Number(row.applied_count ?? 0)])
+      );
+      return NextResponse.json({
+        clubs: clubs.map((club: { id: string; current_participants?: number }) => ({
+          ...club,
+          current_participants: counts.get(club.id) ?? club.current_participants ?? 0,
+        })),
+      });
+    }
+
     return NextResponse.json({ clubs });
   } catch {
     return NextResponse.json({ clubs: [] });

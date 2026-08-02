@@ -62,7 +62,6 @@ export default function BookDetailModal({ book, onClose }: Props) {
   const [saving, setSaving]     = useState(false);
   const [saveError, setSaveError] = useState("");
   const [saveOk, setSaveOk]     = useState(false);
-  const [joined, setJoined]     = useState(false);
   const [quickUrl, setQuickUrl] = useState("");
   const [quickSaving, setQuickSaving] = useState(false);
   const [quickMsg, setQuickMsg] = useState("");
@@ -116,7 +115,6 @@ export default function BookDetailModal({ book, onClose }: Props) {
   useEffect(() => {
     if (!book) { setDetail(null); setEditing(false); return; }
     loadDetail(book);
-    setJoined(typeof window !== "undefined" && localStorage.getItem(`joined_${book.slug}`) === "1");
   }, [book, loadDetail]);
 
   useEffect(() => {
@@ -219,14 +217,6 @@ export default function BookDetailModal({ book, onClose }: Props) {
     setQuickUrl("");
     setQuickSaving(false);
     setTimeout(() => setQuickMsg(""), 4000);
-  };
-
-  // 참여 클릭 — /join API로 서버 리다이렉트 (URL 비노출)
-  const handleJoin = () => {
-    if (!detail?.slug) return;
-    window.open(`/api/book-clubs/${detail.slug}/join`, "_blank", "noopener,noreferrer");
-    localStorage.setItem(`joined_${detail.slug}`, "1");
-    setJoined(true);
   };
 
   const addRow = () => setRows((r) => [...r, { date: "", topic: "", closed: false }]);
@@ -426,13 +416,10 @@ export default function BookDetailModal({ book, onClose }: Props) {
                 )}
                 {deadlinePast ? (
                   <span className="bdm-btn-join-pending">참석 마감됐습니다</span>
-                ) : hasJoinUrl ? (
-                  <button className={`bdm-btn-join${joined ? " joined" : ""}`} onClick={handleJoin}>
-                    {joined ? "참여 신청 완료 ✓" : "참여 신청하기"}
-                    {!joined && <span className="bdm-arrow" />}
-                  </button>
                 ) : (
-                  <span className="bdm-btn-join-pending">모집 준비 중입니다</span>
+                  <a className="bdm-btn-join" href={`/bookclub/${detail?.slug ?? book.slug}`}>
+                    참여 예약하기 <span className="bdm-arrow" />
+                  </a>
                 )}
               </div>
             </>

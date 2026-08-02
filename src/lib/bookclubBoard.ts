@@ -2,7 +2,7 @@
 // 기존 src/lib/bookclub.ts(구 /bookclub 목록·상세, 앵콜 시스템)와는 별개다 —
 // 이 게시판은 정원을 절대 노출하지 않고, 상태를 저장 없이 매번 계산한다.
 
-export const DEFAULT_NAME_EXAMPLE = "서결";
+export const DEFAULT_NAME_EXAMPLE = "지민";
 
 /**
  * 기존 `reason` 컬럼은 명세의 "질문 한 줄"이 아니라 여러 줄 서사 + 그 안에 이미
@@ -175,7 +175,7 @@ export function formatTimeOfDay(input: string | Date): string {
   return minute > 0 ? `${ampm} ${hour12}시 ${minute}분` : `${ampm} ${hour12}시`;
 }
 
-/** 신청 마감일 표기 — "9월 12일까지" 형태(준비 섹션 "신청은 {마감일}까지 받아요"용). */
+/** 신청 마감일 표기 — "9월 12일" 형태(준비 섹션 "신청은 {마감일}까지 받아요"용). */
 export function formatDeadline(input: string | Date): string {
   const { month, day } = seoulParts(input);
   return `${month}월 ${day}일`;

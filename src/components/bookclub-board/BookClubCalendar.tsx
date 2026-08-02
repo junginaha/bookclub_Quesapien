@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CalendarDays, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import type { BoardCardData } from "./types";
 import { formatFullDateWeekday, formatTimeOfDay } from "@/lib/bookclubBoard";
+import BookClubReservation from "@/components/bookclub/BookClubReservation";
 
 const SEOUL_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
   timeZone: "Asia/Seoul",
@@ -145,7 +146,22 @@ export default function BookClubCalendar({ clubs }: { clubs: BoardCardData[] }) 
                   {club.bookAuthor && <p className="qb-calendar-author">{club.bookAuthor}</p>}
                   <div className="qb-calendar-meta"><CalendarDays size={16} aria-hidden="true" /><span>{formatFullDateWeekday(club.startsAt)}</span></div>
                   <div className="qb-calendar-meta"><MapPin size={16} aria-hidden="true" /><span>{club.place}</span></div>
-                  <Link className="qb-calendar-action" href={`/bookclub/${club.slug}`}>북클럽 자세히 보기</Link>
+                  <div className="qb-calendar-actions">
+                    <BookClubReservation
+                      event={{
+                        slug: club.slug,
+                        bookTitle: club.bookTitle,
+                        startsAt: club.startsAt,
+                        place: club.place,
+                        status: club.status,
+                        nameExample: club.nameExample,
+                      }}
+                      className="qb-calendar-action qb-calendar-action--primary"
+                      label={club.status === "full" ? "대기 예약하기" : "참여 예약하기"}
+                      disabled={club.status === "closed" || club.status === "done"}
+                    />
+                    <Link className="qb-calendar-detail-link" href={`/bookclub/${club.slug}`}>소개 자세히 보기</Link>
+                  </div>
                 </article>
               ))}
             </div>

@@ -4,11 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   MapPin, Calendar, Users, Star, ArrowLeft,
-  Clock, ChevronRight, CheckCircle, ExternalLink,
+  Clock, CheckCircle,
 } from "lucide-react";
 import AISummaryBlock from "@/components/seo/AISummaryBlock";
 import RelatedLinks from "@/components/seo/RelatedLinks";
-import type { RelatedItem } from "@/components/seo/RelatedLinks";
 import { useAppStore } from "@/lib/store";
 import { isAdminEmail } from "@/lib/admin";
 import {
@@ -21,6 +20,7 @@ import {
 } from "@/lib/bookclub";
 import { formatSeoulDate, formatSeoulTime } from "@/lib/time";
 import EncoreRequestButton from "@/components/bookclub/EncoreRequestButton";
+import BookClubReservation from "@/components/bookclub/BookClubReservation";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default function BookClubDetailClient({ club: initialClub }: { club: any; isAdmin?: boolean }) {
@@ -28,8 +28,6 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
   const currentUser = useAppStore((s) => s.currentUser);
   const isAdmin = isAdminEmail(currentUser?.email);
   const [club, setClub] = useState<any>(initialClub);
-  const [joinStep, setJoinStep] = useState<"idle" | "done" | "no-link">("idle");
-  const [joining, setJoining] = useState(false);
 
   // ── 어드민 편집 상태 ──────────────────────────────────────────
   const [editOpen, setEditOpen] = useState(false);
@@ -39,7 +37,6 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
     description: initialClub.description ?? "",
     location:    initialClub.location ?? "",
     host_name:   initialClub.host_name ?? "",
-    join_url:    initialClub.join_url ?? "",
   });
   const [saving, setSaving]   = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
@@ -47,33 +44,32 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
   const bgColor = CLUB_COLOR_MAP[club.color as string] ?? "#1B2536";
   // 지금 함께 읽어요 / 다시 함께 읽어요 — 리스트·홈과 동일한 분류 규칙을 재사용한다.
   const view = classifyClub(club);
-  const isAgain = view === "again";
+  const eventStart = getEventStart(club);
   const remainingRaw = remainingSeats(club); // null이면 자리 수를 표시하지 않는다
   const remaining = remainingRaw ?? 0;
   const nearFull = isNearFull(club);
   const full = isFull(club);
-  const isClosed = isAgain || full;
-  const hasJoinLink = !!(club.join_url?.startsWith("http")) || !!club.has_join_url;
+  const registrationClose = club.registration_closes_at
+    ? new Date(club.registration_closes_at)
+    : eventStart;
+  const isClosed = !eventStart
+    || eventStart.getTime() <= Date.now()
+    || (registrationClose ? registrationClose.getTime() < Date.now() : true)
+    || club.status === "closed"
+    || !!club.archived_at;
+  // 정원이 찬 미래 모임은 앵콜 대상이 아니라 대기 예약 대상이다.
+  const isAgain = view === "again" && isClosed;
+  const reservationStatus = isClosed ? "closed" : full ? "full" : nearFull ? "closing" : "open";
   const fillPct = club.max_participants ? Math.round(((club.current_participants ?? 0) / club.max_participants) * 100) : 0;
   const reviews: any[] = club.reviews ?? [];
   const hasReviews = reviews.length > 0;
   const avgRating = hasReviews
     ? reviews.reduce((s: number, r: any) => s + (r.rating ?? 5), 0) / reviews.length
     : 0;
-  const eventStart = getEventStart(club);
   const authorHosts = !!club.author_hosts;
-
-  // ── 참여 신청 — 서버 리다이렉트 (URL 비노출) ──────────────────
-  const handleJoin = async () => {
-    if (isClosed || joining) return;
-    if (!hasJoinLink) { setJoinStep("no-link"); return; }
-    setJoining(true);
-    // /api/book-clubs/[slug]/join 으로 탭 열기 → 서버가 잼잼링크로 302 리다이렉트
-    window.open(`/api/book-clubs/${club.slug}/join`, "_blank", "noopener,noreferrer");
-    setJoining(false);
-    setJoinStep("done");
-    setTimeout(() => setJoinStep("idle"), 3000);
-  };
+  const description = typeof club.description === "string" ? club.description.trim() : "";
+  const whyThisBook = typeof club.why_this_book === "string" ? club.why_this_book.trim() : "";
+  const showWhyThisBook = Boolean(whyThisBook && whyThisBook !== description);
 
   // ── 어드민 저장 ──────────────────────────────────────────────
   const handleSave = async () => {
@@ -88,13 +84,12 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
           description: editForm.description,
           location:    editForm.location,
           host_name:   editForm.host_name,
-          join_url:    editForm.join_url,
           color:       club.color,
         }),
       });
       const json = await res.json() as { club?: any; error?: string };
       if (res.ok && json.club) {
-        setClub((prev: any) => ({ ...prev, ...json.club, join_url: editForm.join_url }));
+        setClub((prev: any) => ({ ...prev, ...json.club }));
         setSaveMsg("✓ 저장됐어요!");
         setTimeout(() => { setSaveMsg(""); setEditOpen(false); }, 1500);
       } else {
@@ -131,7 +126,7 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
               <ArrowLeft size={14} /> 북클럽 목록
             </Link>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 40, alignItems: "end" }}>
+            <div>
               <div>
                 <div style={{
                   fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase",
@@ -152,7 +147,6 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                         description: club.description ?? "",
                         location:    club.location ?? "",
                         host_name:   club.host_name ?? "",
-                        join_url:    club.join_url ?? "",
                       });
                       setSaveMsg("");
                       setEditOpen(true);
@@ -189,105 +183,9 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                   </div>
                 )}
 
-                <p style={{ fontSize: 16, color: "rgba(255,255,255,0.75)", lineHeight: 1.75, maxWidth: 520, marginBottom: 36 }}>
-                  {club.description}
+                <p style={{ fontSize: 16, color: "rgba(255,255,255,0.75)", lineHeight: 1.75, maxWidth: 620, marginBottom: 0, whiteSpace: "pre-line" }}>
+                  {description}
                 </p>
-
-                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-                  {isAgain ? (
-                    <EncoreRequestButton clubSlug={club.slug} />
-                  ) : (
-                    <>
-                      <button
-                        onClick={handleJoin}
-                        disabled={full || joining}
-                        style={{
-                          display: "inline-flex", alignItems: "center", gap: 8,
-                          padding: "14px 28px", borderRadius: 9999,
-                          background: full ? "rgba(255,255,255,0.1)" : joinStep==="done" ? "#10B981" : "white",
-                          color: full ? "rgba(255,255,255,0.5)" : joinStep==="done" ? "white" : bgColor,
-                          fontSize: 15, fontWeight: 600,
-                          border: "none", cursor: full ? "not-allowed" : "pointer",
-                          transition: "all 0.2s",
-                        }}
-                        onMouseEnter={(e) => { if (!full && joinStep!=="done") (e.currentTarget as HTMLElement).style.opacity = "0.88"; }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
-                      >
-                        {full ? "신청 마감" : joinStep==="done" ? "신청 완료 ✓" : joining ? "연결 중…" : "참여 신청"}
-                        {!full && joinStep==="idle" && <ChevronRight size={16} />}
-                      </button>
-
-                      {joinStep==="no-link" && (
-                        <span style={{ fontSize:13, color:"rgba(255,255,255,0.6)" }}>참여 링크가 준비 중입니다.</span>
-                      )}
-
-                      {!full && remainingRaw !== null && (
-                        <div style={{
-                          display: "inline-flex", alignItems: "center", gap: 6,
-                          padding: "14px 20px",
-                          color: "rgba(255,255,255,0.7)", fontSize: 14,
-                        }}>
-                          <Users size={14} />
-                          {remaining}자리 남음
-                          {nearFull && (
-                            <span style={{ color: "#FF8A8A", fontWeight: 500 }}>· 마감 임박</span>
-                          )}
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {/* 리더 관리 버튼 (리더만 표시 — 클라이언트에서 auth 체크 안 함, 링크 자체가 서버에서 보호됨) */}
-                  <a
-                    href={`/bookclub/manage/${club.slug}`}
-                    style={{
-                      display: "inline-flex", alignItems: "center", gap: 6,
-                      padding: "12px 18px", borderRadius: 9999,
-                      background: "rgba(255,255,255,0.12)",
-                      color: "rgba(255,255,255,0.6)", fontSize: 13,
-                      border: "1px solid rgba(255,255,255,0.2)", textDecoration: "none",
-                      transition: "background .2s",
-                    }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.22)"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.12)"; }}
-                    title="리더·관리자만 접근 가능"
-                  >
-                    리더 관리
-                  </a>
-                </div>
-              </div>
-
-              {/* Stat card */}
-              <div style={{
-                background: "rgba(255,255,255,0.1)",
-                backdropFilter: "blur(12px)",
-                borderRadius: 16,
-                padding: "24px",
-                minWidth: 180,
-                border: "1px solid rgba(255,255,255,0.15)",
-              }} className="hidden md:block">
-                {!isAgain && (
-                  <>
-                    <div style={{ marginBottom: 20 }}>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>참여 현황</div>
-                      <div style={{ fontSize: 32, fontFamily: "var(--font-noto-serif-kr), Georgia, serif", color: "white", fontWeight: 400 }}>
-                        {club.current_participants ?? 0}
-                        <span style={{ fontSize: 16, opacity: 0.5 }}>/{club.max_participants ?? 8}</span>
-                      </div>
-                    </div>
-                    <div style={{ height: 4, borderRadius: 9999, background: "rgba(255,255,255,0.2)", marginBottom: 20 }}>
-                      <div style={{ height: "100%", width: `${fillPct}%`, borderRadius: 9999, background: nearFull ? "#FF8A8A" : "rgba(255,255,255,0.75)", transition: "width 0.3s" }} />
-                    </div>
-                  </>
-                )}
-                {hasReviews && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                    <Star size={12} style={{ color: "#FFD700", fill: "#FFD700" }} />
-                    <span style={{ fontSize: 14, color: "rgba(255,255,255,0.8)" }}>
-                      {avgRating.toFixed(1)} ({reviews.length}개 후기)
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -300,10 +198,10 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
             {/* ── Left Column ── */}
             <div style={{ display: "flex", flexDirection: "column", gap: 64 }}>
 
-              {/* 리더 프로필 */}
-              <section>
+              {/* 진행 소개 — 실제 소개가 있을 때만 노출한다. */}
+              {(club.host_philosophy || club.host_intro) && <section>
                 <div style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 24 }}>
-                  Leader — 리더
+                  Host — 모임 진행
                 </div>
                 <div style={{
                   display: "flex", gap: 24, alignItems: "flex-start",
@@ -317,23 +215,23 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 28, color: "white", fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
                   }}>
-                    리
+                    ?!
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 8 }}>
                       <h2 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 20, fontWeight: 500, color: "var(--ink)" }}>
-                        리더
+                        질문하는 사람들
                       </h2>
                     </div>
                     <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.75, marginBottom: 16 }}>
                       {club.host_philosophy ?? club.host_intro}
                     </p>
-                    <div style={{ display: "flex", gap: 20 }}>
+                    {(club.host_sessions_count != null || club.host_books_read != null || club.host_rating != null) && <div style={{ display: "flex", gap: 20 }}>
                       {[
-                        { value: club.host_sessions_count ?? "—", label: "진행한 북토크" },
-                        { value: club.host_books_read ?? "—", label: "읽은 책" },
-                        { value: `${(club.host_rating ?? 4.9).toFixed(1)}점`, label: "평균 후기" },
-                      ].map((s) => (
+                        club.host_sessions_count != null ? { value: club.host_sessions_count, label: "진행한 북토크" } : null,
+                        club.host_books_read != null ? { value: club.host_books_read, label: "읽은 책" } : null,
+                        club.host_rating != null ? { value: `${Number(club.host_rating).toFixed(1)}점`, label: "평균 후기" } : null,
+                      ].filter(Boolean).map((s: any) => (
                         <div key={s.label} style={{ textAlign: "center" }}>
                           <div style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 22, fontWeight: 400, color: "var(--ink)" }}>
                             {s.value}
@@ -341,13 +239,13 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                           <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>{s.label}</div>
                         </div>
                       ))}
-                    </div>
+                    </div>}
                   </div>
                 </div>
-              </section>
+              </section>}
 
               {/* 왜 이 책인가 */}
-              <section>
+              {showWhyThisBook && <section>
                 <div style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 24 }}>
                   Why — 왜 이 책인가
                 </div>
@@ -356,9 +254,9 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                   fontSize: 18, color: "var(--ink-soft)", lineHeight: 1.85,
                   borderLeft: `3px solid ${bgColor}`, paddingLeft: 24,
                 }}>
-                  {club.why_this_book ?? club.description}
+                  {whyThisBook}
                 </p>
-              </section>
+              </section>}
 
               {/* 핵심 질문들 */}
               {(club.key_questions ?? []).length > 0 && (
@@ -544,30 +442,32 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                   <EncoreRequestButton clubSlug={club.slug} />
                 ) : (
                   <>
-                    <button
-                      onClick={handleJoin}
-                      disabled={full}
+                    <BookClubReservation
+                      event={{
+                        slug: club.slug,
+                        bookTitle: club.title,
+                        startsAt: eventStart?.toISOString() ?? "",
+                        place: club.location ?? "장소 미정",
+                        status: reservationStatus,
+                        nameExample: club.name_example,
+                      }}
+                      disabled={isClosed}
+                      label={full ? "대기 예약하기" : "참여 예약하기"}
                       style={{
                         width: "100%", padding: "15px 0",
                         borderRadius: 12,
-                        background: full ? "var(--line-soft)" : bgColor,
-                        color: full ? "var(--muted)" : "white",
+                        background: isClosed ? "var(--line-soft)" : bgColor,
+                        color: isClosed ? "var(--muted)" : "white",
                         fontSize: 15, fontWeight: 600,
-                        border: "none", cursor: full ? "not-allowed" : "pointer",
+                        border: "none", cursor: isClosed ? "not-allowed" : "pointer",
                         display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                         transition: "opacity 0.2s",
                       }}
-                      onMouseEnter={(e) => { if (!full) (e.currentTarget as HTMLElement).style.opacity = "0.85"; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
-                    >
-                      {full ? "신청 마감" : "참여 신청"}
-                      {!full && <ExternalLink size={15} />}
-                    </button>
+                    />
 
-                    {!full && (
+                    {!isClosed && (
                       <p style={{ fontSize: 12, color: "var(--muted)", textAlign: "center", lineHeight: 1.6 }}>
-                        확정 후 이메일로 알려드릴게요.<br />
-                        참가비는 확정 후 알려드릴게요.
+                        예약 결과와 취소 기능은 접수 화면에서 바로 확인할 수 있어요.
                       </p>
                     )}
                   </>
@@ -603,11 +503,6 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
         <RelatedLinks
           title="관련 콘텐츠"
           items={[
-            ...(club.key_questions ?? []).slice(0, 3).map((q: string): RelatedItem => ({
-              label: q.length > 35 ? q.slice(0, 35) + "…" : q,
-              href: `/questions`,
-              type: "question",
-            })),
             { label: "질문 아카이브", href: "/questions", type: "question" },
             { label: "모든 북클럽 보기", href: "/bookclub", type: "booktalk" },
             { label: "후기 아카이브", href: "/archive", type: "review" },
@@ -630,7 +525,7 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
       </div>
 
       {/* ── Floating CTA (Mobile) ── */}
-      {!isClosed && (
+      {!isClosed && eventStart && (
         <div style={{
           position: "fixed", bottom: 0, left: 0, right: 0,
           padding: "16px clamp(20px, 4vw, 48px)",
@@ -642,10 +537,20 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
         }} className="md:hidden">
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: "var(--ink)" }}>{club.title}</div>
-            <div style={{ fontSize: 12, color: "var(--muted)" }}>잔여 {remaining}석</div>
+            <div style={{ fontSize: 12, color: "var(--muted)" }}>
+              {full ? "대기 예약 가능" : remainingRaw !== null ? `잔여 ${remaining}석` : "예약 가능"}
+            </div>
           </div>
-          <button
-            onClick={handleJoin}
+          <BookClubReservation
+            event={{
+              slug: club.slug,
+              bookTitle: club.title,
+              startsAt: eventStart.toISOString(),
+              place: club.location ?? "장소 미정",
+              status: reservationStatus,
+              nameExample: club.name_example,
+            }}
+            label={full ? "대기 예약" : "참여 예약"}
             style={{
               padding: "12px 24px", borderRadius: 9999,
               background: bgColor, color: "white",
@@ -653,69 +558,7 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
               border: "none", cursor: "pointer",
               flexShrink: 0,
             }}
-          >
-            참가 신청
-          </button>
-        </div>
-      )}
-
-
-      {/* 잼잼링크 미설정 안내 */}
-      {joinStep === "no-link" && (
-        <div style={{
-          position: "fixed", inset: 0, zIndex: 1000,
-          background: "rgba(28,31,38,0.6)", backdropFilter: "blur(4px)",
-          display: "flex", alignItems: "center", justifyContent: "center", padding: 24,
-        }} onClick={() => setJoinStep("idle")}>
-          <div
-            style={{ background: "var(--bg)", borderRadius: 20, padding: 40, maxWidth: 380, width: "100%", textAlign: "center" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ fontSize: 28, marginBottom: 16, fontFamily: '"EB Garamond", Georgia, serif', color: "var(--muted)", letterSpacing: "0.1em" }}>— —</div>
-            <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 20, fontWeight: 400, color: "var(--ink)", marginBottom: 12 }}>
-              신청 링크를 준비 중이에요.
-            </h3>
-            <p style={{ fontSize: 13.5, color: "var(--muted)", lineHeight: 1.75, marginBottom: 24 }}>
-              리더가 곧 신청 링크를 등록할 거예요.<br />
-              조금만 기다려 주세요.
-            </p>
-            <button
-              onClick={() => setJoinStep("idle")}
-              style={{ width: "100%", padding: "12px 0", borderRadius: 10, background: bgColor, color: "white", fontSize: 14, border: "none", cursor: "pointer" }}
-            >
-              닫기
-            </button>
-          </div>
-        </div>
-      )}
-
-      {joinStep === "done" && (
-        <div style={{
-          position: "fixed", inset: 0, zIndex: 1000,
-          background: "rgba(28,31,38,0.7)", backdropFilter: "blur(4px)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          padding: 24,
-        }} onClick={() => setJoinStep("idle")}>
-          <div style={{
-            background: "var(--bg)", borderRadius: 20, padding: 48,
-            maxWidth: 400, width: "100%", textAlign: "center",
-          }}>
-            <CheckCircle size={48} style={{ color: bgColor, margin: "0 auto 20px" }} />
-            <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 22, fontWeight: 400, color: "var(--ink)", marginBottom: 12 }}>
-              신청이 완료되었습니다
-            </h3>
-            <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75, marginBottom: 28 }}>
-              확인 후 이메일로 알려드릴게요.<br />
-              마이페이지에서 신청 내역을 확인할 수 있습니다.
-            </p>
-            <Link href="/mypage" style={{
-              display: "block", padding: "12px 0", borderRadius: 10,
-              background: bgColor, color: "white", textDecoration: "none",
-              fontSize: 14, fontWeight: 500,
-            }}>
-              마이페이지 확인
-            </Link>
-          </div>
+          />
         </div>
       )}
 
@@ -759,22 +602,6 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
                 placeholder="이 북클럽에 대해 소개해주세요."
                 style={{ width:"100%", padding:"10px 14px", borderRadius:10, fontSize:14, border:"1px solid var(--line-soft)", background:"rgba(255,255,255,0.7)", color:"var(--ink)", outline:"none", resize:"vertical", boxSizing:"border-box", fontFamily:"var(--font-noto-serif-kr), Georgia, serif" }}
               />
-            </div>
-
-            {/* 참여 링크 (잼잼) */}
-            <div style={{ marginBottom:16 }}>
-              <label style={{ display:"block", fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"var(--muted)", marginBottom:6 }}>
-                참여 링크 (잼잼)
-                {editForm.join_url && <span style={{ color:"var(--accent)", marginLeft:8 }}>✓ 설정됨</span>}
-              </label>
-              <input
-                type="url"
-                value={editForm.join_url}
-                onChange={(e) => setEditForm((f) => ({ ...f, join_url: e.target.value }))}
-                placeholder="잼잼 링크 붙여넣기"
-                style={{ width:"100%", padding:"10px 14px", borderRadius:10, fontSize:14, border:"1px solid var(--line-soft)", background:"rgba(255,255,255,0.7)", color:"var(--ink)", outline:"none", boxSizing:"border-box" }}
-              />
-              <p style={{ fontSize:11, color:"var(--muted)", marginTop:4 }}>저장 버튼을 눌러야 반영됩니다. 사용자에게 URL은 노출되지 않습니다.</p>
             </div>
 
             {saveMsg && (

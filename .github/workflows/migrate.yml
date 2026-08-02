@@ -2,21 +2,68 @@ name: Supabase Migration
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/020_real_bookclub_reservations.sql"
+      - ".github/workflows/migrate.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-supabase-migration
+  cancel-in-progress: false
 
 jobs:
   migrate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: pgstyeddzbjoijmmnuuw
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Run migrations
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      - name: Validate production credentials
         run: |
-          supabase link --project-ref smoehxmgnnaulrxjkqvm
-          supabase db execute --file supabase/SETUP.sql
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "SUPABASE_ACCESS_TOKEN repository secret is required."
+            exit 1
+          fi
+
+      - name: Apply the idempotent reservation migration
+        run: |
+          jq -n --rawfile query supabase/migrations/020_real_bookclub_reservations.sql \
+            '{query: $query, read_only: false}' > /tmp/supabase-migration.json
+
+          status=$(curl --silent --show-error \
+            --output /tmp/supabase-migration-response.json \
+            --write-out '%{http_code}' \
+            --request POST \
+            --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data-binary @/tmp/supabase-migration.json \
+            "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF/database/query")
+
+          if [ "$status" != "201" ]; then
+            echo "Migration API returned HTTP $status"
+            jq -r '.message // .error // "Unknown migration error"' /tmp/supabase-migration-response.json
+            exit 1
+          fi
+
+      - name: Verify reservation database objects
+        run: |
+          jq -n '{
+            query: "select to_regclass('"'"'public.landing_book_club_signups'"'"') is not null as has_signups, to_regprocedure('"'"'public.reserve_book_club_spot(uuid,text,text,text,boolean,boolean)'"'"') is not null as has_reserve_rpc",
+            read_only: true
+          }' > /tmp/supabase-verify.json
+
+          response=$(curl --silent --show-error --fail-with-body \
+            --request POST \
+            --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data-binary @/tmp/supabase-verify.json \
+            "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF/database/query")
+
+          echo "$response" | jq -e '.[0].has_signups == true and .[0].has_reserve_rpc == true' > /dev/null
