@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Star, BookOpen, MessageSquare, ChevronRight } from "lucide-react";
+import { Star, BookOpen, ChevronRight } from "lucide-react";
 
 interface Leader {
   id: string;

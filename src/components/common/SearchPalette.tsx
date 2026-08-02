@@ -61,7 +61,11 @@ export default function SearchPalette() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); open ? closePalette() : openPalette(); }
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        if (open) closePalette();
+        else openPalette();
+      }
       if (!open) return;
       if (e.key === "Escape") closePalette();
       if (e.key === "ArrowDown") { e.preventDefault(); setSelectedIdx((i) => Math.min(i + 1, results.length - 1)); }

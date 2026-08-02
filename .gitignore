@@ -1,10 +1,14 @@
-.vercel
-node_modules
-.env
-.env.local
-.env*.local
-.next
-.env.production
-.env.local
+.vercel/
+node_modules/
+.next/
 tsconfig.tsbuildinfo
-*.env\n.env.*
+
+# Local secrets. Keep the documented placeholder file in git.
+.env
+.env.*
+!.env.local.example
+
+# Tool-generated local state. These paths must never be shared between
+# Claude/Codex workspaces or between Supabase projects.
+.claude/worktrees/
+supabase/.temp/

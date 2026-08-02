@@ -1,12 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-
-const MAIN_SLUGS = [
-  "최신간-북토크", "다정함의-발명", "혼자라는-감각",
-  "아무도-보지-않는-오후", "오늘-저녁-당신께", "인간이라는-풍경",
-];
 
 const SEED_CLUBS = [
   // main 6
@@ -236,9 +231,6 @@ export default function ClubsAdminClient() {
           <button type="submit" style={{ width: "100%", padding: "11px", background: "#5E4632", color: "#fff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: "pointer" }}>
             입장
           </button>
-          <div style={{ marginTop: "16px", fontSize: "12px", color: "#a09080", textAlign: "center" }}>
-            기본값: quesapience2024
-          </div>
         </form>
       </div>
     );
