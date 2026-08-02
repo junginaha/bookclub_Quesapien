@@ -9,7 +9,7 @@ const PENDING_ATTR = "data-intro";
 const WORDMARKS = ["질문하는 사람들", "Quesapience"] as const;
 const AUTO_ADVANCE_MS = 10000;
 
-// 이 컴포넌트는 재방문자에게도 항상 마운트된다(LandingPage.tsx 참고) — 실제
+// 이 컴포넌트는 같은 탭의 재방문자에게도 항상 마운트된다(LandingPage.tsx 참고) — 실제
 // 노출 여부는 React 렌더 타이밍이 아니라 layout.tsx의 차단 스크립트가 첫
 // 페인트 전에 세팅하는 html[data-intro="pending"] 속성 + landing.css의
 // `html:not([data-intro="pending"]) .lp-intro { display: none }` 규칙이
@@ -32,12 +32,11 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
     dismissedRef.current = true;
     setLeaving(true);
     setTimeout(() => {
-      // sessionStorage는 탭 단위라 새 탭·브라우저 재시작마다 다시 떴다 —
-      // localStorage로 브라우저 단위(=한 번 보면 계속 안 봄)로 바꾼다.
-      // 저장이 막힌 브라우저(사파리 강한 프라이버시 모드 등)에서도 진입 자체는
-      // 막히면 안 되므로 에러는 무시한다.
+      // 인트로는 현재 탭에서만 한 번 보여준다. 새 탭이나 브라우저를 다시 열면
+      // 브랜드 진입 화면이 복원되지만, 같은 탭에서 홈을 오갈 때는 반복되지 않는다.
+      // 저장이 막힌 브라우저에서도 진입 자체는 막히면 안 되므로 에러는 무시한다.
       try {
-        localStorage.setItem(SEEN_KEY, "1");
+        sessionStorage.setItem(SEEN_KEY, "1");
       } catch {}
       // 같은 세션에서 홈으로 다시 클라이언트 내비게이션했을 때(새로고침 없이)
       // 이번 로드 때 세팅된 pending 속성이 남아있으면 다시 떠 보이므로 제거한다.
@@ -58,7 +57,7 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
   useEffect(() => {
     let seen = false;
     try {
-      seen = !!localStorage.getItem(SEEN_KEY);
+      seen = !!sessionStorage.getItem(SEEN_KEY);
     } catch {}
     if (seen) {
       try {
