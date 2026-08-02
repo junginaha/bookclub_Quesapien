@@ -104,6 +104,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${notoSansKR.variable} ${notoSerifKR.variable} ${ebGaramond.variable}`}
     >
       <head>
+        {/* 홈 인트로 스플래시(IntroSplash.tsx) 노출 여부를 첫 페인트 전에 확정하는
+            차단 스크립트. 처음 방문자만 html에 data-intro="pending"을 찍어두면
+            landing.css가 그 경우에만 .lp-intro를 보여준다 — React 하이드레이션을
+            기다리지 않아 "로딩 직후 다른 화면이 번쩍 뜨는" 현상이 없어진다.
+            IntroSplash.tsx의 SEEN_KEY/PENDING_ATTR과 반드시 같은 값을 써야 한다. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(!localStorage.getItem('qp-intro-seen')){document.documentElement.setAttribute('data-intro','pending')}}catch(e){}`,
+          }}
+        />
         {/* 키캡 버튼(.btn-keycap) 음각 전용 폰트 — 배민 주아(BMJUA), §C2 */}
         <link
           rel="stylesheet"

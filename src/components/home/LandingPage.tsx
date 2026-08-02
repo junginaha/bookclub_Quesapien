@@ -627,11 +627,12 @@ interface LandingPageProps {
 
 // ─── Main component ───────────────────────────────────────────
 export default function LandingPage({ todayQuestion, recentQuestions, upcomingMeetings = [] }: LandingPageProps) {
-  // 기본값을 "이미 봤음"(true)으로 둔다 — 인트로를 먼저 그렸다가 마운트 후
-  // sessionStorage 확인 결과로 즉시 숨기면(구 로직) 재방문 때마다 인트로가
-  // 팝업처럼 한 프레임 번쩍였다 사라지는 현상이 생긴다. 처음 방문자만 아래
-  // useEffect에서 명시적으로 false로 뒤집어 인트로를 띄운다.
-  const [introDone, setIntroDone] = useState(true);
+  // IntroSplash는 항상(재방문자 포함) 처음부터 마운트해 둔다 — 실제로 보일지는
+  // React 타이밍이 아니라 layout.tsx의 차단 스크립트가 첫 페인트 전에 세팅하는
+  // html[data-intro="pending"] + landing.css의 CSS로 결정된다(자세한 이유는
+  // IntroSplash.tsx 상단 주석 참고). 이 state는 "닫힘/스킵이 확정된 뒤 트리에서
+  // 완전히 제거"하는 역할만 한다.
+  const [introMounted, setIntroMounted] = useState(true);
   const [modalBook, setModalBook] = useState<BookClub | null>(null);
   const [activeFloat, setActiveFloat] = useState<number | null>(null);
   const [askContent, setAskContent] = useState("");
@@ -647,18 +648,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
   const [howToOpen, setHowToOpen] = useState(false);
   const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
   const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
-
-  // 처음 방문자만 인트로를 띄운다(IntroSplash.tsx의 SEEN_KEY와 동일한 값).
-  // introDone 기본값이 true라 이 체크 전까지는 인트로가 아예 그려지지 않는다.
-  // sessionStorage(탭 단위)는 새 탭·브라우저 재시작마다 다시 인트로를 띄워
-  // "재접속하면 또 뜬다"는 원인이 됐다 — localStorage(브라우저 단위)로 통일.
-  useEffect(() => {
-    let seen = false;
-    try {
-      seen = !!localStorage.getItem("qp-intro-seen");
-    } catch {}
-    if (!seen) setIntroDone(false);
-  }, []);
 
   // ── 실시간 활동 카운터 ──────────────────────────────────────
   const [newQuestions, setNewQuestions] = useState(0);
@@ -794,7 +783,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
 
   return (
     <div className="lp">
-      {!introDone && <IntroSplash onEnter={() => setIntroDone(true)} />}
+      {introMounted && <IntroSplash onEnter={() => setIntroMounted(false)} />}
       <div className="lp-grain" aria-hidden="true" />
       <div className="lp-grain-light" aria-hidden="true" />
 

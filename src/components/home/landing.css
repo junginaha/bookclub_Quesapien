@@ -1617,6 +1617,13 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
   text-align: center;
   animation: lp-introFadeIn .6s ease both;
 }
+/* IntroSplash는 재방문자에게도 항상 마운트되어 있다(LandingPage.tsx) — 기본은
+   숨김이고, layout.tsx의 차단 스크립트가 첫 페인트 전에 세팅하는
+   html[data-intro="pending"](처음 방문자만)일 때만 보인다. React 상태/이펙트
+   타이밍에 기대지 않으므로 첫 페인트부터 정확해 번쩍임이 없다. */
+html:not([data-intro="pending"]) .lp-intro {
+  display: none;
+}
 .lp-intro-leaving {
   animation: lp-introFadeOut .45s ease both;
 }

@@ -3,9 +3,21 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+// layout.tsx의 차단 스크립트, landing.css의 CSS와 반드시 같은 값을 써야 한다.
 const SEEN_KEY = "qp-intro-seen";
+const PENDING_ATTR = "data-intro";
 const WORDMARKS = ["질문하는 사람들", "Quesapience"] as const;
 const AUTO_ADVANCE_MS = 10000;
+
+// 이 컴포넌트는 재방문자에게도 항상 마운트된다(LandingPage.tsx 참고) — 실제
+// 노출 여부는 React 렌더 타이밍이 아니라 layout.tsx의 차단 스크립트가 첫
+// 페인트 전에 세팅하는 html[data-intro="pending"] 속성 + landing.css의
+// `html:not([data-intro="pending"]) .lp-intro { display: none }` 규칙이
+// 결정한다. 하이드레이션 이후에 도달하는 아래 useEffect/dismiss()는 그
+// 결정을 "확정"만 할 뿐이라 화면 번쩍임이 생기지 않는다 — React 상태로
+// 초기 노출을 결정하면(구 로직) 첫 페인트와 useEffect 사이에 반드시 한
+// 프레임의 시차가 생겨, 첫 방문자에게는 랜딩 화면이, 재방문자에게는
+// 인트로가 잠깐 번쩍이는 문제가 있었다.
 
 export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
   const [visible, setVisible] = useState(true);
@@ -27,6 +39,11 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
       try {
         localStorage.setItem(SEEN_KEY, "1");
       } catch {}
+      // 같은 세션에서 홈으로 다시 클라이언트 내비게이션했을 때(새로고침 없이)
+      // 이번 로드 때 세팅된 pending 속성이 남아있으면 다시 떠 보이므로 제거한다.
+      try {
+        document.documentElement.removeAttribute(PENDING_ATTR);
+      } catch {}
       onEnter();
     }, 450);
   };
@@ -44,6 +61,9 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
       seen = !!localStorage.getItem(SEEN_KEY);
     } catch {}
     if (seen) {
+      try {
+        document.documentElement.removeAttribute(PENDING_ATTR);
+      } catch {}
       setVisible(false);
       onEnter();
       return;
