@@ -514,7 +514,7 @@ export default function BookClubDetailClient({ club: initialClub }: { club: any;
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <AISummaryBlock
           what={`${club.title ?? "이 북토크"}는 ${club.author ? `${club.author}의 ` : ""}${club.genre ?? "책"}을 중심으로 질문하는 사람들이 진행하는 오프라인 북토크이다.`}
-          why={club.why_this_book ?? club.description ?? "책과 질문을 통해 사람과 사람이 연결되는 경험을 제공한다."}
+          why={showWhyThisBook ? whyThisBook : undefined}
           who={(club.recommended_for ?? ["독서를 좋아하는 분", "새로운 사람을 만나고 싶은 분"]).join(", ")}
           bullets={[
             `장소: ${club.location ?? "서울"}`,

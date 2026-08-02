@@ -6,7 +6,7 @@
 
 interface AISummaryProps {
   what: string;
-  why: string;
+  why?: string;
   who: string;
   bullets?: string[];
 }
@@ -28,7 +28,7 @@ export default function AISummaryBlock({ what, why, who, bullets }: AISummaryPro
       }}
     >
       <p itemProp="description"><strong>무엇인가:</strong> {what}</p>
-      <p itemProp="description"><strong>왜 중요한가:</strong> {why}</p>
+      {why && <p itemProp="description"><strong>왜 중요한가:</strong> {why}</p>}
       <p itemProp="description"><strong>누구에게 적합한가:</strong> {who}</p>
       {bullets && (
         <ul>

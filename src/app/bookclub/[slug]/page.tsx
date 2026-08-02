@@ -38,6 +38,7 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "junginaha@gmail.com,kimjungin
 export default async function BookClubDetailPage({ params }: Props) {
   const { slug: rawSlug } = await params;
   const slug = decodeURIComponent(rawSlug);
+  const fallbackClub = getFallbackClub(slug) ?? null;
   let club: any = null;
 
   const supabase = await createClient();
@@ -53,13 +54,21 @@ export default async function BookClubDetailPage({ params }: Props) {
       .eq("slug", slug)
       .maybeSingle();
     if (data && !data.is_seed) {
+      // 운영 DB가 아직 구조화 일정 컬럼을 갖기 전이어도 상세 페이지가 정확한
+      // 일정·정원을 유지하도록, 비어 있지 않은 DB 값만 정식 폴백 위에 얹는다.
+      // DB의 UUID·소개·현재 인원은 보존하고 누락된 event_starts_at 등만 보완한다.
+      const dbValues = Object.fromEntries(
+        Object.entries(data).filter(([, value]) => value !== null && value !== undefined && value !== "")
+      );
+      const merged = { ...fallbackClub, ...dbValues };
+
       // 비관리자에게는 join_url 숨김 (has_join_url 플래그만 전달)
-      if (!isAdmin && data.join_url) {
-        const { join_url, ...rest } = data;
+      if (!isAdmin && merged.join_url) {
+        const { join_url, ...rest } = merged;
         void join_url;
         club = { ...rest, has_join_url: true };
       } else {
-        club = data;
+        club = merged;
       }
       const { data: signupCounts } = await db
         .from("landing_book_club_signup_counts")
@@ -78,7 +87,7 @@ export default async function BookClubDetailPage({ params }: Props) {
     }
   } catch { /* fallback */ }
 
-  if (!club) club = getFallbackClub(slug) ?? null;
+  if (!club) club = fallbackClub;
   if (!club) notFound();
 
   const eventLd = bookTalkEventSchema(club);
