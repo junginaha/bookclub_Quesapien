@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
-import QuestionsClient from "./QuestionsClient";
+import TrustedQuestionsClient, { type CommunityStats } from "./TrustedQuestionsClient";
 import DefinitionBlock from "@/components/seo/DefinitionBlock";
 import { createClient } from "@/lib/supabase/server";
 import { questionCollectionSchema, breadcrumbSchema } from "@/lib/schema";
@@ -23,20 +23,49 @@ export default async function QuestionsPage() {
   let todayQuestion = null;
   let featuredQuestions: unknown[] = [];
   let recentQuestions: unknown[] = [];
+  let communityStats: CommunityStats | null = null;
 
   try {
     const supabase = await createClient();
-    const [todayRes, featuredRes, recentRes] = await Promise.all([
+    const [todayRes, featuredRes, recentRes, questionCountRes, answerCountRes] = await Promise.all([
       supabase.from("landing_questions").select("*").eq("is_today", true).limit(1).single(),
-      supabase.from("landing_questions").select("*").eq("is_featured", true).eq("is_approved", true).order("likes", { ascending: false }).limit(5),
-      supabase.from("landing_questions").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(12),
+      supabase
+        .from("landing_questions")
+        .select("*")
+        .eq("is_featured", true)
+        .eq("is_approved", true)
+        .order("likes", { ascending: false })
+        .limit(5),
+      supabase
+        .from("landing_questions")
+        .select("*")
+        .eq("is_approved", true)
+        .order("created_at", { ascending: false })
+        .limit(12),
+      supabase
+        .from("landing_questions")
+        .select("id", { count: "exact", head: true })
+        .eq("is_approved", true),
+      supabase
+        .from("landing_question_answers")
+        .select("id", { count: "exact", head: true })
+        .eq("is_approved", true),
     ]);
+
     todayQuestion = todayRes.data;
     featuredQuestions = featuredRes.data ?? [];
     recentQuestions = recentRes.data ?? [];
-  } catch { /* static fallback */ }
 
-  // Stage 1: CollectionPage + BreadcrumbList JSON-LD
+    if (!questionCountRes.error && !answerCountRes.error) {
+      communityStats = {
+        questions: questionCountRes.count ?? 0,
+        answers: answerCountRes.count ?? 0,
+      };
+    }
+  } catch {
+    // 데이터 연결이 끊기면 정적 활동량을 만들지 않고 준비 안내만 표시한다.
+  }
+
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const allQ = [...featuredQuestions, ...recentQuestions] as any[];
   const collectionLd = questionCollectionSchema(
@@ -50,23 +79,22 @@ export default async function QuestionsPage() {
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      {/* Stage 1: Structured data */}
       <JsonLd data={collectionLd} />
       <JsonLd data={crumbLd} />
 
       <Header />
 
-      {/* Stage 4: AI Friendly Definition Block */}
       <DefinitionBlock
         definition="질문하는 사람들의 질문 아카이브. 매일 한 개의 오늘의 질문이 등록되며, 커뮤니티 구성원이 자신의 질문을 남길 수 있다. 좋은 질문은 북토크 주제로 이어진다."
         entityType="QuestionArchive"
       />
 
       <main style={{ flex: 1 }}>
-        <QuestionsClient
+        <TrustedQuestionsClient
           todayQuestion={todayQuestion}
           featuredQuestions={featuredQuestions}
           recentQuestions={recentQuestions}
+          communityStats={communityStats}
         />
       </main>
       <Footer />
