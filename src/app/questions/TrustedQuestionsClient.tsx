@@ -194,7 +194,11 @@ function sanitizeTree(
     return <EmptySection eyebrow="Popular — 인기 질문" message="실제 반응이 쌓인 질문부터 이곳에 소개할게요." />;
   }
 
-  if (element.type === "section" && !options.hasRecent && containsText(children, "최근 질문")) {
+  if (
+    element.type === "section" &&
+    !options.hasRecent &&
+    (containsText(children, "최근 질문") || containsText(children, "검색 결과"))
+  ) {
     return <EmptySection eyebrow="Recent — 최근 질문" message="아직 공개된 질문이 없어요. 첫 질문을 기다리고 있습니다." />;
   }
 
