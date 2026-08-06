@@ -10,6 +10,40 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+function AuthFormLoading() {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        minHeight: 180,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        textAlign: "center",
+      }}
+    >
+      <div
+        style={{
+          width: 24,
+          height: 24,
+          borderRadius: "50%",
+          border: "2px solid var(--line)",
+          borderTopColor: "var(--accent)",
+        }}
+      />
+      <p style={{ margin: 0, fontSize: 14, color: "var(--ink-soft)" }}>
+        함께하기 화면을 준비하고 있어요.
+      </p>
+      <p style={{ margin: 0, fontSize: 12, color: "var(--muted)", lineHeight: 1.6 }}>
+        잠시 후에도 보이지 않으면 새로고침해 주세요.
+      </p>
+    </div>
+  );
+}
+
 export default function SignupPage() {
   return (
     <div style={{
@@ -21,7 +55,6 @@ export default function SignupPage() {
       padding: "40px 24px",
     }}>
       <div style={{ width: "100%", maxWidth: 380 }}>
-        {/* ?! 로고 */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 40 }}>
           <Link href="/" style={{ textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
             <QIMark size="lg" />
@@ -50,7 +83,6 @@ export default function SignupPage() {
           </p>
         </div>
 
-        {/* 폼 카드 */}
         <div style={{
           background: "rgba(255,255,255,0.7)",
           backdropFilter: "blur(12px)",
@@ -59,7 +91,7 @@ export default function SignupPage() {
           padding: "32px 28px",
           boxShadow: "0 8px 40px -16px rgba(28,31,38,.12)",
         }}>
-          <Suspense fallback={null}>
+          <Suspense fallback={<AuthFormLoading />}>
             <SignupForm />
           </Suspense>
         </div>
