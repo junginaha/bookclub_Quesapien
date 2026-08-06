@@ -28,7 +28,13 @@ export default async function QuestionsPage() {
   try {
     const supabase = await createClient();
     const [todayRes, featuredRes, recentRes, questionCountRes, answerCountRes] = await Promise.all([
-      supabase.from("landing_questions").select("*").eq("is_today", true).limit(1).single(),
+      supabase
+        .from("landing_questions")
+        .select("*")
+        .eq("is_today", true)
+        .eq("is_approved", true)
+        .limit(1)
+        .single(),
       supabase
         .from("landing_questions")
         .select("*")
