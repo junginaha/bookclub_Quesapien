@@ -1,22 +1,22 @@
 import type { MetadataRoute } from "next";
+import { REAL_CLUBS } from "@/lib/bookclub";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jilmunhaneun-saramdeul.vercel.app";
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://jilmunhaneun-saramdeul.vercel.app").replace(/\/$/, "");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  // Static pages — highest priority
-  const staticPages: MetadataRoute.Sitemap = [
+  const publicPages: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
       lastModified: now,
       changeFrequency: "daily",
-      priority: 1.0,
+      priority: 1,
     },
     {
       url: `${SITE_URL}/questions`,
       lastModified: now,
-      changeFrequency: "hourly",
+      changeFrequency: "daily",
       priority: 0.95,
     },
     {
@@ -26,58 +26,44 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
     {
-      url: `${SITE_URL}/giants`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
       url: `${SITE_URL}/archive`,
       lastModified: now,
-      changeFrequency: "daily",
+      changeFrequency: "weekly",
       priority: 0.85,
     },
     {
-      url: `${SITE_URL}/questions/create`,
+      url: `${SITE_URL}/giants`,
       lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
+      changeFrequency: "weekly",
+      priority: 0.8,
     },
     {
-      url: `${SITE_URL}/quiz`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: `${SITE_URL}/login`,
+      url: `${SITE_URL}/privacy`,
       lastModified: now,
       changeFrequency: "yearly",
       priority: 0.3,
     },
     {
-      url: `${SITE_URL}/signup`,
+      url: `${SITE_URL}/terms`,
       lastModified: now,
       changeFrequency: "yearly",
       priority: 0.3,
     },
   ];
 
-  // BookClub slugs — static known slugs
-  const bookclubSlugs = [
-    "다정함의-발명",
-    "혼자라는-감각",
-    "아무도-보지-않는-오후",
-    "외로움-시즌-위크4",
-    "오늘-저녁-당신께",
-    "인간이라는-풍경",
-  ];
-  const bookclubPages: MetadataRoute.Sitemap = bookclubSlugs.map((slug) => ({
-    url: `${SITE_URL}/bookclub/${slug}`,
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }));
+  const bookclubPages: MetadataRoute.Sitemap = REAL_CLUBS
+    .filter((club) => !club.is_seed && Boolean(club.slug))
+    .map((club) => {
+      const eventDate = club.event_starts_at ? new Date(club.event_starts_at) : null;
+      const isUpcoming = Boolean(eventDate && eventDate.getTime() >= now.getTime());
 
-  return [...staticPages, ...bookclubPages];
+      return {
+        url: `${SITE_URL}/bookclub/${encodeURIComponent(club.slug)}`,
+        lastModified: eventDate ?? now,
+        changeFrequency: isUpcoming ? ("weekly" as const) : ("monthly" as const),
+        priority: isUpcoming ? 0.85 : 0.65,
+      };
+    });
+
+  return [...publicPages, ...bookclubPages];
 }

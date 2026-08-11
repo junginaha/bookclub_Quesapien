@@ -1,62 +1,19 @@
-# robots.txt — 질문하는 사람들 (Quesapience)
-# AEO/GEO 최적화: 모든 AI 크롤러에게 인덱싱 허용
+# 질문하는 사람들
+# 공개 콘텐츠는 검색과 AI 검색에 열고, 운영·인증·작성 경로는 제외합니다.
 
 User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /api/
 Disallow: /auth/
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /onboarding
+Disallow: /mypage
+Disallow: /questions/create
+Disallow: /quiz
+Disallow: /setup
 
-# Google
-User-agent: Googlebot
-Allow: /
-Disallow: /admin
-Disallow: /api/
-Disallow: /auth/
-
-# Google AI Training
-User-agent: Google-Extended
-Allow: /
-
-# OpenAI (ChatGPT, SearchGPT)
-User-agent: GPTBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: OAI-SearchBot
-Allow: /
-
-# Anthropic (Claude)
-User-agent: anthropic-ai
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-# Perplexity
-User-agent: PerplexityBot
-Allow: /
-
-# Common Crawl (used by many AI systems)
-User-agent: CCBot
-Allow: /
-
-# Meta AI
-User-agent: FacebookBot
-Allow: /
-
-# Apple
-User-agent: Applebot
-Allow: /
-
-# Microsoft (Copilot)
-User-agent: Bingbot
-Allow: /
-
-User-agent: msnbot
-Allow: /
-
-# Sitemap
 Sitemap: https://jilmunhaneun-saramdeul.vercel.app/sitemap.xml
