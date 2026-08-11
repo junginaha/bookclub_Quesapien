@@ -127,7 +127,7 @@ export default function SignupForm() {
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <PrivacyConsentGate checked={consented} onChange={setConsented} />
 
-      {/* 카카오 버튼 — Quesapience 2.0 M0 기본 가입 수단 */}
+      {/* 카카오 버튼 — Qsapiens 2.0 M0 기본 가입 수단 */}
       <button
         onClick={handleKakao}
         disabled={kakaoLoading || oauthDisabled}

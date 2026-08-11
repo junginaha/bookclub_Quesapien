@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 // layout.tsx의 차단 스크립트, landing.css의 CSS와 반드시 같은 값을 써야 한다.
 const SEEN_KEY = "qp-intro-seen";
 const PENDING_ATTR = "data-intro";
-const WORDMARKS = ["질문하는 사람들", "Quesapience"] as const;
+const WORDMARKS = ["질문하는 사람들", "Qsapiens"] as const;
 const AUTO_ADVANCE_MS = 10000;
 
 // 이 컴포넌트는 같은 탭의 재방문자에게도 항상 마운트된다(LandingPage.tsx 참고) — 실제
@@ -67,7 +67,7 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
       onEnter();
       return;
     }
-    // 헤더와 동일한 워드마크 자동 전환(질문하는 사람들 ↔ Quesapience)
+    // 헤더와 동일한 워드마크 자동 전환(질문하는 사람들 ↔ Qsapiens)
     const wordmarkInterval = setInterval(() => {
       setWordmarkFading(true);
       setTimeout(() => {

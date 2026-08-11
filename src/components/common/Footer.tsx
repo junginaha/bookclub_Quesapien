@@ -106,7 +106,7 @@ export default function Footer() {
             <span>협업·문의</span>
             <span style={{ opacity: 0.4 }}>·</span>
             <a
-              href="mailto:junginaha@qsapience.com"
+              href="mailto:junginaha@qsapiens.com"
               style={{
                 color: "rgba(176,138,74,0.65)",
                 textDecoration: "none",
@@ -116,7 +116,7 @@ export default function Footer() {
               onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(176,138,74,1)"; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(176,138,74,0.65)"; }}
             >
-              junginaha@qsapience.com
+              junginaha@qsapiens.com
             </a>
           </div>
           <div style={{
@@ -127,7 +127,7 @@ export default function Footer() {
             gap: 12,
           }}>
             <p style={{ fontSize: 12, color: "rgba(163,154,140,0.4)" }}>
-              © 2026 <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>질문하는 사람들 · Quesapience</Link>. All rights reserved.
+              © 2026 <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>질문하는 사람들 · Qsapiens</Link>. All rights reserved.
             </p>
             <div style={{ display: "flex", gap: 14 }}>
               <Link href="/privacy" style={{ fontSize: 12, color: "rgba(163,154,140,0.5)", textDecoration: "none" }}>개인정보처리방침</Link>

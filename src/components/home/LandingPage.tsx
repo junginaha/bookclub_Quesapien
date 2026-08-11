@@ -38,7 +38,7 @@ function fmtDist(km: number): string {
 const books: BookClub[] = [
   {
     color: "navy", genre: "NEW", slug: "최신간-북토크",
-    title: "최신간 북토크, 핫한 문장들", author: "Quesapience",
+    title: "최신간 북토크, 핫한 문장들", author: "Qsapiens",
     tag: "#신간 #트렌드", recommender: "Q5",
     reason: "새벽 세 시에 깨어 있는 사람만 아는 문장이 여기 있습니다. 잠들지 못한 누군가에게 이 책이 곁에 있다고 말해주고 싶었어요.",
     emotionTags: ["#불면", "#회복", "#고요"],
@@ -795,7 +795,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           </span>
           {/* 랜딩 nav 워드마크 교차 */}
           <span style={{ display: "inline-grid" }}>
-            {(["질문하는 사람들", "Quesapience"] as const).map((w, i) => (
+            {(["질문하는 사람들", "Qsapiens"] as const).map((w, i) => (
               <span key={w} style={{
                 gridArea: "1 / 1", whiteSpace: "nowrap",
                 fontFamily: i === 1 ? '"EB Garamond", Georgia, serif' : "var(--lp-serif-ko)",
@@ -948,7 +948,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
         </div>
       )}
 
-      {/* 내 근처 다음 모임 — Quesapience 2.0 §C1 구조적 귀결① (홈 = 내 근처 다음 모임 피드) */}
+      {/* 내 근처 다음 모임 — Qsapiens 2.0 §C1 구조적 귀결① (홈 = 내 근처 다음 모임 피드) */}
       <NearbyMeetingsFeed items={upcomingMeetings} />
 
       {/* ③ BOOKLOVER */}
@@ -1092,7 +1092,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
       <section className="lp-section lp-question-hub" id="today-q" style={{ background: "var(--lp-bg-soft)" }}>
         <div className="lp-section-head">
           <div className="lp-left">
-            <a href="/questions" className="lp-eyebrow lp-section-title-link">QUESAPIENCE · QUESTIONS — 오늘의 질문</a>
+            <a href="/questions" className="lp-eyebrow lp-section-title-link">QSAPIENS · QUESTIONS — 오늘의 질문</a>
             <a href="/questions" className="lp-section-title-link" style={{ textDecoration: "none" }}>
               <h2 className="lp-h-section">
                 하루에 한 번,<br />
@@ -1262,7 +1262,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
             <a href="/archive">아카이빙</a>
             <a href="/giants">거인의 어깨</a>
           </div>
-          <div className="lp-foot-copy">© 2026 — Quesapience.</div>
+          <div className="lp-foot-copy">© 2026 — Qsapiens.</div>
         </div>
       </footer>
 

@@ -25,7 +25,7 @@ export interface Club {
 export const ALL_CLUBS: Club[] = [
   // ── 1–6: Featured (메인 히어로 섹션) ──────────────────────────
   {
-    id: "c1", slug: "최신간-북토크", title: "최신간 북토크, 핫한 문장들", author: "Quesapience",
+    id: "c1", slug: "최신간-북토크", title: "최신간 북토크, 핫한 문장들", author: "Qsapiens",
     color: "navy", genre: "NEW", tag: "#신간 #트렌드", recommender: "Q5",
     reason: "새벽 세 시에 깨어 있는 사람만 아는 문장이 여기 있습니다.",
     hostName: "정해린", hostIntro: "정답보다 진심을 믿습니다.",

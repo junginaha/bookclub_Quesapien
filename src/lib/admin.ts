@@ -1,5 +1,5 @@
 export const ADMIN_EMAILS = (
-  process.env.ADMIN_EMAILS ?? "junginaha@gmail.com,kimjungin@quesapience.com"
+  process.env.ADMIN_EMAILS ?? "junginaha@gmail.com,kimjungin@qsapiens.com"
 ).split(",").map((e) => e.trim());
 
 export function isAdminEmail(email: string | null | undefined): boolean {
@@ -8,7 +8,7 @@ export function isAdminEmail(email: string | null | undefined): boolean {
 }
 
 /**
- * Quesapience 2.0 신규 코드용 운영자 확인. profiles.is_operator를 서버에서
+ * Qsapiens 2.0 신규 코드용 운영자 확인. profiles.is_operator를 서버에서
  * 직접 조회한다 — 기존 이메일 allowlist(ADMIN_EMAILS)는 구 admin 라우트 전용으로
  * 남겨두고, 신규 대시보드/API는 전부 이 함수를 사용한다.
  * RLS가 이미 anon/타인의 is_operator=true 조작을 막지만, 이 함수는 그와 별개로

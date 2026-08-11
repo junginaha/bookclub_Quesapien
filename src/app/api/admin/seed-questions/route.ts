@@ -22,7 +22,7 @@ const allIds = Object.values(IDS);
 
 export async function POST(req: NextRequest) {
   const secret = req.headers.get("x-seed-secret");
-  if (secret !== process.env.SEED_SECRET && secret !== "quesapience-seed-2026") {
+  if (secret !== process.env.SEED_SECRET && secret !== "qsapiens-seed-2026") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

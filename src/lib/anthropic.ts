@@ -12,7 +12,7 @@ export const anthropic = new Anthropic({
         baseURL: "https://openrouter.ai/api/v1",
         defaultHeaders: {
           "HTTP-Referer": "https://jilmunhaneun-saramdeul.vercel.app",
-          "X-Title": "Quesapience",
+          "X-Title": "Qsapiens",
         },
       }
     : {}),
@@ -45,7 +45,7 @@ export async function callClaude(params: {
   };
   if (isOpenRouter) {
     headers["HTTP-Referer"] = "https://jilmunhaneun-saramdeul.vercel.app";
-    headers["X-Title"] = "Quesapience";
+    headers["X-Title"] = "Qsapiens";
   } else {
     headers["x-api-key"] = key;
     headers["anthropic-version"] = "2023-06-01";

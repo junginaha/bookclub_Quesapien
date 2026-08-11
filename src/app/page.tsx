@@ -15,7 +15,7 @@ export const metadata: Metadata = buildMetadata({
   path: "/",
   type: "website",
   keywords: [
-    "질문하는사람들", "Quesapience", "서초구북클럽",
+    "질문하는사람들", "Qsapiens", "서초구북클럽",
     "미래혁신형북클럽", "오프라인독서모임", "북토크",
     "독서질문", "지적커뮤니티", "북클럽서울", "내근처북클럽",
     "독서모임참여", "거인의어깨", "오늘의질문",
@@ -31,7 +31,7 @@ const landingSchema = [
     "@id": `${SITE_URL}/#website`,
     url: SITE_URL,
     name: "질문하는 사람들",
-    alternateName: "Quesapience",
+    alternateName: "Qsapiens",
     description: "질문을 중심으로 책과 사람을 연결하는 서초구 선정 미래혁신형 북클럽",
     inLanguage: "ko",
     potentialAction: {
@@ -44,7 +44,7 @@ const landingSchema = [
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
-    name: "질문하는 사람들 — Quesapience",
+    name: "질문하는 사람들 — Qsapiens",
     url: SITE_URL,
     logo: `${SITE_URL}/og-default.png`,
     description: "서초구 선정 미래혁신형 북클럽. 질문 → 책 → 대화 → 사람 → 성장.",
@@ -135,7 +135,7 @@ export default async function HomePage() {
     // static fallback in LandingPage
   }
 
-  // Quesapience 2.0 — 홈 = 내 근처 다음 모임 피드(§C1 구조적 귀결①). 신규 clubs/meetings
+  // Qsapiens 2.0 — 홈 = 내 근처 다음 모임 피드(§C1 구조적 귀결①). 신규 clubs/meetings
   // 마이그레이션(010) 적용 전에는 빈 배열로 조용히 폴백한다(기존 홈 동작에 영향 없음).
   const upcomingMeetings = await getUpcomingMeetingsFeed(6).catch(() => []);
 

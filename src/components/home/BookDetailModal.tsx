@@ -33,7 +33,7 @@ interface SessionRow { date: string; topic: string; closed: boolean; }
 
 interface Props { book: BookClub | null; onClose: () => void; }
 
-const ADMIN_EMAILS = ["junginaha@gmail.com", "kimjungin@quesapience.com"];
+const ADMIN_EMAILS = ["junginaha@gmail.com", "kimjungin@qsapiens.com"];
 const DEADLINE_MARKER = "__deadline__";
 
 // session_dates 안에 마감일을 특수 항목으로 저장·추출

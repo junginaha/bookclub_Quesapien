@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isOperator } from "@/lib/admin";
 
-// Quesapience 2.0 clubs CRUD — 기존 /api/admin/clubs(landing_book_clubs, x-admin-key 방식)와는
+// Qsapiens 2.0 clubs CRUD — 기존 /api/admin/clubs(landing_book_clubs, x-admin-key 방식)와는
 // 별개 네임스페이스. RLS(clubs_write_operator)와 이 서버 검증 양쪽에서 is_operator를 확인한다(§C0).
 export async function GET() {
   const supabase = await createClient();

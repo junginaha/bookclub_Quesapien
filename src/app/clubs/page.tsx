@@ -10,7 +10,7 @@ export const metadata: Metadata = buildMetadata({
   description: "질문하는 사람들이 운영하는 오프라인 북클럽을 둘러보고, 다음 모임에 바로 참여하세요.",
   path: "/clubs",
   type: "website",
-  keywords: ["북클럽", "독서모임", "오프라인모임", "Quesapience"],
+  keywords: ["북클럽", "독서모임", "오프라인모임", "Qsapiens"],
 });
 
 export default async function ClubsPage() {

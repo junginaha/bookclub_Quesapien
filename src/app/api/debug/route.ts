@@ -20,7 +20,7 @@ export async function GET() {
       };
       if (isOpenRouter) {
         headers["HTTP-Referer"] = "https://jilmunhaneun-saramdeul.vercel.app";
-        headers["X-Title"] = "Quesapience";
+        headers["X-Title"] = "Qsapiens";
       } else {
         headers["x-api-key"] = key;
         headers["anthropic-version"] = "2023-06-01";

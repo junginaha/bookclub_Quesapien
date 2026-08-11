@@ -41,9 +41,9 @@ export const metadata: Metadata = {
     "질문하는 사람들은 질문을 중심으로 사람과 책을 연결하는 오프라인 북토크 커뮤니티입니다. 서초구 선정 미래혁신형 북클럽. 질문 → 책 → 대화 → 사람 → 성장.",
   keywords: [
     "북클럽", "독서모임", "질문", "서초구", "독서", "토론",
-    "북토크", "오프라인독서모임", "질문하는사람들", "Quesapience",
+    "북토크", "오프라인독서모임", "질문하는사람들", "Qsapiens",
     "미래혁신형북클럽", "지적커뮤니티", "거인의어깨",
-    "북토크", "발제생성", "독서토론", "지성과의대화", "Quesapience",
+    "북토크", "발제생성", "독서토론", "지성과의대화", "Qsapiens",
   ],
   authors: [{ name: "질문하는 사람들" }],
   creator: "질문하는 사람들",
@@ -73,8 +73,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "질문하는 사람들 — 미래혁신형 북클럽",
     description: "질문으로 연결되는 지적 커뮤니티. 서초구 선정 미래혁신형 북클럽.",
-    creator: "@quesapience",
-    site: "@quesapience",
+    creator: "@qsapiens",
+    site: "@qsapiens",
   },
   alternates: { canonical: SITE_URL },
   other: {

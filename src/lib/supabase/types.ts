@@ -11,7 +11,7 @@ export interface ProfileRow {
   id: string; email: string; name: string;
   avatar_url: string | null; bio: string | null;
   joined_at: string; session_count: number;
-  // Quesapience 2.0 — 009_profiles_v2.sql
+  // Qsapiens 2.0 — 009_profiles_v2.sql
   nickname: string;
   phone: string | null;
   home_region: string | null;             // geography(point,4326), PostGIS WKB/GeoJSON as returned by PostgREST
@@ -30,7 +30,7 @@ export interface EventRow {
   created_at: string;
 }
 
-// ─── Quesapience 2.0 M1 — 010_clubs_meetings.sql ─────────────
+// ─── Qsapiens 2.0 M1 — 010_clubs_meetings.sql ─────────────
 export interface ClubVibe {
   faq?: { q: string; a: string }[];
   review_excerpts?: string[];

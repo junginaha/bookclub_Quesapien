@@ -53,7 +53,7 @@ export default async function MyPage() {
     session_count: 0,
   };
 
-  // Quesapience 2.0 M0 — 프로필 온보딩(닉네임/전화번호/관심지역) 미완료 유저는 먼저 완료시킨다.
+  // Qsapiens 2.0 M0 — 프로필 온보딩(닉네임/전화번호/관심지역) 미완료 유저는 먼저 완료시킨다.
   if (!finalProfile.onboarding_completed_at) {
     redirect(`/onboarding/profile?next=${encodeURIComponent("/mypage")}&nickname=${encodeURIComponent(finalProfile.nickname ?? finalProfile.name ?? "")}`);
   }

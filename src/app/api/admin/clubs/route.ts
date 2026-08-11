@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 
-const ADMIN_KEY = process.env.ADMIN_KEY ?? "quesapience2024";
+const ADMIN_KEY = process.env.ADMIN_KEY ?? "qsapiens2024";
 
 function checkKey(req: NextRequest) {
   return req.headers.get("x-admin-key") === ADMIN_KEY;

@@ -115,7 +115,7 @@ export default function LoginForm() {
         </div>
       )}
 
-      {/* 카카오 로그인 — Quesapience 2.0 M0 기본 로그인 수단 */}
+      {/* 카카오 로그인 — Qsapiens 2.0 M0 기본 로그인 수단 */}
       <button onClick={handleKakao} disabled={kakaoLoading}
         style={{
           display: "flex", alignItems: "center", justifyContent: "center", gap: 10,

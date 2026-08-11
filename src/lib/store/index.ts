@@ -192,7 +192,7 @@ export const useAppStore = create<AppStore>()(
           set((s) => {
             s.currentUser = {
               id: "admin-kimjungin",
-              email: "kimjungin@quesapience.com",
+              email: "kimjungin@qsapiens.com",
               name: "kimjungin",
               joined_at: new Date().toISOString(),
               session_count: 0,

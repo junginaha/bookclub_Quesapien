@@ -5,7 +5,7 @@
  */
 import type { Metadata } from "next";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://quesapience.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://qsapiens.com";
 const SITE_NAME = "질문하는 사람들";
 // Dynamic OG image via /og route (Next.js ImageResponse)
 function makeOgImageUrl(title: string, sub?: string): string {
@@ -73,8 +73,8 @@ export function buildMetadata(input: PageMetaInput): Metadata {
       title: input.title,
       description: input.description,
       images: [image],
-      creator: "@quesapience",
-      site: "@quesapience",
+      creator: "@qsapiens",
+      site: "@qsapiens",
     },
     // For AI engines: provide structured hints
     other: {
@@ -90,6 +90,6 @@ export const homeMetadata: Metadata = buildMetadata({
   description:
     "질문하는 사람들은 질문을 중심으로 사람과 책을 연결하는 오프라인 북토크 커뮤니티입니다. 서초구 선정 미래혁신형 북클럽. 질문 → 책 → 대화 → 사람 → 성장.",
   path: "/",
-  keywords: ["질문하는사람들", "Quesapience", "서초구북클럽", "미래혁신형북클럽"],
+  keywords: ["질문하는사람들", "Qsapiens", "서초구북클럽", "미래혁신형북클럽"],
   type: "website",
 });

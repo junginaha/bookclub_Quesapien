@@ -1,4 +1,4 @@
-# CLAUDE.md — 질문하는 사람들 / Quesapience 2.0
+# CLAUDE.md — 질문하는 사람들 / Qsapiens 2.0
 
 이 파일은 MASTER.md(제품 스펙 · 비즈니스 근거 · 세션 운영 규칙)의 부속 문서로,
 세션 간 진행 상태·결정 사항·미해결 이슈를 기록한다. **MASTER.md가 우선**하며,
@@ -13,7 +13,7 @@
 **배포 파이프라인 (2026-07-25)**
 
 - 운영자가 "작업한 게 실반영 안 된다"고 보고. 원인: 최근 6개 커밋이
-  `quesapience-auth-offline-club` 브랜치에만 있었고 Vercel 프로덕션이 추적하는
+  `qsapiens-auth-offline-club` 브랜치에만 있었고 Vercel 프로덕션이 추적하는
   `main`은 그보다 4개 더 뒤처져 있었음(둘 다 병합 안 됨). `main`을 fast-forward
   머지 후 push해 프로덕션 배포 트리거 — 해결.
 - **⚠ 별도로 발견한 심각한 문제 (미해결)**: Vercel Production 환경변수

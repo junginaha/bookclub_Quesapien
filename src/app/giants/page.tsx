@@ -23,7 +23,7 @@ const collectionLd = {
   applicationCategory: "UtilitiesApplication",
   description:
     "책이나 문장을 입력하면 위대한 사유자들의 통찰을 빌려 북클럽 발제 10개를 만들어주는 생성기",
-  url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://quesapience.com"}/giants`,
+  url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://qsapiens.com"}/giants`,
 };
 
 export default function GiantsPage() {

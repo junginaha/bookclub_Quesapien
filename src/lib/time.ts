@@ -1,4 +1,4 @@
-// Quesapience 2.0 — 저장은 timestamptz(UTC), 표시는 전부 Asia/Seoul.
+// Qsapiens 2.0 — 저장은 timestamptz(UTC), 표시는 전부 Asia/Seoul.
 // 이 파일이 유일한 날짜 표시 유틸리티다 — 화면에서 직접 Date 포맷을 만들지 말 것.
 
 const SEOUL_TZ = "Asia/Seoul";

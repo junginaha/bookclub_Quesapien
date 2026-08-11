@@ -27,7 +27,7 @@ const MAIN_BOOKS: BookMain[] = [
     title: "파친코",
     author: "이민진",
     tag: "#이민사",
-    recommender: "— Quesapience가 건넵니다",
+    recommender: "— Qsapiens가 건넵니다",
     quote: "우리가 어디서 왔는지를 알아야 어디로 가야 하는지 알 수 있습니다.",
     emotions: ["#신간", "#트렌드"],
   },

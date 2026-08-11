@@ -82,7 +82,7 @@ ${staticContext}
     };
     if (isOpenRouter) {
       headers["HTTP-Referer"] = "https://jilmunhaneun-saramdeul.vercel.app";
-      headers["X-Title"] = "Quesapience";
+      headers["X-Title"] = "Qsapiens";
     } else {
       headers["x-api-key"] = apiKey;
       headers["anthropic-version"] = "2023-06-01";

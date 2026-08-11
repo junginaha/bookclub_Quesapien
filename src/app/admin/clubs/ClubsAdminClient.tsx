@@ -237,7 +237,7 @@ export default function ClubsAdminClient() {
             입장
           </button>
           <div style={{ marginTop: "16px", fontSize: "12px", color: "#a09080", textAlign: "center" }}>
-            기본값: quesapience2024
+            기본값: qsapiens2024
           </div>
         </form>
       </div>

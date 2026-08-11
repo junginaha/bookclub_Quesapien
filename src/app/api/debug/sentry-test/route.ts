@@ -11,5 +11,5 @@ export async function GET() {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
 
-  throw new Error("[Quesapience] Sentry 강제 에러 테스트 — 이 에러가 보이면 정상입니다.");
+  throw new Error("[Qsapiens] Sentry 강제 에러 테스트 — 이 에러가 보이면 정상입니다.");
 }

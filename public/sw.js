@@ -1,4 +1,4 @@
-const CACHE = "quesapience-v1";
+const CACHE = "qsapiens-v1";
 const STATIC = [
   "/",
   "/questions",

@@ -4,7 +4,7 @@
  * Structured data helps AI crawlers understand page context.
  */
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://quesapience.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://qsapiens.com";
 const ORG_NAME = "질문하는 사람들";
 
 // ─── Organization ─────────────────────────────────────────────
@@ -14,7 +14,7 @@ export function orgSchema() {
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
     name: ORG_NAME,
-    alternateName: "Quesapience",
+    alternateName: "Qsapiens",
     url: SITE_URL,
     description:
       "질문하는 사람들은 질문을 중심으로 사람과 책을 연결하는 오프라인 북토크 커뮤니티입니다. 서초구 선정 미래혁신형 북클럽.",
