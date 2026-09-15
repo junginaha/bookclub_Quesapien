@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { BOOKCLUBS } from "@/lib/bookclubs";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 
@@ -63,20 +64,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // BookClub slugs — static known slugs
-  const bookclubSlugs = [
-    "다정함의-발명",
-    "혼자라는-감각",
-    "아무도-보지-않는-오후",
-    "외로움-시즌-위크4",
-    "오늘-저녁-당신께",
-    "인간이라는-풍경",
-  ];
-  const bookclubPages: MetadataRoute.Sitemap = bookclubSlugs.map((slug) => ({
-    url: `${SITE_URL}/bookclub/${slug}`,
+  // BookClub — src/lib/bookclubs.ts(단일 소스)의 실제 클럽만, 가짜 슬러그 없음.
+  const bookclubPages: MetadataRoute.Sitemap = BOOKCLUBS.map((club) => ({
+    url: `${SITE_URL}/bookclub/${club.slug}`,
     lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
+    changeFrequency: new Date(club.startAt).getTime() > Date.now() ? "weekly" : "monthly",
+    priority: new Date(club.startAt).getTime() > Date.now() ? 0.8 : 0.5,
   }));
 
   return [...staticPages, ...bookclubPages];

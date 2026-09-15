@@ -2,115 +2,71 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
-import BookClubDetailClient from "./BookClubDetailClient";
-import { createClient } from "@/lib/supabase/server";
-import { attachEncoreCounts } from "@/lib/bookclub-server";
-import { getFallbackClub } from "@/lib/bookclub";
-import { bookTalkEventSchema, bookSchema, reviewsSchema, breadcrumbSchema } from "@/lib/schema";
+import { BOOKCLUBS, getBookClub, status as computeStatus } from "@/lib/bookclubs";
+import { getJoinedCounts } from "@/lib/bookclubs.server";
 import { buildMetadata } from "@/lib/metadata";
+import { breadcrumbSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
+import DetailClient from "./DetailClient";
 
-// 예전 이 파일에 있던 6개 항목짜리 STATIC_CLUBS 하드코딩 폴백은
-// src/lib/bookclub.ts의 FALLBACK_CLUBS(getFallbackClub)로 통합했다 —
-// 리스트 페이지(clubsData.ts)가 쓰던 30개짜리 별도 폴백과 값이 어긋나던 문제를 없앤다.
-
-interface Props { params: Promise<{ slug: string }>; }
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug: rawSlug } = await params;
-  const slug = decodeURIComponent(rawSlug);
-  const club = (getFallbackClub(slug) ?? {}) as any;
-  const title = club.title ?? "북클럽";
-  const author = club.author ? ` — ${club.author}` : "";
-  return buildMetadata({
-    title: `${title}${author} 북토크`,
-    description: club.description ?? `${title} 북토크. 질문하는 사람들의 오프라인 독서 모임.`,
-    path: `/bookclub/${slug}`,
-    type: "event",
-    keywords: [title, club.genre, "북토크", "오프라인독서", club.host_name].filter(Boolean),
-    author: club.host_name,
-  });
+interface Props {
+  params: Promise<{ slug: string }>;
 }
 
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "junginaha@gmail.com,kimjungin@qsapiens.com").split(",");
+// joinedCount는 매 요청 실시간 조회가 원칙이라(§B "하드코딩 금지") 정적 캐싱을 쓰지 않는다.
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const club = getBookClub(decodeURIComponent(slug));
+  if (!club) {
+    return buildMetadata({
+      title: "북클럽",
+      description: "질문하는 사람들의 오프라인 북토크.",
+      path: `/bookclub/${slug}`,
+      noIndex: true,
+    });
+  }
+  return buildMetadata({
+    title: `${club.title}`,
+    description: club.reasonOneLine,
+    path: `/bookclub/${club.slug}`,
+    type: "event",
+    image: club.bookCover || undefined,
+    keywords: [club.bookTitle, club.bookAuthor, "북토크", "오프라인독서"],
+  });
+}
 
 export default async function BookClubDetailPage({ params }: Props) {
   const { slug: rawSlug } = await params;
   const slug = decodeURIComponent(rawSlug);
-  const fallbackClub = getFallbackClub(slug) ?? null;
-  let club: any = null;
-
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const isAdmin = user && ADMIN_EMAILS.includes(user.email ?? "");
-
-  try {
-    const { createServiceClient } = await import("@/lib/supabase/server");
-    const db = createServiceClient() as any;
-    const { data } = await db
-      .from("landing_book_clubs")
-      .select("*")
-      .eq("slug", slug)
-      .maybeSingle();
-    if (data && !data.is_seed) {
-      // 운영 DB가 아직 구조화 일정 컬럼을 갖기 전이어도 상세 페이지가 정확한
-      // 일정·정원을 유지하도록, 비어 있지 않은 DB 값만 정식 폴백 위에 얹는다.
-      // DB의 UUID·소개·현재 인원은 보존하고 누락된 event_starts_at 등만 보완한다.
-      const dbValues = Object.fromEntries(
-        Object.entries(data).filter(([, value]) => value !== null && value !== undefined && value !== "")
-      );
-      const merged = { ...fallbackClub, ...dbValues };
-
-      // 비관리자에게는 join_url 숨김 (has_join_url 플래그만 전달)
-      if (!isAdmin && merged.join_url) {
-        const { join_url, ...rest } = merged;
-        void join_url;
-        club = { ...rest, has_join_url: true };
-      } else {
-        club = merged;
-      }
-      const { data: signupCounts } = await db
-        .from("landing_book_club_signup_counts")
-        .select("applied_count, waiting_count")
-        .eq("club_id", data.id)
-        .maybeSingle();
-      if (signupCounts) {
-        club = {
-          ...club,
-          current_participants: Number(signupCounts.applied_count ?? 0),
-          waiting_count: Number(signupCounts.waiting_count ?? 0),
-        };
-      }
-      const [withCount] = await attachEncoreCounts(db, [club]);
-      club = withCount;
-    }
-  } catch { /* fallback */ }
-
-  if (!club) club = fallbackClub;
+  const club = getBookClub(slug);
   if (!club) notFound();
 
-  const eventLd = bookTalkEventSchema(club);
-  const bookLd = bookSchema(club);
-  const reviewLd = reviewsSchema(slug, club.title ?? "", club.reviews ?? []);
+  // 한 번의 병렬 조회로 전부 처리 — Supabase 미연결 시 club당 순차 DNS 실패 지연이
+  // 누적되지 않게 한다(이 클럽 + 나머지 클럽을 두 번에 나눠 부르지 않음).
+  const allCounts = await getJoinedCounts(BOOKCLUBS.map((c) => c.slug));
+  const joinedCount = allCounts[slug] ?? 0;
+  const status = computeStatus(club, joinedCount);
+
+  const nextClubs = BOOKCLUBS.filter((c) => c.slug !== slug)
+    .map((c) => ({ club: c, status: computeStatus(c, allCounts[c.slug] ?? 0), joinedCount: allCounts[c.slug] ?? 0 }))
+    .filter((c) => c.status !== "past")
+    .sort((a, b) => a.club.startAt.localeCompare(b.club.startAt))
+    .slice(0, 3);
+
   const crumbLd = breadcrumbSchema([
     { name: "홈", href: "/" },
     { name: "북클럽", href: "/bookclub" },
-    { name: club.title ?? slug, href: `/bookclub/${slug}` },
+    { name: club.title, href: `/bookclub/${slug}` },
   ]);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
-      {/* Stage 1: Structured data */}
-      <JsonLd data={eventLd} />
-      <JsonLd data={bookLd} />
-      <JsonLd data={reviewLd} />
       <JsonLd data={crumbLd} />
-
       <Header />
-      <BookClubDetailClient club={club} />
+      <DetailClient club={club} status={status} joinedCount={joinedCount} nextClubs={nextClubs} />
       <Footer />
     </div>
   );
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

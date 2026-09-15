@@ -1,0 +1,472 @@
+/* /bookclub IA 재구성 — 전용 스타일. 색·타이포는 globals.css 토큰만 쓴다
+   (--bg/--bg-soft/--ink/--muted/--line/--accent/--gold). 신규 색상 도입 없음. */
+
+.qc-page { min-height: 100vh; background: var(--bg); }
+
+/* ── A-1 커버 배너 ───────────────────────────────────────────── */
+.qc-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3.5 / 1;
+  overflow: hidden;
+  border-radius: 0 0 24px 24px;
+  background: var(--bg-navy);
+}
+.qc-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ── A-2 2컬럼 본문 ──────────────────────────────────────────── */
+.qc-body {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px var(--gutter) 96px;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+@media (max-width: 820px) {
+  .qc-body { grid-template-columns: 1fr; gap: 32px; padding-top: 28px; }
+  .qc-sidebar { order: -1; position: static !important; }
+}
+
+/* ── 좌측 사이드바 ───────────────────────────────────────────── */
+.qc-sidebar {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.qc-sidebar-mark {
+  font-family: var(--font-garamond, Georgia, serif);
+  font-style: italic;
+  font-size: 28px;
+  color: var(--gold);
+}
+.qc-sidebar-name {
+  font-family: var(--font-serif, "Noto Serif KR", serif);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 4px;
+}
+.qc-sidebar-intro {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.qc-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.qc-stat { text-align: center; }
+.qc-stat-num { font-size: 18px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.qc-stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.qc-notify-btn {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.qc-notify-btn:hover { opacity: 0.85; }
+.qc-notify-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.qc-notify-btn.is-outline {
+  background: transparent;
+  color: var(--ink);
+}
+
+.qc-sidebar-links { display: flex; flex-direction: column; gap: 4px; }
+.qc-sidebar-link {
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 6px 0;
+  border-bottom: 1px solid transparent;
+}
+.qc-sidebar-link:hover { text-decoration: underline; }
+.qc-sidebar-link:focus-visible,
+.qc-notify-btn:focus-visible,
+.qc-tab:focus-visible,
+.qc-cal-date:focus-visible,
+.qc-cal-nav:focus-visible,
+.qc-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.qc-notify-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-soft);
+}
+.qc-notify-form input {
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-size: 13px;
+  color: var(--ink);
+}
+.qc-notify-form label { font-size: 12px; color: var(--muted); }
+.qc-notify-status { font-size: 12px; color: var(--accent); }
+
+/* ── 우측 메인 ───────────────────────────────────────────────── */
+.qc-main { min-width: 0; }
+
+/* 미니 캘린더 (필터 위젯) */
+.qc-cal {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  background: #fff;
+  margin-bottom: 24px;
+}
+.qc-cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.qc-cal-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+.qc-cal-nav {
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  cursor: pointer;
+  color: var(--ink);
+}
+.qc-cal-nav:hover { background: var(--bg-soft); }
+.qc-cal-nav:disabled { opacity: 0.35; cursor: not-allowed; }
+.qc-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+}
+.qc-cal-weekday { font-size: 10.5px; color: var(--muted); padding-bottom: 4px; }
+.qc-cal-date {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.qc-cal-date:disabled { color: var(--muted-2); cursor: default; opacity: 0.55; }
+.qc-cal-date.is-empty { visibility: hidden; }
+.qc-cal-date.is-selected { background: var(--ink); color: var(--bg); }
+.qc-cal-date:not(:disabled):not(.is-selected):hover { background: var(--bg-soft); }
+.qc-cal-dot {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px; height: 4px;
+  border-radius: 999px;
+  background: var(--gold);
+}
+.qc-cal-date.is-selected .qc-cal-dot { background: var(--bg); }
+.qc-cal-empty-month {
+  padding: 20px 4px 4px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+.qc-cal-empty-month a { color: var(--accent); text-decoration: underline; }
+
+/* 세그먼트 토글 */
+.qc-tabs {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+  margin-bottom: 20px;
+  gap: 2px;
+}
+.qc-tab {
+  padding: 7px 18px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+.qc-tab.is-active { background: var(--ink); color: var(--bg); }
+
+/* 타임라인 */
+.qc-timeline { position: relative; }
+.qc-tl-group { position: relative; margin-bottom: 8px; }
+.qc-tl-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 0 12px 40px;
+  font-family: var(--font-serif, "Noto Serif KR", serif);
+}
+.qc-tl-group-date { font-size: 16px; font-weight: 700; color: var(--ink); }
+.qc-tl-group-weekday { font-size: 12.5px; color: var(--muted); }
+
+.qc-tl-rail {
+  position: relative;
+  padding-left: 40px;
+}
+.qc-tl-rail::before {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--line);
+}
+.qc-tl-item { position: relative; margin-bottom: 16px; }
+.qc-tl-item:last-child { margin-bottom: 0; }
+.qc-tl-dot {
+  position: absolute;
+  left: -33px;
+  top: 22px;
+  width: 9px; height: 9px;
+  border-radius: 999px;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1px var(--line);
+}
+.qc-tl-item.is-past .qc-tl-dot { background: var(--muted-2); }
+
+.qc-card {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s ease, transform 0.15s ease, background 0.6s ease;
+}
+.qc-card:hover { box-shadow: 0 4px 16px rgba(28,31,38,0.08); }
+.qc-card.is-past { opacity: 0.6; }
+.qc-card.is-highlight {
+  background: var(--bg-warm);
+  box-shadow: 0 0 0 2px var(--gold);
+}
+.qc-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.qc-card-time { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.qc-card-title { font-size: 15.5px; font-weight: 700; color: var(--ink); }
+.qc-card-reason { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.qc-card-book { font-size: 12.5px; color: var(--accent); }
+.qc-card-meta { display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.qc-card-cover {
+  flex-shrink: 0;
+  width: 88px;
+  aspect-ratio: 2 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-navy);
+}
+.qc-card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.qc-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.qc-pill.is-fee { background: var(--bg-soft); color: var(--ink); }
+.qc-pill.is-almost { background: #F3E3C7; color: #7A5A16; }
+.qc-pill.is-full { background: var(--ink); color: var(--bg); }
+.qc-pill.is-tentative { background: var(--bg-soft); color: var(--muted); }
+.qc-pill.is-past { background: transparent; color: var(--muted-2); }
+
+.qc-inline-btn {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.qc-inline-btn:disabled { color: var(--muted-2); cursor: not-allowed; text-decoration: none; }
+
+.qc-empty {
+  padding: 48px 20px;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.qc-empty-cta { margin-top: 12px; }
+
+.qc-retry-btn {
+  margin-top: 10px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ── 상세 페이지 ─────────────────────────────────────────────── */
+.qd-body {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px var(--gutter) 96px;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+@media (max-width: 820px) {
+  .qd-body { grid-template-columns: 1fr; gap: 28px; }
+  .qd-side { position: static !important; }
+}
+.qd-side { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 16px; }
+.qd-cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-navy);
+}
+.qd-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.qd-book-title { font-family: var(--font-serif, "Noto Serif KR", serif); font-size: 18px; font-weight: 700; color: var(--ink); }
+.qd-book-author { font-size: 13px; color: var(--muted); }
+.qd-handed-by { font-size: 12.5px; color: var(--muted); }
+.qd-divider { height: 1px; background: var(--line); border: none; margin: 4px 0; }
+.qd-brand { display: flex; align-items: center; gap: 10px; }
+.qd-brand-mark { font-family: var(--font-garamond, Georgia, serif); font-style: italic; color: var(--gold); font-size: 22px; }
+.qd-brand-name { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.qd-side-links { display: flex; flex-direction: column; gap: 4px; }
+.qd-side-links a { font-size: 12.5px; color: var(--accent); text-decoration: underline; }
+
+.qd-main { min-width: 0; }
+.qd-eyebrow { font-size: 12px; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+.qd-title { font-family: var(--font-serif, "Noto Serif KR", serif); font-size: 26px; font-weight: 700; color: var(--ink); margin-top: 6px; }
+.qd-reason { margin-top: 16px; font-size: 15px; line-height: 1.85; color: var(--ink-soft); white-space: pre-line; }
+
+.qd-block {
+  margin-top: 28px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+.qd-block-label { font-size: 11.5px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 6px; }
+.qd-block-main { font-size: 15px; font-weight: 600; color: var(--ink); }
+.qd-block-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+.qd-questions { margin-top: 28px; }
+.qd-questions-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+.qd-question {
+  padding: 12px 16px;
+  border-left: 3px solid var(--gold);
+  background: var(--bg-soft);
+  border-radius: 0 10px 10px 0;
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+
+.qd-apply { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--line); }
+.qd-apply-title { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.qd-apply-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+.qd-form { display: flex; flex-direction: column; gap: 12px; max-width: 420px; }
+.qd-field { display: flex; flex-direction: column; gap: 5px; }
+.qd-field label { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.qd-field input, .qd-field textarea {
+  padding: 10px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-size: 14px;
+  color: var(--ink);
+  font-family: inherit;
+}
+.qd-field input:focus, .qd-field textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.qd-submit {
+  margin-top: 4px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  align-self: flex-start;
+}
+.qd-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+.qd-form-msg { font-size: 13px; color: var(--accent); }
+.qd-form-msg.is-error { color: #9B4A2E; }
+
+.qd-map { margin-top: 28px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); height: 260px; }
+
+.qd-next { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--line); }
+.qd-next-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 12px; }
+.qd-next-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 640px) {
+  .qd-next-grid { grid-template-columns: 1fr; }
+}
+.qd-next-card { text-decoration: none; color: inherit; }
+.qd-next-cover { aspect-ratio: 2/3; border-radius: 10px; overflow: hidden; background: var(--bg-navy); margin-bottom: 6px; }
+.qd-next-cover img { width: 100%; height: 100%; object-fit: cover; }
+.qd-next-title2 { font-size: 12.5px; font-weight: 600; color: var(--ink); line-height: 1.4; }
+
+.qd-archive-link {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+.qd-archive-link.is-disabled {
+  border-color: var(--line);
+  color: var(--muted-2);
+  pointer-events: none;
+}
+
+/* ── 로딩 스켈레톤 ───────────────────────────────────────────── */
+.qc-skel {
+  background: linear-gradient(90deg, var(--bg-soft) 25%, var(--bg-warm) 37%, var(--bg-soft) 63%);
+  background-size: 400% 100%;
+  animation: qc-shimmer 1.4s ease infinite;
+  border-radius: 10px;
+}
+@keyframes qc-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
