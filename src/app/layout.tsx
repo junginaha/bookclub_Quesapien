@@ -29,7 +29,7 @@ const ebGaramond = EB_Garamond({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jilmunhaneun-saramdeul.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

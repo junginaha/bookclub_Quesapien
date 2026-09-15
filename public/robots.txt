@@ -59,4 +59,4 @@ User-agent: msnbot
 Allow: /
 
 # Sitemap
-Sitemap: https://jilmunhaneun-saramdeul.vercel.app/sitemap.xml
+Sitemap: https://www.qsapiens.com/sitemap.xml

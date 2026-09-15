@@ -11,7 +11,7 @@ export const anthropic = new Anthropic({
     ? {
         baseURL: "https://openrouter.ai/api/v1",
         defaultHeaders: {
-          "HTTP-Referer": "https://jilmunhaneun-saramdeul.vercel.app",
+          "HTTP-Referer": "https://www.qsapiens.com",
           "X-Title": "Qsapiens",
         },
       }
@@ -44,7 +44,7 @@ export async function callClaude(params: {
     "Authorization": `Bearer ${key}`,
   };
   if (isOpenRouter) {
-    headers["HTTP-Referer"] = "https://jilmunhaneun-saramdeul.vercel.app";
+    headers["HTTP-Referer"] = "https://www.qsapiens.com";
     headers["X-Title"] = "Qsapiens";
   } else {
     headers["x-api-key"] = key;

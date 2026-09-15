@@ -4,7 +4,7 @@
  * Structured data helps AI crawlers understand page context.
  */
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://qsapiens.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 const ORG_NAME = "질문하는 사람들";
 
 // ─── Organization ─────────────────────────────────────────────

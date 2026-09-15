@@ -5,7 +5,7 @@
  */
 import type { Metadata } from "next";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://qsapiens.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 const SITE_NAME = "질문하는 사람들";
 // Dynamic OG image via /og route (Next.js ImageResponse)
 function makeOgImageUrl(title: string, sub?: string): string {

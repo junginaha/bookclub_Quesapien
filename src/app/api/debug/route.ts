@@ -19,7 +19,7 @@ export async function GET() {
         "Content-Type": "application/json",
       };
       if (isOpenRouter) {
-        headers["HTTP-Referer"] = "https://jilmunhaneun-saramdeul.vercel.app";
+        headers["HTTP-Referer"] = "https://www.qsapiens.com";
         headers["X-Title"] = "Qsapiens";
       } else {
         headers["x-api-key"] = key;

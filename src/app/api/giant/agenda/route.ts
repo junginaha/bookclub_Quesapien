@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       "Authorization": `Bearer ${apiKey}`,
     };
     if (isOpenRouter) {
-      headers["HTTP-Referer"] = "https://jilmunhaneun-saramdeul.vercel.app";
+      headers["HTTP-Referer"] = "https://www.qsapiens.com";
       headers["X-Title"] = "Qsapiens";
     } else {
       headers["x-api-key"] = apiKey;
