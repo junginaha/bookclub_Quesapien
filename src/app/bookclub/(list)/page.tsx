@@ -20,7 +20,11 @@ export const metadata: Metadata = buildMetadata({
   keywords: ["북토크", "오프라인독서모임", "독서모임일정", "소규모독서"],
 });
 
-export const revalidate = 60;
+// joinedCount는 매 요청 실시간 조회가 원칙이라(§B "하드코딩 금지") 정적 캐싱을 쓰지 않는다.
+// ISR(revalidate)로 두면 빌드 타임에 Suspense 셸만 굳어버리고 이후에도 갱신되지
+// 않는 현상을 재현 확인했다(getJoinedCounts()가 느리거나 실패할 때 정적 생성이
+// 로딩 스켈레톤만 베이크한 채로 캐시됨) — force-dynamic으로 매 요청 새로 렌더링한다.
+export const dynamic = "force-dynamic";
 
 function coverImageUrl() {
   const params = new URLSearchParams({

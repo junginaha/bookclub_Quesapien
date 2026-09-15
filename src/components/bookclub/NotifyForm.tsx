@@ -1,12 +1,9 @@
 "use client";
 
 import { useId, useState } from "react";
+import { joinBookClubWaitlist } from "@/lib/actions/bookclub";
 
-/**
- * bookclub_waitlist 저장용 폼(클럽 단위 대기자 등록/알림 신청, clubSlug=null이면
- * "새 모임 열릴 때 안내"). 구조(A·B) 단계 전용 자리표시 — 실제 서버 액션 연결은
- * C 단계 승인 후 진행한다. 지금은 버튼을 비활성화해 저장되지 않았음을 명확히 한다.
- */
+/** bookclub_waitlist 저장용 폼 — 대기자 등록/알림 신청(clubSlug=null이면 전체 알림). */
 export default function NotifyForm({
   clubSlug,
   mode,
@@ -18,13 +15,49 @@ export default function NotifyForm({
   const phoneId = useId();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [website, setWebsite] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<{ kind: "joined" | "duplicate" } | { error: string } | null>(null);
 
   const valid = name.trim().length > 0 && phone.trim().length >= 9;
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!valid || submitting) return;
+    setSubmitting(true);
+    setResult(null);
+    try {
+      const res = await joinBookClubWaitlist({ clubSlug, name, phone, website });
+      if (!res.ok) {
+        setResult({ error: res.error });
+        return;
+      }
+      setResult({ kind: res.kind });
+      if (res.kind !== "duplicate") {
+        setName("");
+        setPhone("");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (result && "kind" in result) {
+    return (
+      <p className="qc-notify-status">
+        {result.kind === "joined"
+          ? mode === "waitlist"
+            ? "대기자로 등록했어요. 자리가 나면 안내드릴게요."
+            : "알림을 등록했어요."
+          : "이미 등록하셨어요."}
+      </p>
+    );
+  }
 
   return (
     <form
       className="qc-notify-form"
-      onSubmit={(e) => e.preventDefault()}
+      onSubmit={handleSubmit}
       aria-label={mode === "waitlist" ? "대기자 등록" : "알림 받기"}
       data-club-slug={clubSlug ?? "all"}
     >
@@ -36,10 +69,19 @@ export default function NotifyForm({
         <label htmlFor={phoneId}>휴대전화</label>
         <input id={phoneId} value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" inputMode="tel" />
       </div>
-      <button type="submit" className="qc-notify-btn" disabled={!valid} aria-disabled={!valid}>
-        {mode === "waitlist" ? "대기자로 등록" : "알림 받기"}
+      <input
+        type="text"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+      />
+      <button type="submit" className="qc-notify-btn" disabled={!valid || submitting} aria-disabled={!valid || submitting}>
+        {submitting ? "확인 중…" : mode === "waitlist" ? "대기자로 등록" : "알림 받기"}
       </button>
-      <p className="qc-notify-status">저장 연결은 다음 단계에서 진행됩니다.</p>
+      {result && "error" in result && <p className="qc-notify-status" style={{ color: "#9B4A2E" }}>{result.error}</p>}
     </form>
   );
 }

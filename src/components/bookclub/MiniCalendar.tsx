@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 
 export interface CalendarClub {
   slug: string;
@@ -90,6 +90,42 @@ export default function MiniCalendar({
   }
 
   const cells = buildMonthGrid(year, month0);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  const enabledDays = useMemo(
+    () => cells.filter((d): d is number => d !== null && (clubsByDate.get(`${year}-${pad2(month0 + 1)}-${pad2(d)}`)?.length ?? 0) > 0),
+    [cells, clubsByDate, year, month0]
+  );
+
+  function focusDay(day: number) {
+    const el = gridRef.current?.querySelector<HTMLButtonElement>(`button[data-day="${day}"]`);
+    el?.focus();
+  }
+
+  // 화살표로 "모임 있는 날짜"끼리 이동 — 빈 날짜는 어차피 선택할 수 없으므로
+  // 하나씩 건너뛰는 것보다 실질적으로 이동 가능한 날짜 사이를 오가게 한다.
+  function handleGridKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    if (enabledDays.length === 0) return;
+    const target = e.target as HTMLElement;
+    const currentDay = Number(target.dataset.day);
+    const idx = enabledDays.indexOf(currentDay);
+
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      const next = idx === -1 ? enabledDays[0] : enabledDays[(idx + 1) % enabledDays.length];
+      focusDay(next);
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const prev = idx === -1 ? enabledDays[enabledDays.length - 1] : enabledDays[(idx - 1 + enabledDays.length) % enabledDays.length];
+      focusDay(prev);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      focusDay(enabledDays[0]);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      focusDay(enabledDays[enabledDays.length - 1]);
+    }
+  }
 
   return (
     <div className="qc-cal">
@@ -99,7 +135,13 @@ export default function MiniCalendar({
         <button type="button" className="qc-cal-nav" onClick={() => goMonth(1)} aria-label="다음 달">›</button>
       </div>
 
-      <div className="qc-cal-grid" role="grid" aria-label={`${year}년 ${month0 + 1}월 모임 일정`}>
+      <div
+        className="qc-cal-grid"
+        role="grid"
+        aria-label={`${year}년 ${month0 + 1}월 모임 일정 — 화살표 키로 모임 있는 날짜 사이를 이동할 수 있어요`}
+        ref={gridRef}
+        onKeyDown={handleGridKeyDown}
+      >
         {WEEKDAYS.map((w) => (
           <span key={w} className="qc-cal-weekday" aria-hidden="true">{w}</span>
         ))}
@@ -112,8 +154,10 @@ export default function MiniCalendar({
             <button
               key={key}
               type="button"
+              data-day={day}
               className="qc-cal-date"
               disabled={!has}
+              tabIndex={has && enabledDays[0] === day ? 0 : -1}
               onClick={() => has && onSelectDate(key)}
               aria-label={`${month0 + 1}월 ${day}일${has ? " — 모임 있음" : ""}`}
             >
