@@ -1,7 +1,7 @@
 /* /bookclub IA 재구성 — 전용 스타일. 색·타이포는 globals.css 토큰만 쓴다
    (--bg/--bg-soft/--ink/--muted/--line/--accent/--gold). 신규 색상 도입 없음. */
 
-.qc-page { min-height: 100vh; background: var(--bg); }
+.qc-page { min-height: 100vh; min-height: 100dvh; background: var(--bg); }
 
 /* ── A-1 커버 배너 ─── 에디토리얼: 여백감 있는 풀블리드, 화면폭별 비율 조정 ── */
 .qc-cover {

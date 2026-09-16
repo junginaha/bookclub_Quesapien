@@ -131,7 +131,11 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     position: relative;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow-x: hidden;
+    /* 한글 단어 중간에서 줄바꿈되지 않게(품질 게이트 — break-all 금지) */
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
 
   /* Paper grain overlay */
@@ -164,6 +168,10 @@
   h1, h2, h3 {
     font-family: var(--font-noto-serif-kr), "Georgia", serif;
     letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
   }
 }
 

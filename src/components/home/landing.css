@@ -958,7 +958,8 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 @keyframes bdmOverlayIn { from { opacity:0; } }
 .bdm-panel {
   width: min(560px, 100vw);
-  height: 100vh;
+  height: 100vh; /* dvh 미지원 폴백 */
+  height: 100dvh;
   overflow-y: auto;
   background: var(--lp-bg);
   position: relative;
