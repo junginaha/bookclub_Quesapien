@@ -64,15 +64,29 @@ export function CurrentClubCard({ club }: { club: BookClubRecord }) {
             </span>
           )}
           <div style={{ position: "absolute", bottom: 14, left: 16, right: 16 }}>
-            <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 19, color: "white", lineHeight: 1.3, marginBottom: 2 }}>
+            <h3
+              style={{
+                fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                fontSize: "clamp(15px, 4vw, 19px)",
+                color: "white",
+                lineHeight: 1.3,
+                marginBottom: 2,
+                wordBreak: "keep-all",
+                overflowWrap: "anywhere",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+            >
               {club.title}
             </h3>
           </div>
         </div>
 
-        <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
+        <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 8, flex: 1, minWidth: 0 }}>
           {club.author && (
-            <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>
+            <div style={{ fontSize: 13, color: "var(--ink-soft)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               함께 읽는 작가 · {club.author}
               {club.author_hosts && (
                 <span style={{ marginLeft: 6, fontSize: 11, color: "var(--accent)", fontWeight: 500 }}>
@@ -81,13 +95,17 @@ export function CurrentClubCard({ club }: { club: BookClubRecord }) {
               )}
             </div>
           )}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)" }}>
-            <Calendar size={12} />
-            <span>{start ? `${formatSeoulDate(start)} ${formatSeoulTime(start)}` : "일정 조율 중"}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)", minWidth: 0 }}>
+            <Calendar size={12} style={{ flexShrink: 0 }} />
+            <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {start ? `${formatSeoulDate(start)} ${formatSeoulTime(start)}` : "일정 조율 중"}
+            </span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)" }}>
-            <MapPin size={12} />
-            <span>{[club.area, club.location].filter(Boolean).join(" · ") || "장소 미정"}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)", minWidth: 0 }}>
+            <MapPin size={12} style={{ flexShrink: 0 }} />
+            <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {[club.area, club.location].filter(Boolean).join(" · ") || "장소 미정"}
+            </span>
           </div>
 
           <div style={{ marginTop: "auto", paddingTop: 10, display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
@@ -112,24 +130,48 @@ export function EncoreClubCard({ club }: { club: BookClubRecord }) {
         <div style={{ height: 180, position: "relative", overflow: "hidden" }}>
           <CoverImage club={club} />
           <div style={{ position: "absolute", inset: 0, background: "rgba(20,24,31,0.45)" }} />
+          <span style={{ position: "absolute", top: 14, left: 14, fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 9999, background: "rgba(255,255,255,0.85)", color: "var(--accent)" }}>
+            앵콜 대기
+          </span>
           <div style={{ position: "absolute", bottom: 14, left: 16, right: 16 }}>
-            <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 19, color: "white", lineHeight: 1.3 }}>
+            <h3
+              style={{
+                fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
+                fontSize: "clamp(15px, 4vw, 19px)",
+                color: "white",
+                lineHeight: 1.3,
+                wordBreak: "keep-all",
+                overflowWrap: "anywhere",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+            >
               {club.title}
             </h3>
           </div>
         </div>
       </Link>
 
-      <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
-        {club.author && <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>함께 읽는 작가 · {club.author}</div>}
+      <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 8, flex: 1, minWidth: 0 }}>
+        {club.author && (
+          <div style={{ fontSize: 13, color: "var(--ink-soft)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            함께 읽는 작가 · {club.author}
+          </div>
+        )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)" }}>
-          <Calendar size={12} />
-          <span>{lastStart ? `지난 진행 · ${formatSeoulDate(lastStart)}` : "지난 진행 기록"}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)", minWidth: 0 }}>
+          <Calendar size={12} style={{ flexShrink: 0 }} />
+          <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {lastStart ? `지난 진행 · ${formatSeoulDate(lastStart)}` : "지난 진행 기록"}
+          </span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)" }}>
-          <MapPin size={12} />
-          <span>{[club.area, club.location].filter(Boolean).join(" · ") || "장소 미정"}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)", minWidth: 0 }}>
+          <MapPin size={12} style={{ flexShrink: 0 }} />
+          <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {[club.area, club.location].filter(Boolean).join(" · ") || "장소 미정"}
+          </span>
         </div>
 
         <Link href={`/bookclub/${club.slug}`} style={{ fontSize: 12.5, color: "var(--accent)", textDecoration: "underline" }}>

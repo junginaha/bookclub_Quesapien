@@ -989,50 +989,31 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           const fallbackAgain = fallbackRecords.filter((c) => classifyClub(c) === "again");
           const nowClubs = (liveNow.length >= fallbackNow.length ? liveNow : fallbackNow).sort(sortNow).slice(0, 4);
           const againClubs = (liveAgain.length >= fallbackAgain.length ? liveAgain : fallbackAgain).sort(sortAgain).slice(0, 4);
+          const hasAny = nowClubs.length > 0 || againClubs.length > 0;
           return (
-            <>
-              {/* 지금 함께 읽어요 */}
-              <div style={{ marginTop: 56 }}>
-                <div style={{ marginBottom: 24 }}>
-                  <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
-                    지금 함께 읽어요
-                  </h3>
-                </div>
-                {nowClubs.length > 0 ? (
-                  <div className="lp-books-grid">
-                    {nowClubs.map((c) => <CurrentClubCard key={c.id} club={c} />)}
-                  </div>
-                ) : (
-                  <p style={{ fontSize: 14, color: "var(--muted)", padding: "24px 0" }}>지금은 신청 가능한 북클럽이 없어요. 곧 새 일정이 열려요.</p>
-                )}
-                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
-                  <a href="/bookclub" className="btn-pill-neu" style={{ padding: "6px 14px", fontSize: 11.5 }}>
-                    현재 신청 가능한 북클럽
-                  </a>
-                </div>
+            // 참여 가능한 북클럽과 앵콜 북클럽을 하나의 섹션·그리드로 통합.
+            // 카드 자체(배지)로 신청가능/앵콜을 구분하므로 별도 소제목 두 개로
+            // 쪼갤 필요가 없다 — 운영자 피드백: 두 섹션이 나뉘어 있던 걸 합쳐달라.
+            <div style={{ marginTop: 56 }}>
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
+                  함께 읽어요
+                </h3>
               </div>
-
-              {/* 다시 함께 읽어요 */}
-              <div style={{ marginTop: 72 }}>
-                <div style={{ marginBottom: 24 }}>
-                  <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
-                    다시 함께 읽어요
-                  </h3>
+              {hasAny ? (
+                <div className="lp-books-grid">
+                  {nowClubs.map((c) => <CurrentClubCard key={c.id} club={c} />)}
+                  {againClubs.map((c) => <EncoreClubCard key={c.id} club={c} />)}
                 </div>
-                {againClubs.length > 0 ? (
-                  <div className="lp-books-grid">
-                    {againClubs.map((c) => <EncoreClubCard key={c.id} club={c} />)}
-                  </div>
-                ) : (
-                  <p style={{ fontSize: 14, color: "var(--muted)", padding: "24px 0" }}>아직 앵콜을 기다리는 북클럽이 없어요.</p>
-                )}
-                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
-                  <a href="/bookclub" className="btn-pill-neu" style={{ padding: "6px 14px", fontSize: 11.5 }}>
-                    앵콜을 기다리는 북클럽
-                  </a>
-                </div>
+              ) : (
+                <p style={{ fontSize: 14, color: "var(--muted)", padding: "24px 0" }}>지금은 신청 가능한 북클럽이 없어요. 곧 새 일정이 열려요.</p>
+              )}
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+                <a href="/bookclub" className="btn-pill-neu" style={{ padding: "6px 14px", fontSize: 11.5 }}>
+                  북클럽 전체 일정 보기
+                </a>
               </div>
-            </>
+            </div>
           );
         })()}
       </section>
