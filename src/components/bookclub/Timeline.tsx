@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { BookClub, ClubStatus } from "@/lib/bookclubs";
-import { formatWeekdayFull, dateKey } from "@/lib/bookclubs";
+import { formatMonthDay, formatWeekdayFull, dateKey } from "@/lib/bookclubs";
 import TimelineCard from "./TimelineCard";
 
 export interface TimelineEntry {
@@ -42,29 +42,24 @@ export default function Timeline({
 
   return (
     <div className="qc-timeline">
-      {groups.map((g) => {
-        const day = parseInt(g.key.slice(-2), 10);
-        const weekday = formatWeekdayFull(g.date).replace("요일", "");
-        return (
-          <div className="qc-tl-group" key={g.key}>
-            <div className="qc-tl-datebadge" aria-hidden="true">
-              <span className="qc-tl-datebadge-weekday">{weekday}</span>
-              <span className="qc-tl-datebadge-day">{day}</span>
-            </div>
-            <div className="qc-tl-cards">
-              {g.items.map(({ club, status, joinedCount }) => (
-                <TimelineCard
-                  key={club.slug}
-                  club={club}
-                  status={status}
-                  joinedCount={joinedCount}
-                  highlighted={highlightedSlug === club.slug}
-                />
-              ))}
-            </div>
+      {groups.map((g) => (
+        <div className="qc-tl-group" key={g.key}>
+          <div className="qc-tl-group-label">
+            {formatMonthDay(g.date)} {formatWeekdayFull(g.date)}
           </div>
-        );
-      })}
+          <div className="qc-tl-cards">
+            {g.items.map(({ club, status, joinedCount }) => (
+              <TimelineCard
+                key={club.slug}
+                club={club}
+                status={status}
+                joinedCount={joinedCount}
+                highlighted={highlightedSlug === club.slug}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

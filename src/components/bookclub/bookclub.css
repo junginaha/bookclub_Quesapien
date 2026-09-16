@@ -44,13 +44,13 @@
   gap: 28px;
 }
 .qc-sidebar-mark {
-  font-family: var(--font-garamond, Georgia, serif);
+  font-family: var(--font-eb-garamond, Georgia, serif);
   font-style: italic;
   font-size: 30px;
   color: var(--gold);
 }
 .qc-sidebar-name {
-  font-family: var(--font-serif, "Noto Serif KR", serif);
+  font-family: var(--font-noto-serif-kr, "Noto Serif KR", serif);
   font-size: clamp(20px, 2.4vw, 22px);
   font-weight: 600;
   color: var(--ink);
@@ -230,65 +230,50 @@
   .qc-tab { flex: 1; }
 }
 
-/* 타임라인 — Luma 스타일: 날짜 배지 컬럼 + 플랫 카드 리스트 (연결선 없음) */
-.qc-timeline { display: flex; flex-direction: column; gap: 28px; }
-.qc-tl-group {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-.qc-tl-datebadge {
-  flex: 0 0 52px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 8px 4px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: #fff;
-  position: sticky;
-  top: 24px;
-}
-.qc-tl-datebadge-weekday { font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 0.02em; }
-.qc-tl-datebadge-day {
-  font-family: var(--font-serif, "Noto Serif KR", serif);
-  font-size: 20px;
+/* 타임라인 — 카드 하나에 날짜·시간·장소·모임 정보를 전부 합쳐 보여준다.
+   position:sticky/absolute 등 별도 포지셔닝은 전혀 쓰지 않는다(겹침 방지 —
+   과거 sticky 날짜 배지 컬럼이 좁은 화면에서 카드와 겹쳐 보이는 문제가 있었음). */
+.qc-timeline { display: flex; flex-direction: column; gap: 32px; }
+.qc-tl-group { min-width: 0; }
+.qc-tl-group-label {
+  font-family: var(--font-noto-serif-kr, "Noto Serif KR", serif);
+  font-size: 14px;
   font-weight: 700;
   color: var(--ink);
-  font-variant-numeric: tabular-nums;
+  margin-bottom: 12px;
+  padding-left: 2px;
 }
 
-.qc-tl-cards { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
-.qc-tl-item { position: relative; }
+.qc-tl-cards { display: flex; flex-direction: column; gap: 14px; }
+.qc-tl-item { min-width: 0; }
+
+/* 카드 바깥 래퍼: 하이라이트/지난모임 상태 + (있다면) 하단 액션행을 담는다.
+   래퍼 자체엔 테두리/배경이 없어 안쪽 .qc-card와 시각적으로 겹치지 않는다. */
+.qc-card-wrap { min-width: 0; }
+.qc-card-wrap.is-past .qc-card { opacity: 0.6; }
+.qc-card-wrap.is-highlight .qc-card {
+  background: var(--bg-warm);
+  box-shadow: 0 0 0 2px var(--gold);
+}
 
 .qc-card {
   display: flex;
-  gap: 18px;
-  padding: 18px;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: #fff;
   text-decoration: none;
   color: inherit;
-  transition: box-shadow 0.15s ease, transform 0.15s ease, background 0.6s ease;
+  overflow-wrap: break-word;
 }
-.qc-card:hover { box-shadow: 0 4px 16px rgba(28,31,38,0.08); }
-.qc-card.is-past { opacity: 0.6; }
-.qc-card.is-highlight {
-  background: var(--bg-warm);
-  box-shadow: 0 0 0 2px var(--gold);
-}
-.qc-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-.qc-card-time { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.qc-card-title { font-size: 15.5px; font-weight: 700; color: var(--ink); line-height: 1.4; }
-.qc-card-reason { font-size: 13px; color: var(--muted); line-height: 1.55; }
-.qc-card-book { font-size: 12.5px; color: var(--accent); }
-.qc-card-meta { display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 12px; color: var(--muted); margin-top: 3px; }
+.qc-card-link { transition: box-shadow 0.15s ease; }
+.qc-card-link:hover { box-shadow: 0 4px 16px rgba(28,31,38,0.08); }
+
 .qc-card-cover {
-  flex-shrink: 0;
-  width: 88px;
+  flex: 0 0 auto;
+  width: 72px;
   aspect-ratio: 2 / 3;
   border-radius: 8px;
   overflow: hidden;
@@ -296,13 +281,33 @@
 }
 .qc-card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
+.qc-card-body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.qc-card-title { font-size: 15.5px; font-weight: 700; color: var(--ink); line-height: 1.45; }
+.qc-card-datetime {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+.qc-card-reason { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.qc-card-book { font-size: 12.5px; color: var(--accent); }
+.qc-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 2px;
+}
+
+.qc-card-actionrow { margin-top: 8px; display: flex; justify-content: flex-end; }
+.qc-card-actionform { margin-top: 8px; }
+
 @media (max-width: 480px) {
-  .qc-tl-group { gap: 10px; }
-  .qc-tl-datebadge { flex-basis: 44px; padding: 6px 2px; position: static; }
-  .qc-tl-datebadge-day { font-size: 17px; }
-  .qc-card { padding: 14px; gap: 12px; }
-  .qc-card-cover { width: 64px; }
+  .qc-timeline { gap: 24px; }
+  .qc-card { padding: 12px; gap: 12px; }
+  .qc-card-cover { width: 56px; }
   .qc-card-title { font-size: 14.5px; }
+  .qc-card-datetime { font-size: 12px; }
 }
 
 .qc-pill {
@@ -330,7 +335,12 @@
   cursor: pointer;
   text-decoration: underline;
 }
-.qc-inline-btn:disabled { color: var(--muted-2); cursor: not-allowed; text-decoration: none; }
+.qc-inline-btn:disabled,
+.qc-inline-btn.is-disabled {
+  color: var(--muted-2);
+  cursor: not-allowed;
+  text-decoration: none;
+}
 
 .qc-empty {
   padding: 48px 20px;
@@ -376,12 +386,12 @@
   background: var(--bg-navy);
 }
 .qd-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.qd-book-title { font-family: var(--font-serif, "Noto Serif KR", serif); font-size: 18px; font-weight: 700; color: var(--ink); }
+.qd-book-title { font-family: var(--font-noto-serif-kr, "Noto Serif KR", serif); font-size: 18px; font-weight: 700; color: var(--ink); }
 .qd-book-author { font-size: 13px; color: var(--muted); }
 .qd-handed-by { font-size: 12.5px; color: var(--muted); }
 .qd-divider { height: 1px; background: var(--line); border: none; margin: 4px 0; }
 .qd-brand { display: flex; align-items: center; gap: 10px; }
-.qd-brand-mark { font-family: var(--font-garamond, Georgia, serif); font-style: italic; color: var(--gold); font-size: 22px; }
+.qd-brand-mark { font-family: var(--font-eb-garamond, Georgia, serif); font-style: italic; color: var(--gold); font-size: 22px; }
 .qd-brand-name { font-size: 13.5px; font-weight: 600; color: var(--ink); }
 .qd-side-links { display: flex; flex-direction: column; gap: 4px; }
 .qd-side-links a { font-size: 12.5px; color: var(--accent); text-decoration: underline; }
@@ -389,7 +399,7 @@
 .qd-main { min-width: 0; }
 .qd-eyebrow { font-size: 12px; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
 .qd-title {
-  font-family: var(--font-serif, "Noto Serif KR", serif);
+  font-family: var(--font-noto-serif-kr, "Noto Serif KR", serif);
   font-size: clamp(22px, 3.6vw, 30px);
   font-weight: 700;
   color: var(--ink);
