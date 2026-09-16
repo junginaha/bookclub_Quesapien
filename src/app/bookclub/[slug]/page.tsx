@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import { BOOKCLUB_SESSIONS, getSession } from "@/lib/bookclub/data";
-import { getStatus, isPast } from "@/lib/bookclub/selectors";
+import { getStatus } from "@/lib/bookclub/selectors";
 import { getReservedCounts } from "@/lib/bookclub/server";
 import { buildMetadata } from "@/lib/metadata";
-import { breadcrumbSchema } from "@/lib/schema";
+import { breadcrumbSchema, bookclubSessionEventSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
 import DetailClient from "./DetailClient";
 
@@ -46,27 +47,24 @@ export default async function BookClubDetailPage({ params }: Props) {
   // 한 번의 병렬 조회로 전부 처리 — Supabase 미연결 시 세션당 순차 DNS 실패 지연이
   // 누적되지 않게 한다.
   const allCounts = await getReservedCounts(BOOKCLUB_SESSIONS.map((s) => s.slug));
-  const resolved = { ...session, reserved: allCounts[slug] ?? 0 };
+  const allSessions = BOOKCLUB_SESSIONS.map((s) => ({ ...s, reserved: allCounts[s.slug] ?? 0 }));
+  const resolved = allSessions.find((s) => s.slug === slug)!;
   const status = getStatus(resolved);
-
-  const nextSessions = BOOKCLUB_SESSIONS.filter((s) => s.slug !== slug)
-    .map((s) => ({ ...s, reserved: allCounts[s.slug] ?? 0 }))
-    .filter((s) => !isPast(s))
-    .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
-    .slice(0, 3)
-    .map((s) => ({ session: s, status: getStatus(s) }));
 
   const crumbLd = breadcrumbSchema([
     { name: "홈", href: "/" },
     { name: "북클럽", href: "/bookclub" },
     { name: session.title, href: `/bookclub/${slug}` },
   ]);
+  const eventLd = bookclubSessionEventSchema(resolved);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
-      <JsonLd data={crumbLd} />
+      <JsonLd data={[crumbLd, eventLd]} />
       <Header />
-      <DetailClient session={resolved} status={status} nextSessions={nextSessions} />
+      <Suspense fallback={<div className="qc-skel" style={{ height: 480 }} />}>
+        <DetailClient session={resolved} status={status} allSessions={allSessions} />
+      </Suspense>
       <Footer />
     </div>
   );

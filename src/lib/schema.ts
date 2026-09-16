@@ -57,66 +57,56 @@ export function breadcrumbSchema(items: { name: string; href: string }[]) {
   };
 }
 
-// ─── Event (BookTalk) ─────────────────────────────────────────
-interface BookTalkSchemaInput {
+// ─── Event (북클럽 세션) ────────────────────────────────────────
+// 구 bookTalkEventSchema(BookClubRecord 전용, startDate/endDate 누락 + 아무 곳에서도
+// 호출되지 않던 죽은 코드)를 대체. lib/bookclub/types.ts의 BookClubSession 기준.
+interface SessionSchemaInput {
   slug: string;
   title: string;
-  description?: string;
-  author?: string;
-  host_name?: string;
-  schedule?: string;
-  location?: string;
-  max_participants?: number;
-  current_participants?: number;
-  status?: string;
-  genre?: string;
-  key_questions?: string[];
+  summary: string;
+  startsAt: string;
+  endsAt: string;
+  venue: { name: string; address: string; lat: number; lng: number };
+  capacity: number;
+  reserved: number;
 }
 
-export function bookTalkEventSchema(club: BookTalkSchemaInput) {
-  const statusMap: Record<string, string> = {
-    active: "EventScheduled",
-    upcoming: "EventScheduled",
-    closed: "EventCancelled",
-  };
-
+export function bookclubSessionEventSchema(session: SessionSchemaInput) {
   return {
     "@context": "https://schema.org",
     "@type": "Event",
-    "@id": `${SITE_URL}/bookclub/${club.slug}#event`,
-    name: club.title,
-    description: club.description ?? `${club.title} 북토크 — ${ORG_NAME}`,
-    url: `${SITE_URL}/bookclub/${club.slug}`,
-    eventStatus: `https://schema.org/${statusMap[club.status ?? "active"] ?? "EventScheduled"}`,
+    "@id": `${SITE_URL}/bookclub/${session.slug}#event`,
+    name: session.title,
+    description: session.summary,
+    url: `${SITE_URL}/bookclub/${session.slug}`,
+    startDate: session.startsAt,
+    endDate: session.endsAt,
+    eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-    location: club.location
-      ? {
-          "@type": "Place",
-          name: club.location,
-          address: { "@type": "PostalAddress", addressLocality: club.location, addressCountry: "KR" },
-        }
-      : undefined,
+    location: {
+      "@type": "Place",
+      name: session.venue.name,
+      address: { "@type": "PostalAddress", streetAddress: session.venue.address, addressCountry: "KR" },
+      geo: { "@type": "GeoCoordinates", latitude: session.venue.lat, longitude: session.venue.lng },
+    },
     organizer: { "@id": `${SITE_URL}/#organization` },
-    maximumAttendeeCapacity: club.max_participants,
-    remainingAttendeeCapacity: club.max_participants && club.current_participants
-      ? Math.max(0, club.max_participants - club.current_participants)
-      : undefined,
-    about: club.key_questions?.map((q) => ({ "@type": "Question", name: q })),
+    maximumAttendeeCapacity: session.capacity,
+    remainingAttendeeCapacity: Math.max(0, session.capacity - session.reserved),
     inLanguage: "ko",
   };
 }
 
-// ─── Book ─────────────────────────────────────────────────────
-export function bookSchema(club: BookTalkSchemaInput) {
-  if (!club.author) return null;
+export function bookclubItemListSchema(sessions: { slug: string; title: string }[]) {
   return {
     "@context": "https://schema.org",
-    "@type": "Book",
-    "@id": `${SITE_URL}/bookclub/${club.slug}#book`,
-    name: club.title,
-    author: { "@type": "Person", name: club.author },
-    inLanguage: "ko",
-    genre: club.genre,
+    "@type": "ItemList",
+    "@id": `${SITE_URL}/bookclub#itemlist`,
+    itemListElement: sessions.map((s, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${SITE_URL}/bookclub/${s.slug}`,
+      name: s.title,
+    })),
   };
 }
 

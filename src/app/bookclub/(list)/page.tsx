@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import { buildMetadata } from "@/lib/metadata";
-import { breadcrumbSchema } from "@/lib/schema";
+import { breadcrumbSchema, bookclubItemListSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { computeStats } from "@/lib/bookclub/selectors";
 import { getSessionsWithReserved } from "@/lib/bookclub/server";
@@ -11,13 +11,13 @@ import Sidebar from "@/components/bookclub/Sidebar";
 import TogetherReading from "@/components/bookclub/TogetherReading";
 import "@/components/bookclub/bookclub.css";
 
+// keywords 메타태그 삭제(작업지시서 Phase 5) — 검색엔진이 사실상 무시하는 필드.
 export const metadata: Metadata = buildMetadata({
   title: "북클럽 — 오프라인 북토크 일정",
   description:
     "질문하는 사람들의 오프라인 북토크 일정. 날짜를 고르면 그 모임으로 바로 이동합니다.",
   path: "/bookclub",
   type: "website",
-  keywords: ["북토크", "오프라인독서모임", "독서모임일정", "소규모독서"],
 });
 
 // reserved는 매 요청 실시간 조회가 원칙이라(§작업원칙4) 정적 캐싱을 쓰지 않는다.
@@ -39,12 +39,13 @@ export default async function BookClubPage() {
     { name: "홈", href: "/" },
     { name: "북클럽", href: "/bookclub" },
   ]);
+  const itemListLd = bookclubItemListSchema(sessions);
 
   const venueMapUrl = "https://map.kakao.com/?q=" + encodeURIComponent("에피소드 강남 262");
 
   return (
     <div className="qc-page">
-      <JsonLd data={crumbLd} />
+      <JsonLd data={[crumbLd, itemListLd]} />
       <Header />
       <main>
         <div className="qc-cover">
