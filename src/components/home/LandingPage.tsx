@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import dynamic from "next/dynamic";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { createClient } from "@/lib/supabase/client";
 import NearbyMeetingsFeed, { type UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
 import IntroSplash from "./IntroSplash";
-import { type BookClubRecord, FALLBACK_CLUBS, classifyClub, sortAgain, sortNow, visibleClubs } from "@/lib/bookclub";
-import { CurrentClubCard, EncoreClubCard } from "@/components/bookclub/ClubCards";
+import type { BookClubSession } from "@/lib/bookclub/types";
+import TogetherReading from "@/components/bookclub/TogetherReading";
+import "@/components/bookclub/bookclub.css";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import { ChevronDown } from "lucide-react";
 import "./landing.css";
@@ -623,10 +624,11 @@ interface LandingPageProps {
   todayQuestion?: LandingQuestion | null;
   recentQuestions?: LandingQuestion[];
   upcomingMeetings?: UpcomingMeetingFeedItem[];
+  bookclubSessions?: BookClubSession[];
 }
 
 // ─── Main component ───────────────────────────────────────────
-export default function LandingPage({ todayQuestion, recentQuestions, upcomingMeetings = [] }: LandingPageProps) {
+export default function LandingPage({ todayQuestion, recentQuestions, upcomingMeetings = [], bookclubSessions = [] }: LandingPageProps) {
   // IntroSplash는 항상(재방문자 포함) 처음부터 마운트해 둔다 — 실제로 보일지는
   // React 타이밍이 아니라 layout.tsx의 차단 스크립트가 첫 페인트 전에 세팅하는
   // html[data-intro="pending"] + landing.css의 CSS로 결정된다(자세한 이유는
@@ -644,7 +646,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
   const [questionSaves, setQuestionSaves] = useState<number | null>(null);
   const [questionReacted, setQuestionReacted] = useState<{ like: boolean; save: boolean }>({ like: false, save: false });
   const [dbBooks, setDbBooks] = useState<BookClub[]>([]);
-  const [clubRecords, setClubRecords] = useState<BookClubRecord[]>([]);
   const [howToOpen, setHowToOpen] = useState(false);
   const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
   const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
@@ -678,7 +679,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
       .then((d) => {
         if (d.clubs?.length > 0) {
           setDbBooks(d.clubs);
-          setClubRecords(d.clubs); // 같은 응답, 지금/다시 섹션은 snake_case 원본 그대로 사용
         }
       })
       .catch(() => {});
@@ -975,47 +975,21 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           </div>
         </div>
 
-        {(() => {
-          // DB fetch가 늦게 도착해 length>0인 응답을 주더라도, 그 응답이 실제로는
-          // "지금"/"다시" 어느 쪽으로도 폴백보다 적게 분류될 수 있다(예: is_mini
-          // 필터 등으로 일부만 걸러진 부분 응답). ">0"만 보고 통째로 교체하면 이미
-          // 3장 보여주던 카드가 1~2장으로 줄어드는 것도 "떴다 사라지는" 것처럼
-          // 보인다 — 실데이터가 폴백보다 "같거나 더 많을 때"만 폴백을 대체한다.
-          const liveRecords = visibleClubs(clubRecords);
-          const fallbackRecords = visibleClubs(FALLBACK_CLUBS);
-          const liveNow = liveRecords.filter((c) => classifyClub(c) === "now");
-          const liveAgain = liveRecords.filter((c) => classifyClub(c) === "again");
-          const fallbackNow = fallbackRecords.filter((c) => classifyClub(c) === "now");
-          const fallbackAgain = fallbackRecords.filter((c) => classifyClub(c) === "again");
-          const nowClubs = (liveNow.length >= fallbackNow.length ? liveNow : fallbackNow).sort(sortNow).slice(0, 4);
-          const againClubs = (liveAgain.length >= fallbackAgain.length ? liveAgain : fallbackAgain).sort(sortAgain).slice(0, 4);
-          const hasAny = nowClubs.length > 0 || againClubs.length > 0;
-          return (
-            // 참여 가능한 북클럽과 앵콜 북클럽을 하나의 섹션·그리드로 통합.
-            // 카드 자체(배지)로 신청가능/앵콜을 구분하므로 별도 소제목 두 개로
-            // 쪼갤 필요가 없다 — 운영자 피드백: 두 섹션이 나뉘어 있던 걸 합쳐달라.
-            <div style={{ marginTop: 56 }}>
-              <div style={{ marginBottom: 24 }}>
-                <h3 style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(22px, 2.4vw, 30px)", fontWeight: 500, color: "var(--ink)" }}>
-                  함께 읽어요
-                </h3>
-              </div>
-              {hasAny ? (
-                <div className="lp-books-grid">
-                  {nowClubs.map((c) => <CurrentClubCard key={c.id} club={c} />)}
-                  {againClubs.map((c) => <EncoreClubCard key={c.id} club={c} />)}
-                </div>
-              ) : (
-                <p style={{ fontSize: 14, color: "var(--muted)", padding: "24px 0" }}>지금은 신청 가능한 북클럽이 없어요. 곧 새 일정이 열려요.</p>
-              )}
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
-                <a href="/bookclub" className="btn-pill-neu" style={{ padding: "6px 14px", fontSize: 11.5 }}>
-                  북클럽 전체 일정 보기
-                </a>
-              </div>
-            </div>
-          );
-        })()}
+        {/* "함께 읽어요" — 예정/지난 세션을 하나의 배열·하나의 카드 컴포넌트로 통합
+            (작업지시서 Phase 1). /bookclub과 동일한 TogetherReading을 재사용한다 —
+            서로 다른 카드 디자인·서로 다른 데이터로 두 번 구현하지 않는다. */}
+        <div style={{ marginTop: 56 }}>
+          <Suspense fallback={null}>
+            <TogetherReading
+              sessions={bookclubSessions}
+              showCalendar={false}
+              limit={4}
+              syncUrl={false}
+              ctaHref="/bookclub"
+              ctaLabel="북클럽 전체 일정 보기"
+            />
+          </Suspense>
+        </div>
       </section>
 
       {/* ④ ARCHIVING — 후기 섹션 */}

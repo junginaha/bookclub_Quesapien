@@ -3,7 +3,7 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { isAdminEmail } from "@/lib/admin";
-import { BOOKCLUBS } from "@/lib/bookclubs";
+import { BOOKCLUB_SESSIONS } from "@/lib/bookclub/data";
 import BookClubAdminClient, { type ApplicationRow, type WaitlistRow } from "./BookClubAdminClient";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +41,7 @@ export default async function BookClubAdminPage() {
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <Header />
       <BookClubAdminClient
-        clubs={BOOKCLUBS.map((c) => ({ slug: c.slug, title: c.title, capacity: c.capacity }))}
+        clubs={BOOKCLUB_SESSIONS.map((c) => ({ slug: c.slug, title: c.title, capacity: c.capacity }))}
         applications={applications}
         waitlist={waitlist}
         loadError={loadError}

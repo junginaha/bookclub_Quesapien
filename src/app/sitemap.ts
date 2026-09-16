@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { BOOKCLUBS } from "@/lib/bookclubs";
+import { BOOKCLUB_SESSIONS } from "@/lib/bookclub/data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 
@@ -64,12 +64,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // BookClub — src/lib/bookclubs.ts(단일 소스)의 실제 클럽만, 가짜 슬러그 없음.
-  const bookclubPages: MetadataRoute.Sitemap = BOOKCLUBS.map((club) => ({
-    url: `${SITE_URL}/bookclub/${club.slug}`,
+  // BookClub — src/lib/bookclub/data.ts(단일 소스)의 실제 세션만, 가짜 슬러그 없음.
+  const bookclubPages: MetadataRoute.Sitemap = BOOKCLUB_SESSIONS.map((session) => ({
+    url: `${SITE_URL}/bookclub/${session.slug}`,
     lastModified: now,
-    changeFrequency: new Date(club.startAt).getTime() > Date.now() ? "weekly" : "monthly",
-    priority: new Date(club.startAt).getTime() > Date.now() ? 0.8 : 0.5,
+    changeFrequency: new Date(session.startsAt).getTime() > Date.now() ? "weekly" : "monthly",
+    priority: new Date(session.startsAt).getTime() > Date.now() ? 0.8 : 0.5,
   }));
 
   return [...staticPages, ...bookclubPages];

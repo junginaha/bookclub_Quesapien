@@ -7,7 +7,8 @@
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/server";
-import { getBookClub } from "@/lib/bookclubs";
+import { getSession } from "@/lib/bookclub/data";
+import { isPast } from "@/lib/bookclub/selectors";
 
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT = 8;
@@ -73,13 +74,10 @@ export async function applyToBookClub(input: {
   if (!name || name.length > 80) return { ok: false, error: "이름을 확인해 주세요." };
   if (phone.length < 9 || phone.length > 15) return { ok: false, error: "휴대전화 번호를 확인해 주세요." };
 
-  const club = getBookClub(input.clubSlug);
+  const club = getSession(input.clubSlug);
   if (!club) return { ok: false, error: "모임 정보를 찾을 수 없습니다." };
-  if (new Date(club.startAt).getTime() <= Date.now()) {
+  if (isPast(club)) {
     return { ok: false, error: "이미 지난 모임입니다." };
-  }
-  if (club.isTentative) {
-    return { ok: false, error: "아직 책을 고르는 중인 모임입니다." };
   }
 
   try {
@@ -133,7 +131,7 @@ export async function joinBookClubWaitlist(input: {
   if (!name || name.length > 80) return { ok: false, error: "이름을 확인해 주세요." };
   if (phone.length < 9 || phone.length > 15) return { ok: false, error: "휴대전화 번호를 확인해 주세요." };
 
-  if (input.clubSlug && !getBookClub(input.clubSlug)) {
+  if (input.clubSlug && !getSession(input.clubSlug)) {
     return { ok: false, error: "모임 정보를 찾을 수 없습니다." };
   }
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { hashContact } from "@/lib/bookclub-server";
-import { DEFAULT_ENCORE_THRESHOLD, encoreCopy } from "@/lib/bookclub";
+import { ENCORE_THRESHOLD as DEFAULT_ENCORE_THRESHOLD, encoreCopy } from "@/lib/bookclub/selectors";
 
 interface EncoreBody {
   clubSlug: string;

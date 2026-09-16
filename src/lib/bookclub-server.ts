@@ -1,5 +1,11 @@
 import crypto from "node:crypto";
-import type { BookClubRecord } from "./bookclub";
+
+// landing_book_clubs 원본 행(snake_case) 최소 형태 — attachEncoreCounts는 id만 쓴다.
+// 구 lib/bookclub.ts(BookClubRecord)는 Phase 1에서 제거됐다: lib/bookclub/(신규 모듈) 참고.
+interface MinimalClubRow {
+  id: string;
+  encore_request_count?: number;
+}
 
 // 서버 전용 — 클라이언트 번들에 node:crypto가 섞이지 않도록 bookclub.ts와 분리한다.
 // 앵콜 요청 중복 방지용 연락처 해시. 원문 연락처는 저장하지 않는다.
@@ -14,7 +20,7 @@ export function hashContact(value: string): string {
  * (마이그레이션 미적용 상태) 조용히 0으로 채운다 — 계측 실패가 목록 렌더링을
  * 막아서는 안 된다.
  */
-export async function attachEncoreCounts<T extends BookClubRecord>(
+export async function attachEncoreCounts<T extends MinimalClubRow>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
   clubs: T[]

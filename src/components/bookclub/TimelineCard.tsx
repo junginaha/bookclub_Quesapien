@@ -3,10 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import type { BookClub, ClubStatus } from "@/lib/bookclubs";
-import { formatMonthDay, formatWeekdayFull, formatTimeOfDay } from "@/lib/bookclubs";
+import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
+import { cardBlurb, encoreCopy, formatMonthDay, formatTimeOfDay, formatWeekdayFull } from "@/lib/bookclub/selectors";
 import StatusPill from "./StatusPill";
 import NotifyForm from "./NotifyForm";
+import EncoreRequestButton from "./EncoreRequestButton";
 
 function ogFallback(title: string, sub: string) {
   const p = new URLSearchParams({ title, sub });
@@ -14,88 +15,107 @@ function ogFallback(title: string, sub: string) {
 }
 
 /**
- * 카드 하나에 날짜·시간·장소·모임 정보를 전부 합쳐서 보여준다(사용자 피드백:
- * 정보가 여러 요소에 쪼개져 있어 겹쳐 보이고 읽기 어려웠음). sticky 등
- * 별도 포지셔닝 요소 없이 일반 흐름(flex)만 사용해 겹침 위험을 없앤다.
+ * 세션 카드 — 예정/지난 공용 컴포넌트 1개(작업지시서 Phase 1-5). 날짜·시간·장소·
+ * 모임 정보를 카드 하나에 합쳐 보여주고, 우측 액션만 status로 분기한다.
+ *   open → 자리 수 + [참여 신청]
+ *   full → [대기 신청]
+ *   past → 앵콜 요청 문구 + [앵콜 요청] + [기록 보기]
  */
 export default function TimelineCard({
-  club,
+  session,
   status,
-  joinedCount,
   highlighted,
 }: {
-  club: BookClub;
-  status: ClubStatus;
-  joinedCount: number;
+  session: BookClubSession;
+  status: SessionStatus;
   highlighted: boolean;
 }) {
   const [actionOpen, setActionOpen] = useState(false);
-  const cover = club.bookCover || ogFallback(club.bookTitle, club.bookAuthor);
+  const cover = session.coverUrl || ogFallback(session.bookTitle, session.author);
   const isPast = status === "past";
-  const needsAction = status === "full" || status === "tentative";
-  const weekday = formatWeekdayFull(club.startAt).slice(0, 1);
+  const weekday = formatWeekdayFull(session.startsAt).slice(0, 1);
 
   const cardInner = (
     <>
       <div className="qc-card-cover">
-        <Image src={cover} alt={`『${club.bookTitle}』 표지`} width={88} height={132} unoptimized />
+        <Image src={cover} alt={`『${session.bookTitle}』 표지`} width={88} height={132} unoptimized />
       </div>
       <div className="qc-card-body">
-        <span className="qc-card-title">{club.title}</span>
+        <span className="qc-card-title">{session.title}</span>
         <span className="qc-card-datetime">
-          {formatMonthDay(club.startAt)}({weekday}) · {formatTimeOfDay(club.startAt)} · {club.venueName}
+          {formatMonthDay(session.startsAt)}({weekday}) · {formatTimeOfDay(session.startsAt)} · {session.venue.name}
         </span>
-        <span className="qc-card-reason">{club.reasonOneLine}</span>
+        {cardBlurb(session) && <span className="qc-card-reason">{cardBlurb(session)}</span>}
         <div className="qc-card-meta">
-          <span className="qc-card-book">『{club.bookTitle}』 {club.bookAuthor}</span>
-          <StatusPill status={status} club={club} joinedCount={joinedCount} />
+          <span className="qc-card-book">『{session.bookTitle}』 {session.author}</span>
+          <StatusPill status={status} session={session} />
         </div>
       </div>
     </>
   );
 
   return (
-    <div id={`club-${club.slug}`} className="qc-tl-item">
+    <div id={`club-${session.slug}`} className="qc-tl-item">
       <div className={`qc-card-wrap${highlighted ? " is-highlight" : ""}${isPast ? " is-past" : ""}`}>
         {isPast ? (
           <div className="qc-card">{cardInner}</div>
         ) : (
-          <Link href={`/bookclub/${club.slug}`} className="qc-card qc-card-link">
+          <Link href={`/bookclub/${session.slug}`} className="qc-card qc-card-link">
             {cardInner}
           </Link>
         )}
 
-        {needsAction && (
+        {status === "open" && (
+          <div className="qc-card-actionrow">
+            <Link href={`/bookclub/${session.slug}`} className="qc-inline-btn">참여 신청</Link>
+          </div>
+        )}
+
+        {status === "full" && (
           <div className="qc-card-actionrow">
             <button
               type="button"
               className="qc-inline-btn"
-              onClick={(e) => {
-                e.preventDefault();
-                setActionOpen((v) => !v);
-              }}
+              onClick={(e) => { e.preventDefault(); setActionOpen((v) => !v); }}
               aria-expanded={actionOpen}
             >
-              {status === "full" ? "대기자 등록" : "알림 받기"}
+              대기 신청
             </button>
           </div>
         )}
-        {needsAction && actionOpen && (
+        {status === "full" && actionOpen && (
           <div className="qc-card-actionform">
-            <NotifyForm clubSlug={club.slug} mode={status === "full" ? "waitlist" : "notify"} />
+            <NotifyForm clubSlug={session.slug} mode="waitlist" />
           </div>
         )}
 
         {isPast && (
-          <div className="qc-card-actionrow">
-            {club.archiveSlug ? (
-              <Link href={`/archive/${club.archiveSlug}`} className="qc-inline-btn">
-                그날의 기록
-              </Link>
-            ) : (
-              <span className="qc-inline-btn is-disabled">정리 중입니다</span>
+          <>
+            {/* count=0일 때 문구는 섹션 하단 캡션 1회로만 보여준다(카드마다 반복 금지 — 작업지시서 Phase 1-6). */}
+            {(session.encoreCount ?? 0) > 0 && (
+              <p className="qc-card-encore-copy">{encoreCopy(session.encoreCount ?? 0)}</p>
             )}
-          </div>
+            <div className="qc-card-actionrow" style={{ justifyContent: "space-between" }}>
+              {session.archiveSlug ? (
+                <Link href={`/archive/${session.archiveSlug}`} className="qc-inline-btn">기록 보기</Link>
+              ) : (
+                <span className="qc-inline-btn is-disabled">정리 중입니다</span>
+              )}
+              <button
+                type="button"
+                className="qc-inline-btn"
+                onClick={(e) => { e.preventDefault(); setActionOpen((v) => !v); }}
+                aria-expanded={actionOpen}
+              >
+                앵콜 요청
+              </button>
+            </div>
+            {actionOpen && (
+              <div className="qc-card-actionform">
+                <EncoreRequestButton clubSlug={session.slug} />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

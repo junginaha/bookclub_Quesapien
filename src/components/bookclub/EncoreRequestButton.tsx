@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { useAppStore } from "@/lib/store";
-import { AREA_OPTIONS, TIME_OPTIONS, INTENT_OPTIONS } from "@/lib/bookclub";
+
+// 이 폼에서만 쓰는 선택지 — 구 lib/bookclub.ts(Phase 1에서 제거)에 있던 것을 이관.
+const AREA_OPTIONS = ["강남·서초", "마포·홍대", "종로·광화문", "성수·건대", "온라인", "지역 무관"] as const;
+const TIME_OPTIONS = ["평일 저녁", "토요일 오전", "토요일 오후", "일요일 오전", "일요일 오후", "시간 무관"] as const;
+const INTENT_OPTIONS = ["일정이 맞으면 참여", "우선 알림 희망", "가격 확인 후 결정"] as const;
 
 interface Props {
   clubSlug: string;

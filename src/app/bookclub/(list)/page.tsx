@@ -5,10 +5,10 @@ import Footer from "@/components/common/Footer";
 import { buildMetadata } from "@/lib/metadata";
 import { breadcrumbSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { BOOKCLUBS, computeStats, status as computeStatus } from "@/lib/bookclubs";
-import { getJoinedCounts } from "@/lib/bookclubs.server";
+import { computeStats } from "@/lib/bookclub/selectors";
+import { getSessionsWithReserved } from "@/lib/bookclub/server";
 import Sidebar from "@/components/bookclub/Sidebar";
-import BookClubPageClient, { type ClubWithComputed } from "@/components/bookclub/BookClubPageClient";
+import TogetherReading from "@/components/bookclub/TogetherReading";
 import "@/components/bookclub/bookclub.css";
 
 export const metadata: Metadata = buildMetadata({
@@ -20,10 +20,7 @@ export const metadata: Metadata = buildMetadata({
   keywords: ["북토크", "오프라인독서모임", "독서모임일정", "소규모독서"],
 });
 
-// joinedCount는 매 요청 실시간 조회가 원칙이라(§B "하드코딩 금지") 정적 캐싱을 쓰지 않는다.
-// ISR(revalidate)로 두면 빌드 타임에 Suspense 셸만 굳어버리고 이후에도 갱신되지
-// 않는 현상을 재현 확인했다(getJoinedCounts()가 느리거나 실패할 때 정적 생성이
-// 로딩 스켈레톤만 베이크한 채로 캐시됨) — force-dynamic으로 매 요청 새로 렌더링한다.
+// reserved는 매 요청 실시간 조회가 원칙이라(§작업원칙4) 정적 캐싱을 쓰지 않는다.
 export const dynamic = "force-dynamic";
 
 function coverImageUrl() {
@@ -35,13 +32,8 @@ function coverImageUrl() {
 }
 
 export default async function BookClubPage() {
-  const joinedCounts = await getJoinedCounts(BOOKCLUBS.map((c) => c.slug));
-  const items: ClubWithComputed[] = BOOKCLUBS.map((club) => ({
-    club,
-    status: computeStatus(club, joinedCounts[club.slug] ?? 0),
-    joinedCount: joinedCounts[club.slug] ?? 0,
-  }));
-  const stats = computeStats(BOOKCLUBS, joinedCounts);
+  const sessions = await getSessionsWithReserved();
+  const stats = computeStats(sessions);
 
   const crumbLd = breadcrumbSchema([
     { name: "홈", href: "/" },
@@ -62,7 +54,7 @@ export default async function BookClubPage() {
         <div className="qc-body">
           <Sidebar stats={stats} venueName="에피소드 강남 262" venueMapUrl={venueMapUrl} />
           <Suspense fallback={<div className="qc-skel" style={{ height: 480 }} />}>
-            <BookClubPageClient items={items} />
+            <TogetherReading sessions={sessions} />
           </Suspense>
         </div>
       </main>

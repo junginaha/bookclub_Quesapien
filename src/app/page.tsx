@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { createClient } from "@/lib/supabase/server";
 import type { LandingQuestion } from "@/components/home/LandingPage";
 import { getUpcomingMeetingsFeed } from "@/lib/clubQueries";
+import { getSessionsWithReserved } from "@/lib/bookclub/server";
 
 export const revalidate = 300; // 5분 캐시
 
@@ -138,6 +139,7 @@ export default async function HomePage() {
   // Qsapiens 2.0 — 홈 = 내 근처 다음 모임 피드(§C1 구조적 귀결①). 신규 clubs/meetings
   // 마이그레이션(010) 적용 전에는 빈 배열로 조용히 폴백한다(기존 홈 동작에 영향 없음).
   const upcomingMeetings = await getUpcomingMeetingsFeed(6).catch(() => []);
+  const bookclubSessions = await getSessionsWithReserved().catch(() => []);
 
   return (
     <>
@@ -146,6 +148,7 @@ export default async function HomePage() {
         todayQuestion={todayQuestion}
         recentQuestions={recentQuestions}
         upcomingMeetings={upcomingMeetings}
+        bookclubSessions={bookclubSessions}
       />
     </>
   );
