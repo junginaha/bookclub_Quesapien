@@ -431,9 +431,7 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-q-grid { max-width: var(--lp-max); margin: 0 auto; display: grid; grid-template-columns: 3fr 2fr; gap: var(--lp-sp4); align-items: start; }
 @media (max-width: 920px) { .lp-q-grid { grid-template-columns: 1fr; } }
 
-.lp-q-feature { background: var(--lp-bg); border: 1px solid var(--lp-line); border-radius: 6px; padding: clamp(32px, 4vw, 56px); position: relative; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s ease; }
-.lp-q-feature:hover { transform: translateY(-3px); box-shadow: 0 40px 80px -40px rgba(40,30,20,.25); }
-.lp-q-feature::before { content: ""; position: absolute; inset: 0; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.35 0 0 0 0 0.25 0 0 0 0.25 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); opacity: 0.35; mix-blend-mode: multiply; pointer-events: none; }
+.lp-q-feature { background: var(--lp-bg); border: 1px solid var(--lp-line); border-radius: 0; padding: clamp(32px, 4vw, 56px); position: relative; overflow: hidden; }
 .lp-q-marker { display: inline-flex; align-items: center; gap: 10px; margin-bottom: var(--lp-sp4); font-family: var(--lp-serif); font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--lp-accent); }
 .lp-q-marker .qm-pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--lp-accent); position: relative; }
 .lp-q-marker .qm-pulse::before { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 1px solid var(--lp-accent); opacity: 0.4; animation: lp-pulse 2.4s ease-out infinite; }
@@ -448,14 +446,18 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-q-comments .qc-row:last-child { border-bottom: none; padding-bottom: 0; }
 .lp-q-comments .qc-who { font-family: var(--lp-serif); font-style: normal; color: var(--lp-accent); font-size: 14px; }
 .lp-q-comments .qc-what { font-family: var(--lp-serif-ko); color: var(--lp-ink-soft); font-size: var(--lp-base); line-height: var(--lp-lh-snug); }
-.lp-q-card { background: var(--lp-bg); border: 1px solid var(--lp-line); border-radius: 6px; padding: 26px 28px; cursor: pointer; transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease, border-color .4s; display: flex; flex-direction: column; gap: 14px; position: relative; }
-.lp-q-card:hover { transform: translateY(-2px); box-shadow: 0 30px 50px -35px rgba(40,30,20,.3); border-color: var(--lp-ink); }
+.lp-q-card { background: var(--lp-bg); border: none; border-radius: 0; padding: 26px 28px; cursor: pointer; transition: background .3s ease; display: flex; flex-direction: column; gap: 14px; position: relative; }
+.lp-q-card:hover, .lp-q-card:focus-visible { background: var(--lp-bg-soft); }
+@media (prefers-reduced-motion: reduce) { .lp-q-card { transition: none; } }
 .lp-q-card .qcard-num { font-family: var(--lp-serif); font-style: normal; color: var(--lp-accent); font-size: 14px; }
 .lp-q-card .qcard-q { font-family: var(--lp-serif-ko); font-weight: 400; font-size: var(--lp-md); line-height: var(--lp-lh-snug); color: var(--lp-ink); letter-spacing: -0.005em; }
 .lp-q-card .qcard-foot { display: flex; justify-content: space-between; align-items: center; color: var(--lp-muted); font-size: 12.5px; margin-top: auto; }
 .lp-q-card .qcard-foot .qf-nums { display: flex; gap: 16px; }
 .lp-q-card .qcard-foot b { font-family: var(--lp-serif); font-weight: 500; color: var(--lp-ink); }
-.lp-q-card-stack { display: grid; gap: 16px; }
+/* Phase 3 — 촘촘한 격자: 2열로 채워 여백 없이 촘촘하게 배치 */
+.lp-q-card-stack { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--lp-line); }
+.lp-q-card-stack .lp-q-card { padding: 20px 20px; }
+@media (max-width: 480px) { .lp-q-card-stack { grid-template-columns: 1fr; } }
 
 /* ── BOOKS ── */
 .lp-books { background: var(--lp-bg); }
@@ -621,9 +623,15 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 
 /* ── LEADERS ── */
 .lp-leaders { background: var(--lp-bg); }
-.lp-leaders-grid { max-width: var(--lp-max); margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: var(--lp-sp4); }
-@media (max-width: 1024px) { .lp-leaders-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 640px)  { .lp-leaders-grid { grid-template-columns: 1fr; } }
+/* Phase 3 — "참여는 세 걸음이면 돼요" 스텝: 그림자/라운드 없이 헤어라인 구분,
+   본문은 hover/tap 전엔 접혀 있다(HoverReveal). */
+.lp-steps-grid { max-width: var(--lp-max); margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: var(--lp-sp4); }
+@media (max-width: 1024px) { .lp-steps-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px)  { .lp-steps-grid { grid-template-columns: 1fr; } }
+.lp-step { border-top: 1px solid var(--lp-line); padding-top: var(--lp-sp3); }
+.lp-step-num { font-family: '"EB Garamond", Georgia, serif'; font-size: 26px; color: var(--lp-accent); opacity: 0.6; line-height: 1; margin-bottom: 10px; }
+.lp-step-title { font-family: var(--font-noto-serif-kr), Georgia, serif; font-size: 17px; font-weight: 500; color: var(--ink); }
+.lp-step-body { padding-top: 10px; font-size: 14px; color: var(--ink-soft); line-height: 1.7; white-space: pre-line; }
 .lp-leader { background: var(--lp-bg-soft); border: 1px solid var(--lp-line); border-radius: 6px; padding: 36px 34px; display: grid; gap: var(--lp-sp3); transition: transform .4s ease, box-shadow .4s ease; }
 .lp-leader:hover { transform: translateY(-4px); box-shadow: 0 40px 60px -40px rgba(40,30,20,.3); }
 .lp-leader-portrait { width: 80px; height: 80px; border-radius: 50%; background: var(--lp-bg-warm); display: flex; align-items: center; justify-content: center; font-family: var(--lp-serif); font-style: normal; font-size: 30px; color: var(--lp-accent); border: 1px solid var(--lp-line); position: relative; }
@@ -1736,4 +1744,85 @@ html:not([data-intro="pending"]) .lp-intro {
 @keyframes lp-introFadeOut {
   from { opacity: 1; transform: scale(1); }
   to   { opacity: 0; transform: scale(1.02); }
+}
+
+/* ================================================================
+   Phase 3 — 메인 페이지(히어로·nav 제외) sternberg-press.com 상호작용 원리.
+   정보 기본 숨김 → hover/tap시 그 자리에서 노출. 그림자·라운드·그라디언트
+   대신 헤어라인+여백만 쓴다. .lp-hero/.lp-nav/.lp-float(장식 플로팅 요소)는
+   대상에서 제외한다(작업지시서 "하지 말 것": 히어로 수정).
+   ================================================================ */
+
+/* ── HoverReveal: 요약은 항상 보이고, 상세는 hover/tap 전엔 접혀 있다.
+   접힌 상태도 display:none이 아니라 max-height+opacity라 스크린리더는
+   hover 여부와 무관하게 항상 읽는다. ── */
+.lp-reveal-info { cursor: default; }
+.lp-reveal-info:focus-visible { outline: 2px solid var(--lp-accent, var(--accent)); outline-offset: 3px; }
+.lp-reveal-detail {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.3s ease;
+}
+.lp-reveal-info.is-open .lp-reveal-detail { max-height: 600px; opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .lp-reveal-info:hover .lp-reveal-detail,
+  .lp-reveal-info:focus-within .lp-reveal-detail { max-height: 600px; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-reveal-detail { transition: none; }
+}
+
+/* ── 버튼 대신 밑줄 텍스트 ── */
+.lp-underline-cta {
+  display: inline-block;
+  font-family: var(--font-noto-serif-kr), Georgia, serif;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--lp-line, var(--line));
+  transition: text-decoration-color 0.2s ease;
+}
+.lp-underline-cta:hover,
+.lp-underline-cta:focus-visible { text-decoration-color: currentColor; }
+@media (prefers-reduced-motion: reduce) {
+  .lp-underline-cta { transition: none; }
+}
+
+/* ── 공유 컴포넌트(북클럽 카드 등)를 홈에서만 평평하게 — 원본 클래스
+   (.qc-card/.card-base)는 /bookclub 등 다른 페이지와 공유하므로 여기서
+   건드리지 않고, 홈 전용 래퍼 아래에서만 override한다. ── */
+.lp-together-scope .qc-card,
+.lp-nearby-scope .card-base {
+  border-radius: 0;
+  box-shadow: none !important;
+}
+.lp-together-scope .qc-card-link:hover,
+.lp-nearby-scope .card-base:hover {
+  box-shadow: none;
+  transform: none;
+}
+/* ── 가로 스크롤 열(scroll-snap) — 아카이빙 후기 ── */
+.lp-test-scroll {
+  display: flex;
+  gap: 1px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+  background: var(--lp-line);
+}
+.lp-test-scroll .lp-test-item {
+  scroll-snap-align: start;
+  flex: 0 0 min(320px, 82vw);
+  display: block;
+  background: var(--lp-bg);
+  border-bottom: none;
+  padding: 28px 24px;
+}
+.lp-test-scroll .lp-test-item:first-child { border-top: none; }
+.lp-test-scroll .ti-when { text-align: left; padding-top: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-test-scroll { scroll-behavior: auto; }
 }
