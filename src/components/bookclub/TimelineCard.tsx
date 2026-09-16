@@ -50,7 +50,6 @@ export default function TimelineCard({
       id={`club-${club.slug}`}
       className={`qc-tl-item${isPast ? " is-past" : ""}`}
     >
-      <span className="qc-tl-dot" aria-hidden="true" />
       {status === "full" || status === "tentative" ? (
         <div className={`qc-card${highlighted ? " is-highlight" : ""}`} style={{ flexDirection: "column", alignItems: "stretch" }}>
           <Link href={`/bookclub/${club.slug}`} className="qc-card" style={{ border: "none", padding: 0 }}>
