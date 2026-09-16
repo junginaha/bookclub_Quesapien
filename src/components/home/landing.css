@@ -1790,15 +1790,13 @@ html:not([data-intro="pending"]) .lp-intro {
   .lp-underline-cta { transition: none; }
 }
 
-/* ── 공유 컴포넌트(북클럽 카드 등)를 홈에서만 평평하게 — 원본 클래스
-   (.qc-card/.card-base)는 /bookclub 등 다른 페이지와 공유하므로 여기서
-   건드리지 않고, 홈 전용 래퍼 아래에서만 override한다. ── */
-.lp-together-scope .qc-card,
+/* ── 공유 컴포넌트(근처 모임 카드)를 홈에서만 평평하게 — 원본 클래스
+   (.card-base)는 /clubs 등 다른 페이지와 공유하므로 여기서 건드리지 않고,
+   홈 전용 래퍼 아래에서만 override한다. ── */
 .lp-nearby-scope .card-base {
   border-radius: 0;
   box-shadow: none !important;
 }
-.lp-together-scope .qc-card-link:hover,
 .lp-nearby-scope .card-base:hover {
   box-shadow: none;
   transform: none;
@@ -1826,4 +1824,94 @@ html:not([data-intro="pending"]) .lp-intro {
 
 @media (prefers-reduced-motion: reduce) {
   .lp-test-scroll { scroll-behavior: auto; }
+}
+
+/* ================================================================
+   홈 전용 북클럽 카드(EditorialBookRow) — sternberg-press.com 상호작용,
+   2차 지시. 표지+제목+날짜만 기본 노출, hover/tap 시 저자·요약·잔여석이
+   카드 위에 오버레이로 나타난다. 그림자·라운드·그라디언트 없음, 헤어라인만.
+   ================================================================ */
+.lp-ecard-row {
+  display: flex;
+  gap: 1px;
+  background: var(--lp-line);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  max-width: var(--lp-max);
+  margin: 0 auto;
+}
+
+.lp-ecard {
+  position: relative;
+  flex: 0 0 min(280px, 62vw); /* 5장 기준 --lp-max(1240px)보다 넓어져 데스크톱에서도 가로 스크롤이 실제로 필요해진다 */
+  aspect-ratio: 2 / 3;
+  background: var(--lp-bg);
+  scroll-snap-align: start;
+  cursor: default;
+  overflow: hidden;
+}
+.lp-ecard-cover { position: absolute; inset: 0; }
+.lp-ecard-cover img { display: block; }
+.lp-ecard-cover-flat { position: absolute; inset: 0; }
+
+.lp-ecard-face {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 14px 16px;
+  background: rgba(20, 24, 31, 0.72); /* 그라디언트 대신 단색 스크림 */
+}
+.lp-ecard-title {
+  font-family: var(--font-noto-serif-kr), Georgia, serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.35;
+}
+.lp-ecard-line {
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.75);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 오버레이 — opacity/pointer-events로만 감춘다(display:none·aria-hidden 금지,
+   화면 낭독기 상시 노출). */
+.lp-ecard-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--lp-ink, #1C1F26);
+  color: var(--lp-cream, #ECE3CF);
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.lp-ecard.is-open .lp-ecard-overlay { opacity: 1; pointer-events: auto; }
+.lp-ecard:focus-visible { outline: 2px solid var(--lp-accent, var(--accent)); outline-offset: -2px; }
+@media (hover: hover) and (pointer: fine) {
+  .lp-ecard:hover .lp-ecard-overlay,
+  .lp-ecard:focus-within .lp-ecard-overlay { opacity: 1; pointer-events: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-ecard-overlay { transition: none; }
+}
+
+.lp-ecard-author { font-family: var(--lp-serif); font-size: 13px; color: rgba(236,227,207,0.75); }
+.lp-ecard-summary { font-size: 13.5px; line-height: 1.6; }
+.lp-ecard-seats { font-size: 12.5px; color: var(--lp-gold, #B08A4A); font-weight: 600; margin-top: auto; }
+.lp-ecard-link.lp-underline-cta {
+  color: var(--lp-cream, #ECE3CF);
+  text-decoration-color: rgba(236,227,207,0.4);
+}
+.lp-ecard-link.lp-underline-cta:hover,
+.lp-ecard-link.lp-underline-cta:focus-visible {
+  text-decoration-color: var(--lp-cream, #ECE3CF);
+}
+
+@media (max-width: 640px) {
+  .lp-ecard { flex-basis: min(200px, 72vw); }
 }

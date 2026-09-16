@@ -1,15 +1,14 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef, Suspense } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { createClient } from "@/lib/supabase/client";
 import NearbyMeetingsFeed, { type UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
 import IntroSplash from "./IntroSplash";
 import type { BookClubSession } from "@/lib/bookclub/types";
-import TogetherReading from "@/components/bookclub/TogetherReading";
+import EditorialBookRow from "./EditorialBookRow";
 import HoverReveal from "./HoverReveal";
-import "@/components/bookclub/bookclub.css";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import { ChevronDown } from "lucide-react";
 import "./landing.css";
@@ -970,20 +969,16 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           </div>
         </div>
 
-        {/* "함께 읽어요" — 예정/지난 세션을 하나의 배열·하나의 카드 컴포넌트로 통합
-            (작업지시서 Phase 1). /bookclub과 동일한 TogetherReading을 재사용한다 —
-            서로 다른 카드 디자인·서로 다른 데이터로 두 번 구현하지 않는다. */}
-        <div className="lp-together-scope" style={{ marginTop: 56 }}>
-          <Suspense fallback={null}>
-            <TogetherReading
-              sessions={bookclubSessions}
-              showCalendar={false}
-              limit={4}
-              syncUrl={false}
-              ctaHref="/bookclub"
-              ctaLabel="북클럽 전체 일정 보기"
-            />
-          </Suspense>
+        {/* "함께 읽어요" — 홈 전용 에디토리얼 카드(가로 스크롤 스냅, hover/tap
+            오버레이). 데이터·상태 판정(getStatus/seatsLeft)은 /bookclub과 같은
+            lib/bookclub 소스 하나를 공유하되(작업지시서 Phase 1 원칙 유지),
+            화면 표현은 sternberg-press.com 상호작용에 맞춰 홈 전용으로 새로
+            만들었다(2차 지시 — 정보 기본 숨김, hover/tap 오버레이, 가로 스크롤). */}
+        <div style={{ marginTop: 56 }}>
+          <EditorialBookRow sessions={bookclubSessions} />
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+            <a href="/bookclub" className="lp-underline-cta">북클럽 전체 일정 보기 →</a>
+          </div>
         </div>
       </section>
 
