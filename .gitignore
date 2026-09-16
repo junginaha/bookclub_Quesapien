@@ -8,3 +8,4 @@ node_modules
 .env.local
 tsconfig.tsbuildinfo
 *.env\n.env.*
+.claude/worktrees/
