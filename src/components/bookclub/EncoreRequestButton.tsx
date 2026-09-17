@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAppStore } from "@/lib/store";
+import { Button } from "@/components/ui/button";
 
 // 이 폼에서만 쓰는 선택지 — 구 lib/bookclub.ts(Phase 1에서 제거)에 있던 것을 이관.
 const AREA_OPTIONS = ["강남·서초", "마포·홍대", "종로·광화문", "성수·건대", "온라인", "지역 무관"] as const;
@@ -79,15 +80,9 @@ export default function EncoreRequestButton({ clubSlug, initialRequested = false
   if (requested) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-start" }}>
-        <button
-          type="button"
-          disabled={saving}
-          onClick={cancel}
-          className="btn-pill-neu"
-          style={{ opacity: saving ? 0.6 : 1 }}
-        >
+        <Button type="button" variant="ghost" disabled={saving} onClick={cancel}>
           앵콜 요청 완료 · 취소
-        </button>
+        </Button>
         {copy && <span style={{ fontSize: 12, color: "var(--muted)", whiteSpace: "pre-line" }}>{copy}</span>}
       </div>
     );
@@ -96,15 +91,9 @@ export default function EncoreRequestButton({ clubSlug, initialRequested = false
   if (currentUser) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-start" }}>
-        <button
-          type="button"
-          disabled={saving}
-          onClick={() => submit()}
-          className="btn-pill-neu btn-pill-neu-accent"
-          style={{ opacity: saving ? 0.6 : 1 }}
-        >
+        <Button type="button" variant="primary" disabled={saving} onClick={() => submit()}>
           {saving ? "요청 중…" : "앵콜 요청"}
-        </button>
+        </Button>
         {error && <span style={{ fontSize: 12, color: "#EF4444" }}>{error}</span>}
       </div>
     );
@@ -112,9 +101,9 @@ export default function EncoreRequestButton({ clubSlug, initialRequested = false
 
   if (!formOpen) {
     return (
-      <button type="button" onClick={() => setFormOpen(true)} className="btn-pill-neu btn-pill-neu-accent">
+      <Button type="button" variant="primary" onClick={() => setFormOpen(true)}>
         앵콜 요청
-      </button>
+      </Button>
     );
   }
 
@@ -165,11 +154,11 @@ export default function EncoreRequestButton({ clubSlug, initialRequested = false
         개인정보 수집·이용에 동의합니다.
       </label>
       {error && <span style={{ fontSize: 12, color: "#EF4444" }}>{error}</span>}
-      <div style={{ display: "flex", gap: 8 }}>
-        <button type="button" onClick={() => setFormOpen(false)} style={{ fontSize: 12.5, color: "var(--muted)", background: "none", border: "none", cursor: "pointer" }}>취소</button>
-        <button type="submit" disabled={saving || !consent || !contactValue.trim()} className="btn-pill-neu btn-pill-neu-accent" style={{ opacity: (!consent || !contactValue.trim()) ? 0.5 : 1 }}>
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <Button type="button" variant="text" size="sm" onClick={() => setFormOpen(false)}>취소</Button>
+        <Button type="submit" variant="primary" disabled={saving || !consent || !contactValue.trim()}>
           {saving ? "요청 중…" : "앵콜 요청 보내기"}
-        </button>
+        </Button>
       </div>
     </form>
   );

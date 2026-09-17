@@ -32,17 +32,15 @@ export default function ReviewGrid({ reviews }: ReviewGridProps) {
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
         <Filter className="h-4 w-4 text-warm-400 shrink-0" />
         {FILTER_TYPES.map((f) => (
-          <button
+          <Button
             key={f.value}
+            variant={activeFilter === f.value ? "primary" : "ghost"}
+            size="sm"
+            className="shrink-0"
             onClick={() => setActiveFilter(f.value)}
-            className={`shrink-0 px-4 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-              activeFilter === f.value
-                ? "bg-warm-900 text-white"
-                : "bg-warm-100 text-warm-600 hover:bg-warm-200"
-            }`}
           >
             {f.label}
-          </button>
+          </Button>
         ))}
       </div>
 

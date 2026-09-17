@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 type AttendanceStatus = "applied" | "pending" | "waitlist" | "attended" | "no_show" | "canceled" | null;
 
@@ -82,15 +83,9 @@ export default function MeetingApplyButton({
           {STATUS_LABEL[status] ?? status}
         </span>
         {status !== "attended" && (
-          <button
-            type="button" onClick={handleCancel} disabled={loading}
-            style={{
-              fontSize: 11.5, color: "var(--muted-2)", background: "none", border: "none",
-              cursor: loading ? "not-allowed" : "pointer", textDecoration: "underline", padding: "2px 4px",
-            }}
-          >
+          <Button type="button" variant="text" size="sm" onClick={handleCancel} disabled={loading}>
             {loading ? "처리 중…" : "신청 취소"}
-          </button>
+          </Button>
         )}
         {error && <span style={{ fontSize: 11, color: "#EF4444" }}>{error}</span>}
       </div>

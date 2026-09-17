@@ -4,16 +4,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-[background-color,border-color,color,box-shadow,transform] duration-200 ease-out motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.97] motion-reduce:active:scale-100",
   {
     variants: {
+      // primary/ghost/text — 통일 버튼 스펙(작업지시서)이 요구하는 3종.
+      // default/destructive/outline/secondary/link은 기존 호출부 호환을 위해 유지.
       variant: {
         default: "bg-warm-900 text-white hover:bg-warm-800",
+        primary: "bg-warm-900 text-white hover:bg-warm-800",
         destructive: "bg-destructive text-white hover:bg-destructive/90",
         outline: "border border-warm-200 bg-white hover:bg-warm-50 text-warm-900",
         secondary: "bg-warm-100 text-warm-900 hover:bg-warm-200",
         ghost: "hover:bg-warm-100 text-warm-700",
         link: "text-warm-900 underline-offset-4 hover:underline",
+        text: "text-warm-900 underline-offset-4 hover:underline bg-transparent",
       },
       size: {
         default: "h-10 px-5 py-2.5",

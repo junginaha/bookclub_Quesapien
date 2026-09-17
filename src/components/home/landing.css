@@ -1827,86 +1827,74 @@ html:not([data-intro="pending"]) .lp-intro {
 }
 
 /* ================================================================
-   홈 전용 북클럽 카드(EditorialBookRow) — sternberg-press.com 상호작용,
-   2차 지시. 표지+제목+날짜만 기본 노출, hover/tap 시 저자·요약·잔여석이
-   카드 위에 오버레이로 나타난다. 그림자·라운드·그라디언트 없음, 헤어라인만.
+   홈 전용 북클럽 표지 그리드(BookCoverGrid) — chosecommune.com 방식,
+   Phase 3 재지시(sternberg-press.com 가로 스크롤 방식을 대체). 이미지가
+   주인공: 표지를 크게, 제목·날짜만 이미지 아래 항상 보이고 나머지 정보는
+   hover/tap 시 HoverReveal(.lp-reveal-*)이 부드럽게 펼친다. 그림자·
+   border-radius·그라디언트 없음, 넓은 여백만.
    ================================================================ */
-.lp-ecard-row {
-  display: flex;
-  gap: 1px;
-  background: var(--lp-line);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
+.lp-cc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px 20px;
   max-width: var(--lp-max);
   margin: 0 auto;
 }
+@media (max-width: 359px) {
+  .lp-cc-grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 768px) {
+  .lp-cc-grid { grid-template-columns: repeat(2, 1fr); gap: 36px 28px; }
+}
+@media (min-width: 1024px) {
+  .lp-cc-grid { grid-template-columns: repeat(3, 1fr); gap: 40px 32px; }
+}
+@media (min-width: 1440px) {
+  .lp-cc-grid { grid-template-columns: repeat(4, 1fr); gap: 48px 36px; }
+}
 
-.lp-ecard {
+.lp-cc-card { display: flex; flex-direction: column; }
+
+.lp-cc-cover {
   position: relative;
-  flex: 0 0 min(280px, 62vw); /* 5장 기준 --lp-max(1240px)보다 넓어져 데스크톱에서도 가로 스크롤이 실제로 필요해진다 */
   aspect-ratio: 2 / 3;
-  background: var(--lp-bg);
-  scroll-snap-align: start;
-  cursor: default;
+  background: var(--lp-bg-soft);
   overflow: hidden;
 }
-.lp-ecard-cover { position: absolute; inset: 0; }
-.lp-ecard-cover img { display: block; }
-.lp-ecard-cover-flat { position: absolute; inset: 0; }
+.lp-cc-cover img { display: block; }
 
-.lp-ecard-face {
+.lp-cc-fallback {
   position: absolute;
-  left: 0; right: 0; bottom: 0;
-  padding: 14px 16px;
-  background: rgba(20, 24, 31, 0.72); /* 그라디언트 대신 단색 스크림 */
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.lp-ecard-title {
-  font-family: var(--font-noto-serif-kr), Georgia, serif;
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
-  line-height: 1.35;
+
+/* 항상 보이는 최소 캡션 — 이미지 위가 아니라 아래, 표지를 가리지 않는다. */
+.lp-cc-face { margin-top: 14px; cursor: default; }
+.lp-cc-title {
+  font-family: var(--lp-sans);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--lp-ink);
+  line-height: 1.4;
 }
-.lp-ecard-line {
-  margin-top: 4px;
+.lp-cc-meta {
+  margin-top: 3px;
+  font-family: var(--lp-sans);
   font-size: 12px;
-  color: rgba(255,255,255,0.75);
+  color: var(--lp-muted);
   font-variant-numeric: tabular-nums;
 }
 
-/* 오버레이 — opacity/pointer-events로만 감춘다(display:none·aria-hidden 금지,
-   화면 낭독기 상시 노출). */
-.lp-ecard-overlay {
-  position: absolute;
-  inset: 0;
-  background: var(--lp-ink, #1C1F26);
-  color: var(--lp-cream, #ECE3CF);
-  padding: 20px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
-}
-.lp-ecard.is-open .lp-ecard-overlay { opacity: 1; pointer-events: auto; }
-.lp-ecard:focus-visible { outline: 2px solid var(--lp-accent, var(--accent)); outline-offset: -2px; }
-@media (hover: hover) and (pointer: fine) {
-  .lp-ecard:hover .lp-ecard-overlay,
-  .lp-ecard:focus-within .lp-ecard-overlay { opacity: 1; pointer-events: auto; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .lp-ecard-overlay { transition: none; }
-}
-
-.lp-ecard-author { font-family: var(--lp-serif); font-size: 13px; color: rgba(236,227,207,0.75); }
-.lp-ecard-summary { font-size: 13.5px; line-height: 1.6; }
-.lp-ecard-seats { font-size: 12.5px; color: var(--lp-gold, #B08A4A); font-weight: 600; margin-top: auto; }
-.lp-ecard-link.lp-underline-cta {
-  color: var(--lp-cream, #ECE3CF);
-  text-decoration-color: rgba(236,227,207,0.4);
-}
+/* 저자·요약·잔여석 — hover(desktop)/tap(touch) 시 HoverReveal이 펼친다.
+   .lp-reveal-detail의 max-height/opacity 전환을 그대로 쓴다. */
+.lp-cc-face .lp-reveal-detail { margin-top: 6px; display: flex; flex-direction: column; gap: 6px; }
+.lp-cc-author { font-family: var(--lp-serif); font-size: 13px; color: var(--lp-accent); }
+.lp-cc-summary { font-family: var(--lp-sans); font-size: 13px; line-height: 1.6; color: var(--lp-ink-soft); }
+.lp-cc-seats { font-family: var(--lp-sans); font-size: 12px; color: var(--lp-gold, #B08A4A); font-weight: 600; }
+.lp-cc-link.lp-underline-cta { font-family: var(--lp-sans); font-size: 12.5px; }
 .lp-ecard-link.lp-underline-cta:hover,
 .lp-ecard-link.lp-underline-cta:focus-visible {
   text-decoration-color: var(--lp-cream, #ECE3CF);

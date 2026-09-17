@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import NearbyMeetingsFeed, { type UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
 import IntroSplash from "./IntroSplash";
 import type { BookClubSession } from "@/lib/bookclub/types";
-import EditorialBookRow from "./EditorialBookRow";
+import BookCoverGrid from "./BookCoverGrid";
 import HoverReveal from "./HoverReveal";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import { ChevronDown } from "lucide-react";
@@ -969,13 +969,13 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           </div>
         </div>
 
-        {/* "함께 읽어요" — 홈 전용 에디토리얼 카드(가로 스크롤 스냅, hover/tap
-            오버레이). 데이터·상태 판정(getStatus/seatsLeft)은 /bookclub과 같은
-            lib/bookclub 소스 하나를 공유하되(작업지시서 Phase 1 원칙 유지),
-            화면 표현은 sternberg-press.com 상호작용에 맞춰 홈 전용으로 새로
-            만들었다(2차 지시 — 정보 기본 숨김, hover/tap 오버레이, 가로 스크롤). */}
+        {/* "함께 읽어요" — 홈 전용 표지 그리드. 데이터·상태 판정(getStatus/
+            seatsLeft)은 /bookclub과 같은 lib/bookclub 소스 하나를 공유하되
+            (작업지시서 Phase 1 원칙 유지), 화면 표현은 chosecommune.com
+            방식으로 교체했다(Phase 3 재지시 — sternberg-press.com 가로 스크롤
+            방식을 대체. 이미지가 주인공, 반응형 그리드, hover/tap 크로스페이드). */}
         <div style={{ marginTop: 56 }}>
-          <EditorialBookRow sessions={bookclubSessions} />
+          <BookCoverGrid sessions={bookclubSessions} />
           <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
             <a href="/bookclub" className="lp-underline-cta">북클럽 전체 일정 보기 →</a>
           </div>
