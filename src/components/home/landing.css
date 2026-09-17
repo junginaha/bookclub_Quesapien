@@ -221,7 +221,7 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 
 /* ── HERO ── */
 .lp-hero {
-  min-height: 100vh; padding: 160px var(--lp-gutter) 100px;
+  min-height: 100vh; min-height: 100dvh; padding: 160px var(--lp-gutter) 100px;
   display: grid; grid-template-columns: 1fr; align-content: center;
   position: relative; overflow: hidden;
 }

@@ -207,4 +207,52 @@ keep-all; }` 단 한 곳뿐이었습니다. 중복이 존재하지 않아 통합
 확인), `/`·`/bookclub` 200 확인(이 sandbox는 첫 컴파일 포함 요청당 5~22초로
 느리지만 전부 200). 스크린샷은 환경 제약으로 불가.
 
-커밋: `<이 커밋의 해시는 아래 git log 참고>`
+커밋: `0038927` (2·3단계 함께 커밋 — 같은 파일들을 이어서 수정했기 때문)
+
+---
+
+## 4단계 — 품질 게이트
+
+- **word-break: keep-all 전역 적용**: 1단계에서 이미 확인 — `globals.css`의
+  `body` 셀렉터 한 곳, 중복/누락 없음. 추가 조치 없음.
+- **100vh → 100dvh**: 프로젝트 전체 `.css` 파일에서 `100vh`를 검색해 5곳을
+  전부 확인했다. `globals.css`(body)와 `bookclub.css`(`.qc-page`)와
+  `landing.css`(`.bdm-panel`, 북 상세 모달)는 이미 `min-height/height: 100vh`
+  다음 줄에 `100dvh`를 덮어쓰는 올바른 폴백 패턴이었다. **누락 2곳을 찾아
+  고쳤다**: `landing.css`의 `.lp-hero`(히어로 섹션 자체는 이번 세션 초반
+  지시로 손대지 말라고 했지만, 시각적 디자인은 그대로 두고 `min-height:
+  100dvh` 한 줄만 추가하는 건 순수 기술적 품질 수정이라 판단해 포함했다)와
+  `src/app/quiz/quiz.css`의 페이지 루트. 둘 다 `min-height: 100vh;` 다음 줄에
+  `min-height: 100dvh;`를 추가하는 최소 변경.
+- **safe-area-inset-bottom**: 프로젝트 전체에서 `position: fixed` +
+  하단 고정 바 패턴을 감사했다. 이미 있던 곳(`.qd-apply-mobile-bar`,
+  `.qd-sheet`)은 전부 갖춰져 있었고, 그 외에 하단 고정 바를 쓰는 곳은
+  발견되지 않았다(globals.css/quiz.css/landing.css의 다른 `position:fixed`는
+  하단 고정 바가 아님). 추가 조치 없음.
+- **스크린샷(320/375/430/768/1024/1440)**: 이 리포트 최상단에 적은 환경
+  제약(libnspr4 등 부재로 Chromium 실행 자체가 불가)으로 **불가능**.
+  `screenshots/` 폴더를 만들지 못했다. 대신 `tsc --noEmit`·`pnpm build`·
+  `pnpm dev`+curl 스모크 테스트로 각 단계를 검증했다. 운영자가 로컬에서
+  `sudo apt-get install -y libnspr4 libnss3 libasound2` 실행 후 알려주면
+  다음 세션에서 실제 스크린샷 검증을 마무리할 수 있다.
+- **버튼 로딩/성공/실패 3상태 확인**: 이번 세션에서 공용 Button으로 옮긴
+  버튼들을 코드 레벨로 재확인했다 — `EncoreRequestButton`(로딩 "요청 중…"/
+  성공 "완료·취소"/실패 에러 문구), `MeetingApplyButton`(로딩 "처리중"/성공
+  상태 라벨/실패 에러 문구), `ApplyForm`(로딩 "확인 중…"/성공 확정·대기
+  문구/실패 에러), `NotifyForm`(로딩 "확인 중…"/성공 등록·중복 문구/실패
+  에러) 전부 3상태를 이미 갖추고 있었다(대부분 이전 세션에서 이미 구현,
+  이번엔 컴포넌트만 교체). `SessionJoinButton`(다른 기능 도메인, 손대지 않음)도
+  Loader2 스피너/toast 성공/toast 실패로 이미 갖춰져 있었다. 시각적으로
+  버튼을 눌러보는 실사용 확인은 스크린샷 제약과 같은 이유로 못했다 — 코드
+  경로 확인까지만.
+- **focus-visible 아웃라인 유지 확인**: 공용 Button은 `outline-none` 대신
+  `focus-visible:ring-2 ring-ring`(--ring 토큰, globals.css에 정의돼 있음
+  확인)로 대체하고 있어 포커스 표시 자체는 유지된다(아웃라인 스타일만
+  바뀜 — 제거 아님). 감사 중 **버그를 하나 발견해 고쳤다**: 2단계에서 새로
+  추가한 `.qc-cal-chip`(가로 스트립 날짜 칩)에 focus-visible 스타일이
+  빠져 있었다 — `bookclub.css`의 기존 focus-visible 공용 셀렉터 목록에
+  `.qc-cal-chip:focus-visible`을 추가했다.
+
+**검증**: `tsc --noEmit`·`pnpm build` 통과.
+
+커밋: `<git log 참고>`

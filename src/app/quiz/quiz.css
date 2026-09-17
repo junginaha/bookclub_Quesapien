@@ -15,6 +15,7 @@
   --qz-sans:    "Pretendard", -apple-system, "Noto Sans KR", sans-serif;
 
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--qz-bg);
   color: var(--qz-ink);
   font-family: var(--qz-sans);

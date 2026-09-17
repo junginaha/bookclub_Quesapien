@@ -108,6 +108,7 @@
 .qc-notify-btn:focus-visible,
 .qc-tab:focus-visible,
 .qc-cal-date:focus-visible,
+.qc-cal-chip:focus-visible,
 .qc-cal-nav:focus-visible,
 .qc-card:focus-visible {
   outline: 2px solid var(--accent);
