@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
-import { seatsLeft } from "@/lib/bookclub/types";
+import { isWaitlistFull, seatsLeft } from "@/lib/bookclub/types";
+import { Button } from "@/components/ui/button";
 import {
   dateKey,
   feeLabel,
@@ -54,6 +55,13 @@ export default function DetailClient({
     [allSessions]
   );
 
+  // 다른 회차 날짜를 고르면 페이지를 옮기지 않고, 같은 페이지의 "다른 모임"
+  // 타임라인에서 부드럽게 스크롤 + 1.2초 하이라이트로 보여준다(Luma 프레임 —
+  // 2단계 지시). 선택한 날짜가 지금 탭(예정/지난)에 안 보이면 먼저 "전체"로
+  // 바꾼 뒤, 그 리렌더가 끝나 카드가 DOM에 나타나면(otherEntries 갱신) 찾는다.
+  const [highlightedSlug, setHighlightedSlug] = useState<string | null>(null);
+  const [pendingScrollSlug, setPendingScrollSlug] = useState<string | null>(null);
+
   function handleSelectDate(key: string) {
     const match = allSessions.find((s) => dateKey(s.startsAt) === key);
     if (!match) return;
@@ -61,7 +69,11 @@ export default function DetailClient({
       document.getElementById("qd-hero")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
-    router.push(`/bookclub/${match.slug}`);
+    const matchIsPast = isPast(match);
+    if ((period === "upcoming" && matchIsPast) || (period === "past" && !matchIsPast)) {
+      setPeriod("all");
+    }
+    setPendingScrollSlug(match.slug);
   }
 
   const others = allSessions.filter((s) => s.slug !== session.slug);
@@ -70,6 +82,18 @@ export default function DetailClient({
   const otherAll = [...otherUpcoming, ...otherPast];
   const otherList = period === "upcoming" ? otherUpcoming : period === "past" ? otherPast : otherAll;
   const otherEntries: TimelineEntry[] = otherList.map((s) => ({ session: s, status: getStatus(s) }));
+
+  useEffect(() => {
+    if (!pendingScrollSlug) return;
+    const el = document.getElementById(`club-${pendingScrollSlug}`);
+    if (!el) return; // period 전환 리렌더가 아직 안 끝났으면 다음 렌더(otherEntries 갱신)에서 재시도
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    const slug = pendingScrollSlug;
+    setPendingScrollSlug(null);
+    setHighlightedSlug(slug);
+    const t = setTimeout(() => setHighlightedSlug((s) => (s === slug ? null : s)), 1200);
+    return () => clearTimeout(t);
+  }, [pendingScrollSlug, otherEntries]);
 
   function setPeriod(next: Period) {
     const params = new URLSearchParams(searchParams.toString());
@@ -140,15 +164,31 @@ export default function DetailClient({
             )}
           </div>
         ) : (
-          <ApplyPanel triggerLabel={status === "full" ? "대기 신청" : `참여 신청 · ${seatsLeft(session)}자리 남음`}>
+          <ApplyPanel
+            triggerLabel={
+              isWaitlistFull(session) ? "마감되었습니다" : status === "full" ? "대기 신청" : `참여 신청 · ${seatsLeft(session)}자리 남음`
+            }
+            variant={status === "full" ? "outline" : "primary"}
+            disabled={isWaitlistFull(session)}
+          >
             <div className="qd-apply" id="apply">
-              <div className="qd-apply-title">{status === "full" ? "이번 모임은 마감됐어요" : "함께해요"}</div>
+              <div className="qd-apply-title">
+                {isWaitlistFull(session) ? "정원·대기 모두 마감됐어요" : status === "full" ? "이번 모임은 마감됐어요" : "함께해요"}
+              </div>
               <p className="qd-apply-sub">
-                {status === "full"
+                {isWaitlistFull(session)
+                  ? "다음 앵콜 일정이 열리면 가장 먼저 안내해 드릴게요."
+                  : status === "full"
                   ? `${session.venue.name} · 대기자로 등록하면 자리가 나는 대로 안내해 드려요.`
                   : `${formatMonthDay(session.startsAt)} ${weekday} · ${feeLabel(session.fee)} · ${seatsLeft(session)}자리 남음`}
               </p>
-              {status === "full" ? <NotifyForm clubSlug={session.slug} mode="waitlist" /> : <ApplyForm clubSlug={session.slug} />}
+              {isWaitlistFull(session) ? (
+                <Button type="button" variant="outline" disabled>마감되었습니다</Button>
+              ) : status === "full" ? (
+                <NotifyForm clubSlug={session.slug} mode="waitlist" />
+              ) : (
+                <ApplyForm clubSlug={session.slug} />
+              )}
             </div>
           </ApplyPanel>
         )}
@@ -169,7 +209,7 @@ export default function DetailClient({
             </div>
             <Timeline
               entries={otherEntries}
-              highlightedSlug={null}
+              highlightedSlug={highlightedSlug}
               emptyMessage={period === "past" ? "아직 지난 모임 기록이 없어요." : "곧 새 일정이 열려요."}
             />
           </div>

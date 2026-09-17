@@ -2,9 +2,9 @@
 // 절대 세션 객체에 저장하지 않는다 — "수동 상태 필드는 반드시 썩는다"(작업지시서).
 
 import type { BookClubSession, SessionStatus } from "./types";
-import { isPast, seatsLeft } from "./types";
+import { isPast, isWaitlistFull, seatsLeft } from "./types";
 
-export { isPast, seatsLeft };
+export { isPast, isWaitlistFull, seatsLeft };
 
 /**
  * startsAt/endsAt + reserved에서만 파생한다.

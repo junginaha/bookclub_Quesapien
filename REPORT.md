@@ -101,3 +101,110 @@ QuestionDetailClient) 이걸 지시사항 스펙에 맞게 확장했습니다(�
 이번 전면 그리드 교체는 정면으로 배치되지만, 운영자가 실시간으로 명시적 지시를
 내렸으므로 원칙 4(임의 변경 금지 — 운영자에게 물을 것)의 취지상 이미 승인된
 것으로 보고 진행했습니다.
+
+커밋: `e1adf27`
+
+---
+
+## 1단계 — 죽은 코드 정리
+
+**컴포넌트 감사**: `src/components/bookclub/` 아래 12개 파일 전부를 상대경로
+import까지 추적해 `app/page.tsx`·`app/bookclub/[slug]/page.tsx`·
+`app/bookclub/(list)/page.tsx`(지시에 없었지만 실제로 이 폴더 컴포넌트
+2개(`Sidebar`, `TogetherReading`)를 쓰는 세 번째 실제 라우트라 함께 확인)
+기준으로 도달 가능성을 확인했습니다. **결과: 12개 파일 전부 실제로 쓰이고
+있어 삭제 대상이 없습니다.** (`ApplyForm`/`ApplyPanel`/`NotifyForm`/
+`MiniCalendar`/`Timeline`/`VenueCard`는 `DetailClient.tsx`에서, `EncoreRequestButton`/
+`StatusPill`은 `TimelineCard.tsx`에서, `TimelineCard`는 `Timeline.tsx`에서,
+`VenueMap`은 `VenueCard.tsx`에서, `Sidebar`/`TogetherReading`은 `(list)/page.tsx`에서
+각각 import됨.) 삭제한 파일 없음 — 변경 없음이라 이 단계는 커밋하지 않았습니다
+(빈 커밋 방지).
+
+**CSS word-break 중복 규칙 통합**: 프로젝트 전체(`.css`/`.tsx`/`.ts`)를
+`word-break`로 검색한 결과 `src/app/globals.css:137`의 `body { word-break:
+keep-all; }` 단 한 곳뿐이었습니다. 중복이 존재하지 않아 통합할 대상이
+없습니다 — 이미 전역 최상위(body)에 한 곳으로 되어 있는 상태였습니다.
+변경 없음.
+
+---
+
+## 2단계 — 루마 구조 체크리스트 점검 및 보완
+
+대상: `src/app/bookclub/[slug]/DetailClient.tsx` 및 그 하위
+`MiniCalendar`/`Timeline`/`TimelineCard`/`VenueCard`/`VenueMap`/`ApplyPanel`.
+항목별 점검 결과:
+
+| 항목 | 상태(점검 전) | 조치 |
+|---|---|---|
+| 좌측 sticky 캘린더(1024px+), 미만은 상단 가로 스트립 | sticky는 있었으나 breakpoint가 820px였고 "가로 스트립"은 아예 없었음(그냥 세로로 쌓임) | `.qd-body`/`.qd-side` breakpoint를 1024px로 변경. `MiniCalendar`에 `.qc-cal-strip`(모임 있는 날짜만 가로 스크롤 칩)을 추가하고 1024px 미만에서만 보이게, 월 그리드(`.qc-cal-full`)는 그 이상에서만 보이게 CSS로 전환(둘 다 항상 DOM에 있어 레이아웃 시프트 없음) |
+| 캘린더 7열 grid + 모임일 dot | 이미 구현됨(`grid-template-columns: repeat(7,1fr)`, `.qc-cal-dot`) | 변경 없음 |
+| 날짜 클릭 → 타임라인 스무스 스크롤 + 1.2초 하이라이트 | **부분 구현**: `Timeline`/`TimelineCard`에 `highlighted`/`highlightedSlug` prop과 `.is-highlight` CSS는 이미 있었지만 `DetailClient.tsx`가 항상 `highlightedSlug={null}`을 넘겨 실제로 켜진 적이 없었음. 다른 날짜 클릭 시에도 무조건 `router.push`로 페이지 이동만 했음 | `handleSelectDate`를 고쳐 클릭한 날짜가 지금 탭(예정/지난)에 안 보이면 먼저 "전체" 탭으로 전환하고, `pendingScrollSlug` state + `useEffect`(otherEntries 갱신을 기다렸다가 대상 요소를 찾음)로 `#club-{slug}`까지 `scrollIntoView(smooth)` 한 뒤 1.2초간 `highlightedSlug`를 켰다 끈다. 현재 세션 자신의 날짜를 클릭하면 기존대로 히어로로 스크롤(페이지 이동 없음이 이미 맞았음) |
+| 우측 날짜 헤더 sticky | **의도적으로 미적용** — 아래 참조 | 변경 없음 |
+| 세션 카드 시간/제목/저자/장소/CTA 세로 구분 | 이미 구현됨(`.qc-card-body`가 각 줄을 분리) | 변경 없음 |
+| Upcoming/Past 토글 `?period=past` 동기화 | 이미 구현됨(`period` searchParams ↔ `setPeriod`) | 변경 없음 |
+| 날짜 계산 Asia/Seoul 고정, `new Date()` 직접 파싱 금지 | 세션 데이터 포맷 함수(`dateKey`/`formatMonthDay` 등)는 이미 Asia/Seoul Intl 고정이었지만, `MiniCalendar.tsx`가 `new Date(`${dateKey}T00:00:00`)`로 문자열을 다시 파싱해 연/월을 뽑고 있어 실행 환경의 로컬 타임존에 따라(예: UTC-12 등 극단적 오프셋) 하루씩 밀릴 이론적 위험이 있었음 | `new Date(string)` 파싱을 전부 제거하고 `"YYYY-MM-DD"` 문자열을 그냥 쪼개는 `splitDateKey()`로 교체(타임존 개념 자체가 개입하지 않음). "오늘" 판정도 `new Date()`/로컬 비교 대신 `dateKey(new Date())`(Asia/Seoul Intl 고정, 기존 유틸 재사용) 문자열 비교로 바꿈 |
+| 장소 카드: 지도 SDK 실패 시 SVG 폴백, 주소 복사 | 주소 복사(Clipboard API + execCommand 폴백)는 이미 있었지만 Leaflet 로드/초기화 실패 시 폴백이 전혀 없어(try/catch 없음) 빈 회색 박스만 남았음 | `VenueMap.tsx`의 동적 import+초기화를 try/catch로 감싸고, 실패 시 고정 SVG 핀 아이콘 + 장소명 텍스트로 대체(`MapFallback`, 이미지 생성 없음, 인라인 SVG) |
+| 신청 패널: 데스크톱 sticky / 모바일 바텀시트 | 이미 잘 구현돼 있었음(포커스 트랩, Esc, 스크롤 락, 트리거로 포커스 복귀까지) | 변경 없음(3단계에서 트리거 버튼만 공용 Button으로 교체) |
+
+**우측 날짜 헤더 sticky를 의도적으로 적용하지 않은 이유**: `bookclub.css`
+`.qc-timeline` 위 주석에 "position:sticky/absolute 등 별도 포지셔닝은 전혀
+쓰지 않는다(겹침 방지 — 과거 sticky 날짜 배지 컬럼이 좁은 화면에서 카드와
+겹쳐 보이는 문제가 있었음)"이라고 명시돼 있어, 이전 세션이 실제로 겪은 버그를
+고친 결정이었습니다. 이번 세션은 스크린샷/시각 확인이 불가능한 환경이라
+(REPORT.md 상단 참조), 검증 없이 이 결정을 되돌려 같은 버그를 다시 만들
+위험을 감수하지 않기로 했습니다. "기존에 잘 동작하던 부분은 되도록 건드리지
+않는다"는 지시 원칙에 따른 판단입니다. **운영자가 스크린샷 검증이 가능한
+환경에서 sticky 헤더를 다시 시도해보고 싶다면, `.qc-tl-group-label`에
+`position: sticky; top: 0; background: var(--bg); z-index: 3;`을 추가하고
+좁은 화면에서 카드와 겹치지 않는지 직접 확인하는 것을 권장합니다.**
+
+---
+
+## 3단계 — 캘린더·버튼 정리
+
+- **캘린더 셀**: `aspect-ratio: 1`은 이미 있었음(변경 없음). "오늘"/"선택됨"
+  상태가 아예 없었어서(disabled=모임없음만 구분) 추가: `todayKey`(Asia/Seoul
+  고정)·`selectedKey` state를 새로 두고 `.is-today`(box-shadow inset 테두리)·
+  `.is-selected`(어두운 배경, 기존 CSS 재사용) 클래스를 실제로 붙였다. 모임없는
+  날은 opacity 0.55 → **0.35**로 낮춤(지시 값).
+- **오늘+모임 있는 날 겹침**: `.is-today`를 box-shadow(inset)로 넣어
+  `.is-selected`의 배경색과 부딪히지 않게 했다 — 우선순위 없이 테두리+점(dot)
+  둘 다 항상 같이 보인다(지시대로).
+- **참여신청/대기신청 → 공용 Button 통일**: `src/components/ui/button.tsx`
+  (Phase 0에서 이미 primary/text variant 추가해둔 그 컴포넌트)를 아래에 적용:
+  - `TimelineCard.tsx`: "참여 신청"(`variant="primary"`) / "대기 신청"
+    (`variant="outline"`, 테두리만 — 지시한 "보조 CTA" 스펙과 일치)
+  - `ApplyForm.tsx`: "자리 보기" 제출 버튼 → `variant="primary"`
+  - `NotifyForm.tsx`: "대기자로 등록"/"알림 받기" → `variant="outline"`
+  - `ApplyPanel.tsx`: 모바일 하단 트리거 버튼 → `variant` prop을 새로 받아
+    호출부(`DetailClient.tsx`)가 상태에 따라 primary/outline을 넘김
+  - 변경으로 쓸모없어진 `.qd-submit`/`.qd-apply-mobile-trigger` CSS 규칙은
+    삭제(다른 곳에서 안 쓰는 것 확인 후). `.qc-notify-btn`/`.qc-inline-btn`은
+    다른 파일(`TogetherReading.tsx`/`Sidebar.tsx`/관리자 화면 등)에서 여전히
+    쓰고 있어 그대로 둠.
+- **정원 마감 + 대기도 마감 → disabled "마감되었습니다"**: 데이터 모델에
+  대기열 정원 필드가 아예 없어(운영자 확인 필요, 값을 지어내지 않음)
+  `src/lib/bookclub/types.ts`에 `waitlistCapacity?`/`waitlistCount?`
+  (둘 다 `// TODO(unicorn)`, 현재 둘 다 undefined)와 `isWaitlistFull()`
+  셀렉터를 추가했다. `TimelineCard.tsx`/`DetailClient.tsx`의 "대기 신청" 자리에
+  `isWaitlistFull(session)`이 true면 `variant="outline" disabled` "마감되었습니다"
+  버튼을 보여주는 분기를 만들어뒀다 — **지금은 두 필드가 항상 비어있어 이
+  분기가 실제로 켜질 일이 없다(기존 동작 그대로).** 운영자가 실제 대기열
+  정원값을 `lib/bookclub/data.ts`에 채우면 바로 동작한다.
+- **border-radius 통일**: `bookclub.css`에서 실제 쓰인 박스 radius 값의
+  빈도를 셌다 — 999px(pill, 9회, 별도 카테고리라 제외) 다음으로 **10px(7회)**가
+  가장 흔했다(14px 5회, 8px 4회 순). 이 페이지의 "버튼/셀" 정리 범위에 맞게
+  `.qc-cal-date`(8px→10px)를 이 값으로 맞췄다. 카드/시트/지도 등 다른 요소의
+  14px/20px는 이번 지시가 "캘린더·버튼 정리"로 범위를 좁혀뒀고 기존에 잘
+  동작하던 부분이라 건드리지 않았다. 공용 Button(`components/ui/button.tsx`)
+  자체의 Tailwind `rounded-xl`(12px)은 프로젝트 전체에서 이미 20회 이상 쓰이는
+  기존 표준이라 이번 10px 결정 때문에 바꾸지 않았다(10px vs 12px 시각차가
+  크지 않고, 전역 컴포넌트를 한 페이지의 값에 맞춰 바꾸는 게 오히려 더 넓은
+  범위의 스타일 변경이 되어 원칙 위반이라 판단).
+
+**검증**: `tsc --noEmit`·`pnpm build` 통과. `pnpm dev` + curl로 `/bookclub/[slug]`
+200 확인(마운트된 마크업에 `qc-cal-strip`/`qc-cal-full`/`qc-cal-chip` 존재
+확인), `/`·`/bookclub` 200 확인(이 sandbox는 첫 컴파일 포함 요청당 5~22초로
+느리지만 전부 200). 스크린샷은 환경 제약으로 불가.
+
+커밋: `<이 커밋의 해시는 아래 git log 참고>`

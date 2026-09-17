@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { applyToBookClub } from "@/lib/actions/bookclub";
+import { Button } from "@/components/ui/button";
 
 /**
  * bookclub_applications 저장용 신청 폼. 서버(apply_to_bookclub RPC)가 정원을
@@ -87,9 +88,15 @@ export default function ApplyForm({ clubSlug }: { clubSlug: string }) {
         aria-hidden="true"
         style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
       />
-      <button type="submit" className="qd-submit" disabled={!valid || submitting} aria-disabled={!valid || submitting}>
+      <Button
+        type="submit"
+        variant="primary"
+        className="self-start max-[480px]:self-stretch max-[480px]:w-full"
+        disabled={!valid || submitting}
+        aria-disabled={!valid || submitting}
+      >
         {submitting ? "확인 중…" : "자리 보기"}
-      </button>
+      </Button>
       {result && "error" in result && <p className="qd-form-msg is-error">{result.error}</p>}
     </form>
   );

@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { joinBookClubWaitlist } from "@/lib/actions/bookclub";
+import { Button } from "@/components/ui/button";
 
 /** bookclub_waitlist 저장용 폼 — 대기자 등록/알림 신청(clubSlug=null이면 전체 알림). */
 export default function NotifyForm({
@@ -78,9 +79,9 @@ export default function NotifyForm({
         aria-hidden="true"
         style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
       />
-      <button type="submit" className="qc-notify-btn" disabled={!valid || submitting} aria-disabled={!valid || submitting}>
+      <Button type="submit" variant="outline" className="w-full" disabled={!valid || submitting} aria-disabled={!valid || submitting}>
         {submitting ? "확인 중…" : mode === "waitlist" ? "대기자로 등록" : "알림 받기"}
-      </button>
+      </Button>
       {result && "error" in result && <p className="qc-notify-status" style={{ color: "#9B4A2E" }}>{result.error}</p>}
     </form>
   );

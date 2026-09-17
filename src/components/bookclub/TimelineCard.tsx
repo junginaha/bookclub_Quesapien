@@ -4,7 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
+import { isWaitlistFull } from "@/lib/bookclub/types";
 import { cardBlurb, encoreCopy, formatMonthDay, formatTimeOfDay, formatWeekdayFull } from "@/lib/bookclub/selectors";
+import { Button } from "@/components/ui/button";
 import StatusPill from "./StatusPill";
 import NotifyForm from "./NotifyForm";
 import EncoreRequestButton from "./EncoreRequestButton";
@@ -67,23 +69,30 @@ export default function TimelineCard({
 
         {status === "open" && (
           <div className="qc-card-actionrow">
-            <Link href={`/bookclub/${session.slug}`} className="qc-inline-btn">참여 신청</Link>
+            <Link href={`/bookclub/${session.slug}`}>
+              <Button type="button" variant="primary" size="sm">참여 신청</Button>
+            </Link>
           </div>
         )}
 
         {status === "full" && (
           <div className="qc-card-actionrow">
-            <button
-              type="button"
-              className="qc-inline-btn"
-              onClick={(e) => { e.preventDefault(); setActionOpen((v) => !v); }}
-              aria-expanded={actionOpen}
-            >
-              대기 신청
-            </button>
+            {isWaitlistFull(session) ? (
+              <Button type="button" variant="outline" size="sm" disabled>마감되었습니다</Button>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={(e) => { e.preventDefault(); setActionOpen((v) => !v); }}
+                aria-expanded={actionOpen}
+              >
+                대기 신청
+              </Button>
+            )}
           </div>
         )}
-        {status === "full" && actionOpen && (
+        {status === "full" && actionOpen && !isWaitlistFull(session) && (
           <div className="qc-card-actionform">
             <NotifyForm clubSlug={session.slug} mode="waitlist" />
           </div>

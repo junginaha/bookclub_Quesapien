@@ -30,7 +30,14 @@ export interface BookClubSession {
   agendaPreview: string[]; // 발제 미리보기. 없으면 빈 배열(화면에서 섹션 숨김)
   encoreCount?: number; // past 전용 — TODO(unicorn): 영문 slug 기준 앵콜 요청 집계 배선 필요
   archiveSlug?: string;
+  // TODO(unicorn): 대기열 정원 데이터가 아직 없다(운영자 확인 필요). 생기면
+  // 채워 넣으면 isWaitlistFull()이 자동으로 "정원 마감 + 대기도 마감" 상태를
+  // 판정한다 — 그 전까지는 항상 false(현재 UI 동작 변화 없음).
+  waitlistCapacity?: number;
+  waitlistCount?: number;
 }
 
 export const isPast = (s: BookClubSession) => new Date(s.endsAt) < new Date();
 export const seatsLeft = (s: BookClubSession) => Math.max(0, s.capacity - s.reserved);
+export const isWaitlistFull = (s: BookClubSession) =>
+  s.waitlistCapacity != null && (s.waitlistCount ?? 0) >= s.waitlistCapacity;

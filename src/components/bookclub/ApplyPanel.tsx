@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Button } from "@/components/ui/button";
 
 /**
  * 신청 패널 — 데스크톱은 항상 보이는 sticky 인라인 패널, 모바일은 하단 고정
@@ -11,9 +12,14 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
  */
 export default function ApplyPanel({
   triggerLabel,
+  variant = "primary",
+  disabled = false,
   children,
 }: {
   triggerLabel: string;
+  /** 참여신청(주 CTA) vs 대기신청/마감(보조 CTA) — 하나의 Button 컴포넌트로 통일. */
+  variant?: "primary" | "outline";
+  disabled?: boolean;
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -68,12 +74,19 @@ export default function ApplyPanel({
 
       {/* 모바일(<768px): 하단 고정 트리거 */}
       <div className="qd-apply-mobile-bar">
-        <button ref={triggerRef} type="button" className="qd-apply-mobile-trigger" onClick={() => setOpen(true)}>
+        <Button
+          ref={triggerRef}
+          type="button"
+          variant={variant}
+          className="w-full min-h-[48px] text-[15px]"
+          disabled={disabled}
+          onClick={() => setOpen(true)}
+        >
           {triggerLabel}
-        </button>
+        </Button>
       </div>
 
-      {open && (
+      {open && !disabled && (
         <div className="qd-sheet-overlay" onClick={close}>
           <div
             className="qd-sheet"
