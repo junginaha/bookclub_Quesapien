@@ -3,6 +3,18 @@
 이 파일은 매 단계 완료 시 append됩니다. 실패/중단돼도 이 파일 하나로 진행상황을
 파악할 수 있게 유지합니다.
 
+## 요약 (3줄)
+
+1. 메인페이지 북클럽 카드를 sternberg 가로스크롤 방식에서 chosecommune 반응형
+   그리드로 교체하고, 프로젝트 곳곳에 흩어져 있던 버튼 스타일을 공용
+   `components/ui/button.tsx`(primary/outline/ghost/text)로 점진 통일했다.
+2. 북클럽 상세 페이지의 "Luma 프레임" 체크리스트를 감사해 실제로 부분
+   구현이었던 항목(날짜 클릭 하이라이트, 캘린더 오늘/선택 상태, 지도 실패
+   폴백, 타임존 안전한 날짜 계산)을 마저 구현하고, 죽은 코드는 없었음을 확인했다.
+3. 이 sandbox는 Chromium 실행이 불가능해(공유 라이브러리 부재, sudo 불가)
+   스크린샷 검증을 하지 못했다 — 모든 단계는 `tsc`/`pnpm build`/`dev`+curl
+   스모크 테스트로만 검증했고, 이 사실을 각 단계에 명시했다.
+
 ## 환경 제약 (전 단계에 영향)
 
 이 샌드박스는 root/sudo 접근이 없어 Chromium 구동에 필요한 공유 라이브러리
@@ -255,4 +267,51 @@ keep-all; }` 단 한 곳뿐이었습니다. 중복이 존재하지 않아 통합
 
 **검증**: `tsc --noEmit`·`pnpm build` 통과.
 
-커밋: `<git log 참고>`
+커밋: `4fa1849`
+
+---
+
+## 5단계 — 최종 정리
+
+**남은 TODO(unicorn) 항목 전체 목록** (실제 값을 지어내지 않고 남겨둔 것들 —
+운영자 확인 필요):
+
+- `src/lib/bookclub/data.ts` / `types.ts` — `BookClubVenue.detail`(층/호실
+  상세 위치, 현재 빈 문자열), `BookClubVenue.nearestStation`(가까운 역/출구,
+  현재 빈 문자열) — 5개 세션 공용 `EPISODE_GANGNAM_262` 장소 전부.
+- `src/lib/bookclub/data.ts` — `praise-of-idleness`/`museum-for-me` 두
+  세션의 `capacity: 8`·`fee: 20000`이 실제 기록이 아니라 "같은 장소 다른
+  세션과 동일하게 추정"한 값(이번 세션 이전부터 있던 추정, 이번에 새로
+  만들지 않음 — 실제 값 확인 필요).
+- `src/lib/bookclub/types.ts`/`selectors.ts` — `encoreCount`(영문 slug 기준
+  앵콜 요청 집계가 아직 배선 안 됨, 현재 하드코딩 0), `SessionStatus`의
+  `"closed"`(신청마감 시각 필드가 없어 파생 불가, 현재 미사용).
+- **(이번 세션에서 새로 추가)** `src/lib/bookclub/types.ts` —
+  `waitlistCapacity?`/`waitlistCount?`(대기열 정원 데이터 자체가 없음 — 있으면
+  `isWaitlistFull()`이 "정원 마감 + 대기도 마감" UI를 자동으로 켠다).
+- `src/app/privacy/page.tsx`, `src/app/terms/page.tsx` — 개인정보 항목·환불
+  규정·사업자 정보 등 조항 내용이 `[운영자 확정 필요]` 플레이스홀더 상태
+  (이번 세션 범위 밖, 손대지 않음).
+- **이미지**: `src/lib/bookclub/data.ts`의 세션 5건 전부 `coverUrl`이 비어
+  있어(Phase 0에서 발견) 홈 그리드가 전부 플랫컬러+책 아이콘 폴백으로
+  렌더링됨. 표지 이미지를 받으면 `coverUrl` 필드만 채우면 된다.
+
+**`screenshots/` 폴더**: 만들지 못했다. 이유는 이 리포트 최상단 "환경 제약"
+섹션 참조(Chromium 구동에 필요한 `libnspr4.so`/`libnss3.so`/`libnssutil3.so`/
+`libasound.so.2`가 없고, `sudo`가 비밀번호 없이 실행되지 않아 설치 불가).
+`pnpm build`(정적 생성 75페이지 전부 통과)·`tsc --noEmit`·`pnpm dev`+curl
+스모크 테스트(`/`, `/bookclub`, `/bookclub/[slug]` 전부 200, 신규 클래스명
+렌더링 확인)로 대체 검증했다.
+
+**운영자가 다음에 할 일**:
+1. `sudo apt-get install -y libnspr4 libnss3 libasound2` 실행 후 알려주면
+   다음 세션에서 320/375/430/768/1024/1440 스크린샷 검증을 마무리.
+2. `rm -rf node_modules pnpm-lock.yaml pnpm-workspace.yaml && npm install`로
+   패키지 매니저를 npm으로 원상복구(선택 사항 — 지금도 `package-lock.json`
+   기준 빌드/배포에는 영향 없음).
+3. 위 TODO(unicorn) 목록의 실제 값(장소 상세, 정원/가격, 대기열 정원 등) 확인.
+4. 북클럽 세션 표지 이미지 확보 시 `lib/bookclub/data.ts`의 `coverUrl` 필드에
+   추가.
+
+커밋: (이 stage는 REPORT.md 문서 정리만 — 코드 변경 없음, 4단계 커밋에
+이어서 문서만 갱신)
