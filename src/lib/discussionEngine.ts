@@ -320,7 +320,7 @@ export async function regenerateFailedQuestions(
       system,
       messages: [{ role: "user", content: "위 항목만 재생성하세요." }],
       maxTokens: 1200,
-      temperature: 1,
+      temperature: 0.5,
     });
     const raw = extractJson<{ replacements: DiscussionQuestion[] }>(text);
     const byNumber = new Map(raw.replacements.map((r) => [r.number, r]));
