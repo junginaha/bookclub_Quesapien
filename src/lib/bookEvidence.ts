@@ -92,7 +92,7 @@ async function fetchJson<T>(url: string, headers?: HeadersInit): Promise<T | nul
     const res = await fetch(url, {
       headers,
       signal: controller.signal,
-      cache: "no-store",
+      cache: "force-cache",
     });
     if (!res.ok) return null;
     return await res.json() as T;
