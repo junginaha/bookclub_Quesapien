@@ -11,6 +11,8 @@ import {
 const DIRECTIONS: Direction[] = ["free", "life", "society", "philosophy"];
 const DEPTHS: Depth[] = ["first", "general", "deep"];
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({})) as {
     mode?: "book" | "free";
