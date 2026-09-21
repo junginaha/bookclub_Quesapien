@@ -664,3 +664,25 @@
   0% { background-position: 100% 50%; }
   100% { background-position: 0 50%; }
 }
+
+/* 2026-09 detail UX: readable editorial page + payment-ready mobile action */
+.qd-main { max-width: 720px; }
+.qd-hero-top { padding-top: 14px; }
+.qd-cover-sm {
+  width: 118px;
+  border-radius: 2px;
+  box-shadow: 0 14px 30px -22px rgba(28,31,38,.5);
+}
+.qd-title { font-size: clamp(25px,4vw,38px); font-weight: 600; letter-spacing: -.025em; }
+.qd-reason { max-width: 66ch; font-size: 15.5px; line-height: 1.95; }
+.qd-payment-note { display:block; margin-top:9px; color:var(--muted); font-size:10.5px; line-height:1.5; }
+.qd-form-success { max-width:420px; display:grid; gap:10px; }
+@media (max-width:767px) {
+  .qd-body { padding-top: 84px; }
+  .qd-side { display:none; }
+  .qd-main { max-width:none; }
+  .qd-hero-top { gap:14px; }
+  .qd-cover-sm { width:88px; }
+  .qd-title { font-size:26px; }
+  .qd-date-sticky { top:64px; border-radius:0; margin-inline:calc(-1 * var(--gutter)); padding-inline:var(--gutter); }
+}
