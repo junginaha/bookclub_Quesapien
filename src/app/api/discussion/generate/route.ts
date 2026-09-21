@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ result, discussionId });
   } catch (err) {
     if (err instanceof DiscussionEngineError) {
-      const status = err.code === "config_missing" ? 503 : err.code === "insufficient_description" ? 422 : 502;
+      const status = err.code === "config_missing" ? 503 : (err.code === "insufficient_description" || err.code === "book_not_verified") ? 422 : 502;
       console.error(`Discussion generate error [${err.code}]:`, err.message);
       return NextResponse.json({ error: messageFor(err.code), code: err.code }, { status });
     }
@@ -60,8 +60,10 @@ export async function POST(req: NextRequest) {
 
 function messageFor(code: DiscussionEngineError["code"]): string {
   switch (code) {
+    case "book_not_verified":
+      return "책과 저자를 도서 데이터에서 확인하지 못했습니다. 제목과 저자 표기를 확인해주세요.";
     case "insufficient_description":
-      return "이 책을 확실히 식별하지 못했어요. 책 설명을 조금 더 적어주시면 정확도가 올라가요.";
+      return "책은 확인했지만 공개된 설명·주제 데이터가 부족해 근거 있는 발제를 만들기 어렵습니다.";
     case "config_missing":
       return "AI 발제 생성 기능이 아직 설정되지 않았어요. 운영자 확인이 필요합니다.";
     case "timeout":
@@ -92,6 +94,7 @@ async function saveDiscussion(input: BookInput, result: Awaited<ReturnType<typeo
         statement: `발제 생성기 — 「${result.analysis.confirmed_title || input.title}」을 두고 나눌 열 가지 질문`,
         discussion_questions: result.questions.map((q) => q.question),
         source_messages: {
+          evidence: result.evidence,
           analysis: result.analysis,
           giants: result.giants,
           opening_lines: result.opening_lines,
