@@ -146,3 +146,24 @@
 @media (prefers-reduced-motion: reduce) {
   .section button, .section a { transition: none !important; }
 }
+
+/* Entire club introduction is an interactive gateway to its full page. */
+.meeting {
+  cursor: pointer;
+  transform-origin: left center;
+  transition: transform .22s cubic-bezier(.2,.8,.2,1), background-color .22s ease;
+}
+.meeting:hover,
+.meeting:focus-visible {
+  transform: scale(1.018);
+  background: rgba(255,252,246,.52);
+  outline: none;
+}
+.meeting:focus-visible { box-shadow: 0 0 0 2px #796489; }
+@media (hover:none) {
+  .meeting:active { transform: scale(1.01); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .meeting { transition: none; }
+  .meeting:hover, .meeting:focus-visible, .meeting:active { transform: none; }
+}
