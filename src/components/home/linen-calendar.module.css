@@ -25,16 +25,25 @@
     linear-gradient(120deg, rgba(255, 253, 246, .55), rgba(230, 219, 199, .18));
   border: 1px solid #e1d5c2;
   border-radius: 2px 3px 5px 2px;
-  box-shadow: 0 12px 24px -20px rgba(66, 48, 29, .45), inset 0 1px rgba(255,255,255,.7);
+  box-shadow:
+    0 2px 2px rgba(72, 52, 34, .10),
+    0 12px 24px -12px rgba(72, 52, 34, .18),
+    0 28px 54px -30px rgba(48, 33, 20, .34),
+    inset 0 1px rgba(255,255,255,.82),
+    inset 0 -1px rgba(121, 91, 60, .10);
+  transform: perspective(1100px) rotateX(.35deg) rotateZ(-.12deg);
+  transform-origin: center top;
 }
 .fabric::before {
   content: ""; position: absolute; top: 17px; left: 20px; right: 20px;
   border-top: 1px dashed #cabcaa; opacity: .8; pointer-events: none;
 }
 .fabric::after {
-  content: ""; position: absolute; left: 7px; right: 5px; height: 5px; bottom: -6px;
-  background: #ebe2d1; border: 1px solid #dbceba; border-top: 0;
-  transform: rotate(-.25deg); transform-origin: left; z-index: -1; pointer-events: none;
+  content: ""; position: absolute; left: 9px; right: 4px; height: 8px; bottom: -9px;
+  background: linear-gradient(180deg, #eee5d5 0%, #ded0bb 100%);
+  border: 1px solid #d6c7b1; border-top: 0;
+  box-shadow: 0 6px 10px -8px rgba(64,46,29,.55);
+  transform: rotate(-.35deg); transform-origin: left; z-index: -1; pointer-events: none;
 }
 .masthead { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
 .section .script {
@@ -51,9 +60,11 @@
   display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
   border: 1px solid #cdbfa9; border-radius: 50%; background: transparent;
   color: var(--linen-ink); font: 20px/1 Georgia, serif; cursor: pointer;
-  transition: background-color .16s ease, border-color .16s ease;
+  box-shadow: 0 3px 7px -5px rgba(60,43,27,.55), inset 0 1px rgba(255,255,255,.62);
+  transition: background-color .16s ease, border-color .16s ease, transform .16s ease, box-shadow .16s ease;
 }
-.section .toolbar button.monthButton:hover { background: #e9dfce; border-color: #ad957b; }
+.section .toolbar button.monthButton:hover { background: #e9dfce; border-color: #ad957b; transform: translateY(-1px); box-shadow: 0 6px 12px -8px rgba(60,43,27,.55), inset 0 1px rgba(255,255,255,.72); }
+.section .toolbar button.monthButton:active { transform: translateY(1px); box-shadow: inset 0 2px 5px rgba(88,63,39,.18); }
 .calendarTable { width: 100%; border-collapse: collapse; table-layout: fixed; text-align: center; }
 .calendarTable th { height: 36px; padding: 2px 0 10px; color: var(--linen-ink); font: 600 15px/1.2 var(--font-eb-garamond), Georgia, serif; }
 .calendarTable td { height: 55px; border: 0; padding: 0; vertical-align: middle; }
@@ -66,14 +77,14 @@
   -webkit-tap-highlight-color: transparent;
 }
 .section .calendarTable button.day:disabled { color: #6c6257; background: transparent; cursor: default; opacity: 1; }
-.section .calendarTable button.day:not(:disabled):hover { background: #e7dac5; }
-.section .calendarTable button.day[aria-pressed="true"] { background: #554735; color: #fff9ef; border-color: #554735; }
+.section .calendarTable button.day:not(:disabled):hover { background: #e7dac5; transform: translateY(-1px); box-shadow: 0 5px 10px -8px rgba(57,42,29,.6); }
+.section .calendarTable button.day[aria-pressed="true"] { background: linear-gradient(180deg,#655541,#4b3f31); color: #fff9ef; border-color: #4f4233; box-shadow: inset 0 2px 4px rgba(255,255,255,.10), inset 0 -3px 6px rgba(31,23,16,.22), 0 5px 10px -7px rgba(51,37,24,.75); transform: translateY(1px); }
 .section .calendarTable button.day[aria-current="date"] { box-shadow: inset 0 0 0 1px #b49572; }
 .dot { position: absolute; bottom: 5px; width: 4px; height: 4px; border-radius: 50%; background: var(--linen-mark); }
 .day[aria-pressed="true"] .dot { background: #edcda4; }
 .legend { display: flex; justify-content: center; align-items: center; gap: 7px; margin: 21px 0 0; color: var(--linen-muted); font-size: 11px; line-height: 1.5; }
 .legendDot { width: 4px; height: 4px; border-radius: 50%; background: var(--linen-mark); }
-.details { min-width: 0; padding: 18px 0 0; }
+.details { min-width: 0; padding: 24px 22px 20px; background: rgba(250,246,238,.52); border: 1px solid rgba(210,196,176,.72); box-shadow: 0 14px 30px -26px rgba(58,42,27,.45), inset 0 1px rgba(255,255,255,.68); }
 .detailHead { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0 16px; padding-bottom: 10px; border-bottom: 1px solid var(--linen-line); }
 .detailLabel { margin: 0; color: var(--linen-muted); font-size: 12px; letter-spacing: .02em; }
 .section button.locationButton, .section button.clearLocation {
@@ -99,10 +110,11 @@
   min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   padding: 11px 22px; border: 1px solid #bba58a; border-radius: 2px;
   color: var(--linen-ink); background: transparent; font: 500 13px/1.5 var(--font-noto-sans-kr), sans-serif;
-  text-decoration: none; cursor: pointer; transition: background-color .16s ease;
+  text-decoration: none; cursor: pointer; box-shadow: 0 5px 12px -9px rgba(58,42,27,.5), inset 0 1px rgba(255,255,255,.35); transition: background-color .16s ease, transform .16s ease, box-shadow .16s ease;
 }
 .section a.primary { background: #554735; color: #fff9ef; border-color: #554735; }
-.section a.primary:hover { background: #41382c; }
+.section a.primary:hover { background: #41382c; transform: translateY(-1px); box-shadow: 0 8px 16px -10px rgba(49,35,23,.68), inset 0 1px rgba(255,255,255,.2); }
+.section a.primary:active, .section a.secondary:active, .section button.secondary:active { transform: translateY(1px); box-shadow: inset 0 2px 5px rgba(73,52,32,.20); }
 .section a.secondary:hover, .section button.secondary:hover { background: #eae0d0; }
 .section button:focus-visible, .section a:focus-visible { outline: 2px solid #796489; outline-offset: 3px; }
 .notice { margin: 14px 0 0; font-size: 12px; line-height: 1.8; color: #745133; }
@@ -111,7 +123,7 @@
 .srOnly { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 @media (max-width: 850px) {
   .layout { grid-template-columns: 1fr; gap: 32px; }
-  .fabric { width: min(100%, 550px); justify-self: center; }
+  .fabric { width: min(100%, 550px); justify-self: center; transform: perspective(1000px) rotateX(.25deg) rotateZ(-.08deg); }
   .details { padding-top: 0; }
 }
 @media (max-width: 560px) {
