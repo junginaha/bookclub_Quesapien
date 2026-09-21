@@ -215,3 +215,49 @@
   .book { max-width: none; }
   .coverMeta strong { font-size: 13px; }
 }
+
+
+/* Interactive book interior — visual scene stays inside the existing book card */
+.bookScene {
+  position: relative;
+  margin: -18px -18px 16px;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: #e9e0d3;
+}
+.bookScene img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  filter: saturate(.92) contrast(.96) brightness(1.05);
+  transform: scale(1.015);
+  transition: transform .55s cubic-bezier(.2,.8,.2,1), filter .3s ease;
+}
+.book[open] .bookScene img {
+  transform: scale(1.04);
+  filter: saturate(1) contrast(.98) brightness(1.06);
+}
+.bookScene > span {
+  position: absolute;
+  left: 10px;
+  bottom: 9px;
+  padding: 4px 7px;
+  background: rgba(249,245,237,.86);
+  color: #675a4e;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  backdrop-filter: blur(8px);
+}
+.book[open] .bookPages {
+  animation: bookInteriorReveal .28s ease-out;
+}
+@keyframes bookInteriorReveal {
+  from { opacity: 0; transform: translateY(-6px) rotateX(-3deg); }
+  to { opacity: 1; transform: translateY(0) rotateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .book[open] .bookPages,
+  .bookScene img { animation: none; transition: none; }
+}
