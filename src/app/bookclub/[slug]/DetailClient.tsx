@@ -140,6 +140,13 @@ export default function DetailClient({
           </div>
         </div>
 
+        <dl className="qd-event-meta" aria-label="모임 핵심 정보">
+          <div><dt>일시</dt><dd>{formatMonthDay(session.startsAt)} {weekday}<br />{formatTimeRange(session.startsAt, session.endsAt)}</dd></div>
+          <div><dt>장소</dt><dd>{session.venue.name}</dd></div>
+          <div><dt>참여비</dt><dd>{feeLabel(session.fee)}</dd></div>
+          <div><dt>자리</dt><dd>{status === "open" ? seatsLeft(session) + "자리 남음" : status === "full" ? "대기 신청" : "상세 확인"}</dd></div>
+        </dl>
+
         <p className="qd-reason">{session.summary}</p>
 
         <VenueCard venue={session.venue} />
