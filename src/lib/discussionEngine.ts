@@ -169,7 +169,10 @@ function buildGenerationSystemPrompt(evidence: BookEvidence, analysis: BookAnaly
     (g) => `- ${g.name} (${g.slug}): 핵심개념 [${g.core_concepts.join(", ")}] — ${g.summary}`
   ).join("\n");
 
-  return `당신은 북클럽 발제 전문가입니다. 아래 책 분석 결과와 사상가 관점카드 목록을 바탕으로 북클럽 현장에서 바로 쓸 발제문을 만드세요.
+  return `당신은 북클럽 발제 전문가입니다. 아래 검증된 도서 데이터와 분석 결과만 바탕으로 북클럽 현장에서 바로 쓸 발제문을 만드세요.
+
+[검증된 도서 데이터]
+${evidenceForPrompt(evidence)}
 
 [책 분석]
 확정 제목: ${analysis.confirmed_title}
@@ -205,6 +208,7 @@ ${roster}
 }
 
 export async function generateDiscussion(
+  evidence: BookEvidence,
   analysis: BookAnalysis,
   direction: Direction = "free",
   depth: Depth = "general"
@@ -293,6 +297,7 @@ export function validateDiscussion(
 
 /** 검증에 실패한 질문만 골라 1회 재생성한다. */
 export async function regenerateFailedQuestions(
+  evidence: BookEvidence,
   analysis: BookAnalysis,
   giants: GiantUsed[],
   direction: Direction,
@@ -304,6 +309,9 @@ export async function regenerateFailedQuestions(
 
   const targets = failedIndices.map((i) => questions[i]);
   const system = `당신은 북클럽 발제 전문가입니다. 아래 발제 세트 중 문제가 있는 일부 항목만 다시 만듭니다.
+
+[검증된 도서 데이터]
+${evidenceForPrompt(evidence)}
 
 [책 분석] 핵심 개념: ${analysis.key_concepts.join(", ")} / 내부 긴장: ${analysis.tensions.join(" / ")}
 [선택된 사상가] ${giants.map((g) => `${g.name}(${g.stance})`).join(", ")}
