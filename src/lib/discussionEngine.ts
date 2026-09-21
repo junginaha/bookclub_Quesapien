@@ -165,8 +165,8 @@ interface RawGenResult {
 }
 
 function buildGenerationSystemPrompt(evidence: BookEvidence, analysis: BookAnalysis, direction: Direction, depth: Depth): string {
-  const roster = GIANT_PERSPECTIVES.map(
-    (g) => `- ${g.name} (${g.slug}): 핵심개념 [${g.core_concepts.join(", ")}] — ${g.summary}`
+  const roster = GIANT_PERSPECTIVES.filter((g) => g.sourced).map(
+    (g) => `- ${g.name} (${g.slug}): 핵심개념 [${g.core_concepts.join(", ")}] / 주요 저작 [${g.key_works.join(", ")}] — ${g.summary}`
   ).join("\n");
 
   return `당신은 북클럽 발제 전문가입니다. 아래 검증된 도서 데이터와 분석 결과만 바탕으로 북클럽 현장에서 바로 쓸 발제문을 만드세요.
