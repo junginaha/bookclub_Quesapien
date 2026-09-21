@@ -20,7 +20,7 @@ export interface BookBackground {
     | "bibliographic";
   whyItMatters: string;
   questionSeed: string;
-  confidence: "cross_checked" | "bibliographic_cross_check";
+  confidence: "cross_checked" | "bibliographic_cross_check" | "source_verified";
   sources: BackgroundSource[];
 }
 
@@ -81,6 +81,8 @@ async function researchWithAnthropicWebSearch(
     '검색 결과가 부족해 2개 독립 출처로 확인할 수 없다면 정확히 {"fact":"","category":"publication","whyItMatters":"","questionSeed":""} 를 반환하세요.',
   ].filter(Boolean).join("\n");
 
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -88,6 +90,7 @@ async function researchWithAnthropicWebSearch(
       "x-api-key": key,
       "anthropic-version": "2023-06-01",
     },
+    signal: controller.signal,
     body: JSON.stringify({
       model: CHAT_MODEL,
       max_tokens: 1800,
@@ -97,11 +100,11 @@ async function researchWithAnthropicWebSearch(
         {
           type: "web_search_20250305",
           name: "web_search",
-          max_uses: 5,
+          max_uses: 3,
         },
       ],
     }),
-  }).catch(() => null);
+  }).catch(() => null).finally(() => clearTimeout(timer));
 
   if (!response?.ok) return null;
   const data = await response.json().catch(() => null) as {
@@ -452,6 +455,32 @@ function bibliographicFallback(evidence: BookEvidence): BookBackground | null {
   };
 }
 
+function sourceVerifiedFallback(evidence: BookEvidence): BookBackground | null {
+  const source = evidence.sources[0];
+  if (!source) return null;
+
+  const facts = [
+    evidence.publisher ? "확인된 판본의 출판사는 " + evidence.publisher + "입니다." : "",
+    evidence.publishedDate ? "이 판본의 출간 표기는 " + evidence.publishedDate + "입니다." : "",
+    evidence.firstPublishYear ? "작품의 초판연도는 " + evidence.firstPublishYear + "년으로 확인됩니다." : "",
+  ].filter(Boolean);
+
+  if (!facts.length) return null;
+
+  return {
+    fact: facts.join(" "),
+    category: "bibliographic",
+    whyItMatters: "판본과 최초 출간 시점을 구분하면 지금 읽는 책의 편집·번역·시대적 위치를 더 정확하게 놓고 이야기할 수 있습니다.",
+    questionSeed: "이 책이 처음 독자를 만난 시기와 지금 우리가 읽는 시기 사이에서, 가장 달라진 전제는 무엇일까요?",
+    confidence: "source_verified",
+    sources: [{
+      title: source.label,
+      url: source.url,
+      domain: domainOf(source.url) || source.provider,
+    }],
+  };
+}
+
 export async function researchBookBackground(
   evidence: BookEvidence
 ): Promise<BookBackground | null> {
@@ -459,7 +488,7 @@ export async function researchBookBackground(
   if (searched) return searched;
   const publicResearch = await researchFromPublicDocuments(evidence);
   if (publicResearch) return publicResearch;
-  return bibliographicFallback(evidence);
+  return bibliographicFallback(evidence) ?? sourceVerifiedFallback(evidence);
 }
 
 export function backgroundForPrompt(background: BookBackground): string {
