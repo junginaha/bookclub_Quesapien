@@ -23,6 +23,7 @@ import VenueCard from "@/components/bookclub/VenueCard";
 import MiniCalendar, { type CalendarClub } from "@/components/bookclub/MiniCalendar";
 import Timeline, { type TimelineEntry } from "@/components/bookclub/Timeline";
 import "@/components/bookclub/bookclub.css";
+import "./detail-v2.css";
 
 function ogFallback(title: string, sub: string) {
   const p = new URLSearchParams({ title, sub });
