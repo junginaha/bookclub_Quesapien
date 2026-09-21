@@ -386,26 +386,23 @@ export async function buildDiscussion(input: BookInput): Promise<DiscussionResul
     );
   }
 
-  const background = await researchBookBackground(evidence);
+  const [background, analysis] = await Promise.all([
+    researchBookBackground(evidence),
+    analyzeBook(input, evidence),
+  ]);
+
   if (!background) {
     throw new DiscussionEngineError(
       "background_not_verified",
-      "검증 가능한 책의 숨은 배경을 찾지 못했습니다."
+      "검증 가능한 책의 배경을 찾지 못했습니다."
     );
   }
 
-  const analysis = await analyzeBook(input, evidence);
   const gen = await generateDiscussion(evidence, background, analysis, direction, depth);
-  const failed = validateDiscussion(gen, analysis);
-  const questions = await regenerateFailedQuestions(evidence, background, analysis, gen.giants, direction, depth, gen.questions, failed);
+  const questions = gen.questions;
 
-  if (!questions.some((question) => question.background_linked === true)) {
-    throw new DiscussionEngineError("invalid_json", "숨은 배경에서 출발한 질문이 생성되지 않았습니다.");
-  }
-
-  const secondFailed = validateDiscussion({ questions, giants: gen.giants }, analysis);
-  if (secondFailed.length > 2) {
-    throw new DiscussionEngineError("invalid_json", "근거에 맞는 질문 품질 기준을 통과하지 못했습니다.");
+  if (questions.length !== 10 || !questions.some((question) => question.background_linked === true)) {
+    throw new DiscussionEngineError("invalid_json", "숨은 배경을 포함한 발제 10개가 완성되지 않았습니다.");
   }
 
   return {
