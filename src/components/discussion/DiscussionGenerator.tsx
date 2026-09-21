@@ -188,9 +188,30 @@ export default function DiscussionGenerator({ variant }: DiscussionGeneratorProp
 
   function copyAll() {
     if (!result) return;
-    const text = result.questions
-      .map((question) => question.number + ". " + question.question)
+    const sources = result.background.sources
+      .map((source) => "- " + source.title + ": " + source.url)
+      .join("\n");
+    const questionsText = result.questions
+      .map((question) =>
+        question.number + ". " +
+        (question.background_linked ? "[숨은 배경] " : "") +
+        question.question +
+        (question.followup ? "\n   ↳ " + question.followup : "")
+      )
       .join("\n\n");
+    const text = [
+      "『" + result.evidence.title + "』 · " + result.evidence.authors.join(", "),
+      "",
+      "[숨은 배경]",
+      result.background.fact,
+      result.background.whyItMatters,
+      "",
+      "[확인 출처]",
+      sources,
+      "",
+      "[발제]",
+      questionsText,
+    ].join("\n");
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
