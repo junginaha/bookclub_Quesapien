@@ -30,7 +30,7 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
         <div>
           <span className={styles.eyebrow}>NEXT READS</span>
           <h2 id="books-title">함께 읽는 책</h2>
-          <p className={styles.sectionLead}>표지를 눌러 모임을 확인하세요.</p>
+          <p className={styles.sectionLead}>책을 선택하면 모임 상세 페이지로 이동합니다.</p>
         </div>
       </div>
 
@@ -41,33 +41,24 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
           {[...unique.values()].map((session, index) => {
             const scene = SCENES[index];
             return (
-            <details className={styles.book} key={session.slug}>
-              <summary className={styles.bookCover}>
+              <Link className={styles.bookLink} href={"/bookclub/" + session.slug} key={session.slug}>
                 <span className={styles.coverVisual}>
-                  <BookCoverImage
-                    title={session.bookTitle}
-                    author={session.author}
-                    fallbackClassName={styles.coverFallback}
-                  />
+                  <BookCoverImage title={session.bookTitle} author={session.author} fallbackClassName={styles.coverFallback} />
+                  {scene && (
+                    <span className={styles.coverScene} aria-hidden="true">
+                      <img src={scene} alt="" loading="lazy" />
+                    </span>
+                  )}
                 </span>
                 <span className={styles.coverMeta}>
                   <strong>{session.bookTitle}</strong>
                   <small>{session.author}</small>
+                  <small>{formatMonthDay(session.startsAt)} · {getStatus(session) === "past" ? "지난 모임" : session.venue.name}</small>
                 </span>
-                <span className={styles.bookToggle} aria-hidden="true" />
-                <span className={styles.srOnly}>책 정보 펼치기 또는 접기</span>
-              </summary>
-
-              <div className={styles.bookPages}>
-                {scene && (
-                  <div className={styles.bookScene}>
-                    <img
-                      src={scene}
-                      alt="질문하는 사람들 북클럽 모임 풍경"
-                      loading="lazy"
-                    />
-                    <span>BOOK CLUB</span>
-                  </div>
+              </Link>
+            );
+          })}
+        </div>
                 )}
                 {session.leadQuestion && <p className={styles.bookQuestion}>{session.leadQuestion}</p>}
                 <p className={styles.bookSummary}>{session.summary.split("\n").filter(Boolean).slice(0, 2).join(" ")}</p>
