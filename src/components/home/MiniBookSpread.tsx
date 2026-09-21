@@ -38,7 +38,9 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
         <p className={styles.muted}>다음 책을 고르고 있습니다.</p>
       ) : (
         <div className={styles.bookGrid}>
-          {[...unique.values()].map((session, index) => (
+          {[...unique.values()].map((session, index) => {
+            const scene = SCENES[index];
+            return (
             <details className={styles.book} key={session.slug}>
               <summary className={styles.bookCover}>
                 <span className={styles.coverVisual}>
@@ -57,21 +59,24 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
               </summary>
 
               <div className={styles.bookPages}>
-                <div className={styles.bookScene}>
-                  <img
-                    src={SCENES[index % SCENES.length]}
-                    alt="질문하는 사람들 북클럽 모임 풍경"
-                    loading="lazy"
-                  />
-                  <span>BOOK CLUB</span>
-                </div>
+                {scene && (
+                  <div className={styles.bookScene}>
+                    <img
+                      src={scene}
+                      alt="질문하는 사람들 북클럽 모임 풍경"
+                      loading="lazy"
+                    />
+                    <span>BOOK CLUB</span>
+                  </div>
+                )}
                 {session.leadQuestion && <p className={styles.bookQuestion}>{session.leadQuestion}</p>}
                 <p className={styles.bookSummary}>{session.summary.split("\n").filter(Boolean).slice(0, 2).join(" ")}</p>
                 <p className={styles.bookDate}>{formatMonthDay(session.startsAt)} · {getStatus(session) === "past" ? "지난 대화" : session.venue.name}</p>
                 <Link className={styles.secondary} href={"/bookclub/" + session.slug}>모임 자세히 보기</Link>
               </div>
             </details>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>
