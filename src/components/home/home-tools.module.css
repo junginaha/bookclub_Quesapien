@@ -96,20 +96,6 @@
 }
 @media (prefers-reduced-motion: reduce) { .book[open] .bookPages { animation: none; } }
 .generator :global(.dg) {
-  --dg-text: #34383e;
-  --dg-text-dim: #756c62;
-  --dg-border: #d9d5cd;
-  --dg-input-bg: #fff;
-  --dg-accent: #173b75;
-  --dg-accent-bright: #574db9;
-  --dg-btn-bg: #173b75;
-  --dg-btn-text: #fff;
-  max-width: 680px;
+  width: min(760px, 100%);
+  max-width: none;
 }
-.generator :global(.dg) button { min-height: 44px; }
-.generator :global(.dg) :global(.dg-btn), .generator :global(.dg) :global(.dg-chip--active) { background: #173b75; color: #fff; border-radius: 0; }
-.generator :global(.dg) :global(.dg-chip), .generator :global(.dg) :global(.dg-settings-toggle) { border: 1px solid #d9d5cd; border-radius: 0; }
-.generator :global(.dg-input), .generator :global(.dg-settings-panel) { border-radius: 0; }
-.generator :global(.dg-error), .generator :global(.dg-confidence-note) { color: #8c4d20; }
-.generator :global(.dg-giant-chip--support) { color: #35633f; }
-.generator :global(.dg-giant-chip--critical) { color: #8c4d20; }
