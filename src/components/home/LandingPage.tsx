@@ -4,10 +4,11 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { createClient } from "@/lib/supabase/client";
-import NearbyMeetingsFeed, { type UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
-import IntroSplash from "./IntroSplash";
+import type { UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import BookCoverGrid from "./BookCoverGrid";
+import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
+import MiniBookSpread from "./MiniBookSpread";
 import HoverReveal from "./HoverReveal";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import { ChevronDown } from "lucide-react";
@@ -628,13 +629,7 @@ interface LandingPageProps {
 }
 
 // ─── Main component ───────────────────────────────────────────
-export default function LandingPage({ todayQuestion, recentQuestions, upcomingMeetings = [], bookclubSessions = [] }: LandingPageProps) {
-  // IntroSplash는 항상(재방문자 포함) 처음부터 마운트해 둔다 — 실제로 보일지는
-  // React 타이밍이 아니라 layout.tsx의 차단 스크립트가 첫 페인트 전에 세팅하는
-  // html[data-intro="pending"] + landing.css의 CSS로 결정된다(자세한 이유는
-  // IntroSplash.tsx 상단 주석 참고). 이 state는 "닫힘/스킵이 확정된 뒤 트리에서
-  // 완전히 제거"하는 역할만 한다.
-  const [introMounted, setIntroMounted] = useState(true);
+export default function LandingPage({ todayQuestion, recentQuestions, bookclubSessions = [] }: LandingPageProps) {
   const [modalBook, setModalBook] = useState<BookClub | null>(null);
   const [activeFloat, setActiveFloat] = useState<number | null>(null);
   const [askContent, setAskContent] = useState("");
@@ -783,7 +778,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
 
   return (
     <div className="lp">
-      {introMounted && <IntroSplash onEnter={() => setIntroMounted(false)} />}
       <div className="lp-grain" aria-hidden="true" />
       <div className="lp-grain-light" aria-hidden="true" />
 
@@ -841,7 +835,10 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
         </div>
       </nav>
 
-      {/* HERO */}
+      {/* 일정 + 위치를 첫 기능으로 전면 배치 */}
+      <HomeCalendarLocationHub sessions={bookclubSessions} />
+
+      {/* HERO — 브랜드 설명은 예약 도구 다음으로 배치 */}
       <section className="lp-hero" id="top">
         <div className="lp-hero-inner">
           <div className="lp-hero-meta">
@@ -939,11 +936,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
           </div>
         </div>
       )}
-
-      {/* 내 근처 다음 모임 — Qsapiens 2.0 §C1 구조적 귀결① (홈 = 내 근처 다음 모임 피드) */}
-      <div className="lp-nearby-scope">
-        <NearbyMeetingsFeed items={upcomingMeetings} />
-      </div>
 
       {/* ③ BOOKLOVER */}
       <section className="lp-section lp-books" id="books">
@@ -1128,6 +1120,9 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
         </div>
       </section>
 
+
+      {/* 하단 소형 인터랙티브 북 펼침 */}
+      <MiniBookSpread sessions={bookclubSessions} />
 
       {/* ⑥ AT HEART — 통합 하단 섹션 */}
       <section className="lp-final lp-giants-final" id="final">
