@@ -1,6 +1,7 @@
 import { callClaude } from "@/lib/anthropic";
 import { GIANT_PERSPECTIVES, findPerspective } from "@/data/giantPerspectives";
 import { evidenceForPrompt, resolveBookEvidence, type BookEvidence } from "@/lib/bookEvidence";
+import { backgroundForPrompt, researchBookBackground, type BookBackground } from "@/lib/bookBackground";
 
 export type Direction = "free" | "life" | "society" | "philosophy";
 export type Depth = "first" | "general" | "deep";
@@ -48,6 +49,7 @@ export interface DiscussionQuestion {
   followup: string;
   concept: string;
   thinker?: string;
+  background_linked?: boolean;
 }
 
 export interface GiantUsed {
@@ -59,6 +61,7 @@ export interface GiantUsed {
 
 export interface DiscussionResult {
   evidence: BookEvidence;
+  background: BookBackground;
   analysis: BookAnalysis;
   giants: GiantUsed[];
   opening_lines: string[];
@@ -71,6 +74,7 @@ export class DiscussionEngineError extends Error {
   code:
     | "missing_input"
     | "book_not_verified"
+    | "background_not_verified"
     | "insufficient_description"
     | "api_error"
     | "timeout"
@@ -164,7 +168,7 @@ interface RawGenResult {
   facilitator_notes: string;
 }
 
-function buildGenerationSystemPrompt(evidence: BookEvidence, analysis: BookAnalysis, direction: Direction, depth: Depth): string {
+function buildGenerationSystemPrompt(evidence: BookEvidence, background: BookBackground, analysis: BookAnalysis, direction: Direction, depth: Depth): string {
   const roster = GIANT_PERSPECTIVES.filter((g) => g.sourced).map(
     (g) => `- ${g.name} (${g.slug}): 핵심개념 [${g.core_concepts.join(", ")}] / 주요 저작 [${g.key_works.join(", ")}] — ${g.summary}`
   ).join("\n");
@@ -173,6 +177,9 @@ function buildGenerationSystemPrompt(evidence: BookEvidence, analysis: BookAnaly
 
 [검증된 도서 데이터]
 ${evidenceForPrompt(evidence)}
+
+[검증된 숨은 배경]
+${backgroundForPrompt(background)}
 
 [책 분석]
 확정 제목: ${analysis.confirmed_title}
@@ -195,6 +202,8 @@ ${roster}
 - 예/아니오로 답이 끝나는 질문 금지. 참가자마다 다른 대답이 나올 수밖에 없는 구체적 질문을 만드세요.
 - 감상("좋았나요?", "어땠나요?")에 머무르는 질문 금지.
 - 10개 질문은 역할이 겹치지 않아야 합니다: 대화 시작(2) → 심화(5) → 거인의 시선(2) → 마무리(1).
+- 최소 1개 질문은 반드시 [검증된 숨은 배경]에서 출발해야 하며 background_linked를 true로 표시하세요. 이 질문은 숨은 배경의 사실을 장식처럼 붙이지 말고, 그 사실을 알았을 때 책을 새롭게 읽게 되는 지점을 묻습니다.
+- 나머지 질문은 background_linked를 false로 표시하세요.
 - 관점은 개인적 경험 / 사회적 함의 / 윤리적 딜레마 / 비판적 반론 / 실천적 적용 중 서로 다른 각도로 분산하세요.
 - "거인의 시선" 질문 2개는 선택한 두 사상가 각각의 핵심 개념을 실제로 적용해 만드세요. 인물 이름을 나열만 하지 말고 그 사유 방식이 질문 문장 안에 자연스럽게 녹아들게 하세요. 각 항목에 반드시 "thinker" 필드로 선택한 사상가 이름을 넣으세요.
 - 확인되지 않은 줄거리·인물·사건·장·페이지·인용을 지어내지 마세요. 직접 인용은 만들지 마세요.\n- 질문에 들어가는 구체적 사실은 [검증된 도서 데이터]에서 확인 가능한 범위를 넘지 마세요.
@@ -204,16 +213,17 @@ ${roster}
 - 각 질문 객체의 "concept" 필드에는 그 질문이 연결된 핵심 개념/내부 긴장을 정확히 적으세요.
 
 반드시 아래 JSON 형식으로만 응답하세요:
-{"giants_used":[{"slug":"...","stance":"support"},{"slug":"...","stance":"critical"}],"opening_lines":["...","...","..."],"questions":[{"number":1,"stage":"opening","question":"...","intent":"...","followup":"...","concept":"..."}, ... 총 10개, stage는 opening(1~2), deep(3~7), giant(8~9, thinker 필드 포함), closing(10) 순서 ...],"facilitator_notes":"..."}`;
+{"giants_used":[{"slug":"...","stance":"support"},{"slug":"...","stance":"critical"}],"opening_lines":["...","...","..."],"questions":[{"number":1,"stage":"opening","question":"...","intent":"...","followup":"...","concept":"...","background_linked":false}, ... 총 10개, 최소 1개는 background_linked:true, stage는 opening(1~2), deep(3~7), giant(8~9, thinker 필드 포함), closing(10) 순서 ...],"facilitator_notes":"..."}`;
 }
 
 export async function generateDiscussion(
   evidence: BookEvidence,
+  background: BookBackground,
   analysis: BookAnalysis,
   direction: Direction = "free",
   depth: Depth = "general"
 ): Promise<{ giants: GiantUsed[]; opening_lines: string[]; questions: DiscussionQuestion[]; facilitator_notes: string }> {
-  const system = buildGenerationSystemPrompt(evidence, analysis, direction, depth);
+  const system = buildGenerationSystemPrompt(evidence, background, analysis, direction, depth);
   const text = await callClaudeGuarded({
     system,
     messages: [{ role: "user", content: "위 조건에 맞춰 발제문 JSON을 생성하세요." }],
@@ -273,6 +283,8 @@ export function validateDiscussion(
     seenText.add(norm);
   });
 
+  if (!result.questions.some((q) => q.background_linked === true)) failed.add(2);
+
   const giantQs = result.questions
     .map((q, i) => ({ q, i }))
     .filter(({ q }) => q.stage === "giant");
@@ -298,6 +310,7 @@ export function validateDiscussion(
 /** 검증에 실패한 질문만 골라 1회 재생성한다. */
 export async function regenerateFailedQuestions(
   evidence: BookEvidence,
+  background: BookBackground,
   analysis: BookAnalysis,
   giants: GiantUsed[],
   direction: Direction,
@@ -313,11 +326,14 @@ export async function regenerateFailedQuestions(
 [검증된 도서 데이터]
 ${evidenceForPrompt(evidence)}
 
+[검증된 숨은 배경]
+${backgroundForPrompt(background)}
+
 [책 분석] 핵심 개념: ${analysis.key_concepts.join(", ")} / 내부 긴장: ${analysis.tensions.join(" / ")}
 [선택된 사상가] ${giants.map((g) => `${g.name}(${g.stance})`).join(", ")}
 [발제 방향]: ${DIRECTION_LABEL[direction]} / [모임 깊이]: ${DEPTH_LABEL[depth]}
 
-규칙: 범용 질문·예소답형 질문·미검증 인용 금지. 각 질문은 핵심 개념 중 최소 하나와 연결. 아래 각 항목의 number/stage(및 giant 단계면 thinker)는 그대로 유지한 채 question/intent/followup/concept만 새로 채우세요. 기존 질문들과 내용이 겹치지 않게 하세요.
+규칙: 범용 질문·예소답형 질문·미검증 인용 금지. 각 질문은 핵심 개념 중 최소 하나와 연결. 전체 세트에 background_linked:true가 최소 1개는 있어야 합니다. 아래 각 항목의 number/stage(및 giant 단계면 thinker)는 그대로 유지한 채 question/intent/followup/concept/background_linked만 새로 채우세요. 기존 질문들과 내용이 겹치지 않게 하세요.
 
 다시 만들 항목: ${JSON.stringify(targets.map((t) => ({ number: t.number, stage: t.stage, thinker: t.thinker })))}
 
@@ -343,6 +359,7 @@ ${evidenceForPrompt(evidence)}
         intent: replacement.intent,
         followup: replacement.followup,
         concept: replacement.concept,
+        background_linked: replacement.background_linked ?? q.background_linked,
       };
     });
   } catch {
@@ -369,10 +386,18 @@ export async function buildDiscussion(input: BookInput): Promise<DiscussionResul
     );
   }
 
+  const background = await researchBookBackground(evidence);
+  if (!background) {
+    throw new DiscussionEngineError(
+      "background_not_verified",
+      "검증 가능한 책의 숨은 배경을 찾지 못했습니다."
+    );
+  }
+
   const analysis = await analyzeBook(input, evidence);
-  const gen = await generateDiscussion(evidence, analysis, direction, depth);
+  const gen = await generateDiscussion(evidence, background, analysis, direction, depth);
   const failed = validateDiscussion(gen, analysis);
-  const questions = await regenerateFailedQuestions(evidence, analysis, gen.giants, direction, depth, gen.questions, failed);
+  const questions = await regenerateFailedQuestions(evidence, background, analysis, gen.giants, direction, depth, gen.questions, failed);
 
   const secondFailed = validateDiscussion({ questions, giants: gen.giants }, analysis);
   if (secondFailed.length > 2) {
@@ -381,6 +406,7 @@ export async function buildDiscussion(input: BookInput): Promise<DiscussionResul
 
   return {
     evidence,
+    background,
     analysis,
     giants: gen.giants,
     opening_lines: gen.opening_lines,
