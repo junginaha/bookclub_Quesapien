@@ -1,5 +1,6 @@
 import { callClaude } from "@/lib/anthropic";
 import { GIANT_PERSPECTIVES, findPerspective } from "@/data/giantPerspectives";
+import { evidenceForPrompt, resolveBookEvidence, type BookEvidence } from "@/lib/bookEvidence";
 
 export type Direction = "free" | "life" | "society" | "philosophy";
 export type Depth = "first" | "general" | "deep";
@@ -12,9 +13,9 @@ const DIRECTION_LABEL: Record<Direction, string> = {
 };
 
 const DEPTH_LABEL: Record<Depth, string> = {
-  first: "처음 읽는 모임",
-  general: "일반 북클럽",
-  deep: "깊이 있는 토론",
+  first: "가볍게",
+  general: "적당히",
+  deep: "깊이 있게",
 };
 
 export interface BookInput {
@@ -57,6 +58,7 @@ export interface GiantUsed {
 }
 
 export interface DiscussionResult {
+  evidence: BookEvidence;
   analysis: BookAnalysis;
   giants: GiantUsed[];
   opening_lines: string[];
@@ -68,6 +70,7 @@ export interface DiscussionResult {
 export class DiscussionEngineError extends Error {
   code:
     | "missing_input"
+    | "book_not_verified"
     | "insufficient_description"
     | "api_error"
     | "timeout"
