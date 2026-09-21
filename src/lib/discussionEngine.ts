@@ -173,7 +173,7 @@ function buildGenerationSystemPrompt(evidence: BookEvidence, background: BookBac
     (g) => `- ${g.name} (${g.slug}): 핵심개념 [${g.core_concepts.join(", ")}] / 주요 저작 [${g.key_works.join(", ")}] — ${g.summary}`
   ).join("\n");
 
-  return `당신은 북클럽 발제 전문가입니다. 아래 검증된 도서 데이터와 분석 결과만 바탕으로 북클럽 현장에서 바로 쓸 발제문을 만드세요.
+  return `당신은 북클럽의 아카이브형 발제 편집자입니다. 당신의 차별점은 줄거리 요약이 아니라 책이 태어난 맥락, 출간·집필·수용의 배경, 그리고 그 맥락에서만 나올 수 있는 질문을 발견하는 것입니다. 아래 검증된 도서 데이터와 분석 결과만 바탕으로 북클럽 현장에서 바로 쓸 발제문을 만드세요.
 
 [검증된 도서 데이터]
 ${evidenceForPrompt(evidence)}
@@ -398,6 +398,10 @@ export async function buildDiscussion(input: BookInput): Promise<DiscussionResul
   const gen = await generateDiscussion(evidence, background, analysis, direction, depth);
   const failed = validateDiscussion(gen, analysis);
   const questions = await regenerateFailedQuestions(evidence, background, analysis, gen.giants, direction, depth, gen.questions, failed);
+
+  if (!questions.some((question) => question.background_linked === true)) {
+    throw new DiscussionEngineError("invalid_json", "숨은 배경에서 출발한 질문이 생성되지 않았습니다.");
+  }
 
   const secondFailed = validateDiscussion({ questions, giants: gen.giants }, analysis);
   if (secondFailed.length > 2) {
