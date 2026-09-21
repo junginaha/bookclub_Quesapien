@@ -318,12 +318,72 @@
 }
 
 .dg-evidence,
+.dg-background,
 .dg-questions {
   padding: clamp(20px, 4vw, 30px);
   border: 1px solid #d8d1c5;
   background: #fbf8f1;
   color: #2a2d32;
   box-shadow: 0 14px 34px -28px rgba(20,30,40,.34);
+}
+
+
+.dg-background {
+  border-color: #cdbfae;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.52), transparent 26%),
+    #f4ede2;
+}
+
+.dg-background-badge {
+  padding: 6px 9px;
+  border: 1px solid #baa58b;
+  color: #785f47;
+  background: #fffaf3;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dg-background-badge.is-cross {
+  border-color: #6f8e75;
+  color: #3f6b4b;
+  background: #edf6ef;
+}
+
+.dg-background-fact {
+  margin: 22px 0 0;
+  color: #2b2926;
+  font: 600 clamp(17px, 2.4vw, 22px)/1.7 var(--font-noto-serif-kr), serif;
+  word-break: keep-all;
+}
+
+.dg-background-why {
+  margin: 12px 0 0;
+  color: #655e56;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.dg-background-seed {
+  margin-top: 20px;
+  padding-top: 17px;
+  border-top: 1px solid #d8cdbf;
+}
+
+.dg-background-seed > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #8b7056;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.dg-background-seed p {
+  margin: 0;
+  color: #173b75;
+  font: 500 15px/1.75 var(--font-noto-serif-kr), serif;
 }
 
 .dg-output-head {
