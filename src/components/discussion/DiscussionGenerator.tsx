@@ -1,106 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Copy, Pencil, RefreshCw } from "lucide-react";
+import { Check, Copy, RefreshCw } from "lucide-react";
 import "./discussion-generator.css";
 
-interface DiscussionGeneratorProps {
-  variant: "giants" | "landing";
-}
-
+interface DiscussionGeneratorProps { variant: "giants" | "landing"; }
 type Depth = "first" | "general" | "deep";
 type Status = "idle" | "loading" | "done" | "error";
 
-interface EvidenceSource {
-  provider: "Google Books" | "Open Library";
-  label: string;
-  url: string;
-  matchedTitle: string;
-  matchedAuthors: string[];
-}
-
+interface EvidenceSource { provider: "Google Books" | "Open Library"; label: string; url: string; }
 interface BookEvidence {
-  verified: boolean;
   confidence: "high" | "medium" | "low";
-  title: string;
-  authors: string[];
-  publisher?: string;
-  publishedDate?: string;
-  firstPublishYear?: number;
-  isbn13?: string;
-  isbn10?: string;
-  categories: string[];
-  subjects: string[];
-  description?: string;
-  sources: EvidenceSource[];
+  title: string; authors: string[]; publisher?: string; publishedDate?: string;
+  firstPublishYear?: number; isbn13?: string; isbn10?: string; sources: EvidenceSource[];
 }
-
-interface BackgroundSource {
-  title: string;
-  url: string;
-  domain: string;
-}
-
+interface BackgroundSource { title: string; url: string; domain: string; }
 interface BookBackground {
-  fact: string;
-  category: string;
-  whyItMatters: string;
-  questionSeed: string;
-  confidence: "cross_checked" | "bibliographic_cross_check";
+  fact: string; whyItMatters: string; questionSeed: string;
+  confidence: "cross_checked" | "bibliographic_cross_check" | "source_verified";
   sources: BackgroundSource[];
 }
-
 interface DiscussionQuestion {
-  number: number;
-  stage: "opening" | "deep" | "giant" | "closing";
-  question: string;
-  intent: string;
-  followup: string;
-  concept: string;
-  thinker?: string;
-  background_linked?: boolean;
+  number: number; stage: "opening" | "deep" | "giant" | "closing";
+  question: string; intent: string; followup: string; concept: string;
+  thinker?: string; background_linked?: boolean;
 }
-
-interface GiantUsed {
-  slug: string;
-  name: string;
-  stance: "support" | "critical";
-  summary: string;
-}
-
+interface GiantUsed { slug: string; name: string; stance: "support" | "critical"; }
 interface DiscussionResult {
   evidence: BookEvidence;
   background: BookBackground;
-  analysis: {
-    confirmed_title: string;
-    confirmed_author: string;
-    confidence: "high" | "medium" | "low";
-    core_argument: string;
-    key_concepts: string[];
-    tensions: string[];
-    modern_connection: string;
-  };
+  analysis: { core_argument: string; key_concepts: string[]; };
   giants: GiantUsed[];
-  opening_lines: string[];
-  tensions: string[];
   questions: DiscussionQuestion[];
-  facilitator_notes: string;
 }
 
 const HANDOFF_KEY = "qsp_discussion_handoff";
-
 const DEPTHS: { value: Depth; number: string; label: string; sub: string }[] = [
-  { value: "first", number: "01", label: "가볍게", sub: "대화가 잘 열리는 질문" },
-  { value: "general", number: "02", label: "적당히", sub: "논지와 경험을 균형 있게" },
-  { value: "deep", number: "03", label: "깊이 있게", sub: "전제와 반론까지" },
+  { value: "first", number: "1", label: "가볍게", sub: "말문이 쉽게 열리는 질문" },
+  { value: "general", number: "2", label: "적당히", sub: "책과 경험을 오가는 질문" },
+  { value: "deep", number: "3", label: "깊이 있게", sub: "전제와 반론까지 파고드는 질문" },
 ];
-
-const STAGE_LABEL: Record<DiscussionQuestion["stage"], string> = {
-  opening: "대화 시작",
-  deep: "심화",
-  giant: "거인의 시선",
-  closing: "마무리",
-};
+const STAGE_LABEL = { opening: "대화 시작", deep: "깊이 읽기", giant: "거인의 시선", closing: "마무리" };
 
 export default function DiscussionGenerator({ variant }: DiscussionGeneratorProps) {
   const [title, setTitle] = useState("");
@@ -115,7 +55,7 @@ export default function DiscussionGenerator({ variant }: DiscussionGeneratorProp
     if (variant !== "giants") return;
     const params = new URLSearchParams(window.location.search);
     if (params.get("handoff") !== "1") return;
-    const raw = window.sessionStorage.getItem(HANDOFF_KEY);
+    const raw = sessionStorage.getItem(HANDOFF_KEY);
     if (!raw) return;
     try {
       const saved = JSON.parse(raw);
@@ -124,10 +64,8 @@ export default function DiscussionGenerator({ variant }: DiscussionGeneratorProp
       setDepth(saved.depth || "general");
       setResult(saved.result || null);
       if (saved.result) setStatus("done");
-    } catch {
-      // Ignore damaged local handoff state.
-    }
-    window.sessionStorage.removeItem(HANDOFF_KEY);
+    } catch {}
+    sessionStorage.removeItem(HANDOFF_KEY);
   }, [variant]);
 
   const valid = Boolean(title.trim() && author.trim());
@@ -136,85 +74,50 @@ export default function DiscussionGenerator({ variant }: DiscussionGeneratorProp
     if (!valid || status === "loading") return;
     setStatus("loading");
     setErrorMessage("");
+    setResult(null);
     setCopied(false);
 
     try {
       const response = await fetch("/api/discussion/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode: "book",
-          title: title.trim(),
-          author: author.trim(),
-          depth,
-          direction: "free",
-        }),
+        body: JSON.stringify({ mode: "book", title: title.trim(), author: author.trim(), depth, direction: "free" }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.result) {
-        setErrorMessage(data.error || "발제를 만들지 못했습니다.");
+        setErrorMessage(data.error || "발제를 만들지 못했습니다. 잠시 후 다시 시도해주세요.");
         setStatus("error");
         return;
       }
       setResult(data.result);
       setStatus("done");
-
       if (variant === "landing") {
-        window.sessionStorage.setItem(
-          HANDOFF_KEY,
-          JSON.stringify({ title: title.trim(), author: author.trim(), depth, result: data.result })
-        );
+        sessionStorage.setItem(HANDOFF_KEY, JSON.stringify({ title: title.trim(), author: author.trim(), depth, result: data.result }));
       }
     } catch {
-      setErrorMessage("네트워크 오류로 발제를 만들지 못했습니다.");
+      setErrorMessage("연결이 잠시 불안정합니다. 입력 내용은 그대로 두었습니다. 다시 눌러주세요.");
       setStatus("error");
     }
   }
 
   function reset() {
-    setTitle("");
-    setAuthor("");
-    setDepth("general");
-    setResult(null);
-    setStatus("idle");
-    setErrorMessage("");
-  }
-
-  function edit() {
-    setResult(null);
-    setStatus("idle");
-    setErrorMessage("");
+    setTitle(""); setAuthor(""); setDepth("general"); setResult(null); setStatus("idle"); setErrorMessage("");
   }
 
   function copyAll() {
     if (!result) return;
-    const sources = result.background.sources
-      .map((source) => "- " + source.title + ": " + source.url)
-      .join("\n");
-    const questionsText = result.questions
-      .map((question) =>
-        question.number + ". " +
-        (question.background_linked ? "[숨은 배경] " : "") +
-        question.question +
-        (question.followup ? "\n   ↳ " + question.followup : "")
-      )
-      .join("\n\n");
+    const sources = result.background.sources.map((source) => "- " + source.title + ": " + source.url).join("\n");
+    const questions = result.questions.map((q) =>
+      q.number + ". " + (q.background_linked ? "[숨은 배경] " : "") + q.question + (q.followup ? "\n   ↳ " + q.followup : "")
+    ).join("\n\n");
     const text = [
       "『" + result.evidence.title + "』 · " + result.evidence.authors.join(", "),
-      "",
-      "[숨은 배경]",
-      result.background.fact,
-      result.background.whyItMatters,
-      "",
-      "[확인 출처]",
-      sources,
-      "",
-      "[발제]",
-      questionsText,
+      "", "[책의 숨은 배경]", result.background.fact, result.background.whyItMatters,
+      "", "[확인 출처]", sources, "", "[발제]", questions,
     ].join("\n");
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
+      setTimeout(() => setCopied(false), 1800);
     }).catch(() => {});
   }
 
@@ -222,62 +125,38 @@ export default function DiscussionGenerator({ variant }: DiscussionGeneratorProp
 
   return (
     <div className={"dg dg--" + variant}>
-      <div className="dg-machine">
-        <div className="dg-device-top" aria-hidden="true">
-          <span className="dg-slot-line" />
-          <span className="dg-device-label">QSAPIENS · QUESTION MACHINE</span>
-          <span className="dg-status-dot" />
-        </div>
+      <section className="dg-machine" aria-label="북토크 발제 생성기">
+        <header className="dg-machine-head">
+          <div>
+            <span>QUESTION MAKER</span>
+            <h3>발제 생성기</h3>
+          </div>
+          <button type="button" className="dg-reset" onClick={reset}>처음부터</button>
+        </header>
 
         <div className="dg-screen">
-          <div className="dg-screen-meta">
-            <span>BOOK TALK</span>
-            <span>{status === "loading" ? "DATA CHECKING…" : "READY"}</span>
-          </div>
-          <p className="dg-screen-slogan">
-            북토크의 완성은<br />
-            <strong>좋은 질문.</strong>
-          </p>
-
-          <div className="dg-display-fields">
+          <p>북토크의 완성은 <strong>좋은 질문</strong></p>
+          <div className="dg-fields">
             <label>
-              <span>BOOK</span>
-              <input
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                placeholder="책 제목"
-                maxLength={120}
-                autoComplete="off"
-              />
+              <span>책 제목</span>
+              <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="예: 참을 수 없는 존재의 가벼움" maxLength={120} />
             </label>
             <label>
-              <span>AUTHOR</span>
-              <input
-                value={author}
-                onChange={(event) => setAuthor(event.target.value)}
-                placeholder="저자"
-                maxLength={80}
-                autoComplete="off"
-              />
+              <span>저자</span>
+              <input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="예: 밀란 쿤데라" maxLength={80} />
             </label>
           </div>
         </div>
 
-        <div className="dg-keypad">
-          <div className="dg-keypad-head">
-            <span>DIFFICULTY</span>
-            <button type="button" className="dg-ac-key" onClick={reset}>AC</button>
+        <div className="dg-controls">
+          <div className="dg-control-label">
+            <strong>난이도</strong>
+            <span>모임의 분위기에 맞춰 고르세요.</span>
           </div>
-
           <div className="dg-depth-grid" role="group" aria-label="발제 난이도">
             {DEPTHS.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                className={"dg-key " + (depth === item.value ? "is-active" : "")}
-                onClick={() => setDepth(item.value)}
-                aria-pressed={depth === item.value}
-              >
+              <button key={item.value} type="button" className={"dg-key " + (depth === item.value ? "is-active" : "")}
+                onClick={() => setDepth(item.value)} aria-pressed={depth === item.value}>
                 <span className="dg-key-num">{item.number}</span>
                 <strong>{item.label}</strong>
                 <small>{item.sub}</small>
@@ -285,140 +164,77 @@ export default function DiscussionGenerator({ variant }: DiscussionGeneratorProp
             ))}
           </div>
 
-          <button
-            type="button"
-            className="dg-enter-key"
-            disabled={!valid || status === "loading"}
-            onClick={() => void generate()}
-          >
-            <span>{status === "loading" ? "도서 데이터 확인 중…" : "발제 생성"}</span>
+          <button type="button" className="dg-enter" disabled={!valid || status === "loading"} onClick={() => void generate()}>
+            <span>{status === "loading" ? "책을 확인하고 질문을 만들고 있어요…" : "좋은 질문 10개 만들기"}</span>
             <small>ENTER</small>
           </button>
 
           {status === "loading" && (
-            <div className="dg-process" role="status">
-              <span>01 BOOK DATA</span>
-              <i />
-              <span>02 BACKGROUND</span>
-              <i />
-              <span>03 FACT CHECK</span>
-              <i />
-              <span>04 QUESTIONS</span>
+            <div className="dg-progress" role="status">
+              <span>책 확인</span><i /><span>숨은 배경 조사</span><i /><span>팩트체크</span><i /><span>질문 설계</span>
             </div>
           )}
-          {status === "error" && <p className="dg-error" role="alert">{errorMessage}</p>}
+
+          {status === "error" && (
+            <div className="dg-error" role="alert">
+              <strong>생성이 멈췄습니다.</strong>
+              <p>{errorMessage}</p>
+              <button type="button" onClick={() => void generate()} disabled={!valid}>같은 내용으로 다시 시도</button>
+            </div>
+          )}
         </div>
-      </div>
+      </section>
 
       {status === "done" && result && (
         <div className="dg-output">
-          <section className="dg-evidence" aria-labelledby="dg-evidence-title">
+          <section className="dg-evidence">
             <div className="dg-output-head">
-              <div>
-                <span className="dg-output-kicker">VERIFIED BOOK DATA</span>
-                <h3 id="dg-evidence-title">{result.evidence.title}</h3>
-                <p>{result.evidence.authors.join(", ")}</p>
-              </div>
-              <span className={"dg-verify-badge is-" + result.evidence.confidence}>
-                {result.evidence.confidence === "high" ? "2중 대조" : "데이터 확인"}
-              </span>
+              <div><span>확인된 책</span><h3>{result.evidence.title}</h3><p>{result.evidence.authors.join(", ")}</p></div>
+              <span className="dg-verified">{result.evidence.confidence === "high" ? "2중 대조" : "서지 확인"}</span>
             </div>
-
             <dl className="dg-biblio">
               {result.evidence.publisher && <div><dt>출판사</dt><dd>{result.evidence.publisher}</dd></div>}
-              {(result.evidence.publishedDate || result.evidence.firstPublishYear) && (
-                <div><dt>출간</dt><dd>{result.evidence.publishedDate || String(result.evidence.firstPublishYear)}</dd></div>
-              )}
-              {(result.evidence.isbn13 || result.evidence.isbn10) && (
-                <div><dt>ISBN</dt><dd>{result.evidence.isbn13 || result.evidence.isbn10}</dd></div>
-              )}
+              {(result.evidence.publishedDate || result.evidence.firstPublishYear) && <div><dt>출간</dt><dd>{result.evidence.publishedDate || result.evidence.firstPublishYear}</dd></div>}
+              {(result.evidence.isbn13 || result.evidence.isbn10) && <div><dt>ISBN</dt><dd>{result.evidence.isbn13 || result.evidence.isbn10}</dd></div>}
             </dl>
-
-            <div className="dg-source-links">
-              {result.evidence.sources.map((source) => (
-                <a key={source.provider} href={source.url} target="_blank" rel="noreferrer">
-                  {source.provider} ↗
-                </a>
-              ))}
-            </div>
-
-            <details className="dg-analysis">
-              <summary>데이터 기반 핵심 쟁점</summary>
-              <p>{result.analysis.core_argument}</p>
-              <div className="dg-concepts">
-                {result.analysis.key_concepts.map((concept) => <span key={concept}>{concept}</span>)}
-              </div>
-            </details>
           </section>
 
-          <section className="dg-background" aria-labelledby="dg-background-title">
+          <section className="dg-background">
             <div className="dg-output-head">
-              <div>
-                <span className="dg-output-kicker">HIDDEN CONTEXT · FACT CHECKED</span>
-                <h3 id="dg-background-title">책의 숨은 배경</h3>
-              </div>
-              <span className={"dg-background-badge " + (result.background.confidence === "cross_checked" ? "is-cross" : "")}>
-                {result.background.confidence === "cross_checked" ? "교차 검증" : "서지 교차 확인"}
+              <div><span>FACT-CHECKED CONTEXT</span><h3>책의 숨은 배경</h3></div>
+              <span className="dg-verified">
+                {result.background.confidence === "cross_checked" ? "교차 검증" : result.background.confidence === "bibliographic_cross_check" ? "서지 교차 확인" : "출처 확인"}
               </span>
             </div>
-
             <p className="dg-background-fact">{result.background.fact}</p>
             <p className="dg-background-why">{result.background.whyItMatters}</p>
-
             <div className="dg-source-links">
-              {result.background.sources.map((source) => (
-                <a key={source.url} href={source.url} target="_blank" rel="noreferrer">
-                  {source.title} ↗
-                </a>
-              ))}
+              {result.background.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>)}
             </div>
-
-            <div className="dg-background-seed">
-              <span>이 배경에서 시작하는 질문</span>
-              <p>{result.background.questionSeed}</p>
-            </div>
+            <div className="dg-background-seed"><span>이 배경에서 시작하는 질문</span><p>{result.background.questionSeed}</p></div>
           </section>
 
-          <section className="dg-questions" aria-labelledby="dg-questions-title">
+          <section className="dg-questions">
             <div className="dg-output-head">
-              <div>
-                <span className="dg-output-kicker">QUESTION SET</span>
-                <h3 id="dg-questions-title">좋은 질문</h3>
-              </div>
+              <div><span>10 QUESTIONS</span><h3>이 책에서만 나올 수 있는 질문</h3></div>
               <div className="dg-output-actions">
-                <button type="button" onClick={copyAll}>
-                  {copied ? <Check size={14} /> : <Copy size={14} />}
-                  {copied ? "복사됨" : "전체 복사"}
-                </button>
-                <button type="button" onClick={() => void generate()}><RefreshCw size={14} /> 다시 생성</button>
-                <button type="button" onClick={edit}><Pencil size={14} /> 수정</button>
+                <button type="button" onClick={copyAll}>{copied ? <Check size={14}/> : <Copy size={14}/>} {copied ? "복사됨" : "전체 복사"}</button>
+                <button type="button" onClick={() => void generate()}><RefreshCw size={14}/> 다시 만들기</button>
               </div>
             </div>
-
             <ol className="dg-question-list">
-              {(questions || []).map((question) => (
-                <li key={question.number}>
-                  <span className="dg-question-num">{String(question.number).padStart(2, "0")}</span>
+              {(questions || []).map((q) => (
+                <li key={q.number} className={q.background_linked ? "is-background" : ""}>
+                  <span className="dg-question-num">{String(q.number).padStart(2, "0")}</span>
                   <div>
-                    <small>{STAGE_LABEL[question.stage]}{question.thinker ? " · " + question.thinker : ""}{question.background_linked ? " · 숨은 배경" : ""}</small>
-                    <p>{question.question}</p>
-                    {variant === "giants" && question.followup && <span className="dg-followup">↳ {question.followup}</span>}
+                    <small>{STAGE_LABEL[q.stage]}{q.thinker ? " · " + q.thinker : ""}{q.background_linked ? " · 숨은 배경" : ""}</small>
+                    <p>{q.question}</p>
+                    {variant === "giants" && q.followup && <span className="dg-followup">↳ {q.followup}</span>}
                   </div>
                 </li>
               ))}
             </ol>
-
-            {variant === "landing" && (
-              <a className="dg-full-link" href="/giants?handoff=1">발제 10개 전체 보기 →</a>
-            )}
-
-            {variant === "giants" && result.giants.length > 0 && (
-              <div className="dg-giants-used">
-                {result.giants.map((giant) => (
-                  <span key={giant.slug}>{giant.name} · {giant.stance === "support" ? "지지 관점" : "비판 관점"}</span>
-                ))}
-              </div>
-            )}
+            {variant === "landing" && <a className="dg-full-link" href="/giants?handoff=1">10개 질문 전체 보기 →</a>}
           </section>
         </div>
       )}
