@@ -12,6 +12,7 @@ import {
   toggleTodayLandingQuestion,
 } from "@/lib/actions/landing-questions";
 import { toast } from "sonner";
+import nonhome from "../nonhome-v2.module.css";
 
 // ── 고정 UUID (DB 시드와 동일) ────────────────────────────────────────────
 const IDS = {
@@ -215,7 +216,7 @@ export default function QuestionsClient({
   };
 
   return (
-    <div style={{ background: "var(--bg)", overflowX: "hidden" }}>
+    <div className={nonhome.page} style={{ background: "var(--bg)", overflowX: "hidden" }}>
 
       {/* ── Page Header ── */}
       <section style={{

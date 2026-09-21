@@ -1,0 +1,45 @@
+.page {
+  --bg: #FBFAF7;
+  --bg-soft: #F2E7D8;
+  --ink: #173B75;
+  --ink-soft: #3E4758;
+  --muted: #746E67;
+  --muted-2: #9A8F82;
+  --line: #D7D2CA;
+  --line-soft: #E8E3DB;
+  --accent: #6C63D9;
+  --gold: #C79B67;
+  --cream-on-dark: #FFFFFF;
+  --bg-navy: #173B75;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.page :global(.grid-responsive) {
+  grid-template-columns: minmax(0, 1fr) !important;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.page :global(.q-search-row) {
+  max-width: 760px !important;
+}
+
+.page button,
+.page input,
+.page textarea,
+.page select {
+  border-radius: 0 !important;
+}
+
+.page a {
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .page :global(.q-search-row) {
+    align-items: stretch !important;
+    flex-direction: column;
+  }
+}

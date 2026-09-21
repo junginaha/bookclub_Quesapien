@@ -6,6 +6,7 @@ import MyPageClient from "./MyPageClient";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile, getMyReviews, getMySessions } from "@/lib/supabase/queries";
 import { buildMetadata } from "@/lib/metadata";
+import nonhome from "../nonhome-v2.module.css";
 
 export const metadata: Metadata = buildMetadata({
   title: "마이페이지",
@@ -65,7 +66,7 @@ export default async function MyPage() {
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className={`${nonhome.page} min-h-screen flex flex-col`}>
       <Header />
       <main className="flex-1">
         <MyPageClient
