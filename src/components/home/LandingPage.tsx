@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { createClient } from "@/lib/supabase/client";
 import type { UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
+import IntroSplash from "./IntroSplash";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import BookCoverGrid from "./BookCoverGrid";
 import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
@@ -630,6 +631,7 @@ interface LandingPageProps {
 
 // ─── Main component ───────────────────────────────────────────
 export default function LandingPage({ todayQuestion, recentQuestions, bookclubSessions = [] }: LandingPageProps) {
+  const [introMounted, setIntroMounted] = useState(true);
   const [modalBook, setModalBook] = useState<BookClub | null>(null);
   const [activeFloat, setActiveFloat] = useState<number | null>(null);
   const [askContent, setAskContent] = useState("");
@@ -778,6 +780,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
 
   return (
     <div className="lp">
+      {introMounted && <IntroSplash onEnter={() => setIntroMounted(false)} />}
       <div className="lp-grain" aria-hidden="true" />
       <div className="lp-grain-light" aria-hidden="true" />
 
@@ -835,10 +838,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
         </div>
       </nav>
 
-      {/* 일정 + 위치를 첫 기능으로 전면 배치 */}
-      <HomeCalendarLocationHub sessions={bookclubSessions} />
-
-      {/* HERO — 브랜드 설명은 예약 도구 다음으로 배치 */}
+      {/* HERO */}
       <section className="lp-hero" id="top">
         <div className="lp-hero-inner">
           <div className="lp-hero-meta">
@@ -891,6 +891,9 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
           </button>
         </div>
       </section>
+
+      {/* 메인 헤더 직후: 일정 + 위치 웹앱 */}
+      <HomeCalendarLocationHub sessions={bookclubSessions} />
 
       {howToOpen && (
         <div id="how-it-works-panel" className="lp-flat-scope" style={{ padding: "24px var(--lp-gutter) 32px" }}>
