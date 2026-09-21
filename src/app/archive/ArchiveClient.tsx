@@ -8,6 +8,7 @@ import { BookOpen, MessageSquare, FileText, Calendar, Heart } from "lucide-react
 import { formatDate } from "@/lib/utils";
 import AISummaryBlock from "@/components/seo/AISummaryBlock";
 import AIReviewSummary from "@/components/archive/AIReviewSummary";
+import nonhome from "../nonhome-v2.module.css";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Review = any;
@@ -145,7 +146,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
   ];
 
   return (
-    <div style={{ background: "var(--bg)" }}>
+    <div className={nonhome.page} style={{ background: "var(--bg)" }}>
 
       {/* ── Hero ── */}
       <section style={{
