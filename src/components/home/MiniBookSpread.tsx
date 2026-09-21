@@ -17,8 +17,11 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
     const aPast = getStatus(a) === "past";
     const bPast = getStatus(b) === "past";
     if (aPast !== bPast) return aPast ? 1 : -1;
-    return aPast ? Date.parse(b.startsAt) - Date.parse(a.startsAt) : Date.parse(a.startsAt) - Date.parse(b.startsAt);
+    return aPast
+      ? Date.parse(b.startsAt) - Date.parse(a.startsAt)
+      : Date.parse(a.startsAt) - Date.parse(b.startsAt);
   });
+
   for (const session of ordered) {
     const key = session.bookTitle + "\u0000" + session.author;
     if (!unique.has(key)) unique.set(key, session);
@@ -41,9 +44,18 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
           {[...unique.values()].map((session, index) => {
             const scene = SCENES[index];
             return (
-              <Link className={styles.bookLink} href={"/bookclub/" + session.slug} key={session.slug}>
+              <Link
+                className={styles.bookLink}
+                href={"/bookclub/" + session.slug}
+                key={session.slug}
+                aria-label={session.bookTitle + " 북클럽 상세 보기"}
+              >
                 <span className={styles.coverVisual}>
-                  <BookCoverImage title={session.bookTitle} author={session.author} fallbackClassName={styles.coverFallback} />
+                  <BookCoverImage
+                    title={session.bookTitle}
+                    author={session.author}
+                    fallbackClassName={styles.coverFallback}
+                  />
                   {scene && (
                     <span className={styles.coverScene} aria-hidden="true">
                       <img src={scene} alt="" loading="lazy" />
@@ -53,19 +65,11 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
                 <span className={styles.coverMeta}>
                   <strong>{session.bookTitle}</strong>
                   <small>{session.author}</small>
-                  <small>{formatMonthDay(session.startsAt)} · {getStatus(session) === "past" ? "지난 모임" : session.venue.name}</small>
+                  <small>
+                    {formatMonthDay(session.startsAt)} · {getStatus(session) === "past" ? "지난 모임" : session.venue.name}
+                  </small>
                 </span>
               </Link>
-            );
-          })}
-        </div>
-                )}
-                {session.leadQuestion && <p className={styles.bookQuestion}>{session.leadQuestion}</p>}
-                <p className={styles.bookSummary}>{session.summary.split("\n").filter(Boolean).slice(0, 2).join(" ")}</p>
-                <p className={styles.bookDate}>{formatMonthDay(session.startsAt)} · {getStatus(session) === "past" ? "지난 대화" : session.venue.name}</p>
-                <Link className={styles.secondary} href={"/bookclub/" + session.slug}>모임 자세히 보기</Link>
-              </div>
-            </details>
             );
           })}
         </div>
