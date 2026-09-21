@@ -35,6 +35,21 @@ interface BookEvidence {
   sources: EvidenceSource[];
 }
 
+interface BackgroundSource {
+  title: string;
+  url: string;
+  domain: string;
+}
+
+interface BookBackground {
+  fact: string;
+  category: string;
+  whyItMatters: string;
+  questionSeed: string;
+  confidence: "cross_checked" | "bibliographic_cross_check";
+  sources: BackgroundSource[];
+}
+
 interface DiscussionQuestion {
   number: number;
   stage: "opening" | "deep" | "giant" | "closing";
@@ -43,6 +58,7 @@ interface DiscussionQuestion {
   followup: string;
   concept: string;
   thinker?: string;
+  background_linked?: boolean;
 }
 
 interface GiantUsed {
@@ -54,6 +70,7 @@ interface GiantUsed {
 
 interface DiscussionResult {
   evidence: BookEvidence;
+  background: BookBackground;
   analysis: {
     confirmed_title: string;
     confirmed_author: string;
@@ -261,9 +278,11 @@ export default function DiscussionGenerator({ variant }: DiscussionGeneratorProp
             <div className="dg-process" role="status">
               <span>01 BOOK DATA</span>
               <i />
-              <span>02 FACT CHECK</span>
+              <span>02 BACKGROUND</span>
               <i />
-              <span>03 QUESTIONS</span>
+              <span>03 FACT CHECK</span>
+              <i />
+              <span>04 QUESTIONS</span>
             </div>
           )}
           {status === "error" && <p className="dg-error" role="alert">{errorMessage}</p>}
@@ -311,6 +330,34 @@ export default function DiscussionGenerator({ variant }: DiscussionGeneratorProp
             </details>
           </section>
 
+          <section className="dg-background" aria-labelledby="dg-background-title">
+            <div className="dg-output-head">
+              <div>
+                <span className="dg-output-kicker">HIDDEN CONTEXT · FACT CHECKED</span>
+                <h3 id="dg-background-title">책의 숨은 배경</h3>
+              </div>
+              <span className={"dg-background-badge " + (result.background.confidence === "cross_checked" ? "is-cross" : "")}>
+                {result.background.confidence === "cross_checked" ? "교차 검증" : "서지 교차 확인"}
+              </span>
+            </div>
+
+            <p className="dg-background-fact">{result.background.fact}</p>
+            <p className="dg-background-why">{result.background.whyItMatters}</p>
+
+            <div className="dg-source-links">
+              {result.background.sources.map((source) => (
+                <a key={source.url} href={source.url} target="_blank" rel="noreferrer">
+                  {source.title} ↗
+                </a>
+              ))}
+            </div>
+
+            <div className="dg-background-seed">
+              <span>이 배경에서 시작하는 질문</span>
+              <p>{result.background.questionSeed}</p>
+            </div>
+          </section>
+
           <section className="dg-questions" aria-labelledby="dg-questions-title">
             <div className="dg-output-head">
               <div>
@@ -332,7 +379,7 @@ export default function DiscussionGenerator({ variant }: DiscussionGeneratorProp
                 <li key={question.number}>
                   <span className="dg-question-num">{String(question.number).padStart(2, "0")}</span>
                   <div>
-                    <small>{STAGE_LABEL[question.stage]}{question.thinker ? " · " + question.thinker : ""}</small>
+                    <small>{STAGE_LABEL[question.stage]}{question.thinker ? " · " + question.thinker : ""}{question.background_linked ? " · 숨은 배경" : ""}</small>
                     <p>{question.question}</p>
                     {variant === "giants" && question.followup && <span className="dg-followup">↳ {question.followup}</span>}
                   </div>
