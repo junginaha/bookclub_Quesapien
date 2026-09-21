@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { createClient } from "@/lib/supabase/client";
 import type { UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
-import IntroSplash from "./IntroSplash";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import BookCoverGrid from "./BookCoverGrid";
 import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
@@ -780,7 +779,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
 
   return (
     <div className="lp">
-      {introMounted && <IntroSplash onEnter={() => setIntroMounted(false)} />}
       <div className="lp-grain" aria-hidden="true" />
       <div className="lp-grain-light" aria-hidden="true" />
 
@@ -892,53 +890,8 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
         </div>
       </section>
 
-      {/* 메인 헤더 직후: 일정 + 위치 웹앱 */}
+      {/* 캘린더 + 위치 — 메인 헤더 바로 다음 핵심 웹앱 */}
       <HomeCalendarLocationHub sessions={bookclubSessions} />
-
-      {howToOpen && (
-        <div id="how-it-works-panel" className="lp-flat-scope" style={{ padding: "24px var(--lp-gutter) 32px" }}>
-          <h2 className="lp-h-section" style={{ textAlign: "center" }}>참여는 세 걸음이면 돼요</h2>
-          <div className="lp-steps-grid" style={{ marginTop: 40 }}>
-            {[
-              { n: "1", title: "신청해요.", body: "책을 보고 신청하세요." },
-              { n: "2", title: "질문 하나를 보내요.", body: "모임 전, 질문 카드가 도착해요.\n답으로 당신의 질문 하나를\n적어 보내주세요.\n한 줄이면 충분해요." },
-              { n: "3", title: "모임 오세요.", body: "발제는 저희가 준비합니다.\n당신은 책과 질문 하나만\n들고 오시면 돼요." },
-            ].map((step) => (
-              <div key={step.n} className="lp-step">
-                <HoverReveal
-                  summary={
-                    <>
-                      <div className="lp-step-num">{step.n}</div>
-                      <div className="lp-step-title">{step.title}</div>
-                    </>
-                  }
-                  detail={<div className="lp-step-body">{step.body}</div>}
-                />
-              </div>
-            ))}
-          </div>
-          <p style={{
-            maxWidth: 640, margin: "32px auto 0", textAlign: "center",
-            fontSize: 14.5, color: "var(--muted)", lineHeight: 1.85,
-          }}>
-            혼자 오셔도 됩니다. 대부분 혼자 와요.<br />
-            처음이셔도 됩니다. 모두에게 처음이 있었어요.<br />
-            다 읽고 오시면 대화가 깊어지고, 문장 하나만 품고 오셔도 충분합니다.
-          </p>
-          <p style={{
-            marginTop: 20, textAlign: "center",
-            fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-            fontSize: 17, fontWeight: 600, color: "var(--lp-accent, var(--accent))",
-          }}>
-            북클럽에 나가면, 기분이 좋아져요!
-          </p>
-          <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
-            <a href="/bookclub" className="lp-underline-cta" style={{ fontSize: 15 }}>
-              참여하기 →
-            </a>
-          </div>
-        </div>
-      )}
 
       {/* ③ BOOKLOVER */}
       <section className="lp-section lp-books" id="books">
@@ -958,8 +911,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
             </p>
             <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px", marginTop: "2px" }}>
               <span>기록합니다.</span>
-              {/* 위치 기반 근처 북클럽 — 문장 옆에 나란히 배치, 절대 줄바꿈되지 않음 */}
-              <NearbyClubsBanner books={dbBooks.length >= books.length ? dbBooks : books} onOpen={(b) => setModalBook(b)} />
             </div>
           </div>
         </div>
@@ -975,6 +926,8 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
             <a href="/bookclub" className="lp-underline-cta">북클럽 전체 일정 보기 →</a>
           </div>
         </div>
+
+        <MiniBookSpread sessions={bookclubSessions} />
       </section>
 
       {/* ④ ARCHIVING — 후기 섹션 */}
@@ -1034,99 +987,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
         <ArchiveReviewForm />
       </section>
 
-      {/* ⑤ 오늘의 질문 */}
-      <section className="lp-section lp-question-hub" id="today-q" style={{ background: "var(--lp-bg-soft)" }}>
-        <div className="lp-section-head">
-          <div className="lp-left">
-            <a href="/questions" className="lp-eyebrow lp-section-title-link">QSAPIENS · QUESTIONS — 오늘의 질문</a>
-            <a href="/questions" className="lp-section-title-link" style={{ textDecoration: "none" }}>
-              <h2 className="lp-h-section">
-                하루에 한 번,<br />
-                <span className="lp-em">마음을 흔드는</span> 질문
-              </h2>
-            </a>
-          </div>
-          <p className="lp-lede">
-            답하지 않아도 괜찮아요. 잠시 머물러 주세요.<br />
-            <a href="/questions" style={{ fontSize: 13, color: "var(--lp-accent)", fontFamily: "var(--lp-serif)", letterSpacing: "0.04em", opacity: 0.8 }}>
-              전체 질문 보기 →
-            </a>
-          </p>
-        </div>
-
-        <div className="lp-q-grid">
-          <article className="lp-q-feature lp-reveal">
-            <div className="lp-q-marker">
-              <span className="qm-pulse" /> Today
-            </div>
-            <p className="lp-q-text">
-              {todayQuestion?.content ?? "당신이 요즘\n지키고 있는 것은 무엇인가요?"}
-            </p>
-            <div className="lp-q-meta">
-              <span>
-                <strong>{todayQuestion?.answers_count ?? "72"}</strong> 답변
-              </span>
-            </div>
-            <div className="lp-q-comments">
-              <div className="qc-label">In the margins · 답변 미리보기</div>
-              <div className="qc-row">
-                <span className="qc-who">서연 ―</span>
-                <span className="qc-what">&ldquo;아버지 장례식 끝나고 지하철에서. 그게 마지막이었던 것 같아요.&rdquo;</span>
-              </div>
-              <div className="qc-row">
-                <span className="qc-who">현우 ―</span>
-                <span className="qc-what">&ldquo;운 적은 많은데, 진심으로 운 적은 기억이 잘 안 나요.&rdquo;</span>
-              </div>
-              <div className="qc-row">
-                <span className="qc-who">민지 ―</span>
-                <span className="qc-what">&ldquo;오늘 새벽이요. 이유는 모르겠어요.&rdquo;</span>
-              </div>
-            </div>
-            <a
-              href={todayQuestion?.id ? `/questions/${todayQuestion.id}` : "/questions"}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: "var(--lp-sp3)", fontFamily: "var(--lp-serif)", fontSize: 13, letterSpacing: "0.04em", color: "var(--lp-accent)", textDecoration: "none", opacity: 0.85, transition: "opacity .2s ease" }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.85")}
-            >
-              <span>대화 전체 보기 · {todayQuestion?.answers_count ?? 72}개 답변</span>
-              <span style={{ letterSpacing: 0 }}>→</span>
-            </a>
-          </article>
-
-          <div className="lp-q-card-stack">
-            {(recentQuestions && recentQuestions.length >= 3
-              ? recentQuestions.slice(0, 3)
-              : [
-                  { id: "s1", content: "인간은 왜 외로운가요?", likes: 842, answers_count: 56, author_name: "" },
-                  { id: "s2", content: "AI 시대에도 사랑은 여전히 중요할까요?", likes: 1103, answers_count: 91, author_name: "" },
-                  { id: "s3", content: "당신을 살게 만든 한 문장은 무엇인가요?", likes: 2071, answers_count: 143, author_name: "" },
-                ]
-            ).map((c, idx) => (
-              <a
-                key={c.id ?? idx}
-                href={c.id && !c.id.startsWith("s") ? `/questions/${c.id}` : "/questions"}
-                style={{ textDecoration: "none", display: "block" }}
-              >
-                <article className="lp-q-card lp-reveal">
-                  <span className="qcard-num">No. {String(100 - idx).padStart(3, "0")}</span>
-                  <p className="qcard-q">{c.content}</p>
-                  <div className="qcard-foot">
-                    <span className="qf-nums">
-                      <span><b>{c.answers_count}</b> 답변</span>
-                    </span>
-                    <span style={{ fontSize: 12, color: "var(--lp-accent)", opacity: 0.7 }}>→</span>
-                  </div>
-                </article>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-      {/* 하단 소형 인터랙티브 북 펼침 */}
-      <MiniBookSpread sessions={bookclubSessions} />
-
       {/* ⑥ AT HEART — 통합 하단 섹션 */}
       <section className="lp-final lp-giants-final" id="final">
         {/* AT HEART 상단 */}
@@ -1161,41 +1021,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
 
         <DiscussionGenerator variant="landing" />
       </section>
-
-      {/* ── 실시간 활동 알림 뱃지 ── */}
-      {realtimeVisible && (newQuestions > 0 || newAnswers > 0) && (
-        <div
-          style={{
-            position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
-            zIndex: 300, display: "flex", alignItems: "center", gap: 10,
-            padding: "10px 20px", borderRadius: 9999,
-            background: "rgba(20,24,31,0.92)",
-            backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
-            border: "1px solid rgba(176,138,74,0.35)",
-            boxShadow: "0 8px 32px -8px rgba(0,0,0,0.5), 0 0 20px -8px rgba(176,138,74,0.3)",
-            animation: "lp-fade .4s ease",
-            cursor: "pointer",
-          }}
-          onClick={() => { setRealtimeVisible(false); setNewQuestions(0); setNewAnswers(0); }}
-          title="클릭하여 닫기"
-        >
-          {/* 라이브 도트 */}
-          <span style={{ position: "relative", display: "inline-flex", width: 8, height: 8 }}>
-            <span style={{
-              position: "absolute", inset: 0, borderRadius: "50%",
-              background: "#B08A4A",
-              animation: "lp-pulse 1.8s ease-out infinite",
-            }} />
-            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#B08A4A", display: "block" }} />
-          </span>
-          <span style={{ fontSize: 13, fontFamily: "var(--lp-serif-ko)", color: "rgba(236,227,207,0.9)", whiteSpace: "nowrap", letterSpacing: "-0.005em" }}>
-            {newQuestions > 0 && <><strong style={{ color: "#DDBE85" }}>새 질문 +{newQuestions}</strong></>}
-            {newQuestions > 0 && newAnswers > 0 && <span style={{ color: "rgba(236,227,207,0.4)", margin: "0 6px" }}>·</span>}
-            {newAnswers > 0 && <><strong style={{ color: "#DDBE85" }}>새 답변 +{newAnswers}</strong></>}
-          </span>
-          <span style={{ fontSize: 11, color: "rgba(236,227,207,0.3)", marginLeft: 2 }}>방금 업데이트</span>
-        </div>
-      )}
 
       {/* FOOTER */}
       <footer className="lp-footer">
