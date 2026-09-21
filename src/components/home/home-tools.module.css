@@ -261,3 +261,50 @@
   .book[open] .bookPages,
   .bookScene img { animation: none; transition: none; }
 }
+
+/* Chose Commune interaction: content enlarges on hover/touch, click enters its full page. */
+.bookLink {
+  display: block;
+  max-width: 280px;
+  color: inherit;
+  text-decoration: none;
+  perspective: 900px;
+}
+.bookLink .coverVisual {
+  position: relative;
+  isolation: isolate;
+  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease;
+}
+.coverScene {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  overflow: hidden;
+  background: #e9e0d3;
+  transition: opacity .24s ease;
+}
+.coverScene img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(.94) contrast(.97) brightness(1.04);
+  transform: scale(1.025);
+  transition: transform .4s cubic-bezier(.2,.8,.2,1);
+}
+.bookLink:hover .coverVisual,
+.bookLink:focus-visible .coverVisual {
+  transform: translateY(-7px) scale(1.035);
+  box-shadow: 0 24px 42px -25px rgba(49,38,28,.72), 8px 9px 0 -4px #d7c7b0;
+}
+.bookLink:hover .coverScene,
+.bookLink:focus-visible .coverScene { opacity: .96; }
+.bookLink:hover .coverScene img,
+.bookLink:focus-visible .coverScene img { transform: scale(1.06); }
+.bookLink:focus-visible { outline: 2px solid #8b735c; outline-offset: 5px; }
+@media (hover:none) {
+  .bookLink:active .coverVisual { transform: scale(1.025); }
+  .bookLink:active .coverScene { opacity: .96; }
+}
+@media (max-width:720px) { .bookLink { max-width:none; } }
