@@ -164,7 +164,7 @@ interface RawGenResult {
   facilitator_notes: string;
 }
 
-function buildGenerationSystemPrompt(analysis: BookAnalysis, direction: Direction, depth: Depth): string {
+function buildGenerationSystemPrompt(evidence: BookEvidence, analysis: BookAnalysis, direction: Direction, depth: Depth): string {
   const roster = GIANT_PERSPECTIVES.map(
     (g) => `- ${g.name} (${g.slug}): 핵심개념 [${g.core_concepts.join(", ")}] — ${g.summary}`
   ).join("\n");
@@ -194,7 +194,7 @@ ${roster}
 - 10개 질문은 역할이 겹치지 않아야 합니다: 대화 시작(2) → 심화(5) → 거인의 시선(2) → 마무리(1).
 - 관점은 개인적 경험 / 사회적 함의 / 윤리적 딜레마 / 비판적 반론 / 실천적 적용 중 서로 다른 각도로 분산하세요.
 - "거인의 시선" 질문 2개는 선택한 두 사상가 각각의 핵심 개념을 실제로 적용해 만드세요. 인물 이름을 나열만 하지 말고 그 사유 방식이 질문 문장 안에 자연스럽게 녹아들게 하세요. 각 항목에 반드시 "thinker" 필드로 선택한 사상가 이름을 넣으세요.
-- 확인되지 않은 줄거리·인물·사건·인용을 지어내지 마세요. 직접 인용(따옴표)은 만들지 마세요.
+- 확인되지 않은 줄거리·인물·사건·장·페이지·인용을 지어내지 마세요. 직접 인용은 만들지 마세요.\n- 질문에 들어가는 구체적 사실은 [검증된 도서 데이터]에서 확인 가능한 범위를 넘지 마세요.
 - opening_lines는 진행자가 책의 문제의식을 참가자에게 소개하는 짧은 멘트 3문장입니다.
 - facilitator_notes는 진행 시 주의할 점 1~2문장입니다.
 - 모든 텍스트는 한국어 존댓말로 작성하세요.
@@ -209,12 +209,12 @@ export async function generateDiscussion(
   direction: Direction = "free",
   depth: Depth = "general"
 ): Promise<{ giants: GiantUsed[]; opening_lines: string[]; questions: DiscussionQuestion[]; facilitator_notes: string }> {
-  const system = buildGenerationSystemPrompt(analysis, direction, depth);
+  const system = buildGenerationSystemPrompt(evidence, analysis, direction, depth);
   const text = await callClaudeGuarded({
     system,
     messages: [{ role: "user", content: "위 조건에 맞춰 발제문 JSON을 생성하세요." }],
     maxTokens: 2400,
-    temperature: 1,
+    temperature: depth === "deep" ? 0.65 : 0.55,
   });
 
   const raw = extractJson<RawGenResult>(text);
@@ -346,21 +346,33 @@ export async function regenerateFailedQuestions(
 export async function buildDiscussion(input: BookInput): Promise<DiscussionResult> {
   const direction = input.direction ?? "free";
   const depth = input.depth ?? "general";
+  const evidence = await resolveBookEvidence(input.title, input.author);
 
-  const analysis = await analyzeBook(input);
-
-  if (analysis.confidence === "low" && !input.description?.trim()) {
+  if (!evidence.verified) {
+    throw new DiscussionEngineError(
+      "book_not_verified",
+      "입력한 책과 저자를 외부 도서 데이터에서 확인하지 못했습니다."
+    );
+  }
+  if (!hasThematicEvidence(evidence) && !input.description?.trim()) {
     throw new DiscussionEngineError(
       "insufficient_description",
-      "이 책을 확실히 식별하지 못했습니다. 책 설명을 조금 더 추가해주세요."
+      "책은 확인했지만 발제에 쓸 설명·주제 데이터가 부족합니다."
     );
   }
 
-  const gen = await generateDiscussion(analysis, direction, depth);
+  const analysis = await analyzeBook(input, evidence);
+  const gen = await generateDiscussion(evidence, analysis, direction, depth);
   const failed = validateDiscussion(gen, analysis);
-  const questions = await regenerateFailedQuestions(analysis, gen.giants, direction, depth, gen.questions, failed);
+  const questions = await regenerateFailedQuestions(evidence, analysis, gen.giants, direction, depth, gen.questions, failed);
+
+  const secondFailed = validateDiscussion({ questions, giants: gen.giants }, analysis);
+  if (secondFailed.length > 2) {
+    throw new DiscussionEngineError("invalid_json", "근거에 맞는 질문 품질 기준을 통과하지 못했습니다.");
+  }
 
   return {
+    evidence,
     analysis,
     giants: gen.giants,
     opening_lines: gen.opening_lines,
