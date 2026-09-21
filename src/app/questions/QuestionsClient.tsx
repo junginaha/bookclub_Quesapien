@@ -6,6 +6,7 @@ import { PenLine, MessageSquare, ChevronRight, Search, Pencil, Trash2, Check, X,
 import { useAppStore } from "@/lib/store";
 import { isAdminEmail } from "@/lib/admin";
 import {
+import nonhome from "../nonhome-v2.module.css";
   updateLandingQuestionAction,
   deleteLandingQuestionAction,
   toggleFeaturedLandingQuestion,
@@ -215,7 +216,7 @@ export default function QuestionsClient({
   };
 
   return (
-    <div style={{ background: "var(--bg)", overflowX: "hidden" }}>
+    <div className={nonhome.page} style={{ background: "var(--bg)", overflowX: "hidden" }}>
 
       {/* ── Page Header ── */}
       <section style={{
