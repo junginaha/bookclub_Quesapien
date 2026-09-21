@@ -187,7 +187,7 @@ export default function DetailClient({
               ) : status === "full" ? (
                 <NotifyForm clubSlug={session.slug} mode="waitlist" />
               ) : (
-                <ApplyForm clubSlug={session.slug} />
+                <ApplyForm clubSlug={session.slug} fee={session.fee} productName={session.title} />
               )}
             </div>
           </ApplyPanel>
