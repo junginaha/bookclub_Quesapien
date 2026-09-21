@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { dateKey, feeLabel, formatMonthDay, formatTimeRange, formatWeekdayFull, getStatus } from "@/lib/bookclub/selectors";
@@ -32,6 +33,7 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
   sessions: BookClubSession[];
   headingLevel?: 1 | 2;
 }) {
+  const router = useRouter();
   const sorted = useMemo(() => [...sessions]
     .filter(s => Number.isFinite(Date.parse(s.startsAt)) && Number.isFinite(Date.parse(s.endsAt)))
     .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt)), [sessions]);
@@ -132,7 +134,20 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
                 && Math.abs(session.venue.lat) <= 90 && Math.abs(session.venue.lng) <= 180;
               const km = origin && canLocate ? straightLineKm(origin, session.venue) : null;
               const venueText = session.venue.address || session.venue.name;
-              return <article className={styles.meeting} key={session.slug}>
+              return <article
+                className={styles.meeting}
+                key={session.slug}
+                role="link"
+                tabIndex={0}
+                aria-label={session.bookTitle + " 북클럽 상세 보기"}
+                onClick={(event) => {
+                  if ((event.target as HTMLElement).closest("a,button")) return;
+                  router.push("/bookclub/" + session.slug);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") router.push("/bookclub/" + session.slug);
+                }}
+              >
                 <p className={styles.status}>{status === "past" ? "지난 모임" : status === "full" ? "정원 마감" : status === "closed" ? "신청 마감" : "모집 중"}</p>
                 <h3>{session.bookTitle}</h3>
                 <p className={styles.author}>{session.author}</p>
