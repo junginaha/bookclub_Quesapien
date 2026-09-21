@@ -1,253 +1,127 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { BookClubSession } from "@/lib/bookclub/types";
+import { dateKey, feeLabel, formatMonthDay, formatTimeRange, formatWeekdayFull, getStatus } from "@/lib/bookclub/selectors";
+import styles from "./home-tools.module.css";
 
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const pad = (value: number) => String(value).padStart(2, "0");
 
-function pad2(value: number) {
-  return String(value).padStart(2, "0");
+export function monthDays(year: number, month0: number): (number | null)[][] {
+  const offset = new Date(Date.UTC(year, month0, 1)).getUTCDay();
+  const count = new Date(Date.UTC(year, month0 + 1, 0)).getUTCDate();
+  const cells: (number | null)[] = Array(Math.ceil((offset + count) / 7) * 7).fill(null);
+  for (let day = 1; day <= count; day++) cells[offset + day - 1] = day;
+  return Array.from({ length: cells.length / 7 }, (_, i) => cells.slice(i * 7, i * 7 + 7));
 }
 
-function splitDateKey(key: string) {
-  const [year, month, day] = key.split("-").map(Number);
-  return { year, month0: month - 1, day };
+export function straightLineKm(from: { lat: number; lng: number }, to: { lat: number; lng: number }): number {
+  const rad = (value: number) => value * Math.PI / 180;
+  const a = Math.sin(rad(to.lat - from.lat) / 2) ** 2 + Math.cos(rad(from.lat)) * Math.cos(rad(to.lat)) * Math.sin(rad(to.lng - from.lng) / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(Math.min(1, Math.max(0, a))));
 }
 
-function dateKey(session: BookClubSession) {
-  return session.startsAt.slice(0, 10);
-}
-
-function monthCells(year: number, month0: number) {
-  const first = new Date(year, month0, 1).getDay();
-  const count = new Date(year, month0 + 1, 0).getDate();
-  return [
-    ...Array.from({ length: first }, () => null),
-    ...Array.from({ length: count }, (_, index) => index + 1),
-  ] as Array<number | null>;
-}
-
-function formatTime(iso: string) {
-  const [hh, mm] = iso.slice(11, 16).split(":").map(Number);
-  const label = hh < 12 ? "오전" : "오후";
-  return `${label} ${hh % 12 || 12}:${pad2(mm)}`;
-}
-
-function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
-  const rad = (n: number) => (n * Math.PI) / 180;
-  const earth = 6371;
-  const dLat = rad(lat2 - lat1);
-  const dLng = rad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return earth * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function isPast(session: BookClubSession) {
-  return new Date(session.endsAt).getTime() < Date.now();
-}
-
-function formatDistance(km: number) {
-  return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`;
-}
-
-export default function HomeCalendarLocationHub({ sessions }: { sessions: BookClubSession[] }) {
-  const sorted = useMemo(
-    () => [...sessions].sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
-    [sessions]
-  );
-
-  const upcoming = useMemo(() => sorted.filter((session) => !isPast(session)), [sorted]);
-  const firstSession = upcoming[0] ?? sorted[0] ?? null;
-  const firstKey = firstSession ? dateKey(firstSession) : "2026-10-01";
-  const firstParts = splitDateKey(firstKey);
-
-  const [year, setYear] = useState(firstParts.year);
-  const [month0, setMonth0] = useState(firstParts.month0);
-  const [selectedKey, setSelectedKey] = useState(firstKey);
-  const [distance, setDistance] = useState<number | null>(null);
-  const [locationState, setLocationState] =
-    useState<"idle" | "loading" | "ready" | "denied">("idle");
-
-  const sessionsByDate = useMemo(() => {
-    const map = new Map<string, BookClubSession[]>();
-    for (const session of sorted) {
-      const key = dateKey(session);
-      map.set(key, [...(map.get(key) ?? []), session]);
-    }
-    return map;
-  }, [sorted]);
-
-  const selectedSessions = sessionsByDate.get(selectedKey) ?? [];
-  const selected = selectedSessions[0] ?? firstSession;
-  const cells = monthCells(year, month0);
-
-  useEffect(() => {
-    setDistance(null);
-    setLocationState("idle");
-  }, [selectedKey]);
+export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: {
+  sessions: BookClubSession[];
+  headingLevel?: 1 | 2;
+}) {
+  const sorted = useMemo(() => [...sessions].filter(s => Number.isFinite(Date.parse(s.startsAt)) && Number.isFinite(Date.parse(s.endsAt))).sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt)), [sessions]);
+  const first = sorted.find(s => getStatus(s) !== "past") ?? sorted[sorted.length - 1];
+  const startKey = first ? dateKey(first.startsAt) : dateKey(new Date());
+  const [month, setMonth] = useState(startKey.slice(0, 7));
+  const [selection, setSelection] = useState(startKey);
+  const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locationMessage, setLocationMessage] = useState("");
+  const locatingRef = useRef(false);
+  const [year, monthNumber] = month.split("-").map(Number);
+  const inMonth = sorted.filter(s => dateKey(s.startsAt).startsWith(month));
+  const selectedKey = inMonth.some(s => dateKey(s.startsAt) === selection) ? selection : inMonth[0] ? dateKey(inMonth[0].startsAt) : "";
+  const selected = inMonth.filter(s => dateKey(s.startsAt) === selectedKey);
+  const eventDays = new Set(inMonth.map(s => dateKey(s.startsAt)));
+  const Heading = headingLevel === 1 ? "h1" : "h2";
 
   function moveMonth(delta: number) {
-    const next = new Date(year, month0 + delta, 1);
-    setYear(next.getFullYear());
-    setMonth0(next.getMonth());
+    const next = new Date(Date.UTC(year, monthNumber - 1 + delta, 1));
+    setMonth(`${next.getUTCFullYear()}-${pad(next.getUTCMonth() + 1)}`);
+    setSelection("");
   }
 
-  function selectDay(day: number) {
-    const key = `${year}-${pad2(month0 + 1)}-${pad2(day)}`;
-    if (sessionsByDate.has(key)) setSelectedKey(key);
+  function locate() {
+    if (locatingRef.current) return;
+    if (!navigator.geolocation) { setLocationMessage("위치를 사용할 수 없습니다. 장소 옆 지도를 이용해 주세요."); return; }
+    locatingRef.current = true;
+    setLocating(true);
+    setLocationMessage("");
+    // Coordinates stay in memory and are requested only after an explicit click.
+    navigator.geolocation.getCurrentPosition(position => {
+      setOrigin({ lat: position.coords.latitude, lng: position.coords.longitude });
+      locatingRef.current = false;
+      setLocating(false);
+    }, error => {
+      setLocationMessage(error.code === 1 ? "위치 권한이 꺼져 있습니다. 지도는 권한 없이 볼 수 있습니다." : "위치를 확인하지 못했습니다. 다시 시도해 주세요.");
+      locatingRef.current = false;
+      setLocating(false);
+    }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 });
   }
-
-  function detectLocation() {
-    if (!selected || !navigator.geolocation) {
-      setLocationState("denied");
-      return;
-    }
-    setLocationState("loading");
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const km = distanceKm(
-          position.coords.latitude,
-          position.coords.longitude,
-          selected.venue.lat,
-          selected.venue.lng
-        );
-        setDistance(km);
-        setLocationState("ready");
-      },
-      () => setLocationState("denied"),
-      { timeout: 7000, maximumAge: 300000 }
-    );
-  }
-
-  const selectedDate = splitDateKey(selectedKey);
-  const selectedWeekday = WEEKDAYS[new Date(selectedDate.year, selectedDate.month0, selectedDate.day).getDay()];
-  const mapQuery = selected
-    ? encodeURIComponent(selected.venue.address || selected.venue.name)
-    : "";
 
   return (
-    <section className="lp-apphub" aria-label="북클럽 일정과 위치">
-      <div className="lp-apphub-top">
-        <div>
-          <span className="lp-apphub-brand">질문하는 사람들</span>
-          <h1>북클럽을 날짜와 위치로 찾습니다.</h1>
-          <p>일정을 고르면 책·시간·장소가 한 화면에서 연결됩니다.</p>
+    <section className={styles.section} id="calendar" aria-labelledby="calendar-title">
+      <div className={styles.sectionHead}>
+        <Heading id="calendar-title">모임 일정</Heading>
+        <div className={styles.actions}>
+          <button type="button" className={styles.secondary} onClick={locate} disabled={locating}>{locating ? "위치 확인 중…" : "내 위치에서 거리 보기"}</button>
+          {origin && <button type="button" className={styles.textButton} onClick={() => { setOrigin(null); setLocationMessage(""); }}>위치 지우기</button>}
         </div>
-        <Link href="/bookclub" className="lp-apphub-all">전체 일정 →</Link>
       </div>
-
-      <div className="lp-apphub-frame">
-        <div className="lp-apphub-cal">
-          <div className="lp-apphub-toolbar">
-            <div>
-              <span>일정</span>
-              <strong>{year}년 {month0 + 1}월</strong>
-            </div>
-            <div className="lp-apphub-nav">
-              <button type="button" onClick={() => moveMonth(-1)} aria-label="이전 달">←</button>
-              <button type="button" onClick={() => moveMonth(1)} aria-label="다음 달">→</button>
+      {locationMessage && <p role="status" className={styles.notice}>{locationMessage}</p>}
+      <div className={styles.calendarLayout}>
+        <div className={styles.calendar}>
+          <div className={styles.toolbar}>
+            <strong aria-live="polite">{year}년 {monthNumber}월</strong>
+            <div className={styles.actions}>
+              <button type="button" className={styles.iconButton} onClick={() => moveMonth(-1)} aria-label="이전 달">←</button>
+              <button type="button" className={styles.iconButton} onClick={() => moveMonth(1)} aria-label="다음 달">→</button>
             </div>
           </div>
-
-          <div className="lp-apphub-week" aria-hidden="true">
-            {WEEKDAYS.map((day) => <span key={day}>{day}</span>)}
-          </div>
-
-          <div className="lp-apphub-grid" role="grid" aria-label="북클럽 일정 캘린더">
-            {cells.map((day, index) => {
-              if (day === null) {
-                return <span key={`blank-${index}`} className="lp-apphub-blank" aria-hidden="true" />;
-              }
-              const key = `${year}-${pad2(month0 + 1)}-${pad2(day)}`;
-              const has = sessionsByDate.has(key);
-              const active = key === selectedKey;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  className={`lp-apphub-day${has ? " has" : ""}${active ? " active" : ""}`}
-                  disabled={!has}
-                  onClick={() => selectDay(day)}
-                  aria-pressed={active}
-                  aria-label={`${month0 + 1}월 ${day}일${has ? " 모임 있음" : ""}`}
-                >
-                  <span>{day}</span>
-                  {has && <i aria-hidden="true" />}
-                </button>
-              );
-            })}
-          </div>
+          <table className={styles.calendarTable}>
+            <caption className={styles.srOnly}>{year}년 {monthNumber}월 북클럽 일정</caption>
+            <thead><tr>{DAYS.map(day => <th key={day} scope="col">{day}</th>)}</tr></thead>
+            <tbody>{monthDays(year, monthNumber - 1).map((week, index) => <tr key={index}>{week.map((day, column) => {
+              const key = day ? `${month}-${pad(day)}` : "";
+              const hasEvent = eventDays.has(key);
+              return <td key={column}>{day && <button type="button" className={styles.day} disabled={!hasEvent} aria-pressed={key === selectedKey} aria-label={`${monthNumber}월 ${day}일${hasEvent ? " · 모임 있음" : " · 모임 없음"}`} onClick={() => setSelection(key)}>{day}{hasEvent && <span className={styles.dot} aria-hidden="true" />}</button>}</td>;
+            })}</tr>)}</tbody>
+          </table>
+          <p className={styles.hint}>점이 있는 날짜를 선택하세요.</p>
         </div>
-
-        <aside className="lp-apphub-place">
-          <div className="lp-apphub-placehead">
-            <span>선택한 모임</span>
-            <strong>{selectedDate.month0 + 1}월 {selectedDate.day}일 · {selectedWeekday}</strong>
-          </div>
-
-          {selected ? (
-            <>
-              <div className="lp-apphub-book">
-                <small>{isPast(selected) ? "지난 모임" : "예약 가능"}</small>
-                <h2>{selected.bookTitle}</h2>
-                <p>{selected.author}</p>
+        <div className={styles.meetings} aria-live="polite" aria-atomic="false">
+          {selected.length === 0 ? <div className={styles.empty}>
+            <p>{sorted.length ? "이달에는 등록된 모임이 없습니다." : "아직 등록된 모임이 없습니다."}</p>
+            {first && <button type="button" className={styles.secondary} onClick={() => { setMonth(startKey.slice(0, 7)); setSelection(startKey); }}>등록된 일정 보기</button>}
+          </div> : selected.map(session => {
+            const status = getStatus(session);
+            const canLocate = Number.isFinite(session.venue.lat) && Number.isFinite(session.venue.lng) && Math.abs(session.venue.lat) <= 90 && Math.abs(session.venue.lng) <= 180;
+            const km = origin && canLocate ? straightLineKm(origin, session.venue) : null;
+            const venueText = session.venue.address || session.venue.name;
+            return <article className={styles.meeting} key={session.slug}>
+              <p className={styles.status}>{status === "past" ? "지난 모임" : status === "full" ? "정원 마감" : status === "closed" ? "신청 마감" : "모집 중"}</p>
+              <h3>{session.bookTitle}</h3>
+              <p className={styles.muted}>{session.author}</p>
+              <dl className={styles.facts}>
+                <div><dt>일시</dt><dd>{formatMonthDay(session.startsAt)} {formatWeekdayFull(session.startsAt)}<br />{formatTimeRange(session.startsAt, session.endsAt)}</dd></div>
+                <div><dt>장소</dt><dd>{session.venue.name || "장소 확인 중"}{session.venue.address && <small>{session.venue.address}</small>}{km !== null && <small>직선거리 약 {km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`}</small>}</dd></div>
+                <div><dt>참가비</dt><dd>{feeLabel(session.fee)}</dd></div>
+              </dl>
+              <div className={styles.actions}>
+                <Link className={styles.primary} href={`/bookclub/${session.slug}`}>{status === "open" ? "참여 신청" : "모임 상세 보기"}</Link>
+                {venueText && <a className={styles.secondary} href={`https://map.kakao.com/?q=${encodeURIComponent(venueText)}`} target="_blank" rel="noopener noreferrer">지도 보기</a>}
               </div>
-
-              <div className="lp-apphub-facts">
-                <div>
-                  <span>시간</span>
-                  <strong>{formatTime(selected.startsAt)} – {formatTime(selected.endsAt)}</strong>
-                </div>
-                <div>
-                  <span>장소</span>
-                  <strong>{selected.venue.name}</strong>
-                  <small>{selected.venue.address}</small>
-                </div>
-                <div>
-                  <span>내 위치</span>
-                  {locationState === "ready" && distance != null ? (
-                    <strong>현재 위치에서 약 {formatDistance(distance)}</strong>
-                  ) : (
-                    <button type="button" onClick={detectLocation} disabled={locationState === "loading"}>
-                      {locationState === "loading"
-                        ? "위치 확인 중…"
-                        : locationState === "denied"
-                          ? "위치 권한을 확인해 주세요"
-                          : "내 위치 기준 거리 보기"}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="lp-apphub-actions">
-                <Link href={`/bookclub/${selected.slug}`} className="primary">
-                  {isPast(selected) ? "모임 기록 보기" : "이 모임 예약하기"}
-                </Link>
-                <a
-                  href={`https://map.kakao.com/?q=${mapQuery}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="secondary"
-                >
-                  지도 보기
-                </a>
-              </div>
-            </>
-          ) : (
-            <p className="lp-apphub-empty">등록된 북클럽 일정이 없습니다.</p>
-          )}
-        </aside>
-      </div>
-
-      <div className="lp-apphub-steps" aria-label="이용 순서">
-        <span><b>1</b> 날짜</span>
-        <i />
-        <span><b>2</b> 위치</span>
-        <i />
-        <span><b>3</b> 예약</span>
+            </article>;
+          })}
+        </div>
       </div>
     </section>
   );

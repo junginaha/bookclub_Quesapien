@@ -1,617 +1,15 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import dynamic from "next/dynamic";
-import BookDetailModal, { type BookClub } from "./BookDetailModal";
-import { createClient } from "@/lib/supabase/client";
-import type { UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import type { BookClubSession } from "@/lib/bookclub/types";
-import BookCoverGrid from "./BookCoverGrid";
+import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
 import MiniBookSpread from "./MiniBookSpread";
-import HoverReveal from "./HoverReveal";
-import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
-import { ChevronDown } from "lucide-react";
+import HomeArchive from "./HomeArchive";
 import "./landing.css";
+import styles from "./home-tools.module.css";
 
-// Leaflet은 window/DOM에 의존하므로 클라이언트에서만 로드
-const NearbyClubsMap = dynamic(() => import("./NearbyClubsMap"), {
-  ssr: false,
-  loading: () => <div className="lp-nearby-map lp-nearby-map-loading">지도를 불러오는 중…</div>,
-});
-
-// ─── 거리 계산 (Haversine) ────────────────────────────────────
-function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function fmtDist(km: number): string {
-  if (km < 1) return `${Math.round(km * 1000)}m`;
-  if (km < 10) return `${km.toFixed(1)}km`;
-  return `${Math.round(km)}km`;
-}
-
-// ─── Static data ──────────────────────────────────────────────
-const books: BookClub[] = [
-  {
-    color: "navy", genre: "NEW", slug: "최신간-북토크",
-    title: "최신간 북토크, 핫한 문장들", author: "Qsapiens",
-    tag: "#신간 #트렌드", recommender: "Q5",
-    reason: "새벽 세 시에 깨어 있는 사람만 아는 문장이 여기 있습니다. 잠들지 못한 누군가에게 이 책이 곁에 있다고 말해주고 싶었어요.",
-    emotionTags: ["#불면", "#회복", "#고요"],
-    hostName: "정해린", hostIntro: "정답보다 진심을 믿습니다. 우리는 결론을 미루는 연습 중입니다.",
-    schedule: "2026년 6월 28일 (토) 오후 3시", location: "서울 서초구 교대역 인근",
-    lat: 37.4930, lng: 127.0151,
-    joinUrl: undefined, maxParticipants: 8, currentParticipants: 3,
-    description: "새로 출간된 책들 중 가장 뜨거운 문장들을 함께 읽습니다. 매 회 다른 책, 같은 깊이의 질문.",
-    sessionDates: [{ date: "2026-06-28", topic: "왜 지금 이 문장인가" }],
-  },
-  {
-    color: "cream", genre: "ESSAY · 산문", slug: "다정함의-발명",
-    title: "다정함의 발명", author: "허지영",
-    tag: "#관계 · #사랑", recommender: "지영",
-    reason: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 헤어진 친구에게 부치지 못한 편지처럼 읽었습니다.",
-    emotionTags: ["#다정함", "#일상", "#연결"],
-    hostName: "정해린", hostIntro: "대화는 답을 찾는 과정이 아니라 함께 머무는 과정입니다.",
-    schedule: "2026년 6월 14일 (토) 오후 3시 – 5시 30분", location: "서울 서초구 서초동",
-    lat: 37.4946, lng: 127.0209,
-    joinUrl: undefined, maxParticipants: 8, currentParticipants: 5,
-    description: "사랑은 큰 사건이 아니라 매일 발명되는 작은 다정함이라는 말. 우리가 일상에서 놓치고 있는 다정함의 순간들을 함께 발견합니다.",
-    sessionDates: [
-      { date: "2026-06-14", topic: "다정함의 정의" },
-      { date: "2026-06-28", topic: "다정함을 주고받는 방법" },
-    ],
-  },
-  {
-    color: "rust", genre: "PHILOSOPHY", slug: "혼자라는-감각",
-    title: "혼자라는 감각", author: "주성원",
-    tag: "#외로움 · #인생전환", recommender: "성원",
-    reason: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자 있는 것이 부끄럽지 않아진 첫 책이었어요.",
-    emotionTags: ["#고독", "#성장", "#사유"],
-    hostName: "서민준", hostIntro: "조용한 사람의 한 문장은 시끄러운 사람의 한 시간보다 길게 남습니다.",
-    schedule: "2026년 6월 21일 (토) 오후 2시 – 4시 30분", location: "서울 마포구 합정동",
-    lat: 37.5492, lng: 126.9148,
-    joinUrl: undefined, maxParticipants: 6, currentParticipants: 4,
-    description: "고독을 결핍이 아니라 깊이로 다루는 책. 혼자라는 감각이 두려움이 아닌 능력이 되는 공간을 함께 만들어봅니다.",
-    sessionDates: [{ date: "2026-06-21", topic: "고독의 의미" }],
-  },
-  {
-    color: "olive", genre: "MEMOIR · 회고", slug: "아무도-보지-않는-오후",
-    title: "아무도 보지 않는 오후", author: "김범",
-    tag: "#창업 · #번아웃", recommender: "범",
-    reason: "실패한 사람이 아니라, 멈춰본 적 있는 사람의 문장. 무너졌던 시기에 이 책의 챕터 7이 저를 일으켰습니다.",
-    emotionTags: ["#회복", "#쉼", "#용기"],
-    hostName: "유은재", hostIntro: "대화는 답을 찾는 일이 아니라, 함께 머무는 일입니다.",
-    schedule: "2026년 6월 28일 (토) 오후 4시 – 6시 30분", location: "서울 용산구 한남동",
-    lat: 37.5344, lng: 127.0049,
-    joinUrl: undefined, maxParticipants: 10, currentParticipants: 3,
-    description: "실패한 사람이 아니라 멈춰본 적 있는 사람의 문장. 번아웃 이후를 살아가는 법을 함께 이야기합니다.",
-    sessionDates: [
-      { date: "2026-06-28", topic: "멈춤의 의미" },
-      { date: "2026-07-12", topic: "다시 시작하는 법" },
-    ],
-  },
-  {
-    color: "dusk", genre: "POETRY · 시", slug: "오늘-저녁-당신께",
-    title: "오늘 저녁, 당신께", author: "박상현",
-    tag: "#사랑 · #이별", recommender: "상현",
-    reason: "시집은 빠르게 읽지 않는 것이라고 가르쳐준 책. 한 페이지에서 일주일을 머문 적이 있어요.",
-    emotionTags: ["#느림", "#이별", "#기억"],
-    hostName: "서민준", hostIntro: "느리게 읽는 것의 가치를 믿습니다.",
-    schedule: "2026년 7월 12일 (토) 오후 6시 – 8시", location: "서울 종로구 부암동",
-    lat: 37.5921, lng: 126.9602,
-    joinUrl: undefined, maxParticipants: 8, currentParticipants: 8,
-    description: "시집은 빠르게 읽지 않는 것이라고 가르쳐준 책. 한 줄의 시로 한 시간을 이야기하는 모임입니다.",
-    sessionDates: [{ date: "2026-07-12", topic: "이별을 기억하는 방법", closed: true }],
-  },
-  {
-    color: "sage", genre: "NON-FICTION", slug: "인간이라는-풍경",
-    title: "인간이라는 풍경", author: "한강",
-    tag: "#인간 · #사유", recommender: "한강",
-    reason: "인간을 풍경처럼 멀리서 바라보는 시선. 미워하던 사람을 다시 사람으로 보게 만드는 책입니다.",
-    emotionTags: ["#관계", "#용서", "#거리"],
-    hostName: "유은재", hostIntro: "모든 사람은 이해받아야 할 이유가 있습니다.",
-    schedule: "2026년 7월 19일 (토) 오후 2시 – 4시 30분", location: "서울 마포구 망원동",
-    lat: 37.5558, lng: 126.9073,
-    joinUrl: undefined, maxParticipants: 10, currentParticipants: 2,
-    description: "인간을 풍경처럼 멀리서 바라보는 시선. 미워하던 사람을 다시 사람으로 보게 만드는 책을 함께 읽습니다.",
-    sessionDates: [
-      { date: "2026-07-19", topic: "인간이란 무엇인가" },
-      { date: "2026-08-02", topic: "용서와 거리" },
-    ],
-  },
-];
-
-// ─── 위치 기반 근처 모임 컴포넌트 ─────────────────────────────
-interface NearbyBook extends BookClub { distKm: number }
-
-function NearbyClubsBanner({ books: allBooks, onOpen }: { books: BookClub[]; onOpen: (b: BookClub) => void }) {
-  const [status, setStatus] = useState<"idle" | "loading" | "found" | "denied" | "unsupported">("idle");
-  const [nearby, setNearby] = useState<NearbyBook[]>([]);
-  const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null);
-
-  const detect = () => {
-    if (!navigator.geolocation) { setStatus("unsupported"); return; }
-    setStatus("loading");
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude } = pos.coords;
-        setUserLoc({ lat: latitude, lng: longitude });
-        try {
-          // PostGIS 지오쿼리 우선 시도
-          const res = await fetch(
-            `/api/book-clubs/nearby?lat=${latitude}&lng=${longitude}&radius=15`
-          );
-          if (res.ok) {
-            const data = await res.json();
-            if (data.clubs?.length > 0) {
-              const withDist: NearbyBook[] = data.clubs.map((c: BookClub & { distance_km?: number }) => ({
-                ...c,
-                distKm: c.distance_km ?? haversineKm(latitude, longitude, c.lat!, c.lng!),
-              }));
-              setNearby(withDist.slice(0, 3));
-              setStatus("found");
-              return;
-            }
-          }
-        } catch { /* fall through */ }
-        // Fallback: 클라이언트 Haversine
-        const withDist = allBooks
-          .filter((b) => b.lat !== undefined && b.lng !== undefined && (b.currentParticipants ?? 0) < (b.maxParticipants ?? 8))
-          .map((b) => ({ ...b, distKm: haversineKm(latitude, longitude, b.lat!, b.lng!) }))
-          .sort((a, b) => a.distKm - b.distKm)
-          .slice(0, 3);
-        setNearby(withDist);
-        setStatus("found");
-      },
-      () => setStatus("denied"),
-      { timeout: 8000, maximumAge: 300000 }
-    );
-  };
-
-  if (status === "idle") {
-    return (
-      <button className="lnd-pill" onClick={detect} type="button">
-        <span className="lnd-pill-shimmer" aria-hidden="true" />
-        <span className="lnd-pill-text">내 근처 북클럽 찾기</span>
-      </button>
-    );
-  }
-
-  if (status === "loading") {
-    return (
-      <div className="lp-nearby-trigger">
-        <div className="lp-nearby-loading">
-          <span className="lp-nearby-spin" />
-          <span>근처 모임을 찾고 있어요…</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (status === "denied" || status === "unsupported") {
-    return (
-      <div className="lp-nearby-trigger">
-        <span className="lp-nearby-hint" style={{ color: "var(--lp-muted)" }}>
-          {status === "denied" ? "위치 권한이 필요해요. 브라우저 설정에서 허용해 주시면 찾아드릴게요." : "이 브라우저에서는 위치 기반 서비스를 지원하지 않아요."}
-        </span>
-      </div>
-    );
-  }
-
-  if (status === "found" && nearby.length === 0) {
-    return (
-      <div className="lp-nearby-trigger">
-        <span className="lp-nearby-hint">지금은 근처에 빈 자리가 없어요. 곧 새 모임이 열릴 거예요.</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="lp-nearby-panel">
-      <div className="lp-nearby-header">
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span className="lp-nearby-pin-icon lp-nearby-pin-active" aria-hidden="true">
-            <svg width="14" height="17" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M7.5 0C3.36 0 0 3.36 0 7.5C0 13.125 7.5 18 7.5 18C7.5 18 15 13.125 15 7.5C15 3.36 11.64 0 7.5 0ZM7.5 10.125C6.045 10.125 4.875 8.955 4.875 7.5C4.875 6.045 6.045 4.875 7.5 4.875C8.955 4.875 10.125 6.045 10.125 7.5C10.125 8.955 8.955 10.125 7.5 10.125Z" fill="currentColor"/>
-            </svg>
-          </span>
-          <span className="lp-nearby-title">내 근처 북클럽</span>
-        </div>
-        <button className="lp-nearby-reset" onClick={() => { setStatus("idle"); setNearby([]); setUserLoc(null); }} aria-label="닫기">×</button>
-      </div>
-      {userLoc && (
-        <NearbyClubsMap
-          userLat={userLoc.lat}
-          userLng={userLoc.lng}
-          clubs={nearby.filter((b) => b.lat !== undefined && b.lng !== undefined) as (NearbyBook & { lat: number; lng: number })[]}
-          onOpen={(slug) => {
-            const club = nearby.find((b) => b.slug === slug);
-            if (club) onOpen(club);
-          }}
-        />
-      )}
-      <div className="lp-nearby-list">
-        {nearby.map((b) => (
-          <button key={b.slug} className="lp-nearby-item" onClick={() => onOpen(b)}>
-            <div className={`lp-nearby-dot ${b.color}`} />
-            <div className="lp-nearby-info">
-              <span className="lp-nearby-name">{b.title}</span>
-              <span className="lp-nearby-loc">{b.location}</span>
-            </div>
-            <div className="lp-nearby-dist">
-              <span className="lp-nearby-km">{fmtDist(b.distKm)}</span>
-              <span className="lp-nearby-seats">{(b.maxParticipants ?? 8) - (b.currentParticipants ?? 0)}자리 남음</span>
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-
-// 전부 시드(목업) 후기 — 삭제 대신 is_seed로 노출만 차단한다(작업1).
-const SEED_TESTIMONIALS = [
-  { who: "채현", sub: "UX 디자이너 · 30", said: "처음으로 모르는 사람 앞에서 솔직한 대화를 했어요. 그 밤이 한 달 동안 저를 흔들고 있었습니다.", when: "외로움 시즌 · Week 04", is_seed: true },
-  { who: "진우", sub: "개발자 · 34", said: "'사람은 아직 믿을 만하다'는 감각을 4년 만에 다시 느꼈습니다. 그게 가장 큰 회복이었어요.", when: "관계 시즌 · 종료 후", is_seed: true },
-  { who: "윤서", sub: "에디터 · 28", said: "질문 하나가 삶을 흔들었습니다. 그 후로 일을 그만두고 6개월을 쉬었어요. 후회하지 않습니다.", when: "사랑 시즌 · Week 02", is_seed: true },
-  { who: "도연", sub: "대학원생 · 26", said: "대답을 잘 하려 애쓰지 않게 된 첫 번째 자리였어요. 정답 없이 머무는 법을 배웠습니다.", when: "인간 시즌", is_seed: true },
-  { who: "하린", sub: "교사 · 39", said: "우리 반 아이들에게도 이런 자리를 만들어주고 싶다고 생각했습니다. 그게 변화의 시작이었어요.", when: "AI와 인간 시즌", is_seed: true },
-];
-const testimonials = SEED_TESTIMONIALS.filter((t) => !t.is_seed);
-
-const leaders = [
-  { initial: "J", name: "정해린", role: "시즌 04 진행", philosophy: "정답보다 진심을 믿습니다. 우리는 결론을 미루는 연습 중입니다.", q: "\"당신이 가장 오래 미뤄둔 감정은 무엇인가요?\"" },
-  { initial: "S", name: "서민준", role: "시즌 03 진행", philosophy: "조용한 사람의 한 문장은 시끄러운 사람의 한 시간보다 길게 남습니다.", q: "\"당신이 마지막으로 누군가에게 진심으로 사과한 건 언제였나요?\"" },
-  { initial: "Y", name: "유은재", role: "시즌 02 진행", philosophy: "대화는 답을 찾는 일이 아니라, 함께 머무는 일입니다.", q: "\"기계가 더 잘하는 시대에, 인간으로 남고 싶은 부분이 있나요?\"" },
-];
-
-// Random float popup content pool
-const floatPopupPool = [
-  ...books.map((b) => ({ type: "book" as const, title: b.title, sub: b.genre ?? "", color: b.color, slug: b.slug })),
-  ...leaders.map((l) => ({ type: "leader" as const, title: l.name, sub: l.role, color: "ink", slug: "" })),
-];
-
-// ─── Float popup component ─────────────────────────────────────
-function FloatPopup({ color, title, sub, type, onOpen }: {
-  color: string; title: string; sub: string; type: "book" | "leader"; onOpen: () => void;
-}) {
-  return (
-    <div className="fp-popup">
-      <div className={`fp-visual ${color}`}>
-        {type === "book" ? "📖" : "💬"}
-      </div>
-      <div className="fp-body">
-        <div className="fp-title">{title}</div>
-        <div className="fp-sub">{sub}</div>
-        <button className="fp-link" onClick={onOpen}>
-          {type === "book" ? "자세히 보기" : "만나보기"} →
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── Archive Review Form 컴포넌트 ─────────────────────────────
-const VIDEO_MAX_SIZE = 50 * 1024 * 1024; // 50MB — 서버 프록시가 아니라 브라우저에서 Supabase Storage로 직접 업로드하므로 Vercel 요청 크기 제한과 무관
-const VIDEO_ALLOWED_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
-
-function ArchiveReviewForm() {
-  const [tab, setTab] = useState<"text" | "photo" | "video">("text");
-  const [content, setContent] = useState("");
-  const [authorName, setAuthorName] = useState("");
-  const [photoUrl, setPhotoUrl] = useState("");
-  const [photoPreview, setPhotoPreview] = useState("");
-  const [videoUrl, setVideoUrl] = useState("");
-  const [videoIsFile, setVideoIsFile] = useState(false);
-  const [videoError, setVideoError] = useState("");
-  const [isPublic, setIsPublic] = useState(true);
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "done" | "error">("idle");
-  const fileRef = useRef<HTMLInputElement>(null);
-  const videoFileRef = useRef<HTMLInputElement>(null);
-
-  const handlePhotoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const objectUrl = URL.createObjectURL(file);
-    setPhotoPreview(objectUrl);
-    setUploadStatus("uploading");
-    try {
-      const form = new FormData();
-      form.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: form });
-      if (!res.ok) throw new Error("upload failed");
-      const { url } = await res.json();
-      setPhotoUrl(url);
-      setUploadStatus("done");
-    } catch {
-      setUploadStatus("error");
-      setPhotoPreview("");
-    }
-  };
-
-  // 영상 파일은 서버를 거치지 않고 브라우저에서 Supabase Storage로 바로 올린다
-  // (10~수십MB짜리 영상을 Next.js API 라우트로 프록시하면 Vercel 서버리스 함수의
-  // 요청 크기 제한에 걸리기 쉽다).
-  const handleVideoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setVideoError("");
-    if (file.size > VIDEO_MAX_SIZE) {
-      setVideoError("영상 파일은 50MB 이하여야 해요.");
-      return;
-    }
-    if (!VIDEO_ALLOWED_TYPES.includes(file.type)) {
-      setVideoError("MP4, WEBM, MOV 파일만 올릴 수 있어요.");
-      return;
-    }
-    setUploadStatus("uploading");
-    try {
-      const supabase = createClient();
-      const ext = file.name.split(".").pop()?.toLowerCase() ?? "mp4";
-      const path = `reviews/video-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { data, error } = await supabase.storage
-        .from("reviews")
-        .upload(path, file, { contentType: file.type, cacheControl: "3600", upsert: false });
-      if (error) throw error;
-      const { data: urlData } = supabase.storage.from("reviews").getPublicUrl(data.path);
-      setVideoUrl(urlData.publicUrl);
-      setVideoIsFile(true);
-      setUploadStatus("done");
-    } catch {
-      setUploadStatus("error");
-      setVideoError("업로드에 실패했어요. 링크로 입력해 주실 수 있어요.");
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (content.trim().length < 20) return;
-    if ((tab === "photo" || tab === "video") && uploadStatus === "uploading") return;
-    setStatus("sending");
-    try {
-      const res = await fetch("/api/archive/review", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: tab,
-          content: content.trim(),
-          author_name: authorName.trim() || "익명",
-          photo_url: tab === "photo" ? photoUrl.trim() || null : null,
-          video_url: tab === "video" ? videoUrl.trim() || null : null,
-          is_public: isPublic,
-        }),
-      });
-      if (!res.ok) throw new Error("fail");
-      setStatus("sent");
-      setContent(""); setAuthorName(""); setPhotoUrl(""); setPhotoPreview(""); setVideoUrl("");
-      setVideoIsFile(false); setVideoError("");
-      setUploadStatus("idle");
-    } catch {
-      setStatus("error");
-    }
-    setTimeout(() => setStatus("idle"), 4000);
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: "100%", padding: "12px 16px", borderRadius: 10, fontSize: 14,
-    border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)",
-    color: "var(--lp-ink)", outline: "none", boxSizing: "border-box", fontFamily: "var(--lp-sans)",
-  };
-
-  const canSubmit = content.trim().length >= 20 && uploadStatus !== "uploading";
-
-  return (
-    <div style={{ padding: "36px 40px", borderRadius: 16, background: "rgba(255,255,255,0.4)", border: "1px solid var(--lp-line-soft)", maxWidth: 1020, margin: "56px auto 0" }}>
-      <div style={{ fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--lp-muted)", marginBottom: 10 }}>아카이빙에 남기기</div>
-      <p style={{ fontSize: 15, color: "var(--lp-ink-soft)", marginBottom: 6, lineHeight: 1.6 }}>
-        한 번쯤 남겨볼까 싶으셨다면, 그 생각이 맞아요.
-      </p>
-      <p style={{ fontSize: 13.5, color: "var(--lp-muted)", marginBottom: 24, lineHeight: 1.6 }}>
-        글·사진·영상으로 남겨주세요. 공개 여부는 직접 고르실 수 있어요.
-      </p>
-
-      {/* 공개/비공개 토글 */}
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
-        <div style={{ display: "flex", borderRadius: 9999, overflow: "hidden", border: "1px solid var(--lp-line-soft)" }}>
-          {[{ v: true, label: "공개" }, { v: false, label: "나만 보기" }].map(({ v, label }) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => setIsPublic(v)}
-              style={{
-                padding: "7px 18px", fontSize: 13, border: "none", cursor: "pointer",
-                background: isPublic === v ? "var(--lp-ink)" : "transparent",
-                color: isPublic === v ? "var(--lp-cream)" : "var(--lp-muted)",
-                transition: "all .2s ease",
-                fontFamily: "var(--lp-serif-ko)", letterSpacing: "-0.005em",
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <span style={{ fontSize: 12.5, color: "var(--lp-muted)", fontFamily: "var(--lp-serif-ko)", fontStyle: "normal" }}>
-          {isPublic ? "아카이빙에 올라가요." : "나만 간직해요."}
-        </span>
-      </div>
-
-      {/* 유형 탭 */}
-      <div style={{ display: "flex", gap: 0, marginBottom: 24, borderBottom: "1px solid var(--lp-line-soft)" }}>
-        {(["text", "photo", "video"] as const).map((t) => (
-          <button key={t} type="button" onClick={() => setTab(t)} style={{
-            padding: "8px 22px", fontSize: 13.5, background: "none", border: "none",
-            cursor: "pointer", color: tab === t ? "var(--lp-ink)" : "var(--lp-muted)",
-            borderBottom: tab === t ? "2px solid var(--lp-ink)" : "2px solid transparent",
-            marginBottom: -1, transition: "color 0.2s",
-            fontFamily: "var(--lp-serif-ko)", letterSpacing: "-0.005em",
-          }}>
-            {t === "text" ? "글" : t === "photo" ? "사진" : "영상"}
-          </button>
-        ))}
-      </div>
-
-      {status === "sent" ? (
-        <div style={{ padding: "32px 0", textAlign: "center" }}>
-          <div style={{ fontSize: 22, marginBottom: 12, fontFamily: "var(--lp-serif)", color: "var(--lp-accent)", letterSpacing: "0.2em" }}>— ✦ —</div>
-          <p style={{ fontSize: 16, color: "var(--lp-ink)", marginBottom: 8, fontFamily: "var(--lp-serif-ko)" }}>
-            {isPublic ? "아카이빙에 올라갔어요." : "기록이 저장됐어요."}
-          </p>
-          <span style={{ fontSize: 13.5, color: "var(--lp-muted)" }}>
-            {isPublic ? "다른 분들도 읽으실 수 있어요. 감사해요." : "소중한 기록, 안전하게 담아뒀어요."}
-          </span>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          {tab === "photo" && (
-            <div style={{ marginBottom: 16 }}>
-              {photoPreview ? (
-                <div style={{ position: "relative", marginBottom: 8 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={photoPreview} alt="미리보기" style={{ width: "100%", maxHeight: 220, objectFit: "cover", borderRadius: 10, display: "block" }} />
-                  <button
-                    type="button"
-                    onClick={() => { setPhotoPreview(""); setPhotoUrl(""); setUploadStatus("idle"); }}
-                    style={{ position: "absolute", top: 8, right: 8, width: 28, height: 28, borderRadius: "50%", background: "rgba(0,0,0,0.6)", color: "#fff", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}
-                  >×</button>
-                  {uploadStatus === "uploading" && (
-                    <div style={{ position: "absolute", inset: 0, borderRadius: 10, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, gap: 8 }}>
-                      <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
-                      올리는 중이에요…
-                    </div>
-                  )}
-                  {uploadStatus === "error" && (
-                    <p style={{ fontSize: 12, color: "rgba(239,68,68,0.9)", marginTop: 4 }}>올리기에 실패했어요. 링크로 입력해 주실 수 있어요.</p>
-                  )}
-                </div>
-              ) : (
-                <label
-                  style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: "28px 16px", borderRadius: 10, border: "2px dashed var(--lp-line-soft)", cursor: "pointer", transition: "background .2s ease", background: "rgba(255,255,255,0.3)" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.6)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.3)")}
-                >
-                  <input ref={fileRef} type="file" accept="image/*" hidden onChange={handlePhotoFile} />
-                  <span style={{ fontSize: 14, color: "var(--lp-ink-soft)", fontFamily: "var(--lp-serif-ko)" }}>사진 고르기</span>
-                  <span style={{ fontSize: 12, color: "var(--lp-muted)", fontFamily: "var(--lp-serif-ko)" }}>또는 아래에 링크로 올릴 수 있어요</span>
-                </label>
-              )}
-              {!photoPreview && (
-                <input type="url" placeholder="사진 링크 입력" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} style={{ ...inputStyle, marginTop: 8 }} />
-              )}
-            </div>
-          )}
-          {tab === "video" && (
-            <div style={{ marginBottom: 16 }}>
-              {videoUrl && videoIsFile ? (
-                <div style={{ position: "relative", marginBottom: 8 }}>
-                  <video src={videoUrl} controls style={{ width: "100%", maxHeight: 220, borderRadius: 10, display: "block", background: "#000" }} />
-                  <button
-                    type="button"
-                    onClick={() => { setVideoUrl(""); setVideoIsFile(false); setUploadStatus("idle"); if (videoFileRef.current) videoFileRef.current.value = ""; }}
-                    style={{ position: "absolute", top: 8, right: 8, width: 28, height: 28, borderRadius: "50%", background: "rgba(0,0,0,0.6)", color: "#fff", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}
-                  >×</button>
-                  {uploadStatus === "uploading" && (
-                    <div style={{ position: "absolute", inset: 0, borderRadius: 10, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, gap: 8 }}>
-                      <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
-                      올리는 중이에요…
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <label
-                  style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: "28px 16px", marginBottom: 8, borderRadius: 10, border: "2px dashed var(--lp-line-soft)", cursor: "pointer", transition: "background .2s ease", background: "rgba(255,255,255,0.3)" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.6)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.3)")}
-                >
-                  <input ref={videoFileRef} type="file" accept="video/mp4,video/webm,video/quicktime" hidden onChange={handleVideoFile} />
-                  <span style={{ fontSize: 14, color: "var(--lp-ink-soft)", fontFamily: "var(--lp-serif-ko)" }}>
-                    {uploadStatus === "uploading" ? "올리는 중이에요…" : "영상 파일 고르기 (최대 50MB)"}
-                  </span>
-                  <span style={{ fontSize: 12, color: "var(--lp-muted)", fontFamily: "var(--lp-serif-ko)" }}>또는 아래에 링크로 올릴 수 있어요</span>
-                </label>
-              )}
-              {videoError && <p style={{ fontSize: 12, color: "rgba(239,68,68,0.9)", marginBottom: 8 }}>{videoError}</p>}
-              {!videoIsFile && (
-                <>
-                  <input
-                    type="url"
-                    placeholder="YouTube · Vimeo 링크를 붙여넣어 주세요"
-                    value={videoUrl}
-                    onChange={(e) => setVideoUrl(e.target.value)}
-                    style={inputStyle}
-                  />
-                  {videoUrl && (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) && (
-                    <div style={{ marginTop: 8, borderRadius: 10, overflow: "hidden", background: "#000" }}>
-                      <iframe
-                        src={videoUrl.replace("watch?v=", "embed/").replace("youtu.be/", "www.youtube.com/embed/")}
-                        style={{ width: "100%", height: 180, border: "none" }}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media"
-                        allowFullScreen
-                      />
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          )}
-          <textarea
-            placeholder={
-              tab === "text"
-                ? "모임 이후 달라진 것, 오래 남은 문장, 작은 변화를 적어주세요."
-                : "이 사진·영상에 담긴 이야기를 들려주세요."
-            }
-            rows={tab === "text" ? 5 : 3}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            minLength={20}
-            required
-            style={{
-              width: "100%", padding: "14px 16px", borderRadius: 10, fontSize: 14,
-              border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)",
-              color: "var(--lp-ink)", outline: "none", resize: "vertical", boxSizing: "border-box",
-              lineHeight: 1.7, fontFamily: "var(--lp-serif-ko)",
-            }}
-          />
-          <div style={{ marginTop: 12, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <input
-              type="text"
-              placeholder="닉네임 (익명도 괜찮아요)"
-              value={authorName}
-              onChange={(e) => setAuthorName(e.target.value)}
-              maxLength={20}
-              style={{ flex: 1, minWidth: 160, padding: "10px 14px", borderRadius: 9, fontSize: 13.5, border: "1px solid var(--lp-line-soft)", background: "rgba(255,255,255,0.6)", color: "var(--lp-ink)", outline: "none", fontFamily: "var(--lp-sans)" }}
-            />
-            <button
-              type="submit"
-              disabled={!canSubmit || status === "sending"}
-              style={{
-                padding: "10px 26px", borderRadius: 9999, fontSize: 14, fontWeight: 500,
-                background: canSubmit ? "var(--lp-ink)" : "var(--lp-line-soft)",
-                color: canSubmit ? "var(--lp-cream)" : "var(--lp-muted)",
-                border: "none", cursor: canSubmit ? "pointer" : "not-allowed",
-                transition: "all 0.2s", whiteSpace: "nowrap",
-              }}
-            >
-              {status === "sending" ? "저장 중…" : "기록하기"}
-            </button>
-          </div>
-          {status === "error" && (
-            <p style={{ fontSize: 12.5, color: "rgba(239,68,68,0.8)", marginTop: 8 }}>잠시 후 다시 눌러주세요.</p>
-          )}
-        </form>
-      )}
-    </div>
-  );
-}
-
-// ─── Types ────────────────────────────────────────────────────
 export interface LandingQuestion {
   id: string;
   content: string;
@@ -621,174 +19,43 @@ export interface LandingQuestion {
   answers_count: number;
 }
 
-interface LandingPageProps {
-  todayQuestion?: LandingQuestion | null;
-  recentQuestions?: LandingQuestion[];
-  upcomingMeetings?: UpcomingMeetingFeedItem[];
-  bookclubSessions?: BookClubSession[];
-}
-
-// ─── Main component ───────────────────────────────────────────
-export default function LandingPage({ todayQuestion, recentQuestions, bookclubSessions = [] }: LandingPageProps) {
-  const [introMounted, setIntroMounted] = useState(true);
-  const [modalBook, setModalBook] = useState<BookClub | null>(null);
-  const [activeFloat, setActiveFloat] = useState<number | null>(null);
-  const [askContent, setAskContent] = useState("");
-  const [navBtnIdx, setNavBtnIdx] = useState(0); // 0=로그인, 1=회원가입
+export default function LandingPage({ bookclubSessions = [] }: { bookclubSessions?: BookClubSession[] }) {
+  const [navBtnIdx, setNavBtnIdx] = useState(0);
   const [navBtnFading, setNavBtnFading] = useState(false);
-  const [askAuthor, setAskAuthor] = useState("");
-  const [askStatus, setAskStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [questionLikes, setQuestionLikes] = useState<number | null>(null);
-  const [questionSaves, setQuestionSaves] = useState<number | null>(null);
-  const [questionReacted, setQuestionReacted] = useState<{ like: boolean; save: boolean }>({ like: false, save: false });
-  const [dbBooks, setDbBooks] = useState<BookClub[]>([]);
   const [howToOpen, setHowToOpen] = useState(false);
-  const sessionKeyRef = useRef<string>(Math.random().toString(36).slice(2));
-  const floatTimeouts = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
-
-  // ── 실시간 활동 카운터 ──────────────────────────────────────
-  const [newQuestions, setNewQuestions] = useState(0);
-  const [newAnswers, setNewAnswers] = useState(0);
-  const [realtimeVisible, setRealtimeVisible] = useState(false);
+  const guide = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const supabase = createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const ch = (supabase as any)
-      .channel("landing-activity")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "landing_questions" }, () => {
-        setNewQuestions((n) => n + 1);
-        setRealtimeVisible(true);
-      })
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "landing_question_answers" }, () => {
-        setNewAnswers((n) => n + 1);
-        setRealtimeVisible(true);
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, []);
-
-  // DB에서 북클럽 불러오기 (위치 기반용 lat/lng 포함)
-  useEffect(() => {
-    fetch("/api/book-clubs?mini=false")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.clubs?.length > 0) {
-          setDbBooks(d.clubs);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  // Pick random popup items for each float element (stable per session)
-  const [floatItems] = useState(() =>
-    [0, 1, 2, 3, 4].map(() => floatPopupPool[Math.floor(Math.random() * floatPopupPool.length)])
-  );
-
-  // 랜딩 nav 버튼 순환
-  useEffect(() => {
+    let transition: ReturnType<typeof setTimeout> | undefined;
     const interval = setInterval(() => {
       setNavBtnFading(true);
-      setTimeout(() => { setNavBtnIdx((i) => (i + 1) % 2); setNavBtnFading(false); }, 300);
+      transition = setTimeout(() => { setNavBtnIdx(i => (i + 1) % 2); setNavBtnFading(false); }, 300);
     }, 3000);
-    return () => clearInterval(interval);
+    return () => { clearInterval(interval); clearTimeout(transition); };
   }, []);
 
   useEffect(() => {
     const nav = document.getElementById("lp-nav");
-    if (!nav) return;
-    const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 30);
+    const onScroll = () => nav?.classList.toggle("scrolled", window.scrollY > 30);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => {
-        if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); }
-      }),
-      { threshold: 0.1 }
-    );
-    document.querySelectorAll(".lp-reveal").forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const ta = document.querySelector(".lp-ask-field textarea") as HTMLTextAreaElement;
-    if (!ta) return;
-    const grow = () => { ta.style.height = "auto"; ta.style.height = ta.scrollHeight + "px"; };
-    ta.addEventListener("input", grow);
-    return () => ta.removeEventListener("input", grow);
-  }, []);
-
-  const openFloat = useCallback((idx: number) => {
-    const t = floatTimeouts.current.get(idx);
-    if (t) clearTimeout(t);
-    setActiveFloat(idx);
-  }, []);
-
-  const closeFloat = useCallback((idx: number) => {
-    const t = setTimeout(() => setActiveFloat(null), 200);
-    floatTimeouts.current.set(idx, t);
-  }, []);
-
-  const handleFloatOpen = useCallback((idx: number) => {
-    const item = floatItems[idx];
-    if (item.type === "book") {
-      const book = books.find((b) => b.slug === item.slug);
-      if (book) setModalBook(book);
-    }
-  }, [floatItems]);
-
-  const handleReact = async (type: "like" | "save") => {
-    if (!todayQuestion?.id) return;
-    try {
-      const res = await fetch(`/api/landing-questions/${todayQuestion.id}/react`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, session_key: sessionKeyRef.current }),
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      setQuestionReacted((prev) => ({ ...prev, [type]: data.reacted }));
-      if (type === "like" && data.likes !== undefined) setQuestionLikes(data.likes);
-      if (type === "save" && data.saves !== undefined) setQuestionSaves(data.saves);
-    } catch { /* ignore */ }
-  };
-
-  const handleAskSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!askContent.trim() || askContent.trim().length < 5) return;
-    setAskStatus("sending");
-    try {
-      const res = await fetch("/api/landing-questions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: askContent.trim(), author_name: askAuthor.trim() || "익명" }),
-      });
-      if (!res.ok) throw new Error("fail");
-      setAskStatus("sent");
-      setAskContent("");
-      setAskAuthor("");
-    } catch {
-      setAskStatus("error");
-    }
-    setTimeout(() => setAskStatus("idle"), 3000);
-  };
+    if (howToOpen && !guide.current?.open) guide.current?.showModal();
+    if (!howToOpen && guide.current?.open) guide.current.close();
+  }, [howToOpen]);
 
   return (
     <div className="lp">
       <div className="lp-grain" aria-hidden="true" />
       <div className="lp-grain-light" aria-hidden="true" />
-
-      {/* NAV */}
       <nav className="lp-nav" id="lp-nav">
         <a href="#top" className="lp-wordmark">
           <span className="wm-mark" aria-hidden="true">
             <span className="wm-q">?</span><span className="wm-bang">!</span>
           </span>
-          {/* 랜딩 nav 워드마크 교차 */}
           <span style={{ display: "inline-grid" }}>
             {(["질문하는 사람들", "Qsapiens"] as const).map((w, i) => (
               <span key={w} style={{
@@ -801,7 +68,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
                 transition: "opacity 0.4s ease, transform 0.4s cubic-bezier(.2,.8,.2,1)",
                 opacity: navBtnIdx === i && !navBtnFading ? 1 : 0,
                 transform: navBtnIdx === i && !navBtnFading ? "translateY(0)" : navBtnIdx === i ? "translateY(-4px)" : "translateY(4px)",
-              }}>{w}</span>
+              }} aria-hidden={navBtnIdx !== i}>{w}</span>
             ))}
           </span>
         </a>
@@ -811,7 +78,6 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
           <a href="/archive">아카이빙</a>
           <a href="/giants">거인의 어깨</a>
         </div>
-        {/* 로그인/회원가입 순환 버튼 */}
         <div style={{ position: "relative", width: 100, height: 40, overflow: "visible" }}>
           {[
             { href: "/login", label: "로그인", filled: false },
@@ -821,6 +87,8 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
               key={btn.href}
               href={btn.href}
               className={btn.filled ? "btn-pill-neu btn-pill-neu-accent" : "btn-pill-neu"}
+              tabIndex={navBtnIdx === i ? 0 : -1}
+              aria-hidden={navBtnIdx !== i}
               style={{
                 position: "absolute", inset: 0,
                 display: "flex",
@@ -835,213 +103,61 @@ export default function LandingPage({ todayQuestion, recentQuestions, bookclubSe
           ))}
         </div>
       </nav>
-
-      {/* HERO */}
-      <section className="lp-hero" id="top">
-        <div className="lp-hero-inner">
-          <div className="lp-hero-meta">
-            <div className="lp-eyebrow">서초구 선정 미래혁신형 북클럽</div>
-            <div className="lp-right" />
-          </div>
-          <h1 className="lp-h-display">
-            <span className="lp-reveal"><span>좋은 <span className="lp-em">질문</span>은</span></span>
-            <span className="lp-reveal"><span>좋은 사람을</span></span>
-            <span className="lp-reveal lp-reveal-last">
-              <span style={{ display: "flex", alignItems: "flex-end", gap: "clamp(6px, 1.2vw, 16px)", flexWrap: "nowrap",
-                /* 버튼 그림자(상하)를 위한 여백: overflow:visible 과 함께 작동 */
-                paddingBottom: "28px", paddingTop: "12px",
-                marginBottom: "-28px", marginTop: "-12px" }}>
-                <span>데려옵니다</span>
-                <a href="/bookclub" className="lp-hero-bookclub-btn">
-                  <span>북클럽 둘러보기</span>
-                </a>
+      <main>
+        <section className="lp-hero" id="top">
+          <div className="lp-hero-inner">
+            <div className="lp-hero-meta">
+              <div className="lp-eyebrow">서초구 선정 미래혁신형 북클럽</div>
+              <div className="lp-right" />
+            </div>
+            <h1 className="lp-h-display">
+              <span className="lp-reveal"><span>좋은 <span className="lp-em">질문</span>은</span></span>
+              <span className="lp-reveal"><span>좋은 사람을</span></span>
+              <span className="lp-reveal lp-reveal-last">
+                <span style={{ display: "flex", alignItems: "flex-end", gap: "clamp(6px, 1.2vw, 16px)", flexWrap: "nowrap",
+                  paddingBottom: "28px", paddingTop: "12px",
+                  marginBottom: "-28px", marginTop: "-12px" }}>
+                  <span>데려옵니다</span>
+                  <a href="/bookclub" className="lp-hero-bookclub-btn">
+                    <span>북클럽 둘러보기</span>
+                  </a>
+                </span>
               </span>
-            </span>
-          </h1>
-          <div className="lp-hero-sub">
-            <p>
-              <span className="lp-kw">질문</span>으로{" "}
-              <span className="lp-kw k2">연결</span>되는 미래혁신형{" "}
-              <span className="lp-kw k3">북클럽</span>.<br />
-              <span className="lp-kw k4">사람들</span>이 가장 깊은 이야기를 나눠요.
-            </p>
-          </div>
-
-        </div>
-        <div className="lp-scroll-cue">
-          <span className="sc-line" />
-        </div>
-
-        {/* 처음 온 당신에게 — 버튼처럼 보이지 않는 문장형 진입점, 스크롤 큐 세로선 옆에 나란히 */}
-        <div className="lp-hero-entry-cta">
-          <button
-            type="button"
-            onClick={() => setHowToOpen((v) => !v)}
-            aria-expanded={howToOpen}
-            aria-controls="how-it-works-panel"
-            className="lp-hero-entry-btn"
-          >
-            <span className="lp-hero-entry-text">처음 온 당신에게</span>
-            <ChevronDown
-              size={15}
-              className={`lp-hero-entry-arrow${howToOpen ? " lp-hero-entry-arrow--open" : ""}`}
-            />
-          </button>
-        </div>
-      </section>
-
-      {/* 캘린더 + 위치 — 메인 헤더 바로 다음 핵심 웹앱 */}
-      <HomeCalendarLocationHub sessions={bookclubSessions} />
-
-      {/* ③ BOOKLOVER */}
-      <section className="lp-section lp-books" id="books">
-        <div className="lp-section-head">
-          <div className="lp-left">
-            <a href="/bookclub" className="lp-eyebrow lp-section-title-link">BOOK LOVERS — 책을 건네는 마음</a>
-            <a href="/bookclub" className="lp-section-title-link" style={{ textDecoration: "none" }}>
-              <h2 className="lp-h-section">
-                이 책을 누군가에게<br /><span className="lp-em">꼭 건네고</span> 싶은 이유
-              </h2>
-            </a>
-          </div>
-          <div className="lp-lede">
-            <p style={{ margin: 0 }}>
-              우리는 &lsquo;왜 이 책을 건네고 싶었는지&rsquo;를 씁니다.<br />
-              이 책이 한 사람에게 어떻게 스며들었는지를 함께
-            </p>
-            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px", marginTop: "2px" }}>
-              <span>기록합니다.</span>
+            </h1>
+            <div className="lp-hero-sub">
+              <p>
+                <span className="lp-kw">질문</span>으로{" "}
+                <span className="lp-kw k2">연결</span>되는 미래혁신형{" "}
+                <span className="lp-kw k3">북클럽</span>.<br />
+                <span className="lp-kw k4">사람들</span>이 가장 깊은 이야기를 나눠요.
+              </p>
             </div>
           </div>
-        </div>
-
-        {/* "함께 읽어요" — 홈 전용 표지 그리드. 데이터·상태 판정(getStatus/
-            seatsLeft)은 /bookclub과 같은 lib/bookclub 소스 하나를 공유하되
-            (작업지시서 Phase 1 원칙 유지), 화면 표현은 chosecommune.com
-            방식으로 교체했다(Phase 3 재지시 — sternberg-press.com 가로 스크롤
-            방식을 대체. 이미지가 주인공, 반응형 그리드, hover/tap 크로스페이드). */}
-        <div style={{ marginTop: 56 }}>
-          <BookCoverGrid sessions={bookclubSessions} />
-          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
-            <a href="/bookclub" className="lp-underline-cta">북클럽 전체 일정 보기 →</a>
+          <div className="lp-scroll-cue"><span className="sc-line" /></div>
+          <div className="lp-hero-entry-cta">
+            <button type="button" onClick={() => setHowToOpen(v => !v)} aria-expanded={howToOpen} aria-controls="how-it-works-panel" className="lp-hero-entry-btn">
+              <span className="lp-hero-entry-text">처음 온 당신에게</span>
+              <ChevronDown size={15} className={`lp-hero-entry-arrow${howToOpen ? " lp-hero-entry-arrow--open" : ""}`} />
+            </button>
           </div>
-        </div>
-
+        </section>
+        <HomeCalendarLocationHub sessions={bookclubSessions} />
         <MiniBookSpread sessions={bookclubSessions} />
-      </section>
-
-      {/* ④ ARCHIVING — 후기 섹션 */}
-      <section className="lp-section lp-testify" id="testify">
-        <div className="lp-section-head">
-          <div className="lp-left">
-            <a href="/archive" className="lp-eyebrow lp-section-title-link">ARCHIVING — 사람, 변화, 기록</a>
-            <a href="/archive" className="lp-section-title-link" style={{ textDecoration: "none" }}>
-              <h2 className="lp-h-section">
-                한 시즌이 지나면<br /><span className="lp-em">한 사람이</span> 바뀝니다
-              </h2>
-            </a>
-          </div>
-          <p className="lp-lede">
-            가장 아끼는, 작고 단단한 목소리들이에요.<br />
-            <a href="/archive" style={{ fontSize: 13, color: "var(--lp-accent)", fontFamily: "var(--lp-serif)", letterSpacing: "0.04em", opacity: 0.8 }}>
-              전체 아카이브 보기 →
-            </a>
-          </p>
-        </div>
-        {testimonials.length > 0 && (
-          <div className="lp-test-list lp-test-scroll">
-            {testimonials.map((t) => (
-              <div key={t.who} className="lp-test-item">
-                <HoverReveal
-                  summary={<div className="ti-who">— {t.who}<span className="ti-sub">{t.sub}</span></div>}
-                  detail={
-                    <>
-                      <div className="ti-said">{t.said}</div>
-                      <div className="ti-when">{t.when}</div>
-                    </>
-                  }
-                />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* 아카이빙 더 보기 */}
-        <div style={{ maxWidth: 1020, margin: "32px auto 0", display: "flex", justifyContent: "flex-end" }}>
-          <a
-            href="/archive"
-            style={{
-              fontFamily: "var(--lp-serif)", fontSize: 13.5, letterSpacing: "0.06em",
-              color: "var(--lp-accent)", textDecoration: "none",
-              display: "inline-flex", alignItems: "center", gap: 6,
-              opacity: 0.85, transition: "opacity .2s ease",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.85")}
-          >
-            더 많은 기록 보기 — 아카이빙 →
-          </a>
-        </div>
-
-        {/* 후기 남기기 폼 */}
-        <ArchiveReviewForm />
-      </section>
-
-      {/* ⑥ AT HEART — 통합 하단 섹션 */}
-      <section className="lp-final lp-giants-final" id="final">
-        {/* AT HEART 상단 */}
-        <div className="lp-eyebrow">AT HEART</div>
-        <p className="lp-final-quote">
-          <span className="lp-em">질문</span>은<br />가장 <span className="lp-em">인간적인</span><br />대화의 시작이에요
-        </p>
-        <div className="lp-final-divider" />
-
-        {/*
-          거인의 어깨 인물 카드/탐색 CTA는 2026-07-17 운영자 지시로 홈 노출을 껐다(코드는 보존, 삭제 아님).
-          이 섹션을 "대화가 필요해" 발제 생성기로 교체하면서 함께 내림 — /giants 라우트 자체와 푸터 링크는
-          손대지 않았음(범위: 이 섹션만). 참고: CLAUDE.md 절대 원칙 7(거인의 어깨 = 사망 70년 규칙 검증
-          전까지 신규 노출 금지)과도 부합. 나중에 "거인의 어깨가 왜 안 보이냐"는 문제가 생기면 이 주석과
-          CLAUDE.md 세션 로그를 참고할 것 — 버그가 아니라 의도적으로 숨긴 것.
-        {[
-            { slug: "friedrich-nietzsche", name: "니체", color: "#2D3748" },
-            { slug: "immanuel-kant", name: "칸트", color: "#4A5568" },
-            { slug: "socrates", name: "소크라테스", color: "#5B4A35" },
-            { slug: "fyodor-dostoevsky", name: "도스토옙스키", color: "#4A3728" },
-            { slug: "virginia-woolf", name: "버지니아 울프", color: "#4A3A5C" },
-            { slug: "albert-einstein", name: "아인슈타인", color: "#1A3A5C" },
-          ]
-        */}
-
-        {/* 대화가 필요해 — 거인의 어깨 기반 발제 생성기 */}
-        <h3 className="lp-dialogue-title">대화가 필요해</h3>
-        <p className="lp-dialogue-desc">
-          책이나 문장을 남겨보세요. 위대한 사유자들의 시선을 빌려,
-          함께 나눌 발제 10개를 만들어드릴게요.
-        </p>
-
-        <DiscussionGenerator variant="landing" />
-      </section>
-
-      {/* FOOTER */}
+        <HomeArchive />
+        <section className={`${styles.section} ${styles.generator}`} id="final" aria-labelledby="discussion-title">
+          <div className={styles.sectionHead}><h2 id="discussion-title">발제 · 거인의 어깨</h2><a className={styles.secondary} href="/giants">전체 발제 도구</a></div>
+          <DiscussionGenerator variant="landing" />
+        </section>
+      </main>
       <footer className="lp-footer">
-        <div className="lp-foot-inner">
-          <a href="/" className="lp-foot-mark" style={{ textDecoration: "none", transition: "opacity .2s" }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
-            <span className="lp-em">—</span>질문하는 사람들 · 미래혁신형 북클럽
-          </a>
-          <div className="lp-foot-links">
-            <a href="/questions">질문</a>
-            <a href="/bookclub">북클럽</a>
-            <a href="/archive">아카이빙</a>
-            <a href="/giants">거인의 어깨</a>
-          </div>
-          <div className="lp-foot-copy">© 2026 — Qsapiens.</div>
-        </div>
+        <div className="lp-foot-inner"><span className="lp-foot-mark">질문하는 사람들</span><span className="lp-foot-copy">© 2026 Qsapiens.</span></div>
       </footer>
-
-      {/* Book Detail Modal */}
-      <BookDetailModal book={modalBook} onClose={() => setModalBook(null)} />
+      <dialog ref={guide} id="how-it-works-panel" className={styles.dialog} onClose={() => setHowToOpen(false)} aria-labelledby="guide-title">
+        <h2 id="guide-title">처음 온 당신에게</h2>
+        <p>캘린더에서 날짜를 고른 뒤, 책과 장소를 확인하고 참여를 신청하세요.</p>
+        <p>혼자 오셔도, 처음이셔도 괜찮습니다.</p>
+        <button type="button" onClick={() => setHowToOpen(false)}>닫기</button>
+      </dialog>
     </div>
   );
 }
