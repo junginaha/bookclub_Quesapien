@@ -1,0 +1,242 @@
+/* Bookclub detail V2 — homepage untouched. Blue / Violet / Camel / White only. */
+.qd-body {
+  --blue: #173B75;
+  --violet: #6C63D9;
+  --camel: #C79B67;
+  --camel-soft: #F2E7D8;
+  --white: #FFFFFF;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 36px 20px 110px;
+  display: flex !important;
+  flex-direction: column;
+  gap: 30px;
+  background: #FBFAF7;
+}
+
+.qd-side {
+  width: 100%;
+  position: static !important;
+  display: block !important;
+  order: 0;
+}
+
+.qd-side .qd-brand,
+.qd-side .qd-side-links {
+  display: none !important;
+}
+
+.qd-side .qc-cal {
+  width: 100%;
+  padding: 0;
+}
+
+.qd-side .qc-cal-full {
+  display: block !important;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 28px;
+  background: #FFFFFF;
+  border: 1px solid #D9D5CD;
+  box-shadow: 0 20px 60px rgba(23,59,117,.07);
+}
+
+.qd-side .qc-cal-strip {
+  display: none !important;
+}
+
+.qd-side .qc-cal-head {
+  margin-bottom: 20px;
+}
+
+.qd-side .qc-cal-title {
+  color: var(--blue);
+  font-family: Georgia, "Noto Serif KR", serif;
+  font-size: 28px;
+  font-weight: 400;
+}
+
+.qd-side .qc-cal-nav {
+  color: var(--violet);
+  border-color: #DED9D2;
+  background: #FFFFFF;
+}
+
+.qd-side .qc-cal-date {
+  border-radius: 0 !important;
+}
+
+.qd-side .qc-cal-date.is-selected {
+  background: var(--blue) !important;
+  color: #FFFFFF !important;
+}
+
+.qd-side .qc-cal-dot {
+  background: var(--violet) !important;
+}
+
+.qd-main {
+  width: min(100%, 780px);
+  margin: 0 auto;
+}
+
+.qd-main #qd-hero {
+  padding-top: 8px;
+}
+
+.qd-hero-top {
+  display: grid !important;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 28px !important;
+  align-items: start;
+}
+
+.qd-cover-sm {
+  border-radius: 0 !important;
+  overflow: hidden;
+  box-shadow: 8px 10px 0 var(--camel-soft);
+}
+
+.qd-eyebrow {
+  color: var(--violet) !important;
+  font-size: 11px !important;
+  letter-spacing: .16em !important;
+}
+
+.qd-title {
+  color: var(--blue) !important;
+  font-family: Georgia, "Noto Serif KR", serif !important;
+  font-size: clamp(34px, 5vw, 58px) !important;
+  font-weight: 400 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -.035em !important;
+}
+
+.qd-book-title {
+  color: #293A57 !important;
+}
+
+.qd-book-author {
+  color: #77716A !important;
+}
+
+.qd-date-sticky {
+  position: static !important;
+  margin: 28px 0 0 !important;
+  padding: 14px 18px !important;
+  background: var(--camel-soft) !important;
+  border: 0 !important;
+  color: var(--blue) !important;
+  font-weight: 600;
+}
+
+.qd-reason {
+  margin: 34px 0 !important;
+  padding: 0 !important;
+  color: #3F4652 !important;
+  font-size: 16px !important;
+  line-height: 1.85 !important;
+}
+
+.qd-questions,
+.qd-apply,
+.qd-next {
+  border-radius: 0 !important;
+  border: 1px solid #DED9D2 !important;
+  background: #FFFFFF !important;
+  box-shadow: none !important;
+}
+
+.qd-questions-title,
+.qd-apply-title,
+.qd-next-title {
+  color: var(--blue) !important;
+  font-family: Georgia, "Noto Serif KR", serif !important;
+  font-weight: 400 !important;
+}
+
+.qd-question {
+  border-color: #E7E2DB !important;
+}
+
+.qd-apply {
+  padding: 26px !important;
+  border-top: 4px solid var(--violet) !important;
+}
+
+.qd-apply-sub {
+  color: #736F69 !important;
+}
+
+.qd-form input,
+.qd-form textarea {
+  border-radius: 0 !important;
+  border: 1px solid #D8D3CB !important;
+  background: #FFFFFF !important;
+}
+
+.qd-form input:focus,
+.qd-form textarea:focus {
+  outline: 2px solid rgba(108,99,217,.22) !important;
+  border-color: var(--violet) !important;
+}
+
+.qd-apply button,
+.qd-apply a {
+  border-radius: 0 !important;
+}
+
+.qd-next .qc-tab.is-active {
+  color: var(--violet) !important;
+  border-color: var(--violet) !important;
+}
+
+@media (max-width: 767px) {
+  .qd-body {
+    padding: 20px 12px 110px;
+    gap: 22px;
+  }
+
+  .qd-side .qc-cal-full {
+    display: block !important;
+    padding: 18px 12px;
+    box-shadow: none;
+  }
+
+  .qd-side .qc-cal-strip {
+    display: none !important;
+  }
+
+  .qd-side .qc-cal-date {
+    min-height: 46px;
+    font-size: 12px;
+  }
+
+  .qd-hero-top {
+    grid-template-columns: 86px minmax(0, 1fr);
+    gap: 18px !important;
+  }
+
+  .qd-title {
+    font-size: clamp(28px, 8vw, 40px) !important;
+  }
+
+  .qd-date-sticky {
+    margin-top: 20px !important;
+  }
+
+  .qd-apply-mobile-bar {
+    background: rgba(255,255,255,.96) !important;
+    border-top: 1px solid #D8D3CB !important;
+  }
+
+  .qd-apply-mobile-bar button {
+    border-radius: 0 !important;
+    background: var(--blue) !important;
+  }
+
+  .qd-sheet {
+    border-radius: 18px 18px 0 0 !important;
+    background: #FBFAF7 !important;
+  }
+}
