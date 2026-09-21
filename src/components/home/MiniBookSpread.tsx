@@ -6,6 +6,11 @@ import { formatMonthDay, getStatus } from "@/lib/bookclub/selectors";
 import BookCoverImage from "./BookCoverImage";
 import styles from "./home-tools.module.css";
 
+const SCENES = [
+  "/images/bookclub/warm-group.webp",
+  "/images/bookclub/actual-group.webp",
+];
+
 export default function MiniBookSpread({ sessions }: { sessions: BookClubSession[] }) {
   const unique = new Map<string, BookClubSession>();
   const ordered = [...sessions].sort((a, b) => {
@@ -25,7 +30,7 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
         <div>
           <span className={styles.eyebrow}>NEXT READS</span>
           <h2 id="books-title">함께 읽는 책</h2>
-          <p className={styles.sectionLead}>책을 고르는 순간부터 모임은 시작됩니다. 표지를 눌러 다음 대화를 미리 만나보세요.</p>
+          <p className={styles.sectionLead}>표지를 눌러 모임을 확인하세요.</p>
         </div>
       </div>
 
@@ -33,7 +38,7 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
         <p className={styles.muted}>다음 책을 고르고 있습니다.</p>
       ) : (
         <div className={styles.bookGrid}>
-          {[...unique.values()].map((session) => (
+          {[...unique.values()].map((session, index) => (
             <details className={styles.book} key={session.slug}>
               <summary className={styles.bookCover}>
                 <span className={styles.coverVisual}>
@@ -50,7 +55,16 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
                 <span className={styles.bookToggle} aria-hidden="true" />
                 <span className={styles.srOnly}>책 정보 펼치기 또는 접기</span>
               </summary>
+
               <div className={styles.bookPages}>
+                <div className={styles.bookScene}>
+                  <img
+                    src={SCENES[index % SCENES.length]}
+                    alt="질문하는 사람들 북클럽 모임 풍경"
+                    loading="lazy"
+                  />
+                  <span>BOOK CLUB</span>
+                </div>
                 {session.leadQuestion && <p className={styles.bookQuestion}>{session.leadQuestion}</p>}
                 <p className={styles.bookSummary}>{session.summary.split("\n").filter(Boolean).slice(0, 2).join(" ")}</p>
                 <p className={styles.bookDate}>{formatMonthDay(session.startsAt)} · {getStatus(session) === "past" ? "지난 대화" : session.venue.name}</p>
