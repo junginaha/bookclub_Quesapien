@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import SignupForm from "@/components/auth/SignupForm";
 import { QIMark } from "@/components/common/QIMark";
+import nonhome from "../../nonhome-v2.module.css";
 
 export const metadata: Metadata = {
   title: "함께하기 — 질문하는 사람들",
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function SignupPage() {
   return (
-    <div style={{
+    <div className={nonhome.page} style={{
       minHeight: "100vh",
       background: "var(--bg)",
       display: "flex",
@@ -52,12 +53,12 @@ export default function SignupPage() {
 
         {/* 폼 카드 */}
         <div style={{
-          background: "rgba(255,255,255,0.7)",
+          background: "#FFFFFF",
           backdropFilter: "blur(12px)",
           border: "1px solid var(--line-soft)",
-          borderRadius: 20,
+          borderRadius: 0,
           padding: "32px 28px",
-          boxShadow: "0 8px 40px -16px rgba(28,31,38,.12)",
+          boxShadow: "0 18px 50px rgba(23,59,117,.07)",
         }}>
           <Suspense fallback={null}>
             <SignupForm />
