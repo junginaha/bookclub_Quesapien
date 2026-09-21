@@ -6,6 +6,7 @@ import type { BookClubSession } from "@/lib/bookclub/types";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
 import MiniBookSpread from "./MiniBookSpread";
+import BookclubPopup from "./BookclubPopup";
 import HomeArchive from "./HomeArchive";
 import "./landing.css";
 import styles from "./home-tools.module.css";
@@ -23,6 +24,7 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
   const [navBtnIdx, setNavBtnIdx] = useState(0);
   const [navBtnFading, setNavBtnFading] = useState(false);
   const [howToOpen, setHowToOpen] = useState(false);
+  const [bookclubOpen, setBookclubOpen] = useState(false);
   const guide = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -92,7 +94,7 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
         </a>
         <div className="lp-nav-links">
           <a href="/questions">질문</a>
-          <a href="/bookclub">북클럽</a>
+          <button type="button" className="lp-nav-popup-link" onClick={() => setBookclubOpen(true)}>북클럽</button>
           <a href="/archive">아카이빙</a>
           <a href="/giants">거인의 어깨</a>
         </div>
@@ -136,9 +138,9 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
                   paddingBottom: "28px", paddingTop: "12px",
                   marginBottom: "-28px", marginTop: "-12px" }}>
                   <span>데려옵니다</span>
-                  <a href="/bookclub" className="lp-hero-bookclub-btn">
+                  <button type="button" className="lp-hero-bookclub-btn" onClick={() => setBookclubOpen(true)}>
                     <span>북클럽 둘러보기</span>
-                  </a>
+                  </button>
                 </span>
               </span>
             </h1>
@@ -170,6 +172,7 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
       <footer className="lp-footer">
         <div className="lp-foot-inner"><span className="lp-foot-mark">질문하는 사람들</span><span className="lp-foot-copy">© 2026 Qsapiens.</span></div>
       </footer>
+      <BookclubPopup open={bookclubOpen} sessions={bookclubSessions} onClose={() => setBookclubOpen(false)} />
       <dialog ref={guide} id="how-it-works-panel" className={styles.dialog} onClose={() => setHowToOpen(false)} aria-labelledby="guide-title">
         <h2 id="guide-title">처음 온 당신에게</h2>
         <p>캘린더에서 날짜를 고른 뒤, 책과 장소를 확인하고 참여를 신청하세요.</p>
