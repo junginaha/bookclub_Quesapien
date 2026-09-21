@@ -78,7 +78,7 @@ async function researchWithAnthropicWebSearch(
     "최종 답변은 아래 JSON 하나만 반환하세요.",
     '{"fact":"검증된 숨은 배경 1개","category":"writing|publication|reception|censorship|translation|author_context|adaptation","whyItMatters":"이 배경을 알고 읽으면 달라지는 지점","questionSeed":"이 배경에서 출발하는 북토크 질문"}',
     "",
-    "검색 결과가 부족해 2개 독립 출처로 확인할 수 없다면 정확히 {"fact":"","category":"publication","whyItMatters":"","questionSeed":""} 를 반환하세요.",
+    '검색 결과가 부족해 2개 독립 출처로 확인할 수 없다면 정확히 {"fact":"","category":"publication","whyItMatters":"","questionSeed":""} 를 반환하세요.',
   ].filter(Boolean).join("\n");
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
