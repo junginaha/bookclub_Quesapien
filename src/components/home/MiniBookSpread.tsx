@@ -4,7 +4,6 @@ import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { formatMonthDay, getStatus } from "@/lib/bookclub/selectors";
 import BookCoverImage from "./BookCoverImage";
-import ClubMoments from "./ClubMoments";
 import styles from "./home-tools.module.css";
 
 export default function MiniBookSpread({ sessions }: { sessions: BookClubSession[] }) {
@@ -61,8 +60,6 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
           ))}
         </div>
       )}
-
-      <ClubMoments />
     </section>
   );
 }
