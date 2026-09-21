@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import BookDetailModal, { type BookClub } from "./BookDetailModal";
 import { createClient } from "@/lib/supabase/client";
 import type { UpcomingMeetingFeedItem } from "./NearbyMeetingsFeed";
+import IntroSplash from "./IntroSplash";
 import { type BookClubRecord, FALLBACK_CLUBS, classifyClub, sortAgain, sortNow, visibleClubs } from "@/lib/bookclub";
 import { CurrentClubCard, EncoreClubCard } from "@/components/bookclub/ClubCards";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
@@ -627,6 +628,7 @@ interface LandingPageProps {
 
 // ─── Main component ───────────────────────────────────────────
 export default function LandingPage({ todayQuestion, recentQuestions, upcomingMeetings = [] }: LandingPageProps) {
+  const [introDone, setIntroDone] = useState(false);
   const [modalBook, setModalBook] = useState<BookClub | null>(null);
   const [activeFloat, setActiveFloat] = useState<number | null>(null);
   const [askContent, setAskContent] = useState("");
@@ -776,6 +778,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
 
   return (
     <div className="lp">
+      {!introDone && <IntroSplash onEnter={() => setIntroDone(true)} />}
       <div className="lp-grain" aria-hidden="true" />
       <div className="lp-grain-light" aria-hidden="true" />
 
@@ -833,12 +836,7 @@ export default function LandingPage({ todayQuestion, recentQuestions, upcomingMe
         </div>
       </nav>
 
-      {/* 일정 + 위치를 첫 기능으로 전면 배치 */}
-      <HomeCalendarLocationHub
-        clubs={visibleClubs(clubRecords.length > 0 ? clubRecords : FALLBACK_CLUBS)}
-      />
-
-      {/* HERO — 브랜드 설명은 기능 다음으로 배치 */}
+      {/* HERO */}
       <section className="lp-hero" id="top">
         <div className="lp-hero-inner">
           <div className="lp-hero-meta">
