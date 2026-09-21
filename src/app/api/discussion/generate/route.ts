@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ result, discussionId });
   } catch (err) {
     if (err instanceof DiscussionEngineError) {
-      const status = err.code === "config_missing" ? 503 : (err.code === "insufficient_description" || err.code === "book_not_verified") ? 422 : 502;
+      const status = err.code === "config_missing" ? 503 : (err.code === "insufficient_description" || err.code === "book_not_verified" || err.code === "background_not_verified") ? 422 : 502;
       console.error(`Discussion generate error [${err.code}]:`, err.message);
       return NextResponse.json({ error: messageFor(err.code), code: err.code }, { status });
     }
@@ -62,6 +62,8 @@ function messageFor(code: DiscussionEngineError["code"]): string {
   switch (code) {
     case "book_not_verified":
       return "책과 저자를 도서 데이터에서 확인하지 못했습니다. 제목과 저자 표기를 확인해주세요.";
+    case "background_not_verified":
+      return "책은 확인했지만 팩트체크 가능한 숨은 배경을 찾지 못했습니다. 확인되지 않은 비화를 만들지 않기 위해 생성을 멈췄습니다.";
     case "insufficient_description":
       return "책은 확인했지만 공개된 설명·주제 데이터가 부족해 근거 있는 발제를 만들기 어렵습니다.";
     case "config_missing":
@@ -95,6 +97,7 @@ async function saveDiscussion(input: BookInput, result: Awaited<ReturnType<typeo
         discussion_questions: result.questions.map((q) => q.question),
         source_messages: {
           evidence: result.evidence,
+          background: result.background,
           analysis: result.analysis,
           giants: result.giants,
           opening_lines: result.opening_lines,
