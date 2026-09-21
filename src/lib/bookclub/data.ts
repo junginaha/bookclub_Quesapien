@@ -18,6 +18,34 @@ const EPISODE_GANGNAM_262 = {
   nearestStation: "", // TODO(unicorn): 가까운 역/출구 안내 — 운영자 확인 필요
 };
 
+
+const KYOBO_GANGNAM = {
+  name: "교보문고 강남점",
+  detail: "작가와의 만남",
+  address: "서울특별시 서초구 강남대로 465, 교보타워 지하 1~지하 2층",
+  lat: Number.NaN,
+  lng: Number.NaN,
+  nearestStation: "신논현역 인근",
+};
+
+const CHEONGDAM_BRUNCH = {
+  name: "청담동 브런치 카페",
+  detail: "참여자에게 상세 장소 안내",
+  address: "",
+  lat: Number.NaN,
+  lng: Number.NaN,
+  nearestStation: "",
+};
+
+const EDIYA_LAB = {
+  name: "이디야커피랩 · 컬처스페이스",
+  detail: "이디야 본사",
+  address: "서울특별시 강남구 논현로 636 이디야빌딩",
+  lat: Number.NaN,
+  lng: Number.NaN,
+  nearestStation: "",
+};
+
 export const BOOKCLUB_SESSIONS: BookClubSession[] = [
   {
     id: "dangerous-leaders",
@@ -51,6 +79,57 @@ export const BOOKCLUB_SESSIONS: BookClubSession[] = [
     leadQuestion: "",
     summary:
       "형을 잃은 남자가 세계에서 가장 큰 미술관의 경비원이 되었습니다.\n10년 동안 그림 앞에 서 있었고, 천천히 회복했습니다.\n\n깊어지는 가을, 상실과 회복에 대해 이야기 나눠요.\n슬픔을 지나온 분도, 지나는 중인 분도,\n그 곁에 있고 싶은 분도 환영합니다.\n\n조용한 책이에요. 그래서 오래 남습니다.",
+    agendaPreview: [],
+  },
+  {
+    id: "money-interview-author",
+    slug: "money-interview-author",
+    title: "『돈의 면접』 작가와의 만남",
+    bookTitle: "돈의 면접",
+    author: "박은규",
+    startsAt: "2026-10-17T14:00:00+09:00",
+    endsAt: "2026-10-17T16:00:00+09:00",
+    venue: KYOBO_GANGNAM,
+    capacity: 20,
+    reserved: 0,
+    fee: 0,
+    leadQuestion: "책에는 다 담지 못한 돈과 삶의 이야기를 작가에게 직접 묻습니다.",
+    summary:
+      "책을 읽고 끝내지 않습니다. 저자에게 직접 묻고, 답을 들으며 출간의 기쁨과 책 밖의 이야기를 함께 나눕니다.\n처음 온 분도 편하게 앉을 수 있는 작가와 독자의 오후입니다.",
+    agendaPreview: [],
+  },
+  {
+    id: "singler-lightness",
+    slug: "singler-lightness",
+    title: "싱글러 : 1인칭 북클럽",
+    bookTitle: "참을 수 없는 존재의 가벼움",
+    author: "밀란 쿤데라",
+    startsAt: "2026-10-28T11:30:00+09:00",
+    endsAt: "2026-10-28T13:30:00+09:00",
+    venue: CHEONGDAM_BRUNCH,
+    capacity: 10,
+    reserved: 0,
+    fee: 10000,
+    leadQuestion: "누구의 반쪽이 아니라, 온전한 한 사람으로 산다는 것은 어떤 모습일까요?",
+    summary:
+      "브런치와 『참을 수 없는 존재의 가벼움』 사이에 앉아, 누구의 무엇이 아닌 ‘나’로 살아가는 이야기를 나눕니다.\n싱글이거나, 싱글이나 다름없는 가을의 사람들이 만납니다.",
+    agendaPreview: [],
+  },
+  {
+    id: "notebooklm-workshop",
+    slug: "notebooklm-workshop",
+    title: "『노트북LM 완전정복』 강신범 작가 직강",
+    bookTitle: "노트북LM 완전정복",
+    author: "강신범",
+    startsAt: "2026-10-31T14:00:00+09:00",
+    endsAt: "2026-10-31T17:00:00+09:00",
+    venue: EDIYA_LAB,
+    capacity: 20,
+    reserved: 0,
+    fee: 30000,
+    leadQuestion: "‘언젠가 써야지’ 모아둔 자료를 오늘 실제 결과물로 바꿀 수 있을까요?",
+    summary:
+      "현직 개발자인 저자와 내 기록을 글이나 기획안의 초안으로 직접 만들어봅니다.\n전자책 포함, 이디야랩 메뉴 할인 혜택과 함께하는 실전형 토요일 오후입니다.",
     agendaPreview: [],
   },
   {
