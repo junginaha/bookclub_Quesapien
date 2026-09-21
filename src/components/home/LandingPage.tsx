@@ -43,6 +43,24 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
   }, []);
 
   useEffect(() => {
+    const elements = document.querySelectorAll("#top .lp-reveal");
+    if (!("IntersectionObserver" in window)) {
+      elements.forEach(element => element.classList.add("visible"));
+      return;
+    }
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    elements.forEach(element => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     if (howToOpen && !guide.current?.open) guide.current?.showModal();
     if (!howToOpen && guide.current?.open) guide.current.close();
   }, [howToOpen]);
