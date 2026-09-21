@@ -1903,3 +1903,19 @@ html:not([data-intro="pending"]) .lp-intro {
 @media (max-width: 640px) {
   .lp-ecard { flex-basis: min(200px, 72vw); }
 }
+
+/* Chose Commune-inspired quick-view trigger: visually identical to the existing nav link. */
+.lp-nav-popup-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--lp-ink-soft);
+  opacity: .78;
+  font: inherit;
+  font-size: var(--lp-sm);
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: opacity .25s ease;
+}
+.lp-nav-popup-link:hover,
+.lp-nav-popup-link:focus-visible { opacity: 1; }
