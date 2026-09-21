@@ -14,9 +14,9 @@ const DIRECTION_LABEL: Record<Direction, string> = {
 };
 
 const DEPTH_LABEL: Record<Depth, string> = {
-  first: "가볍게",
-  general: "적당히",
-  deep: "깊이 있게",
+  first: "가볍게 — 책의 구체적 소재에서 시작해 누구나 자신의 경험으로 답할 수 있게. 이론 용어는 최소화하고 후속 질문도 짧게.",
+  general: "적당히 — 책의 논지와 개인 경험을 오가며 근거·반론·적용을 균형 있게.",
+  deep: "깊이 있게 — 책이 전제하는 가치, 내부 모순, 반론, 시대 맥락과 사상적 연결까지 파고들기.",
 };
 
 export interface BookInput {
@@ -337,7 +337,7 @@ ${backgroundForPrompt(background)}
 
 다시 만들 항목: ${JSON.stringify(targets.map((t) => ({ number: t.number, stage: t.stage, thinker: t.thinker })))}
 
-반드시 다음 JSON 형식으로만 응답하세요: {"replacements":[{"number":1,"stage":"opening","question":"...","intent":"...","followup":"...","concept":"...","thinker":"(giant 단계일 때만)"}]}`;
+반드시 다음 JSON 형식으로만 응답하세요: {"replacements":[{"number":1,"stage":"opening","question":"...","intent":"...","followup":"...","concept":"...","thinker":"(giant 단계일 때만)","background_linked":false}]}`;
 
   try {
     const text = await callClaudeGuarded({
