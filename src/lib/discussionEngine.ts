@@ -109,36 +109,52 @@ async function callClaudeGuarded(params: Parameters<typeof callClaude>[0]): Prom
   }
 }
 
-export async function analyzeBook(input: BookInput): Promise<BookAnalysis> {
-  const system = `당신은 인문학 편집자입니다. 사용자가 입력한 책 정보(제목, 저자, 설명)를 분석해 북클럽 발제에 필요한 핵심 정보를 JSON으로 추출하세요.
+function hasThematicEvidence(evidence: BookEvidence): boolean {
+  return Boolean(
+    (evidence.description && evidence.description.trim().length >= 80) ||
+    evidence.subjects.length >= 2 ||
+    evidence.categories.length >= 1
+  );
+}
 
-규칙:
-- 확인되지 않은 줄거리, 등장인물, 사건, 인용문을 지어내지 마세요. 이 책을 확실히 알고 있을 때만 구체적으로 쓰고, 그렇지 않다면 사용자가 준 설명 안에서만 근거를 찾으세요.
-- confidence는 이 책의 내용을 신뢰 있게 알고 있으면 "high", 사용자가 준 설명으로만 추론 가능하면 "medium", 근거가 거의 없으면 "low"로 표시하세요.
-- key_concepts는 이 책 고유의 개념·주제 3~5개. "사랑", "행복", "인간" 같은 범용 단어는 금지하고, 이 책이 다루는 구체적 개념/소재를 쓰세요.
-- tensions는 이 책 내부의 갈등·모순·역설 3개.
-- premises는 이 책이 당연하게 깔고 가는 전제 가치, counterarguments는 이 책에 제기할 수 있는 반론 지점입니다.
-- modern_connection은 이 책의 문제의식이 오늘날 어떻게 이어지는지 1~2문장.
+export async function analyzeBook(input: BookInput, evidence: BookEvidence): Promise<BookAnalysis> {
+  const system = `당신은 북클럽용 인문학 편집자입니다. 아래 [검증된 도서 데이터]만 사실 근거로 사용해 책의 논지와 쟁점을 구조화하세요.
+
+절대 규칙:
+- 모델의 기억만으로 줄거리·등장인물·사건·장·페이지·인용문을 보충하지 마세요.
+- 제공된 도서 설명·주제어·카테고리에 없는 구체적 사실을 사실처럼 쓰지 마세요.
+- 직접 인용문은 만들지 마세요.
+- core_argument는 도서 설명과 주제어에서 확인 가능한 범위의 핵심 문제의식으로 쓰세요.
+- key_concepts는 구체적이고 책에 붙어 있는 개념·소재 3~5개만 쓰세요.
+- tensions는 근거 데이터에서 도출 가능한 긴장·모순·쟁점 3개를 쓰세요.
+- premises와 counterarguments는 해석이며 사실 진술과 구분되도록 작성하세요.
+- confidence는 시스템이 검증 수준으로 덮어씁니다.
+
+[검증된 도서 데이터]
+${evidenceForPrompt(evidence)}
 
 반드시 아래 JSON 형식으로만 응답하세요:
-{"confirmed_title":"...","confirmed_author":"...","confidence":"high|medium|low","core_argument":"...","key_concepts":["...","..."],"tensions":["...","...","..."],"premises":"...","counterarguments":"...","modern_connection":"..."}`;
-
-  const userMsg = `책 제목: ${input.title}\n저자: ${input.author || "(미상)"}${
-    input.description ? `\n설명: ${input.description}` : ""
-  }`;
+{"confirmed_title":"...","confirmed_author":"...","confidence":"medium","core_argument":"...","key_concepts":["..."],"tensions":["...","...","..."],"premises":"...","counterarguments":"...","modern_connection":"..."}`;
 
   const text = await callClaudeGuarded({
     system,
-    messages: [{ role: "user", content: userMsg }],
-    maxTokens: 900,
-    temperature: 0.4,
+    messages: [{ role: "user", content: "검증 데이터 범위 안에서만 북클럽용 책 분석을 작성하세요." }],
+    maxTokens: 1100,
+    temperature: 0.25,
   });
 
-  const analysis = extractJson<BookAnalysis>(text);
-  if (!Array.isArray(analysis.key_concepts) || analysis.key_concepts.length === 0) {
+  const raw = extractJson<BookAnalysis>(text);
+  if (!Array.isArray(raw.key_concepts) || raw.key_concepts.length < 2) {
     throw new DiscussionEngineError("invalid_json", "책 분석 결과가 불완전합니다.");
   }
-  return analysis;
+  return {
+    ...raw,
+    confirmed_title: evidence.title,
+    confirmed_author: evidence.authors.join(", "),
+    confidence: evidence.confidence,
+    key_concepts: raw.key_concepts.slice(0, 5),
+    tensions: Array.isArray(raw.tensions) ? raw.tensions.slice(0, 3) : [],
+  };
 }
 
 interface RawGenResult {
