@@ -167,3 +167,35 @@
   .meeting { transition: none; }
   .meeting:hover, .meeting:focus-visible, .meeting:active { transform: none; }
 }
+
+/* Minimal event preview: only status, book, author, date/time and two actions. */
+.details {
+  padding: 8px 0 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.detailHead { padding: 0 0 14px; border-bottom: 1px solid var(--linen-line); }
+.detailLabel { font-size: 11px; letter-spacing: .08em; }
+.meeting { padding: 22px 0 4px; }
+.status { margin-bottom: 14px; font-size: 11px; letter-spacing: .04em; }
+.section .meeting h3 { margin-bottom: 8px; font-size: clamp(24px, 2.5vw, 31px); line-height: 1.42; }
+.author { font-size: 13px; }
+.facts { margin: 24px 0 20px; }
+.facts > div {
+  grid-template-columns: 54px minmax(0,1fr);
+  padding: 15px 0;
+  border-top: 1px solid var(--linen-line);
+  border-bottom: 1px solid var(--linen-line);
+  font-size: 14px;
+  line-height: 1.8;
+}
+.actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.section a.primary, .section a.secondary { min-height:48px; padding:11px 14px; box-shadow:none; }
+@media (max-width:560px) {
+  .details { padding-top:0; }
+  .meeting { padding-top:20px; }
+  .facts { margin:20px 0 16px; }
+  .actions { grid-template-columns:1fr 1fr; }
+  .actions > a { width:100%; }
+}
