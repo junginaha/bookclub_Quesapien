@@ -54,6 +54,7 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
                   <BookCoverImage
                     title={session.bookTitle}
                     author={session.author}
+                    coverUrl={session.coverUrl}
                     fallbackClassName={styles.coverFallback}
                   />
                   {scene && (

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import BookCoverImage from "@/components/home/BookCoverImage";
 import { useState } from "react";
 import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
 import { isWaitlistFull } from "@/lib/bookclub/types";
@@ -10,11 +10,6 @@ import { Button } from "@/components/ui/button";
 import StatusPill from "./StatusPill";
 import NotifyForm from "./NotifyForm";
 import EncoreRequestButton from "./EncoreRequestButton";
-
-function ogFallback(title: string, sub: string) {
-  const p = new URLSearchParams({ title, sub });
-  return `/og?${p.toString()}`;
-}
 
 /**
  * 세션 카드 — 예정/지난 공용 컴포넌트 1개(작업지시서 Phase 1-5). 날짜·시간·장소·
@@ -33,14 +28,13 @@ export default function TimelineCard({
   highlighted: boolean;
 }) {
   const [actionOpen, setActionOpen] = useState(false);
-  const cover = session.coverUrl || ogFallback(session.bookTitle, session.author);
   const isPast = status === "past";
   const weekday = formatWeekdayFull(session.startsAt).slice(0, 1);
 
   const cardInner = (
     <>
       <div className="qc-card-cover">
-        <Image src={cover} alt={`『${session.bookTitle}』 표지`} width={88} height={132} unoptimized />
+        <BookCoverImage title={session.bookTitle} author={session.author} coverUrl={session.coverUrl} />
       </div>
       <div className="qc-card-body">
         <span className="qc-card-title">{session.title}</span>

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import BookCoverImage from "@/components/home/BookCoverImage";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -119,16 +118,12 @@ export default function DetailClient({
         <div id="qd-hero">
           <div className="qd-hero-top">
             <div className="qd-cover-sm">
-              {session.coverUrl ? (
-                <Image src={session.coverUrl} alt={`『${session.bookTitle}』 표지`} width={120} height={180} unoptimized priority />
-              ) : (
-                <BookCoverImage
-                  key={session.slug}
-                  title={session.bookTitle}
-                  author={session.author}
-                  fallbackClassName="flex h-full flex-col justify-center gap-2 p-2 text-center text-xs"
-                />
-              )}
+              <BookCoverImage
+                title={session.bookTitle}
+                author={session.author}
+                coverUrl={session.coverUrl}
+                priority
+              />
             </div>
             <div>
               <p className="qd-eyebrow">BOOK CLUB</p>

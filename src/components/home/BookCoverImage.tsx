@@ -2,22 +2,34 @@
 
 import { useEffect, useState } from "react";
 
-export default function BookCoverImage({
-  title,
-  author,
-  fallbackClassName,
-}: {
+type BookCoverProps = {
   title: string;
   author: string;
+  coverUrl?: string;
   fallbackClassName?: string;
-}) {
-  const [url, setUrl] = useState<string | null>(null);
+  priority?: boolean;
+};
+
+// All book surfaces share the same explicit-cover/API/fallback policy.
+// Remount on book changes so an old cover cannot flash for a different book.
+export default function BookCoverImage(props: BookCoverProps) {
+  return <ResolvedBookCover key={JSON.stringify([props.title, props.author, props.coverUrl])} {...props} />;
+}
+
+function ResolvedBookCover({
+  title,
+  author,
+  coverUrl,
+  fallbackClassName = "flex h-full flex-col justify-center gap-2 p-2 text-center text-xs",
+  priority = false,
+}: BookCoverProps) {
+  const [url, setUrl] = useState<string | null>(coverUrl || null);
+  const [lookup, setLookup] = useState(!coverUrl);
 
   useEffect(() => {
+    if (!lookup) return;
     let active = true;
     const controller = new AbortController();
-    setUrl(null);
-    // Bypass blank responses cached by the previous API implementation.
     const params = new URLSearchParams({ title, author, v: "2" });
     fetch("/api/book-cover?" + params.toString(), { signal: controller.signal })
       .then((response) => response.ok ? response.json() : null)
@@ -26,7 +38,7 @@ export default function BookCoverImage({
       })
       .catch(() => {});
     return () => { active = false; controller.abort(); };
-  }, [title, author]);
+  }, [title, author, lookup]);
 
   if (!url) {
     return (
@@ -41,8 +53,8 @@ export default function BookCoverImage({
     <img
       src={url}
       alt={title + " 실제 도서 표지"}
-      loading="lazy"
-      onError={() => setUrl(null)}
+      loading={priority ? "eager" : "lazy"}
+      onError={() => { setUrl(null); setLookup(true); }}
     />
   );
 }
