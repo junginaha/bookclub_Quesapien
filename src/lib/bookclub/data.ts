@@ -168,7 +168,7 @@ export const BOOKCLUB_SESSIONS: BookClubSession[] = [
     id: "dangerous-leaders",
     slug: "dangerous-leaders",
     title: "위험한 리더는 어떻게 만들어지는가 북토크",
-    bookTitle: "위험한 리더는 어떻게 만들어지는가",
+    bookTitle: "불통, 독단, 야망",
     author: "스티브 테일러",
     startsAt: "2026-09-19T10:00:00+09:00",
     endsAt: "2026-09-19T12:00:00+09:00",

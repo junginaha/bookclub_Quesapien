@@ -51,7 +51,27 @@ function norm(value: string) {
     .replace(/[\s\p{P}\p{S}]/gu, "");
 }
 
+function authorsMatch(authors: string[], query: string) {
+  const expected = query.split(/[·,|;&]/).map(norm).filter(Boolean);
+  const actual = authors.map(norm).filter(Boolean);
+  return !expected.length || expected.some((name) =>
+    actual.some((value) => value.includes(name) || name.includes(value)));
+}
+
+// Verified Korean editions: book21.com/book/book_view.html?bookSID=6920
+// and yes24.com/product/goods/64620409. ISBN avoids subtitle/author-order ambiguity.
+function knownIsbn(title: string, author: string) {
+  if (["불통독단야망", "위험한리더는어떻게만들어지는가"].includes(norm(title)) &&
+      norm(author).includes("스티브테일러")) return "9791173570650";
+  if (norm(title) === "어떻게민주주의는무너지는가" &&
+      authorsMatch(["스티븐 레비츠키", "대니얼 지블랫"], author) && author.trim())
+    return "9791160560589";
+  return undefined;
+}
+
 function matchScore(candidate: Candidate, title: string, author: string) {
+  const isbn = knownIsbn(title, author);
+  if (isbn && candidate.isbn?.split(/\s+/).includes(isbn)) return 200 + candidate.quality;
   const qt = norm(title);
   const qa = norm(author);
   const ct = norm(candidate.title);
@@ -64,7 +84,7 @@ function matchScore(candidate: Candidate, title: string, author: string) {
 
   if (qa && ca) {
     if (ca === qa) score += 36;
-    else if (ca.includes(qa) || qa.includes(ca)) score += 28;
+    else if (authorsMatch(candidate.authors, author)) score += 28;
     else score -= 18;
   }
 
@@ -116,8 +136,9 @@ async function searchKakao(title: string, author: string): Promise<Candidate[]> 
   if (!key) return [];
 
   const url = new URL("https://dapi.kakao.com/v3/search/book");
-  url.searchParams.set("query", title);
-  url.searchParams.set("target", "title");
+  const isbn = knownIsbn(title, author);
+  url.searchParams.set("query", isbn || title);
+  url.searchParams.set("target", isbn ? "isbn" : "title");
   url.searchParams.set("size", "20");
   url.searchParams.set("sort", "accuracy");
 
@@ -142,7 +163,7 @@ async function searchKakao(title: string, author: string): Promise<Candidate[]> 
         quality: 12,
         isbn: item.isbn,
       }))
-      .filter((item) => !author || norm(item.authors.join(" ")).includes(norm(author)) || norm(author).includes(norm(item.authors.join(" "))));
+      .filter((item) => isbn ? Boolean(item.isbn?.split(/\s+/).includes(isbn)) : authorsMatch(item.authors, author));
   } catch {
     console.warn("[book-cover] kakao request failed or timed out");
     return [];
