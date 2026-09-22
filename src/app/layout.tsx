@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR, Noto_Serif_KR, EB_Garamond } from "next/font/google";
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { JsonLd } from "@/components/seo/JsonLd";
