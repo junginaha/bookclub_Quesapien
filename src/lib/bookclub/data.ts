@@ -76,6 +76,31 @@ const VENUE_TBA = {
 
 export const BOOKCLUB_SESSIONS: BookClubSession[] = [
   {
+    id: "by-the-sea-gurnah",
+    slug: "by-the-sea-gurnah",
+    title: "누구나 책수다 · 『바닷가에서』",
+    bookTitle: "바닷가에서",
+    author: "압둘라자크 구르나",
+    startsAt: "2026-10-27T19:00:00+09:00",
+    endsAt: "2026-10-27T21:00:00+09:00",
+    venue: CAFE_SINAMON,
+    capacity: 1,
+    reserved: 0,
+    registrationClosed: true,
+    fee: 0,
+    feeLabelOverride: "별도 안내",
+    leadQuestion: "고향을 떠난 뒤에도 우리는 어디까지 그곳의 사람일까요?",
+    summary: "10월 27일 저녁, 압둘라자크 구르나의 『바닷가에서』를 함께 읽는 책수다입니다. 현재 참여 신청은 마감됐고 대기 신청을 받고 있습니다.",
+    bookIntro: "2021년 노벨문학상 수상 작가 압둘라자크 구르나의 장편소설입니다. 망명과 이주, 기억과 소속을 중심에 두고, 서로 원한으로 얽힌 두 가문의 이야기가 낯선 땅에서 다시 만나는 과정을 따라갑니다. 개인의 기억이 식민주의와 난민의 역사에 어떻게 포개지는지, 그리고 서로의 이야기를 듣는 일이 오해를 넘어 이해와 연대로 이어질 수 있는지를 묻습니다. 한국어판은 문학동네 세계문학전집 210번으로 2022년에 출간됐습니다.",
+    bookSourceUrl: "https://www.yes24.com/product/goods/109367120",
+    bookSourceLabel: "YES24 · 문학동네 도서정보",
+    agendaPreview: [
+      "고향을 떠난 뒤에도 우리는 어디까지 그곳의 사람일까요?",
+      "같은 과거를 두 사람이 전혀 다르게 기억할 때, 무엇을 진실이라고 부를 수 있을까요?",
+      "타인의 이야기를 듣는 일은 실제로 화해의 시작이 될 수 있을까요?"
+    ],
+  },
+  {
     id: "chekhov-love-desire",
     slug: "chekhov-love-desire",
     title: "누구나 책수다 · 『사랑과 욕망의 변주곡』",
