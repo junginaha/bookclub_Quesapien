@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { ArrowUpRight, Check, Copy, MapPin } from "lucide-react";
+import { ArrowUpRight, Check, ChevronDown, Copy, MapPin } from "lucide-react";
 import type { BookClubVenue } from "@/lib/bookclub/types";
 import styles from "./VenueCard.module.css";
 
@@ -69,14 +69,17 @@ export default function VenueCard({ venue }: { venue: BookClubVenue }) {
       <div role="status" className={copyState === "failed" ? styles.feedback : "sr-only"}>
         {copyState === "copied" ? "주소를 복사했어요." : copyState === "failed" ? "주소를 길게 눌러 복사해 주세요." : ""}
       </div>
-      {address && <nav className={styles.directions} aria-label="지도와 길찾기">
+      {address && <details className={styles.mapDisclosure}>
+        <summary className={styles.mapToggle}>지도 보기<ChevronDown size={15} aria-hidden="true" /></summary>
+        <nav className={styles.directions} aria-label="지도와 길찾기">
         <a href={kakaoUrl} target="_blank" rel="noopener noreferrer" aria-label={hasCoordinates ? "카카오맵 길찾기 (새 창)" : "카카오맵에서 위치 보기 (새 창)"}>
           <span>카카오맵</span><ArrowUpRight size={16} aria-hidden="true" />
         </a>
         <a href={naverUrl} target="_blank" rel="noopener noreferrer" aria-label="네이버지도에서 위치 보기 (새 창)">
           <span>네이버지도</span><ArrowUpRight size={16} aria-hidden="true" />
         </a>
-      </nav>}
+      </nav>
+      </details>}
     </section>
   );
 }
