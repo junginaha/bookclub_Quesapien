@@ -26,7 +26,7 @@ export interface BookClubSession {
   reserved: number; // 렌더 시점에 getJoinedCounts()로 덮어써진다 — 정적 값 아님
   fee: number; // 원 단위. 0이면 무료(단, feeLabelOverride가 있으면 해당 문구 우선)\n  feeLabelOverride?: string; // 금액 미확정/별도 안내 등 운영 문구\n  registrationClosed?: boolean; // 일정은 예정이지만 일반 참여 신청을 닫은 경우
   leadQuestion: string; // 히어로·카드에 노출할 대표 발제. 없으면 빈 문자열(화면에서 숨김)
-  summary: string;
+  summary: string;\n  bookIntro?: string; // 검증된 서지/책소개를 바탕으로 한 상세페이지용 책 내용\n  bookSourceUrl?: string;\n  bookSourceLabel?: string;
   agendaPreview: string[]; // 발제 미리보기. 없으면 빈 배열(화면에서 섹션 숨김)
   encoreCount?: number; // past 전용 — TODO(unicorn): 영문 slug 기준 앵콜 요청 집계 배선 필요
   archiveSlug?: string;
