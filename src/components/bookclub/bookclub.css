@@ -701,3 +701,22 @@
   .qd-event-meta { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .qd-event-meta > div:nth-child(n+3) { border-top:1px solid var(--line); }
 }
+
+.qd-closed-actions { display:grid; gap:10px; max-width:420px; }
+.qd-encore-button {
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--ink);
+  border-radius:10px;
+  background:transparent;
+  color:var(--ink);
+  text-decoration:none;
+  font-size:14px;
+  font-weight:600;
+  transition:transform .18s ease, background .18s ease;
+}
+.qd-encore-button:hover,
+.qd-encore-button:focus-visible { background:#f0ece4; transform:translateY(-1px); }
+.qd-closed-actions > small { color:var(--muted); font-size:10.5px; line-height:1.6; }
