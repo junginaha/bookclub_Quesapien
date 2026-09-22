@@ -223,3 +223,23 @@
   .detailHead { align-items:center; }
   .nearbyButton { min-height:40px; padding-inline:13px; }
 }
+
+.locationActions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.mapFinderButton {
+  min-height:38px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:7px 12px;
+  border:1px solid #bba58a;
+  border-radius:999px;
+  color:var(--linen-ink);
+  background:transparent;
+  text-decoration:none;
+  font:600 11px/1.4 var(--font-noto-sans-kr),sans-serif;
+}
+.mapFinderButton:hover { background:#eee5d7; }
+@media(max-width:560px){
+  .locationActions { width:100%; display:grid; grid-template-columns:1fr 1fr; }
+  .nearbyButton,.mapFinderButton { width:100%; min-height:42px; }
+}
