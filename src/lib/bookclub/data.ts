@@ -94,7 +94,7 @@ export const BOOKCLUB_SESSIONS: BookClubSession[] = [
     bookIntro: "안톤 체호프의 사랑·욕망·권태를 다룬 단편 16편을 묶은 선집입니다. 『사랑에 대하여』와 『개를 데리고 다니는 부인』을 포함해, 일상의 타성과 관계의 의무 사이에서 흔들리는 인물들을 통해 욕망을 단순한 도덕 판단으로 환원하지 않고 인간의 복잡한 감정과 선택을 들여다봅니다.",
     bookSourceUrl: "https://www.ptlib.go.kr/intro/menu/10045/program/30015/plusSearchResultDetail.do?bookKey=1102959829&currentPageNo=1&preSearchKey=ALL&preSearchKeyword=%EC%95%84%EB%9E%8C&publishFormCode=BO&reSearchYn=N&recKey=1102959827&searchCategory=NONBOOK&searchKdc=1&searchKey=ALL&searchKeyword=%EC%95%84%EB%9E%8C&searchOrder=DESC&searchRecordCount=10&searchSort=SIMILAR&searchType=SIMPLE&viewStatus=IMAGE",
     bookSourceLabel: "평택시도서관 도서정보",
-    agendaPreview: ["욕망은 우리를 더 솔직하게 만들까요, 더 자기기만하게 만들까요?","체호프는 인물의 일탈을 왜 쉽게 심판하지 않을까요?","『사랑에 대하여』와 『개를 데리고 다니는 부인』에서 사랑과 의무의 충돌은 어떻게 달라지나요?"],,
+    agendaPreview: ["욕망은 우리를 더 솔직하게 만들까요, 더 자기기만하게 만들까요?","체호프는 인물의 일탈을 왜 쉽게 심판하지 않을까요?","『사랑에 대하여』와 『개를 데리고 다니는 부인』에서 사랑과 의무의 충돌은 어떻게 달라지나요?"],
   },
   {
     id: "glass-bead-game",
@@ -115,7 +115,7 @@ export const BOOKCLUB_SESSIONS: BookClubSession[] = [
     bookIntro: "먼 미래의 정신적 엘리트 공동체 카스탈리엔과 그 중심에 있는 ‘유리알 유희’를 배경으로, 유희 명인 요제프 크네히트의 삶을 따라가는 헤세의 마지막 장편소설입니다. 예술과 학문을 통합하려는 이상과 현실 세계에 대한 책임 사이의 긴장을 통해, 지식은 삶과 어떤 관계를 맺어야 하는지 묻습니다. 헤세는 1931년 집필을 시작해 제2차 세계대전 중 작품을 완성했습니다.",
     bookSourceUrl: "https://www.yes24.com/product/goods/117934290",
     bookSourceLabel: "YES24 도서정보",
-    agendaPreview: ["완벽하게 정제된 지식은 현실과 멀어질수록 더 가치 있어질까요?","크네히트가 카스탈리엔 밖의 삶을 의식하기 시작한 이유는 무엇일까요?","지식인의 자유와 사회적 책임은 어디에서 충돌할까요?"],,
+    agendaPreview: ["완벽하게 정제된 지식은 현실과 멀어질수록 더 가치 있어질까요?","크네히트가 카스탈리엔 밖의 삶을 의식하기 시작한 이유는 무엇일까요?","지식인의 자유와 사회적 책임은 어디에서 충돌할까요?"],
   },
   {
     id: "thinking-fast-slow",
@@ -136,7 +136,7 @@ export const BOOKCLUB_SESSIONS: BookClubSession[] = [
     bookIntro: "대니얼 카너먼은 인간의 사고를 빠르고 자동적인 직관적 사고와, 느리고 의식적인 숙고의 사고라는 두 작동 방식으로 설명합니다. 다양한 판단 실험을 통해 휴리스틱, 편향, 과신, 손실회피 등이 우리의 선택에 어떻게 개입하는지 보여주며, ‘합리적으로 판단한다’는 인간의 자기 확신을 다시 묻게 합니다.",
     bookSourceUrl: "https://www.yes24.com/Product/Goods/59580017",
     bookSourceLabel: "YES24 도서정보",
-    agendaPreview: ["내가 ‘직감’이라고 믿는 판단은 언제 유용하고 언제 위험할까요?","틀렸다는 증거가 있어도 첫 판단을 고수하는 이유는 무엇일까요?","내 결정에서 가장 자주 작동하는 편향 하나를 찾는다면 무엇일까요?"],,
+    agendaPreview: ["내가 ‘직감’이라고 믿는 판단은 언제 유용하고 언제 위험할까요?","틀렸다는 증거가 있어도 첫 판단을 고수하는 이유는 무엇일까요?","내 결정에서 가장 자주 작동하는 편향 하나를 찾는다면 무엇일까요?"],
   },
 
   {
