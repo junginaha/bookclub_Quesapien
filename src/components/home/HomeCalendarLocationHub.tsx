@@ -133,9 +133,19 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
         <div className={styles.details}>
           <div className={styles.detailHead}>
             <p className={styles.detailLabel}>함께 읽는 날</p>
-            <button type="button" className={styles.nearbyButton} onClick={findNearbyClub} disabled={findingNearby}>
-              {findingNearby ? "위치 확인 중…" : "내 근처 북클럽 찾기"}
-            </button>
+            <div className={styles.locationActions}>
+              <button type="button" className={styles.nearbyButton} onClick={findNearbyClub} disabled={findingNearby}>
+                {findingNearby ? "위치 확인 중…" : "내 근처 북클럽 찾기"}
+              </button>
+              <a
+                className={styles.mapFinderButton}
+                href="https://map.kakao.com/?q=%EB%B6%81%ED%81%B4%EB%9F%BD"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                지도에서 찾기
+              </a>
+            </div>
           </div>
           {nearbyMessage && <p className={styles.nearbyMessage} role="status">{nearbyMessage}</p>}
           <div className={styles.meetings} aria-live="polite" aria-atomic="false">
@@ -168,7 +178,7 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
                 </dl>
                 <div className={styles.actions}>
                   <Link className={styles.primary} href={`/bookclub/${session.slug}`}>{status === "open" ? "참여 신청" : "모임 상세 보기"}</Link>
-                  {venueText && <a className={styles.secondary} href={`https://map.kakao.com/?q=${encodeURIComponent(venueText)}`} target="_blank" rel="noopener noreferrer">지도 보기<span className={styles.srOnly}> · 새 창</span></a>}
+                  <a className={styles.secondary} href={`https://map.kakao.com/?q=${encodeURIComponent(venueText || session.bookTitle + " 북클럽")}`} target="_blank" rel="noopener noreferrer">지도 보기<span className={styles.srOnly}> · 새 창</span></a>
                 </div>
               </article>;
             })}
