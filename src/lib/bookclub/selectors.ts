@@ -14,6 +14,7 @@ export { isPast, isWaitlistFull, seatsLeft };
  */
 export function getStatus(s: BookClubSession): SessionStatus {
   if (isPast(s)) return "past";
+  if (s.registrationClosed) return "full";
   if (seatsLeft(s) <= 0) return "full";
   return "open";
 }
