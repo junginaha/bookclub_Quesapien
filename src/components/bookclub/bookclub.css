@@ -720,3 +720,14 @@
 .qd-encore-button:hover,
 .qd-encore-button:focus-visible { background:#f0ece4; transform:translateY(-1px); }
 .qd-closed-actions > small { color:var(--muted); font-size:10.5px; line-height:1.6; }
+
+.qd-book-intro {
+  margin: 28px 0;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.qd-book-intro > span { color:var(--muted); font-size:9px; font-weight:700; letter-spacing:.14em; }
+.qd-book-intro h2 { margin:7px 0 12px; font-size:20px; line-height:1.4; font-weight:600; }
+.qd-book-intro p { margin:0; max-width:65ch; font-size:14px; line-height:1.9; word-break:keep-all; }
+.qd-book-intro a { display:inline-block; margin-top:12px; color:var(--muted); font-size:10.5px; text-underline-offset:3px; }
