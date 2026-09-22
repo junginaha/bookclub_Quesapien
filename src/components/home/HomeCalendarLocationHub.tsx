@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import type { BookClubSession } from "@/lib/bookclub/types";
-import { dateKey, feeLabel, formatMonthDay, formatTimeRange, formatWeekdayFull, getStatus } from "@/lib/bookclub/selectors";
+import { dateKey, formatMonthDay, formatTimeRange, formatWeekdayFull, getStatus } from "@/lib/bookclub/selectors";
 import styles from "./linen-calendar.module.css";
 
 const DAYS = [
@@ -41,10 +41,6 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
   const startKey = first ? dateKey(first.startsAt) : dateKey(new Date());
   const [month, setMonth] = useState(startKey.slice(0, 7));
   const [selection, setSelection] = useState(startKey);
-  const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
-  const [locating, setLocating] = useState(false);
-  const [locationMessage, setLocationMessage] = useState("");
-  const locatingRef = useRef(false);
   const [year, monthNumber] = month.split("-").map(Number);
   const inMonth = sorted.filter(s => dateKey(s.startsAt).startsWith(month));
   const selectedKey = inMonth.some(s => dateKey(s.startsAt) === selection)
@@ -53,36 +49,10 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
   const eventDays = new Set(inMonth.map(s => dateKey(s.startsAt)));
   const todayKey = dateKey(new Date());
   const Heading = headingLevel === 1 ? "h1" : "h2";
-  const hasCoordinates = selected.some(s => Number.isFinite(s.venue.lat) && Number.isFinite(s.venue.lng)
-    && Math.abs(s.venue.lat) <= 90 && Math.abs(s.venue.lng) <= 180);
-
   function moveMonth(delta: number) {
     const next = new Date(Date.UTC(year, monthNumber - 1 + delta, 1));
     setMonth(`${next.getUTCFullYear()}-${pad(next.getUTCMonth() + 1)}`);
     setSelection("");
-  }
-
-  function locate() {
-    if (locatingRef.current) return;
-    if (!navigator.geolocation) {
-      setLocationMessage("위치를 사용할 수 없습니다. 지도 보기를 이용해 주세요.");
-      return;
-    }
-    locatingRef.current = true;
-    setLocating(true);
-    setLocationMessage("");
-    // Location is opt-in, held only in memory, and never sent to a server.
-    navigator.geolocation.getCurrentPosition(position => {
-      setOrigin({ lat: position.coords.latitude, lng: position.coords.longitude });
-      locatingRef.current = false;
-      setLocating(false);
-    }, error => {
-      setLocationMessage(error.code === 1
-        ? "위치 권한이 꺼져 있습니다. 지도는 권한 없이 볼 수 있습니다."
-        : "위치를 확인하지 못했습니다. 다시 시도해 주세요.");
-      locatingRef.current = false;
-      setLocating(false);
-    }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 });
   }
 
   return (
@@ -120,19 +90,13 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
         <div className={styles.details}>
           <div className={styles.detailHead}>
             <p className={styles.detailLabel}>함께 읽는 날</p>
-            {hasCoordinates && <button type="button" className={styles.locationButton} onClick={locate} disabled={locating}>{locating ? "위치 확인 중…" : origin ? "거리 새로 확인" : "내 위치에서 거리 보기"}</button>}
           </div>
-          {locationMessage && <p role="status" className={styles.notice}>{locationMessage}</p>}
-          {origin && <button type="button" className={styles.clearLocation} onClick={() => { setOrigin(null); setLocationMessage(""); }}>위치 지우기</button>}
           <div className={styles.meetings} aria-live="polite" aria-atomic="false">
             {selected.length === 0 ? <div className={styles.empty}>
               <p>{sorted.length ? "이달에는 등록된 모임이 없습니다." : "다음 모임을 준비하고 있습니다."}</p>
               {first && <button type="button" className={styles.secondary} onClick={() => { setMonth(startKey.slice(0, 7)); setSelection(startKey); }}>등록된 일정 보기</button>}
             </div> : selected.map(session => {
               const status = getStatus(session);
-              const canLocate = Number.isFinite(session.venue.lat) && Number.isFinite(session.venue.lng)
-                && Math.abs(session.venue.lat) <= 90 && Math.abs(session.venue.lng) <= 180;
-              const km = origin && canLocate ? straightLineKm(origin, session.venue) : null;
               const venueText = session.venue.address || session.venue.name;
               return <article
                 className={styles.meeting}
@@ -153,8 +117,6 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
                 <p className={styles.author}>{session.author}</p>
                 <dl className={styles.facts}>
                   <div><dt>일시</dt><dd>{formatMonthDay(session.startsAt)} {formatWeekdayFull(session.startsAt)}<br />{formatTimeRange(session.startsAt, session.endsAt)}</dd></div>
-                  <div><dt>장소</dt><dd>{session.venue.name || "장소 확인 중"}{session.venue.address && <small>{session.venue.address}</small>}{km !== null && <small>직선거리 약 {km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`}</small>}</dd></div>
-                  <div><dt>참가비</dt><dd>{feeLabel(session.fee)}</dd></div>
                 </dl>
                 <div className={styles.actions}>
                   <Link className={styles.primary} href={`/bookclub/${session.slug}`}>{status === "open" ? "참여 신청" : "모임 상세 보기"}</Link>
