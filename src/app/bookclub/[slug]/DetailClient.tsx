@@ -45,7 +45,9 @@ export default function DetailClient({
   const searchParams = useSearchParams();
   const cover = session.coverUrl || ogFallback(session.bookTitle, session.author);
   const isSessionPast = status === "past";
-  const weekday = formatWeekdayFull(session.startsAt);\n  const feeText = session.feeLabelOverride ?? feeLabel(session.fee);\n  const encoreHref = `mailto:junginaha@qsapiens.com?subject=${encodeURIComponent(`[앵콜 요청] ${session.bookTitle}`)}&body=${encodeURIComponent(`${session.title} 앵콜 모임을 요청합니다.`)}`;
+  const weekday = formatWeekdayFull(session.startsAt);
+  const feeText = session.feeLabelOverride ?? feeLabel(session.fee);
+  const encoreHref = `mailto:junginaha@qsapiens.com?subject=${encodeURIComponent(`[앵콜 요청] ${session.bookTitle}`)}&body=${encodeURIComponent(`${session.title} 앵콜 모임을 요청합니다.`)}`;
 
   const rawPeriod = searchParams.get("period") ?? searchParams.get("filter");
   const period: Period = rawPeriod === "past" ? "past" : rawPeriod === "all" ? "all" : "upcoming";
@@ -148,6 +150,19 @@ export default function DetailClient({
         </dl>
 
         <p className="qd-reason">{session.summary}</p>
+
+        {session.bookIntro && (
+          <section className="qd-book-intro" aria-labelledby="qd-book-intro-title">
+            <span>ABOUT THE BOOK</span>
+            <h2 id="qd-book-intro-title">책은 이런 이야기입니다</h2>
+            <p>{session.bookIntro}</p>
+            {session.bookSourceUrl && (
+              <a href={session.bookSourceUrl} target="_blank" rel="noreferrer">
+                {session.bookSourceLabel ?? "책 정보 확인"} ↗
+              </a>
+            )}
+          </section>
+        )}
 
         <VenueCard venue={session.venue} />
 
