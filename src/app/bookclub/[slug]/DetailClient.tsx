@@ -45,7 +45,7 @@ export default function DetailClient({
   const searchParams = useSearchParams();
   const cover = session.coverUrl || ogFallback(session.bookTitle, session.author);
   const isSessionPast = status === "past";
-  const weekday = formatWeekdayFull(session.startsAt);
+  const weekday = formatWeekdayFull(session.startsAt);\n  const feeText = session.feeLabelOverride ?? feeLabel(session.fee);\n  const encoreHref = `mailto:junginaha@qsapiens.com?subject=${encodeURIComponent(`[앵콜 요청] ${session.bookTitle}`)}&body=${encodeURIComponent(`${session.title} 앵콜 모임을 요청합니다.`)}`;
 
   const rawPeriod = searchParams.get("period") ?? searchParams.get("filter");
   const period: Period = rawPeriod === "past" ? "past" : rawPeriod === "all" ? "all" : "upcoming";
@@ -143,7 +143,7 @@ export default function DetailClient({
         <dl className="qd-event-meta" aria-label="모임 핵심 정보">
           <div><dt>일시</dt><dd>{formatMonthDay(session.startsAt)} {weekday}<br />{formatTimeRange(session.startsAt, session.endsAt)}</dd></div>
           <div><dt>장소</dt><dd>{session.venue.name}</dd></div>
-          <div><dt>참여비</dt><dd>{feeLabel(session.fee)}</dd></div>
+          <div><dt>참여비</dt><dd>{feeText}</dd></div>
           <div><dt>자리</dt><dd>{status === "open" ? seatsLeft(session) + "자리 남음" : status === "full" ? "대기 신청" : "상세 확인"}</dd></div>
         </dl>
 
@@ -187,12 +187,16 @@ export default function DetailClient({
                   ? "다음 앵콜 일정이 열리면 가장 먼저 안내해 드릴게요."
                   : status === "full"
                   ? `${session.venue.name} · 대기자로 등록하면 자리가 나는 대로 안내해 드려요.`
-                  : `${formatMonthDay(session.startsAt)} ${weekday} · ${feeLabel(session.fee)} · ${seatsLeft(session)}자리 남음`}
+                  : `${formatMonthDay(session.startsAt)} ${weekday} · ${feeText} · ${seatsLeft(session)}자리 남음`}
               </p>
               {isWaitlistFull(session) ? (
                 <Button type="button" variant="outline" disabled>마감되었습니다</Button>
               ) : status === "full" ? (
-                <NotifyForm clubSlug={session.slug} mode="waitlist" />
+                <div className="qd-closed-actions">
+                  <NotifyForm clubSlug={session.slug} mode="waitlist" />
+                  <a className="qd-encore-button" href={encoreHref}>앵콜 요청</a>
+                  <small>같은 책으로 다음 모임이 열리길 원하시면 앵콜을 요청해 주세요.</small>
+                </div>
               ) : (
                 <ApplyForm clubSlug={session.slug} fee={session.fee} productName={session.title} />
               )}
