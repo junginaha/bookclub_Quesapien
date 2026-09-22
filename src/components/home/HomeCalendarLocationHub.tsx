@@ -43,6 +43,7 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
   const [selection, setSelection] = useState(startKey);
   const [findingNearby, setFindingNearby] = useState(false);
   const [nearbyMessage, setNearbyMessage] = useState("");
+  const [nearbyResults, setNearbyResults] = useState<Array<{ session: BookClubSession; km: number }>>([]);
   const [year, monthNumber] = month.split("-").map(Number);
   const inMonth = sorted.filter(s => dateKey(s.startsAt).startsWith(month));
   const selectedKey = inMonth.some(s => dateKey(s.startsAt) === selection)
@@ -79,15 +80,16 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
           setFindingNearby(false);
           return;
         }
-        const nearest = candidates
+        const results = candidates
           .map((session) => ({ session, km: straightLineKm(here, session.venue) }))
-          .sort((a, b) => a.km - b.km)[0];
+          .sort((a, b) => a.km - b.km)
+          .slice(0, 5);
+        const nearest = results[0];
         const key = dateKey(nearest.session.startsAt);
         setMonth(key.slice(0, 7));
         setSelection(key);
-        setNearbyMessage(
-          `현재 위치 기준 가장 가까운 등록 모임 · ${nearest.km < 1 ? Math.round(nearest.km * 1000) + "m" : nearest.km.toFixed(1) + "km"}`
-        );
+        setNearbyResults(results);
+        setNearbyMessage("현재 위치에서 가까운 순서입니다.");
         setFindingNearby(false);
       },
       (error) => {
@@ -133,21 +135,41 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
         <div className={styles.details}>
           <div className={styles.detailHead}>
             <p className={styles.detailLabel}>함께 읽는 날</p>
-            <div className={styles.locationActions}>
-              <button type="button" className={styles.nearbyButton} onClick={findNearbyClub} disabled={findingNearby}>
-                {findingNearby ? "위치 확인 중…" : "내 근처 북클럽 찾기"}
-              </button>
-              <a
-                className={styles.mapFinderButton}
-                href="https://map.kakao.com/?q=%EB%B6%81%ED%81%B4%EB%9F%BD"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                지도에서 찾기
-              </a>
-            </div>
+            <button type="button" className={styles.nearbyButton} onClick={findNearbyClub} disabled={findingNearby}>
+              {findingNearby ? "위치 확인 중…" : "내 근처 북클럽 찾기"}
+            </button>
           </div>
           {nearbyMessage && <p className={styles.nearbyMessage} role="status">{nearbyMessage}</p>}
+          {nearbyResults.length > 0 && (
+            <section className={styles.nearbyPanel} aria-label="내 근처 북클럽">
+              <div className={styles.nearbyMap}>
+                <iframe
+                  title="내 근처 북클럽 지도"
+                  src={`https://map.kakao.com/?q=${encodeURIComponent(nearbyResults[0].session.venue.address || nearbyResults[0].session.venue.name)}`}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+              <div className={styles.nearbyList}>
+                {nearbyResults.map(({ session, km }, index) => (
+                  <button
+                    type="button"
+                    key={session.slug}
+                    className={styles.nearbyItem}
+                    onClick={() => {
+                      const key = dateKey(session.startsAt);
+                      setMonth(key.slice(0, 7));
+                      setSelection(key);
+                    }}
+                  >
+                    <span>{index + 1}</span>
+                    <strong>{session.bookTitle}</strong>
+                    <small>{session.venue.name} · {km < 1 ? Math.round(km * 1000) + "m" : km.toFixed(1) + "km"}</small>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
           <div className={styles.meetings} aria-live="polite" aria-atomic="false">
             {selected.length === 0 ? <div className={styles.empty}>
               <p>{sorted.length ? "이달에는 등록된 모임이 없습니다." : "다음 모임을 준비하고 있습니다."}</p>
