@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import BookCoverImage from "@/components/home/BookCoverImage";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
@@ -24,11 +25,6 @@ import MiniCalendar, { type CalendarClub } from "@/components/bookclub/MiniCalen
 import Timeline, { type TimelineEntry } from "@/components/bookclub/Timeline";
 import "@/components/bookclub/bookclub.css";
 
-function ogFallback(title: string, sub: string) {
-  const p = new URLSearchParams({ title, sub });
-  return `/og?${p.toString()}`;
-}
-
 type Period = "upcoming" | "past" | "all";
 
 export default function DetailClient({
@@ -43,7 +39,6 @@ export default function DetailClient({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const cover = session.coverUrl || ogFallback(session.bookTitle, session.author);
   const isSessionPast = status === "past";
   const weekday = formatWeekdayFull(session.startsAt);
   const feeText = session.feeLabelOverride ?? feeLabel(session.fee);
@@ -124,7 +119,16 @@ export default function DetailClient({
         <div id="qd-hero">
           <div className="qd-hero-top">
             <div className="qd-cover-sm">
-              <Image src={cover} alt={`『${session.bookTitle}』 표지`} width={120} height={180} unoptimized priority />
+              {session.coverUrl ? (
+                <Image src={session.coverUrl} alt={`『${session.bookTitle}』 표지`} width={120} height={180} unoptimized priority />
+              ) : (
+                <BookCoverImage
+                  key={session.slug}
+                  title={session.bookTitle}
+                  author={session.author}
+                  fallbackClassName="flex h-full flex-col justify-center gap-2 p-2 text-center text-xs"
+                />
+              )}
             </div>
             <div>
               <p className="qd-eyebrow">BOOK CLUB</p>
