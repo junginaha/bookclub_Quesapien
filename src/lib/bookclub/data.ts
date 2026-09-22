@@ -46,7 +46,90 @@ const EDIYA_LAB = {
   nearestStation: "",
 };
 
+
+const CAFE_SINAMON = {
+  name: "카페시나몬",
+  detail: "",
+  address: "",
+  lat: Number.NaN,
+  lng: Number.NaN,
+  nearestStation: "",
+};
+
+const DAEWOO_UTOPIA_OFFICETEL = {
+  name: "대우유토피아오피스텔",
+  detail: "",
+  address: "",
+  lat: Number.NaN,
+  lng: Number.NaN,
+  nearestStation: "",
+};
+
+const VENUE_TBA = {
+  name: "장소 추후 안내",
+  detail: "",
+  address: "",
+  lat: Number.NaN,
+  lng: Number.NaN,
+  nearestStation: "",
+};
+
 export const BOOKCLUB_SESSIONS: BookClubSession[] = [
+  {
+    id: "chekhov-love-desire",
+    slug: "chekhov-love-desire",
+    title: "누구나 책수다 · 『사랑과 욕망의 변주곡』",
+    bookTitle: "사랑과 욕망의 변주곡",
+    author: "안톤 체호프",
+    startsAt: "2026-09-22T19:00:00+09:00",
+    endsAt: "2026-09-22T21:00:00+09:00",
+    venue: CAFE_SINAMON,
+    capacity: 1,
+    reserved: 0,
+    registrationClosed: true,
+    fee: 0,
+    feeLabelOverride: "별도 안내",
+    leadQuestion: "사랑과 욕망은 우리를 어디까지 솔직하게 만들까요?",
+    summary: "9월 22일 저녁, 안톤 체호프의 『사랑과 욕망의 변주곡』을 함께 읽는 책수다입니다. 현재 참여 신청은 마감됐고 대기 신청을 받고 있습니다.",
+    agendaPreview: [],
+  },
+  {
+    id: "glass-bead-game",
+    slug: "glass-bead-game",
+    title: "고전문학 & 벽돌책깨기 · 『유리알 유희』",
+    bookTitle: "유리알 유희",
+    author: "헤르만 헤세",
+    startsAt: "2026-10-11T15:00:00+09:00",
+    endsAt: "2026-10-11T17:30:00+09:00",
+    venue: DAEWOO_UTOPIA_OFFICETEL,
+    capacity: 1,
+    reserved: 0,
+    registrationClosed: true,
+    fee: 0,
+    feeLabelOverride: "별도 안내",
+    leadQuestion: "지성과 삶은 어디에서 만나고, 어디에서 서로를 놓칠까요?",
+    summary: "10월 11일 오후, 헤르만 헤세의 『유리알 유희』를 함께 읽는 고전문학·벽돌책깨기 모임입니다. 현재 참여 신청은 마감됐고 대기 신청을 받고 있습니다.",
+    agendaPreview: [],
+  },
+  {
+    id: "thinking-fast-slow",
+    slug: "thinking-fast-slow",
+    title: "고전문학 & 벽돌책깨기 · 『생각에 관한 생각』",
+    bookTitle: "생각에 관한 생각",
+    author: "대니얼 카너먼",
+    startsAt: "2026-11-08T15:00:00+09:00",
+    endsAt: "2026-11-08T17:30:00+09:00",
+    venue: VENUE_TBA,
+    capacity: 1,
+    reserved: 0,
+    registrationClosed: true,
+    fee: 0,
+    feeLabelOverride: "별도 안내",
+    leadQuestion: "우리는 정말 생각해서 판단할까요, 판단한 뒤 이유를 만들까요?",
+    summary: "11월 8일 오후, 대니얼 카너먼의 『생각에 관한 생각』을 함께 읽는 고전문학·벽돌책깨기 모임입니다. 현재 참여 신청은 마감됐고 대기 신청을 받고 있습니다.",
+    agendaPreview: [],
+  },
+
   {
     id: "dangerous-leaders",
     slug: "dangerous-leaders",
