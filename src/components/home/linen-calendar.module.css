@@ -199,3 +199,27 @@
   .actions { grid-template-columns:1fr 1fr; }
   .actions > a { width:100%; }
 }
+
+.nearbyButton {
+  min-height: 38px;
+  padding: 7px 12px;
+  border: 1px solid #bba58a;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--linen-ink);
+  font: 600 11px/1.4 var(--font-noto-sans-kr), sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.nearbyButton:hover { background:#eee5d7; }
+.nearbyButton:disabled { opacity:.55; cursor:wait; }
+.nearbyMessage {
+  margin: 12px 0 0;
+  color: var(--linen-muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+@media (max-width:560px) {
+  .detailHead { align-items:center; }
+  .nearbyButton { min-height:40px; padding-inline:13px; }
+}
