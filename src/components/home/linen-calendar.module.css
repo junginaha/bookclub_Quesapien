@@ -243,3 +243,39 @@
   .locationActions { width:100%; display:grid; grid-template-columns:1fr 1fr; }
   .nearbyButton,.mapFinderButton { width:100%; min-height:42px; }
 }
+
+/* One-action nearby experience: map + clubs reveal together. */
+.nearbyPanel {
+  margin: 12px 0 18px;
+  display:grid;
+  grid-template-columns:minmax(0,1.08fr) minmax(190px,.92fr);
+  border:1px solid var(--linen-line);
+  background:rgba(250,246,238,.66);
+  overflow:hidden;
+}
+.nearbyMap { min-height:240px; background:#e8e0d3; }
+.nearbyMap iframe { width:100%; height:100%; min-height:240px; display:block; border:0; }
+.nearbyList { display:flex; flex-direction:column; border-left:1px solid var(--linen-line); }
+.nearbyItem {
+  width:100%;
+  display:grid;
+  grid-template-columns:22px 1fr;
+  gap:2px 8px;
+  padding:13px 12px;
+  border:0;
+  border-bottom:1px solid var(--linen-line);
+  background:transparent;
+  color:var(--linen-ink);
+  text-align:left;
+  cursor:pointer;
+}
+.nearbyItem:last-child { border-bottom:0; }
+.nearbyItem:hover,.nearbyItem:focus-visible { background:#eee5d7; outline:none; }
+.nearbyItem > span { grid-row:1 / 3; color:var(--linen-muted); font:500 10px/1.5 var(--font-eb-garamond),serif; }
+.nearbyItem strong { font:500 12px/1.45 var(--font-noto-serif-kr),serif; word-break:keep-all; }
+.nearbyItem small { color:var(--linen-muted); font-size:9.5px; line-height:1.45; }
+@media(max-width:650px){
+  .nearbyPanel { grid-template-columns:1fr; }
+  .nearbyMap,.nearbyMap iframe { min-height:210px; }
+  .nearbyList { border-left:0; border-top:1px solid var(--linen-line); }
+}
