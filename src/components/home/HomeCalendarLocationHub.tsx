@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { dateKey, formatMonthDay, formatTimeRange, formatWeekdayFull, getStatus } from "@/lib/bookclub/selectors";
 import styles from "./linen-calendar.module.css";
+import NearbyBookclubMap from "./NearbyBookclubMap";
 
 const DAYS = [
   { en: "Sun", ko: "일요일" }, { en: "Mon", ko: "월요일" },
@@ -44,6 +45,7 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
   const [findingNearby, setFindingNearby] = useState(false);
   const [nearbyMessage, setNearbyMessage] = useState("");
   const [nearbyResults, setNearbyResults] = useState<Array<{ session: BookClubSession; km: number }>>([]);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [year, monthNumber] = month.split("-").map(Number);
   const inMonth = sorted.filter(s => dateKey(s.startsAt).startsWith(month));
   const selectedKey = inMonth.some(s => dateKey(s.startsAt) === selection)
@@ -68,6 +70,7 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const here = { lat: position.coords.latitude, lng: position.coords.longitude };
+        setUserLocation(here);
         const candidates = sorted.filter((session) =>
           getStatus(session) !== "past" &&
           Number.isFinite(session.venue.lat) &&
@@ -83,13 +86,14 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
         const results = candidates
           .map((session) => ({ session, km: straightLineKm(here, session.venue) }))
           .sort((a, b) => a.km - b.km)
-          .slice(0, 5);
+          .slice(0, 50);
         const nearest = results[0];
         const key = dateKey(nearest.session.startsAt);
         setMonth(key.slice(0, 7));
         setSelection(key);
         setNearbyResults(results);
-        setNearbyMessage("현재 위치에서 가까운 순서입니다.");
+        const within10 = results.filter((item) => item.km <= 10).length;
+        setNearbyMessage(within10 > 0 ? `반경 10km 안에 등록된 북클럽 ${within10}개 · 가까운 순서` : "가장 가까운 등록 북클럽부터 보여드립니다.");
         setFindingNearby(false);
       },
       (error) => {
@@ -99,6 +103,12 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
     );
   }
+
+  const selectNearbySession = useCallback((session: BookClubSession) => {
+    const key = dateKey(session.startsAt);
+    setMonth(key.slice(0, 7));
+    setSelection(key);
+  }, []);
 
   return (
     <section className={styles.section} id="calendar" aria-labelledby="calendar-title" data-calendar-design="linen-20260922">
@@ -143,12 +153,13 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
           {nearbyResults.length > 0 && (
             <section className={styles.nearbyPanel} aria-label="내 근처 북클럽">
               <div className={styles.nearbyMap}>
-                <iframe
-                  title="내 근처 북클럽 지도"
-                  src={`https://map.kakao.com/?q=${encodeURIComponent(nearbyResults[0].session.venue.address || nearbyResults[0].session.venue.name)}`}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
+                {userLocation && (
+                  <NearbyBookclubMap
+                    user={userLocation}
+                    results={nearbyResults}
+                    onSelect={selectNearbySession}
+                  />
+                )}
               </div>
               <div className={styles.nearbyList}>
                 {nearbyResults.map(({ session, km }, index) => (
@@ -156,11 +167,7 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
                     type="button"
                     key={session.slug}
                     className={styles.nearbyItem}
-                    onClick={() => {
-                      const key = dateKey(session.startsAt);
-                      setMonth(key.slice(0, 7));
-                      setSelection(key);
-                    }}
+                    onClick={() => selectNearbySession(session)}
                   >
                     <span>{index + 1}</span>
                     <strong>{session.bookTitle}</strong>
@@ -176,7 +183,6 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
               {first && <button type="button" className={styles.secondary} onClick={() => { setMonth(startKey.slice(0, 7)); setSelection(startKey); }}>등록된 일정 보기</button>}
             </div> : selected.map(session => {
               const status = getStatus(session);
-              const venueText = session.venue.address || session.venue.name;
               return <article
                 className={styles.meeting}
                 key={session.slug}
@@ -200,7 +206,6 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
                 </dl>
                 <div className={styles.actions}>
                   <Link className={styles.primary} href={`/bookclub/${session.slug}`}>{status === "open" ? "참여 신청" : "모임 상세 보기"}</Link>
-                  <a className={styles.secondary} href={`https://map.kakao.com/?q=${encodeURIComponent(venueText || session.bookTitle + " 북클럽")}`} target="_blank" rel="noopener noreferrer">지도 보기<span className={styles.srOnly}> · 새 창</span></a>
                 </div>
               </article>;
             })}
