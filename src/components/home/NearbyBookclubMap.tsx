@@ -22,11 +22,12 @@ export default function NearbyBookclubMap({
       const L = await import("leaflet");
       if (cancelled || !nodeRef.current) return;
 
-      map = L.map(nodeRef.current, {
+      const activeMap = L.map(nodeRef.current, {
         zoomControl: false,
         attributionControl: true,
         scrollWheelZoom: false,
       }).setView([user.lat, user.lng], 13);
+      map = activeMap;
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
@@ -56,7 +57,7 @@ export default function NearbyBookclubMap({
           iconSize: [34, 34],
           iconAnchor: [17, 17],
         });
-        const marker = L.marker([lat, lng], { icon }).addTo(map);
+        const marker = L.marker([lat, lng], { icon }).addTo(activeMap);
         marker.bindTooltip(
           `<strong>${session.bookTitle}</strong><br><span>${session.venue.name} · ${km < 1 ? Math.round(km * 1000) + "m" : km.toFixed(1) + "km"}</span>`,
           { direction: "top", offset: [0, -12], className: "qs-map-tooltip" }
