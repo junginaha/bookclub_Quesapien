@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import BookCoverImage from "@/components/home/BookCoverImage";
+import OpenBook from "@/components/bookclub/OpenBook";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
@@ -116,22 +116,7 @@ export default function DetailClient({
 
       <div className="qd-main">
         <div id="qd-hero">
-          <div className="qd-hero-top">
-            <div className="qd-cover-sm">
-              <BookCoverImage
-                title={session.bookTitle}
-                author={session.author}
-                coverUrl={session.coverUrl}
-                priority
-              />
-            </div>
-            <div>
-              <p className="qd-eyebrow">BOOK CLUB</p>
-              <h1 className="qd-title">{session.title}</h1>
-              <div className="qd-book-title">『{session.bookTitle}』</div>
-              <div className="qd-book-author">{session.author}</div>
-            </div>
-          </div>
+          <OpenBook key={session.slug} session={session} />
 
           {/* 스크롤해도 날짜·시간이 계속 보이는 sticky 서브헤더(Luma 프레임 — 작업지시서 Phase 2). */}
           <div className="qd-date-sticky">
@@ -141,7 +126,7 @@ export default function DetailClient({
           </div>
         </div>
 
-        <dl className="qd-event-meta" aria-label="모임 핵심 정보">
+        <dl id="meeting-details" className="qd-event-meta" aria-label="모임 핵심 정보">
           <div><dt>일시</dt><dd>{formatMonthDay(session.startsAt)} {weekday}<br />{formatTimeRange(session.startsAt, session.endsAt)}</dd></div>
           <div><dt>장소</dt><dd>{session.venue.name}</dd></div>
           <div><dt>참여비</dt><dd>{feeText}</dd></div>
