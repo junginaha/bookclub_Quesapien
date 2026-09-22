@@ -138,8 +138,8 @@ export const BOOKCLUB_SESSIONS: BookClubSession[] = [
     leadQuestion: "지성과 삶은 어디에서 만나고, 어디에서 서로를 놓칠까요?",
     summary: "10월 11일 오후, 헤르만 헤세의 『유리알 유희』를 함께 읽는 고전문학·벽돌책깨기 모임입니다. 현재 참여 신청은 마감됐고 대기 신청을 받고 있습니다.",
     bookIntro: "먼 미래의 정신적 엘리트 공동체 카스탈리엔과 그 중심에 있는 ‘유리알 유희’를 배경으로, 유희 명인 요제프 크네히트의 삶을 따라가는 헤세의 마지막 장편소설입니다. 예술과 학문을 통합하려는 이상과 현실 세계에 대한 책임 사이의 긴장을 통해, 지식은 삶과 어떤 관계를 맺어야 하는지 묻습니다. 헤세는 1931년 집필을 시작해 제2차 세계대전 중 작품을 완성했습니다.",
-    bookSourceUrl: "https://www.yes24.com/product/goods/117934290",
-    bookSourceLabel: "YES24 도서정보",
+    bookSourceUrl: "https://openlibrary.org/books/OL19694118M/The_glass_bead_game",
+    bookSourceLabel: "Open Library · 1943년 초판 정보",
     agendaPreview: ["완벽하게 정제된 지식은 현실과 멀어질수록 더 가치 있어질까요?","크네히트가 카스탈리엔 밖의 삶을 의식하기 시작한 이유는 무엇일까요?","지식인의 자유와 사회적 책임은 어디에서 충돌할까요?"],
   },
   {
@@ -159,8 +159,8 @@ export const BOOKCLUB_SESSIONS: BookClubSession[] = [
     leadQuestion: "우리는 정말 생각해서 판단할까요, 판단한 뒤 이유를 만들까요?",
     summary: "11월 8일 오후, 대니얼 카너먼의 『생각에 관한 생각』을 함께 읽는 고전문학·벽돌책깨기 모임입니다. 현재 참여 신청은 마감됐고 대기 신청을 받고 있습니다.",
     bookIntro: "대니얼 카너먼은 인간의 사고를 빠르고 자동적인 직관적 사고와, 느리고 의식적인 숙고의 사고라는 두 작동 방식으로 설명합니다. 다양한 판단 실험을 통해 휴리스틱, 편향, 과신, 손실회피 등이 우리의 선택에 어떻게 개입하는지 보여주며, ‘합리적으로 판단한다’는 인간의 자기 확신을 다시 묻게 합니다.",
-    bookSourceUrl: "https://www.yes24.com/Product/Goods/59580017",
-    bookSourceLabel: "YES24 도서정보",
+    bookSourceUrl: "https://us.macmillan.com/books/9780374275631/thinkingfastandslow/",
+    bookSourceLabel: "Farrar, Straus and Giroux · 공식 도서정보",
     agendaPreview: ["내가 ‘직감’이라고 믿는 판단은 언제 유용하고 언제 위험할까요?","틀렸다는 증거가 있어도 첫 판단을 고수하는 이유는 무엇일까요?","내 결정에서 가장 자주 작동하는 편향 하나를 찾는다면 무엇일까요?"],
   },
 
