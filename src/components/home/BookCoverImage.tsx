@@ -12,18 +12,20 @@ export default function BookCoverImage({
   fallbackClassName?: string;
 }) {
   const [url, setUrl] = useState<string | null>(null);
-  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     let active = true;
-    const params = new URLSearchParams({ title, author });
-    fetch("/api/book-cover?" + params.toString())
+    const controller = new AbortController();
+    setUrl(null);
+    // Bypass blank responses cached by the previous API implementation.
+    const params = new URLSearchParams({ title, author, v: "2" });
+    fetch("/api/book-cover?" + params.toString(), { signal: controller.signal })
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
         if (active && data?.coverUrl) setUrl(data.coverUrl);
       })
       .catch(() => {});
-    return () => { active = false; };
+    return () => { active = false; controller.abort(); };
   }, [title, author]);
 
   if (!url) {
@@ -40,8 +42,7 @@ export default function BookCoverImage({
       src={url}
       alt={title + " 실제 도서 표지"}
       loading="lazy"
-      onLoad={() => setLoaded(true)}
-      style={{ opacity: loaded ? 1 : 0 }}
+      onError={() => setUrl(null)}
     />
   );
 }

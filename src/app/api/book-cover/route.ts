@@ -68,8 +68,8 @@ function matchScore(candidate: Candidate, title: string, author: string) {
 }
 
 async function searchNaver(title: string, author: string): Promise<Candidate[]> {
-  const id = process.env.NAVER_CLIENT_ID;
-  const secret = process.env.NAVER_CLIENT_SECRET;
+  const id = process.env.NAVER_CLIENT_ID?.trim();
+  const secret = process.env.NAVER_CLIENT_SECRET?.trim();
   if (!id || !secret) return [];
 
   const url = new URL("https://openapi.naver.com/v1/search/book.json");
@@ -83,9 +83,13 @@ async function searchNaver(title: string, author: string): Promise<Candidate[]> 
         "X-Naver-Client-Id": id,
         "X-Naver-Client-Secret": secret,
       },
-      next: { revalidate: 604800 },
+      cache: "no-store",
+      signal: AbortSignal.timeout(5000),
     });
-    if (!response.ok) return [];
+    if (!response.ok) {
+      console.warn("[book-cover] naver HTTP", response.status);
+      return [];
+    }
     const data = await response.json() as { items?: NaverItem[] };
     return (data.items ?? [])
       .filter((item) => item.image && item.title)
@@ -98,12 +102,13 @@ async function searchNaver(title: string, author: string): Promise<Candidate[]> 
         isbn: item.isbn,
       }));
   } catch {
+    console.warn("[book-cover] naver request failed or timed out");
     return [];
   }
 }
 
 async function searchKakao(title: string, author: string): Promise<Candidate[]> {
-  const key = process.env.KAKAO_REST_API_KEY;
+  const key = process.env.KAKAO_REST_API_KEY?.trim();
   if (!key) return [];
 
   const url = new URL("https://dapi.kakao.com/v3/search/book");
@@ -115,9 +120,13 @@ async function searchKakao(title: string, author: string): Promise<Candidate[]> 
   try {
     const response = await fetch(url, {
       headers: { Authorization: "KakaoAK " + key },
-      next: { revalidate: 604800 },
+      cache: "no-store",
+      signal: AbortSignal.timeout(5000),
     });
-    if (!response.ok) return [];
+    if (!response.ok) {
+      console.warn("[book-cover] kakao HTTP", response.status);
+      return [];
+    }
     const data = await response.json() as { documents?: KakaoDocument[] };
     return (data.documents ?? [])
       .filter((item) => item.thumbnail && item.title)
@@ -131,6 +140,7 @@ async function searchKakao(title: string, author: string): Promise<Candidate[]> 
       }))
       .filter((item) => !author || norm(item.authors.join(" ")).includes(norm(author)) || norm(author).includes(norm(item.authors.join(" "))));
   } catch {
+    console.warn("[book-cover] kakao request failed or timed out");
     return [];
   }
 }
@@ -144,8 +154,11 @@ async function searchGoogle(title: string, author: string): Promise<Candidate[]>
   if (key) url.searchParams.set("key", key);
 
   try {
-    const response = await fetch(url, { next: { revalidate: 604800 } });
-    if (!response.ok) return [];
+    const response = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(5000) });
+    if (!response.ok) {
+      console.warn("[book-cover] google HTTP", response.status);
+      return [];
+    }
     const data = await response.json() as { items?: GoogleItem[] };
 
     return (data.items ?? []).flatMap((item) => {
@@ -174,6 +187,7 @@ async function searchGoogle(title: string, author: string): Promise<Candidate[]>
       }];
     });
   } catch {
+    console.warn("[book-cover] google request failed or timed out");
     return [];
   }
 }
@@ -208,6 +222,9 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  response.headers.set("Cache-Control", "public, s-maxage=604800, stale-while-revalidate=2592000");
+  // Missing keys and temporary provider failures must never become a cached blank cover.
+  response.headers.set("Cache-Control", best
+    ? "public, max-age=0, s-maxage=86400, stale-while-revalidate=3600"
+    : "no-store");
   return response;
 }
