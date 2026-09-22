@@ -41,6 +41,8 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
   const startKey = first ? dateKey(first.startsAt) : dateKey(new Date());
   const [month, setMonth] = useState(startKey.slice(0, 7));
   const [selection, setSelection] = useState(startKey);
+  const [findingNearby, setFindingNearby] = useState(false);
+  const [nearbyMessage, setNearbyMessage] = useState("");
   const [year, monthNumber] = month.split("-").map(Number);
   const inMonth = sorted.filter(s => dateKey(s.startsAt).startsWith(month));
   const selectedKey = inMonth.some(s => dateKey(s.startsAt) === selection)
@@ -53,6 +55,47 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
     const next = new Date(Date.UTC(year, monthNumber - 1 + delta, 1));
     setMonth(`${next.getUTCFullYear()}-${pad(next.getUTCMonth() + 1)}`);
     setSelection("");
+  }
+
+  function findNearbyClub() {
+    if (!navigator.geolocation) {
+      setNearbyMessage("이 기기에서는 위치 기능을 사용할 수 없습니다.");
+      return;
+    }
+    setFindingNearby(true);
+    setNearbyMessage("");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const here = { lat: position.coords.latitude, lng: position.coords.longitude };
+        const candidates = sorted.filter((session) =>
+          getStatus(session) !== "past" &&
+          Number.isFinite(session.venue.lat) &&
+          Number.isFinite(session.venue.lng) &&
+          Math.abs(session.venue.lat) <= 90 &&
+          Math.abs(session.venue.lng) <= 180
+        );
+        if (!candidates.length) {
+          setNearbyMessage("거리 계산이 가능한 모임을 준비 중입니다.");
+          setFindingNearby(false);
+          return;
+        }
+        const nearest = candidates
+          .map((session) => ({ session, km: straightLineKm(here, session.venue) }))
+          .sort((a, b) => a.km - b.km)[0];
+        const key = dateKey(nearest.session.startsAt);
+        setMonth(key.slice(0, 7));
+        setSelection(key);
+        setNearbyMessage(
+          `현재 위치 기준 가장 가까운 등록 모임 · ${nearest.km < 1 ? Math.round(nearest.km * 1000) + "m" : nearest.km.toFixed(1) + "km"}`
+        );
+        setFindingNearby(false);
+      },
+      (error) => {
+        setNearbyMessage(error.code === 1 ? "위치 권한을 허용하면 가까운 모임을 찾을 수 있습니다." : "현재 위치를 확인하지 못했습니다.");
+        setFindingNearby(false);
+      },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+    );
   }
 
   return (
@@ -90,7 +133,11 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
         <div className={styles.details}>
           <div className={styles.detailHead}>
             <p className={styles.detailLabel}>함께 읽는 날</p>
+            <button type="button" className={styles.nearbyButton} onClick={findNearbyClub} disabled={findingNearby}>
+              {findingNearby ? "위치 확인 중…" : "내 근처 북클럽 찾기"}
+            </button>
           </div>
+          {nearbyMessage && <p className={styles.nearbyMessage} role="status">{nearbyMessage}</p>}
           <div className={styles.meetings} aria-live="polite" aria-atomic="false">
             {selected.length === 0 ? <div className={styles.empty}>
               <p>{sorted.length ? "이달에는 등록된 모임이 없습니다." : "다음 모임을 준비하고 있습니다."}</p>
@@ -117,6 +164,7 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
                 <p className={styles.author}>{session.author}</p>
                 <dl className={styles.facts}>
                   <div><dt>일시</dt><dd>{formatMonthDay(session.startsAt)} {formatWeekdayFull(session.startsAt)}<br />{formatTimeRange(session.startsAt, session.endsAt)}</dd></div>
+                  <div><dt>장소</dt><dd>{session.venue.name || "장소 추후 안내"}</dd></div>
                 </dl>
                 <div className={styles.actions}>
                   <Link className={styles.primary} href={`/bookclub/${session.slug}`}>{status === "open" ? "참여 신청" : "모임 상세 보기"}</Link>
