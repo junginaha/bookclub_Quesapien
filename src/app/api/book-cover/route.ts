@@ -39,6 +39,10 @@ type KakaoDocument = {
   isbn?: string;
 };
 
+function kakaoKey() {
+  return process.env.KAKAO_REST_API_KEY?.trim() || process.env.KAKAO_API?.trim();
+}
+
 function norm(value: string) {
   return value
     .replace(/<[^>]+>/g, "")
@@ -108,7 +112,7 @@ async function searchNaver(title: string, author: string): Promise<Candidate[]> 
 }
 
 async function searchKakao(title: string, author: string): Promise<Candidate[]> {
-  const key = process.env.KAKAO_REST_API_KEY?.trim();
+  const key = kakaoKey();
   if (!key) return [];
 
   const url = new URL("https://dapi.kakao.com/v3/search/book");
@@ -217,7 +221,7 @@ export async function GET(request: NextRequest) {
     isbn: best?.isbn ?? null,
     sourcesAvailable: {
       naver: Boolean(process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET),
-      kakao: Boolean(process.env.KAKAO_REST_API_KEY),
+      kakao: Boolean(kakaoKey()),
       google: true,
     },
   });
