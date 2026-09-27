@@ -8,20 +8,51 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 const ORG_NAME = "질문하는 사람들";
 
 // ─── Organization ─────────────────────────────────────────────
+// sameAs는 운영자가 확인한 공식 채널만 NEXT_PUBLIC_SAME_AS(콤마 구분)로 넣는다 — 추측 URL 금지.
+const SAME_AS = (process.env.NEXT_PUBLIC_SAME_AS ?? "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 export function orgSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
     name: ORG_NAME,
-    alternateName: "Qsapiens",
+    alternateName: ["Qsapiens", "큐사피엔스", "질문하는 사람들 북클럽"],
     url: SITE_URL,
+    logo: `${SITE_URL}/icon-512`,
+    image: `${SITE_URL}/og-default.png`,
+    email: "junginaha@qsapiens.com",
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "junginaha@qsapiens.com",
+      availableLanguage: ["Korean"],
+    },
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "서초구",
+      addressRegion: "서울특별시",
+      addressCountry: "KR",
+    },
     description:
       "질문하는 사람들은 질문을 중심으로 사람과 책을 연결하는 오프라인 북토크 커뮤니티입니다. 서초구 선정 미래혁신형 북클럽.",
     foundingDate: "2025",
     areaServed: { "@type": "Country", name: "대한민국" },
-    sameAs: [],
-    knowsAbout: ["독서모임", "북클럽", "질문 기반 대화", "지적 커뮤니티"],
+    sameAs: SAME_AS,
+    knowsAbout: [
+      "독서모임",
+      "북클럽",
+      "질문 기반 대화",
+      "지적 커뮤니티",
+      "북토크",
+      "발제",
+      "독서토론 질문",
+      "서초구 독서모임",
+      "강남 독서모임",
+    ],
   };
 }
 
@@ -33,6 +64,8 @@ export function websiteSchema() {
     "@id": `${SITE_URL}/#website`,
     url: SITE_URL,
     name: "질문하는 사람들",
+    alternateName: ["Qsapiens", "큐사피엔스"],
+    inLanguage: "ko-KR",
     description: "질문 → 책 → 대화 → 사람 → 성장으로 이어지는 지적 커뮤니티",
     publisher: { "@id": `${SITE_URL}/#organization` },
     potentialAction: {
@@ -63,22 +96,51 @@ export function breadcrumbSchema(items: { name: string; href: string }[]) {
 interface SessionSchemaInput {
   slug: string;
   title: string;
+  bookTitle: string;
+  author: string;
+  coverUrl?: string;
   summary: string;
   startsAt: string;
   endsAt: string;
   venue: { name: string; address: string; lat: number; lng: number };
   capacity: number;
   reserved: number;
+  fee: number;
+  /** "별도 안내" 등 금액 미확정 문구 — 있으면 price/무료 여부를 단정하지 않는다. */
+  feeLabelOverride?: string;
+  registrationClosed?: boolean;
+}
+
+// http(s) 표지는 그대로, 사이트 내부 표지(/images/covers/...)는 절대 URL로 바꾼다.
+// 그 외(빈 값 등)는 null → 동적 OG 이미지로 대체.
+export function absoluteCoverUrl(url?: string): string | null {
+  if (!url) return null;
+  if (/^https?:\/\//.test(url)) return url;
+  if (url.startsWith("/")) return `${SITE_URL}${url}`;
+  return null;
 }
 
 export function bookclubSessionEventSchema(session: SessionSchemaInput) {
+  const url = `${SITE_URL}/bookclub/${session.slug}`;
+  // 신청을 닫은 모임은 좌석 수와 무관하게 남은 자리 0으로 표시(SoldOut과 모순되지 않게).
+  const remaining = session.registrationClosed ? 0 : Math.max(0, session.capacity - session.reserved);
+  const name = session.title.includes(session.bookTitle)
+    ? session.title
+    : `${session.title} · 『${session.bookTitle}』`;
+  const image =
+    absoluteCoverUrl(session.coverUrl) ??
+    `${SITE_URL}/og?${new URLSearchParams({ title: session.title }).toString()}`;
+  const priceKnown = !session.feeLabelOverride;
+  const hasGeo = Number.isFinite(session.venue.lat) && Number.isFinite(session.venue.lng);
+
   return {
     "@context": "https://schema.org",
     "@type": "Event",
-    "@id": `${SITE_URL}/bookclub/${session.slug}#event`,
-    name: session.title,
+    "@id": `${url}#event`,
+    name,
     description: session.summary,
-    url: `${SITE_URL}/bookclub/${session.slug}`,
+    url,
+    image,
     startDate: session.startsAt,
     endDate: session.endsAt,
     eventStatus: "https://schema.org/EventScheduled",
@@ -86,13 +148,55 @@ export function bookclubSessionEventSchema(session: SessionSchemaInput) {
     location: {
       "@type": "Place",
       name: session.venue.name,
-      address: { "@type": "PostalAddress", streetAddress: session.venue.address, addressCountry: "KR" },
-      geo: { "@type": "GeoCoordinates", latitude: session.venue.lat, longitude: session.venue.lng },
+      address: {
+        "@type": "PostalAddress",
+        ...(session.venue.address ? { streetAddress: session.venue.address } : {}),
+        addressLocality: "서울특별시",
+        addressCountry: "KR",
+      },
+      ...(hasGeo
+        ? { geo: { "@type": "GeoCoordinates", latitude: session.venue.lat, longitude: session.venue.lng } }
+        : {}),
     },
-    organizer: { "@id": `${SITE_URL}/#organization` },
+    about: { "@type": "Book", name: session.bookTitle, author: { "@type": "Person", name: session.author } },
+    offers: {
+      "@type": "Offer",
+      url,
+      ...(priceKnown ? { price: session.fee, priceCurrency: "KRW" } : {}),
+      availability:
+        remaining === 0
+          ? "https://schema.org/SoldOut"
+          : "https://schema.org/InStock",
+    },
+    ...(priceKnown ? { isAccessibleForFree: session.fee === 0 } : {}),
+    organizer: { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: ORG_NAME, url: SITE_URL },
     maximumAttendeeCapacity: session.capacity,
-    remainingAttendeeCapacity: Math.max(0, session.capacity - session.reserved),
+    remainingAttendeeCapacity: remaining,
     inLanguage: "ko",
+  };
+}
+
+// ─── ItemList (발제 질문) ─────────────────────────────────────
+interface DiscussionQuestionsInput {
+  slug: string;
+  bookTitle: string;
+  author: string;
+  questions: string[];
+}
+
+export function discussionQuestionsSchema(input: DiscussionQuestionsInput) {
+  if (!input.questions.length) return null;
+  const book = { "@type": "Book", name: input.bookTitle, author: { "@type": "Person", name: input.author } };
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${SITE_URL}/bookclub/${input.slug}#questions`,
+    name: `『${input.bookTitle}』 독서모임 발제 질문`,
+    itemListElement: input.questions.map((q, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: { "@type": "Question", name: q, about: book },
+    })),
   };
 }
 
@@ -106,40 +210,6 @@ export function bookclubItemListSchema(sessions: { slug: string; title: string }
       position: i + 1,
       url: `${SITE_URL}/bookclub/${s.slug}`,
       name: s.title,
-    })),
-  };
-}
-
-// ─── AggregateRating / Review ──────────────────────────────────
-interface ReviewInput {
-  id: string;
-  author_name: string;
-  content: string;
-  rating?: number;
-  created_at: string;
-}
-
-export function reviewsSchema(targetSlug: string, targetName: string, reviews: ReviewInput[]) {
-  if (!reviews.length) return null;
-  const avgRating = reviews.reduce((s, r) => s + (r.rating ?? 5), 0) / reviews.length;
-  return {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "@id": `${SITE_URL}/bookclub/${targetSlug}#business`,
-    name: targetName,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: avgRating.toFixed(1),
-      reviewCount: reviews.length,
-      bestRating: "5",
-      worstRating: "1",
-    },
-    review: reviews.map((r) => ({
-      "@type": "Review",
-      author: { "@type": "Person", name: r.author_name },
-      reviewBody: r.content,
-      reviewRating: { "@type": "Rating", ratingValue: r.rating ?? 5 },
-      datePublished: r.created_at,
     })),
   };
 }

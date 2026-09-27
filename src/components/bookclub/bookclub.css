@@ -528,7 +528,7 @@
 .qd-venue-btn:hover { background: var(--bg-soft); }
 
 .qd-questions { margin-top: 28px; }
-.qd-questions-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+.qd-questions-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-top: 0; margin-bottom: 10px; line-height: 1.4; }
 .qd-question {
   padding: 12px 16px;
   border-left: 3px solid var(--gold);
@@ -539,7 +539,7 @@
   margin-bottom: 8px;
 }
 
-.qd-apply { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--line); }
+.qd-apply { scroll-margin-top: 80px; margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--line); }
 .qd-apply-title { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
 .qd-apply-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
 .qd-form { display: flex; flex-direction: column; gap: 12px; max-width: 420px; }

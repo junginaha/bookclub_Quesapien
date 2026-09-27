@@ -354,7 +354,7 @@
     border: none;
     border-radius: 11px;
 
-    font-family: "BMJUA", var(--font-noto-sans-kr), "Noto Sans KR", sans-serif;
+    font-family: var(--font-bmjua), var(--font-noto-sans-kr), "Noto Sans KR", sans-serif;
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 0;

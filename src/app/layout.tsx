@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR, Noto_Serif_KR, EB_Garamond } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import { Toaster } from "sonner";
@@ -9,21 +10,32 @@ import { orgSchema, websiteSchema } from "@/lib/schema";
 import KeycapSound from "@/components/common/KeycapSound";
 
 const notoSansKR = Noto_Sans_KR({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"], variable: "--font-noto-sans-kr", display: "swap" });
-const notoSerifKR = Noto_Serif_KR({ subsets: ["latin"], weight: ["400", "500", "600", "700", "900"], variable: "--font-noto-serif-kr", display: "swap" });
+const notoSerifKR = Noto_Serif_KR({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700", "900"], variable: "--font-noto-serif-kr", display: "swap" });
 const ebGaramond = EB_Garamond({ subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"], variable: "--font-eb-garamond", display: "swap" });
+// 배민 주아체 — 키캡 버튼(.btn-keycap) 전용. 예전 jsDelivr CSS 링크는 404였고 렌더를
+// 막고 있었다. 자체 호스팅 + preload 끔: 키캡이 있는 페이지에서만 내려받는다.
+const bmjua = localFont({ src: "../../public/fonts/BMJUA.woff", variable: "--font-bmjua", display: "swap", preload: false });
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
+
+// 검색엔진 소유 확인 — 값이 있는 것만 출력한다(빈 메타 태그 방지).
+const GOOGLE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+const verificationOther: Record<string, string> = {};
+if (process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION) verificationOther["naver-site-verification"] = process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION;
+if (process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION) verificationOther["msvalidate.01"] = process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "질문하는 사람들 — 미래혁신형 북클럽", template: "%s | 질문하는 사람들" },
   description: "질문하는 사람들은 질문을 중심으로 사람과 책을 연결하는 오프라인 북토크 커뮤니티입니다. 서초구 선정 미래혁신형 북클럽. 질문 → 책 → 대화 → 사람 → 성장.",
-  keywords: ["북클럽", "독서모임", "질문", "서초구", "독서", "토론", "북토크", "오프라인독서모임", "질문하는사람들", "Qsapiens", "미래혁신형북클럽", "지적커뮤니티", "거인의어깨", "발제생성", "독서토론", "지성과의대화"],
   authors: [{ name: "질문하는 사람들" }],
   creator: "질문하는 사람들", publisher: "질문하는 사람들", category: "education",
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large", "max-video-preview": -1 } },
   openGraph: { title: "질문하는 사람들 — 미래혁신형 북클럽", description: "질문하는 사람들은 질문을 중심으로 사람과 책을 연결하는 오프라인 북토크 커뮤니티입니다.", type: "website", locale: "ko_KR", siteName: "질문하는 사람들", url: SITE_URL },
   twitter: { card: "summary_large_image", title: "질문하는 사람들 — 미래혁신형 북클럽", description: "질문으로 연결되는 지적 커뮤니티. 서초구 선정 미래혁신형 북클럽.", creator: "@qsapiens", site: "@qsapiens" },
-  alternates: { canonical: SITE_URL },
+  alternates: { canonical: SITE_URL, types: { "text/plain": `${SITE_URL}/llms.txt` } },
+  ...(GOOGLE_VERIFICATION || Object.keys(verificationOther).length
+    ? { verification: { ...(GOOGLE_VERIFICATION ? { google: GOOGLE_VERIFICATION } : {}), ...(Object.keys(verificationOther).length ? { other: verificationOther } : {}) } }
+    : {}),
   other: { "application-name": "질문하는 사람들", "mobile-web-app-capable": "yes", "apple-mobile-web-app-capable": "yes", "apple-mobile-web-app-status-bar-style": "default", "apple-mobile-web-app-title": "질문하는 사람들" },
   manifest: "/manifest.json",
 };
@@ -34,8 +46,7 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="ko" className={`${notoSansKR.variable} ${notoSerifKR.variable} ${ebGaramond.variable}`}>
-    <head><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/BMJUA.css" /></head>
+  return <html lang="ko" className={`${notoSansKR.variable} ${notoSerifKR.variable} ${ebGaramond.variable} ${bmjua.variable}`}>
     <body className="min-h-screen antialiased">
       <JsonLd data={orgSchema()} />
       <JsonLd data={websiteSchema()} />

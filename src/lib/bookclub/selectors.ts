@@ -75,6 +75,14 @@ export function formatTimeRange(startsAt: string, endsAt: string): string {
   return `${formatTimeOfDay(startsAt)} – ${formatTimeOfDay(endsAt)}`;
 }
 
+/** "10월 11일(일) 오후 3시 – 5시 30분" — 같은 오전/오후면 종료 시각의 오전/오후를 생략. */
+export function formatCompactSchedule(startsAt: string, endsAt: string): string {
+  const start = seoulParts(startsAt);
+  const endLabel = formatTimeOfDay(endsAt);
+  const sameHalf = (start.hour24 < 12) === (seoulParts(endsAt).hour24 < 12);
+  return `${start.month}월 ${start.day}일(${start.weekdayKo}) ${formatTimeOfDay(startsAt)} – ${sameHalf ? endLabel.replace(/^오[전후] /, "") : endLabel}`;
+}
+
 export function feeLabel(fee: number): string {
   if (fee === 0) return "무료";
   return `${fee.toLocaleString("ko-KR")}원`;

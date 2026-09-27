@@ -24,6 +24,8 @@ interface PageMetaInput {
   /** Schema.org type hint for AI engines */
   type?: "website" | "article" | "profile" | "book" | "event";
   keywords?: string[];
+  /** OG 이미지 보조 문구 — 없으면 description 앞부분을 쓴다. */
+  ogSub?: string;
   publishedAt?: string;
   author?: string;
   noIndex?: boolean;
@@ -31,26 +33,19 @@ interface PageMetaInput {
 
 export function buildMetadata(input: PageMetaInput): Metadata {
   const canonical = `${SITE_URL}${input.path}`;
-  const image = input.image ?? makeOgImageUrl(input.title, input.description?.slice(0, 80));
+  const image = input.image ?? makeOgImageUrl(input.title, input.ogSub ?? input.description?.slice(0, 80));
   const ogType = input.type === "article" ? "article" : "website";
 
   return {
     title: input.title,
     description: input.description,
-    keywords: [
-      "북클럽",
-      "독서모임",
-      "질문",
-      "서초구",
-      "오프라인 독서",
-      "북토크",
-      ...(input.keywords ?? []),
-    ],
+    ...(input.keywords?.length ? { keywords: input.keywords } : {}),
     authors: input.author ? [{ name: input.author }] : [{ name: SITE_NAME }],
     creator: SITE_NAME,
     publisher: SITE_NAME,
     metadataBase: new URL(SITE_URL),
-    alternates: { canonical },
+    // 페이지 alternates는 레이아웃 값을 통째로 덮어쓰므로 llms.txt 링크를 여기서도 넣는다.
+    alternates: { canonical, types: { "text/plain": `${SITE_URL}/llms.txt` } },
     robots: input.noIndex
       ? { index: false, follow: false }
       : {

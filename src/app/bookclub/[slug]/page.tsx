@@ -4,10 +4,10 @@ import { notFound } from "next/navigation";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import { BOOKCLUB_SESSIONS, getSession } from "@/lib/bookclub/data";
-import { getStatus } from "@/lib/bookclub/selectors";
+import { feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus } from "@/lib/bookclub/selectors";
 import { getReservedCounts } from "@/lib/bookclub/server";
 import { buildMetadata } from "@/lib/metadata";
-import { breadcrumbSchema, bookclubSessionEventSchema } from "@/lib/schema";
+import { absoluteCoverUrl, breadcrumbSchema, bookclubSessionEventSchema, discussionQuestionsSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
 import DetailClient from "./DetailClient";
 
@@ -29,12 +29,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       noIndex: true,
     });
   }
+  const book = `『${session.bookTitle}』`;
+  const title = session.title.includes(session.bookTitle)
+    ? `${session.title} 독서모임`
+    : `${session.title} · ${book} 독서모임`;
+  const when = `${formatMonthDay(session.startsAt)} ${formatWeekdayFull(session.startsAt)} ${formatTimeOfDay(session.startsAt)}`;
+  const fee = session.feeLabelOverride ?? feeLabel(session.fee);
+  const description = [
+    `${book}(${session.author}) 함께 읽는 북토크 · ${when} · ${session.venue.name}.`,
+    session.leadQuestion ? `대표 발제: ${session.leadQuestion}` : "",
+    `참여비 ${fee}.`,
+  ]
+    .filter(Boolean)
+    .join(" ");
   return buildMetadata({
-    title: session.title,
-    description: session.leadQuestion || session.summary.split("\n")[0],
+    title,
+    description: description.length > 155 ? `${description.slice(0, 154)}…` : description,
     path: `/bookclub/${session.slug}`,
     type: "event",
-    image: session.coverUrl || undefined,
+    keywords: [
+      session.bookTitle,
+      session.author,
+      `${session.bookTitle} 독서모임`,
+      `${session.bookTitle} 발제`,
+      "강남 독서모임",
+      "서초 북클럽",
+    ],
+    ogSub: `${when} · ${session.venue.name} · 참여비 ${fee}`,
+    image: absoluteCoverUrl(session.coverUrl) ?? undefined,
   });
 }
 
@@ -57,10 +79,16 @@ export default async function BookClubDetailPage({ params }: Props) {
     { name: session.title, href: `/bookclub/${slug}` },
   ]);
   const eventLd = bookclubSessionEventSchema(resolved);
+  const questionsLd = discussionQuestionsSchema({
+    slug: resolved.slug,
+    bookTitle: resolved.bookTitle,
+    author: resolved.author,
+    questions: resolved.agendaPreview,
+  });
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
-      <JsonLd data={[crumbLd, eventLd]} />
+      <JsonLd data={questionsLd ? [crumbLd, eventLd, questionsLd] : [crumbLd, eventLd]} />
       <Header />
       <Suspense fallback={<div className="qc-skel" style={{ height: 480 }} />}>
         <DetailClient session={resolved} status={status} allSessions={allSessions} />

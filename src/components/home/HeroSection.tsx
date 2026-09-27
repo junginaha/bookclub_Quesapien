@@ -183,9 +183,9 @@ export default function HeroSection() {
                   }}
                 />
               </em>
-              은
+              은{" "}
               <br />
-              좋은 사람을
+              좋은 사람을{" "}
               <br />
               데려옵니다
             </h1>

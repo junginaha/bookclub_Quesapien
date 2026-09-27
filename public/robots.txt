@@ -1,4 +1,4 @@
-# robots.txt — 질문하는 사람들 (Quesapience)
+# robots.txt — 질문하는 사람들 (Qsapiens)
 # AEO/GEO 최적화: 모든 AI 크롤러에게 인덱싱 허용
 
 User-agent: *
@@ -6,6 +6,9 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 Disallow: /auth/
+Disallow: /mypage
+Disallow: /reset-password
+Disallow: /forgot-password
 
 # Google
 User-agent: Googlebot
@@ -13,6 +16,29 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 Disallow: /auth/
+Disallow: /mypage
+Disallow: /reset-password
+Disallow: /forgot-password
+
+# Naver
+User-agent: Yeti
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /auth/
+Disallow: /mypage
+Disallow: /reset-password
+Disallow: /forgot-password
+
+# Daum (Kakao)
+User-agent: Daum
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /auth/
+Disallow: /mypage
+Disallow: /reset-password
+Disallow: /forgot-password
 
 # Google AI Training
 User-agent: Google-Extended

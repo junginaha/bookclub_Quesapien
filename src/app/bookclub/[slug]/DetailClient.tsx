@@ -152,7 +152,7 @@ export default function DetailClient({
 
         {session.agendaPreview.length > 0 && (
           <div className="qd-questions">
-            <div className="qd-questions-title">이번 발제 미리보기</div>
+            <h2 className="qd-questions-title">『{session.bookTitle}』 발제 질문 미리보기</h2>
             {session.agendaPreview.slice(0, 3).map((q, i) => (
               <p className="qd-question" key={i}>{q}</p>
             ))}

@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
-import type { BookClubSession } from "@/lib/bookclub/types";
-import { dateKey, formatMonthDay, formatTimeRange, formatWeekdayFull, getStatus } from "@/lib/bookclub/selectors";
+import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
+import { dateKey, formatCompactSchedule, getStatus, isWaitlistFull, seatsLeft } from "@/lib/bookclub/selectors";
 import styles from "./linen-calendar.module.css";
 import NearbyBookclubMap from "./NearbyBookclubMap";
 
@@ -30,6 +30,25 @@ export function straightLineKm(from: { lat: number; lng: number }, to: { lat: nu
   return 6371 * 2 * Math.asin(Math.sqrt(Math.min(1, Math.max(0, a))));
 }
 
+function statusLine(session: BookClubSession, status: SessionStatus): string {
+  if (status === "open") return `모집 중 · ${seatsLeft(session)}자리 남음`;
+  if (status === "full") return isWaitlistFull(session) ? "정원·대기 마감" : "정원 마감 · 대기 신청 가능";
+  if (status === "closed") return "신청 마감";
+  return "지난 모임";
+}
+
+function MeetingActions({ session, status }: { session: BookClubSession; status: SessionStatus }) {
+  const href = `/bookclub/${session.slug}`;
+  if (status === "past") return <Link className={styles.primary} href={href}>모임 기록 보기</Link>;
+  if (status === "open" || (status === "full" && !isWaitlistFull(session))) {
+    return <>
+      <Link className={styles.primary} href={`${href}#apply`}>{status === "open" ? "참여 신청하기" : "대기 신청하기"}</Link>
+      <Link className={styles.secondary} href={href}>상세 보기</Link>
+    </>;
+  }
+  return <Link className={styles.primary} href={href}>모임 상세 보기</Link>;
+}
+
 export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: {
   sessions: BookClubSession[];
   headingLevel?: 1 | 2;
@@ -38,7 +57,10 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
   const sorted = useMemo(() => [...sessions]
     .filter(s => Number.isFinite(Date.parse(s.startsAt)) && Number.isFinite(Date.parse(s.endsAt)))
     .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt)), [sessions]);
-  const first = sorted.find(s => getStatus(s) !== "past") ?? sorted[sorted.length - 1];
+  // 초기 선택: 모집 중인 가장 가까운 모임 → 지나지 않은 모임 → 마지막 모임.
+  const first = sorted.find(s => getStatus(s) === "open")
+    ?? sorted.find(s => getStatus(s) !== "past")
+    ?? sorted[sorted.length - 1];
   const startKey = first ? dateKey(first.startsAt) : dateKey(new Date());
   const [month, setMonth] = useState(startKey.slice(0, 7));
   const [selection, setSelection] = useState(startKey);
@@ -197,15 +219,18 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
                   if (event.key === "Enter") router.push("/bookclub/" + session.slug);
                 }}
               >
-                <p className={styles.status}>{status === "past" ? "지난 모임" : status === "full" ? "정원 마감" : status === "closed" ? "신청 마감" : "모집 중"}</p>
-                <h3>{session.bookTitle}</h3>
-                <p className={styles.author}>{session.author}</p>
-                <dl className={styles.facts}>
-                  <div><dt>일시</dt><dd>{formatMonthDay(session.startsAt)} {formatWeekdayFull(session.startsAt)}<br />{formatTimeRange(session.startsAt, session.endsAt)}</dd></div>
-                  <div><dt>장소</dt><dd>{session.venue.name || "장소 추후 안내"}</dd></div>
-                </dl>
+                <p className={`${styles.status}${status === "open" ? ` ${styles.statusOpen}` : ""}`}>{statusLine(session, status)}</p>
+                <h3 className={styles.compactTitle}>
+                  {session.bookTitle}
+                  <span className={styles.compactAuthor}>{session.author}</span>
+                </h3>
+                <p className={styles.compactMeta}>
+                  <time dateTime={session.startsAt}>{formatCompactSchedule(session.startsAt, session.endsAt)}</time>
+                  {" · "}
+                  {session.venue.name || "장소 추후 안내"}
+                </p>
                 <div className={styles.actions}>
-                  <Link className={styles.primary} href={`/bookclub/${session.slug}`}>{status === "open" ? "참여 신청" : "모임 상세 보기"}</Link>
+                  <MeetingActions session={session} status={status} />
                 </div>
               </article>;
             })}
