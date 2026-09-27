@@ -31,6 +31,13 @@ export default function ApplyPanel({
     triggerRef.current?.focus();
   }
 
+  // 모바일에서는 인라인 패널(#apply)이 숨겨져 있어 앵커 이동이 안 된다 —
+  // 홈 카드 등에서 #apply로 들어오면 바텀시트를 바로 연다.
+  useEffect(() => {
+    if (disabled || window.location.hash !== "#apply") return;
+    if (window.matchMedia("(max-width: 767px)").matches) setOpen(true);
+  }, [disabled]);
+
   useEffect(() => {
     if (!open) return;
     const prevOverflow = document.body.style.overflow;

@@ -128,20 +128,18 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
               <div className="lp-eyebrow">서초구 선정 미래혁신형 북클럽</div>
               <div className="lp-right" />
             </div>
-            <h1 className="lp-h-display">
-              <span className="lp-reveal"><span>좋은 <span className="lp-em">질문</span>은</span></span>
-              <span className="lp-reveal"><span>좋은 사람을</span></span>
-              <span className="lp-reveal lp-reveal-last">
-                <span style={{ display: "flex", alignItems: "flex-end", gap: "clamp(6px, 1.2vw, 16px)", flexWrap: "nowrap",
-                  paddingBottom: "28px", paddingTop: "12px",
-                  marginBottom: "-28px", marginTop: "-12px" }}>
-                  <span>데려옵니다</span>
-                  <a href="/bookclub" className="lp-hero-bookclub-btn">
-                    <span>북클럽 둘러보기</span>
-                  </a>
-                </span>
-              </span>
-            </h1>
+            {/* 버튼은 h1 밖에 둔다(제목 텍스트에 링크 문구가 섞이지 않도록). h1을 inline으로
+                흘려 버튼이 "데려옵니다" 바로 옆 같은 줄에 오게 한다 — landing.css .lp-hero-headline */}
+            <div className="lp-hero-headline">
+              <h1 className="lp-h-display">
+                <span className="lp-reveal"><span>좋은 <span className="lp-em">질문</span>은</span></span>{" "}
+                <span className="lp-reveal"><span>좋은 사람을</span></span>{" "}
+                <span className="lp-reveal lp-reveal-last"><span>데려옵니다</span></span>
+              </h1>
+              <a href="/bookclub" className="lp-hero-bookclub-btn">
+                <span>북클럽 둘러보기</span>
+              </a>
+            </div>
             <div className="lp-hero-sub">
               <p>
                 <span className="lp-kw">질문</span>으로{" "}

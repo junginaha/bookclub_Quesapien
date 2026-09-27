@@ -85,8 +85,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   let q: any = null;
   try { q = await getQuestionById(id); } catch { /* */ }
+  // DB에 없는 질문(목업·정적 랜딩 폴백)은 실제 커뮤니티 데이터가 아니므로 색인하지 않는다.
+  const fromDb = !!q;
   if (!q) q = mockQuestions.find((m) => m.id === id);
-  if (!q) return { title: "질문 상세" };
+  if (!q && STATIC_LANDING_QUESTIONS[id]) q = { content: STATIC_LANDING_QUESTIONS[id].content };
+  if (!q) return { title: "질문 상세", robots: { index: false, follow: false } };
   const title = (q.title ?? q.content ?? "질문").slice(0, 60);
   return buildMetadata({
     title: `"${title}"`,
@@ -97,6 +100,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     type: "article",
     keywords: [...(q.tags ?? []), "북토크질문", "독서토론"],
     author: q.author?.name ?? q.author_name,
+    noIndex: !fromDb,
   });
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
