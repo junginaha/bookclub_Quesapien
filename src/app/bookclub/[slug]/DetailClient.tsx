@@ -23,6 +23,7 @@ import VenueCard from "@/components/bookclub/VenueCard";
 import MiniCalendar, { type CalendarClub } from "@/components/bookclub/MiniCalendar";
 import Timeline, { type TimelineEntry } from "@/components/bookclub/Timeline";
 import "@/components/bookclub/bookclub.css";
+import { trackGrowthEvent } from "@/lib/analytics/growth";
 
 type Period = "upcoming" | "past" | "all";
 
@@ -42,6 +43,14 @@ export default function DetailClient({
   const weekday = formatWeekdayFull(session.startsAt);
   const feeText = session.feeLabelOverride ?? feeLabel(session.fee);
   const encoreHref = `mailto:junginaha@qsapiens.com?subject=${encodeURIComponent(`[앵콜 요청] ${session.bookTitle}`)}&body=${encodeURIComponent(`${session.title} 앵콜 모임을 요청합니다.`)}`;
+
+  useEffect(() => {
+    trackGrowthEvent("bookclub_detail_view", {
+      club_slug: session.slug,
+      fee: session.fee,
+      status,
+    });
+  }, [session.slug, session.fee, status]);
 
   const rawPeriod = searchParams.get("period") ?? searchParams.get("filter");
   const period: Period = rawPeriod === "past" ? "past" : rawPeriod === "all" ? "all" : "upcoming";
