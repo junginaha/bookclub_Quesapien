@@ -1,7 +1,6 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import type { Json } from "@/lib/supabase/types";
 
 export type GrowthEventName =
   | "bookclub_detail_view"
@@ -13,17 +12,13 @@ export type GrowthEventName =
 
 export function trackGrowthEvent(
   name: GrowthEventName,
-  props: Record<string, Json | undefined> = {}
+  props: Record<string, string | number | boolean | null | undefined> = {}
 ) {
   try {
     const supabase = createClient();
-    const cleanProps = Object.fromEntries(
-      Object.entries(props).filter((entry): entry is [string, Json] => entry[1] !== undefined)
-    ) as { [key: string]: Json };
-
     void supabase
       .from("events")
-      .insert({ name, props: cleanProps })
+      .insert({ name, props: JSON.parse(JSON.stringify(props)) })
       .then(({ error }) => {
         if (error && process.env.NODE_ENV === "development") {
           console.warn("[growth-event]", name, error.message);
