@@ -3,6 +3,7 @@
 import Script from "next/script";
 import { useId, useState } from "react";
 import { applyToBookClub } from "@/lib/actions/bookclub";
+import { trackGrowthEvent } from "@/lib/analytics/growth";
 import { Button } from "@/components/ui/button";
 
 declare global {
@@ -45,6 +46,7 @@ export default function ApplyForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!valid || submitting) return;
+    trackGrowthEvent("apply_start", { club_slug: clubSlug, fee });
     setSubmitting(true);
     setResult(null);
     try {
@@ -54,7 +56,10 @@ export default function ApplyForm({
         return;
       }
       setResult({ kind: res.kind });
-      if (res.kind === "confirmed") setConfirmedPhone(phone.trim());
+      if (res.kind === "confirmed") {
+        setConfirmedPhone(phone.trim());
+        trackGrowthEvent("attend_apply", { club_slug: clubSlug, fee, result: res.kind });
+      }
       if (res.kind !== "duplicate") {
         setName(""); setPhone(""); setEmail(""); setNote("");
       }
@@ -65,6 +70,7 @@ export default function ApplyForm({
 
   function pay() {
     if (!window.PayApp || fee <= 0 || !confirmedPhone) return;
+    trackGrowthEvent("checkout_start", { club_slug: clubSlug, fee, product_name: productName });
     window.PayApp.setDefault("userid", "onedaybooks");
     window.PayApp.setDefault("shopname", "질문하는 사람들");
     window.PayApp.setParam("goodname", productName);
