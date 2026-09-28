@@ -30,7 +30,7 @@ function ResolvedBookCover({
     if (!lookup) return;
     let active = true;
     const controller = new AbortController();
-    const params = new URLSearchParams({ title, author, v: "2" });
+    const params = new URLSearchParams({ title, author, v: "3" });
     fetch("/api/book-cover?" + params.toString(), { signal: controller.signal })
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {

@@ -43,6 +43,15 @@ function kakaoKey() {
   return process.env.KAKAO_REST_API_KEY?.trim() || process.env.KAKAO_API?.trim();
 }
 
+// Kakao returns a 120px thumbnail proxy; its fname param is the full-size original.
+function kakaoOriginal(thumbnail: string) {
+  try {
+    const original = new URL(thumbnail).searchParams.get("fname");
+    if (original) return original.replace(/^http:/, "https:");
+  } catch {}
+  return thumbnail.replace(/^http:/, "https:");
+}
+
 function norm(value: string) {
   return value
     .replace(/<[^>]+>/g, "")
@@ -159,7 +168,7 @@ async function searchKakao(title: string, author: string): Promise<Candidate[]> 
         provider: "kakao" as const,
         title: item.title ?? "",
         authors: item.authors ?? [],
-        coverUrl: item.thumbnail!.replace(/^http:/, "https:"),
+        coverUrl: kakaoOriginal(item.thumbnail!),
         quality: 12,
         isbn: item.isbn,
       }))

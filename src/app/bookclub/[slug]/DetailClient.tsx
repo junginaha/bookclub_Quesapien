@@ -138,7 +138,7 @@ export default function DetailClient({
         {session.bookIntro && (
           <section className="qd-book-intro" aria-labelledby="qd-book-intro-title">
             <span>ABOUT THE BOOK</span>
-            <h2 id="qd-book-intro-title">책은 이런 이야기입니다</h2>
+            <h2 id="qd-book-intro-title">한마디로, 이런 책입니다</h2>
             <p>{session.bookIntro}</p>
             {session.bookSourceUrl && (
               <a href={session.bookSourceUrl} target="_blank" rel="noreferrer">

@@ -46,7 +46,6 @@ export default function OpenBook({ session }: { session: BookClubSession }) {
           {spread === 0 ? (
             <>
               <p className={styles.copy}>{session.bookIntro || session.summary}</p>
-              <p className={styles.note}>북클럽에서 준비한 소개입니다.</p>
               {session.bookSourceUrl && <a href={session.bookSourceUrl} target="_blank" rel="noreferrer" className={styles.source}>도서 정보 보기 ↗</a>}
             </>
           ) : (
