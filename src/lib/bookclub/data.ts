@@ -23,8 +23,8 @@ const KYOBO_GANGNAM = {
   name: "교보문고 강남점",
   detail: "작가와의 만남",
   address: "서울특별시 서초구 강남대로 465, 교보타워 지하 1~지하 2층",
-  lat: Number.NaN,
-  lng: Number.NaN,
+  lat: 37.5039551, // OSM Nominatim · 강남대로 465 교보타워
+  lng: 127.0240401,
   nearestStation: "신논현역 인근",
 };
 
@@ -41,8 +41,8 @@ const EDIYA_LAB = {
   name: "이디야커피랩 · 컬처스페이스",
   detail: "이디야 본사",
   address: "서울특별시 강남구 논현로 636 이디야빌딩",
-  lat: Number.NaN,
-  lng: Number.NaN,
+  lat: 37.5105088, // OSM Nominatim · 논현로 636 이디야커피랩
+  lng: 127.0326807,
   nearestStation: "",
 };
 
