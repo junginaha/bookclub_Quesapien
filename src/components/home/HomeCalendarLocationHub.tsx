@@ -30,6 +30,15 @@ export function straightLineKm(from: { lat: number; lng: number }, to: { lat: nu
   return 6371 * 2 * Math.asin(Math.sqrt(Math.min(1, Math.max(0, a))));
 }
 
+function hasCoords(session: BookClubSession): boolean {
+  const { lat, lng } = session.venue;
+  return Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+}
+
+function formatKm(km: number): string {
+  return km < 1 ? Math.round(km * 1000) + "m" : km.toFixed(1) + "km";
+}
+
 function statusLine(session: BookClubSession, status: SessionStatus): string {
   if (status === "open") return `모집 중 · ${seatsLeft(session)}자리 남음`;
   if (status === "full") return isWaitlistFull(session) ? "정원·대기 마감" : "정원 마감 · 대기 신청 가능";
@@ -68,6 +77,7 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
   const [nearbyMessage, setNearbyMessage] = useState("");
   const [nearbyResults, setNearbyResults] = useState<Array<{ session: BookClubSession; km: number }>>([]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [hiddenOpenCount, setHiddenOpenCount] = useState(0);
   const [year, monthNumber] = month.split("-").map(Number);
   const inMonth = sorted.filter(s => dateKey(s.startsAt).startsWith(month));
   const selectedKey = inMonth.some(s => dateKey(s.startsAt) === selection)
@@ -93,29 +103,25 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
       (position) => {
         const here = { lat: position.coords.latitude, lng: position.coords.longitude };
         setUserLocation(here);
-        const candidates = sorted.filter((session) =>
-          getStatus(session) !== "past" &&
-          Number.isFinite(session.venue.lat) &&
-          Number.isFinite(session.venue.lng) &&
-          Math.abs(session.venue.lat) <= 90 &&
-          Math.abs(session.venue.lng) <= 180
-        );
-        if (!candidates.length) {
-          setNearbyMessage("거리 계산이 가능한 모임을 준비 중입니다.");
+        // 추천 대상은 "지금 참여할 수 있는" 모임만: 모집 중 우선, 없으면 대기 신청 가능.
+        const open = sorted.filter((session) => getStatus(session) === "open");
+        const waitlist = sorted.filter((session) => getStatus(session) === "full" && !isWaitlistFull(session));
+        const pool = open.some(hasCoords) ? open : waitlist;
+        const results = pool.filter(hasCoords)
+          .map((session) => ({ session, km: straightLineKm(here, session.venue) }))
+          .sort((a, b) => a.km - b.km);
+        const hidden = open.filter((session) => !hasCoords(session)).length;
+        setNearbyResults(results);
+        setHiddenOpenCount(pool === open ? hidden : 0);
+        if (!results.length) {
+          setNearbyMessage(open.length ? "모집 중인 모임은 장소가 아직 비공개예요. 캘린더에서 확인해 주세요." : "지금 모집 중인 모임이 없어요. 다음 모임을 준비하고 있어요.");
           setFindingNearby(false);
           return;
         }
-        const results = candidates
-          .map((session) => ({ session, km: straightLineKm(here, session.venue) }))
-          .sort((a, b) => a.km - b.km)
-          .slice(0, 50);
-        const nearest = results[0];
-        const key = dateKey(nearest.session.startsAt);
+        const key = dateKey(results[0].session.startsAt);
         setMonth(key.slice(0, 7));
         setSelection(key);
-        setNearbyResults(results);
-        const within10 = results.filter((item) => item.km <= 10).length;
-        setNearbyMessage(within10 > 0 ? `반경 10km 안에 등록된 북클럽 ${within10}개 · 가까운 순서` : "가장 가까운 등록 북클럽부터 보여드립니다.");
+        setNearbyMessage("");
         setFindingNearby(false);
       },
       (error) => {
@@ -172,6 +178,25 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
             </button>
           </div>
           {nearbyMessage && <p className={styles.nearbyMessage} role="status">{nearbyMessage}</p>}
+          {nearbyResults.length > 0 && (() => {
+            const { session, km } = nearbyResults[0];
+            const status = getStatus(session);
+            return (
+              <article className={styles.nearbyPick} aria-label="가장 가까운 북클럽 추천">
+                <p className={styles.nearbyPickLabel}>{status === "open" ? "가장 가까운 모집 중 북클럽" : "가장 가까운 대기 신청 북클럽"} · 직선 {formatKm(km)}</p>
+                <h3 className={styles.compactTitle}>
+                  <Link href={`/bookclub/${session.slug}`}>{session.bookTitle}</Link>
+                  <span className={styles.compactAuthor}>{session.author}</span>
+                </h3>
+                <p className={styles.compactMeta}>
+                  <time dateTime={session.startsAt}>{formatCompactSchedule(session.startsAt, session.endsAt)}</time>
+                  {" · "}{session.venue.name} · {statusLine(session, status)}
+                </p>
+                <div className={styles.actions}><MeetingActions session={session} status={status} /></div>
+                {hiddenOpenCount > 0 && <p className={styles.nearbyPickNote}>장소 비공개로 모집 중인 모임 {hiddenOpenCount}개는 캘린더에서 확인해 주세요.</p>}
+              </article>
+            );
+          })()}
           {nearbyResults.length > 0 && (
             <section className={styles.nearbyPanel} aria-label="내 근처 북클럽">
               <div className={styles.nearbyMap}>
@@ -193,7 +218,7 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
                   >
                     <span>{index + 1}</span>
                     <strong>{session.bookTitle}</strong>
-                    <small>{session.venue.name} · {km < 1 ? Math.round(km * 1000) + "m" : km.toFixed(1) + "km"}</small>
+                    <small>{session.venue.name} · {formatKm(km)}</small>
                   </button>
                 ))}
               </div>
