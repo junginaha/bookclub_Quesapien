@@ -9,7 +9,7 @@ create table public.clubs (
   name text not null,
   slug text unique not null,
   description text,
-  location geography(point, 4326),
+  location extensions.geography(point, 4326),
   location_name text,
   schedule_note text,
   capacity int,
@@ -95,8 +95,8 @@ create or replace function public.clubs_within(p_lat double precision, p_lng dou
 returns setof public.clubs language sql stable as $$
   select c.* from public.clubs c
   where c.location is not null
-    and ST_DWithin(c.location, ST_MakePoint(p_lng, p_lat)::geography, p_radius_m)
-  order by ST_Distance(c.location, ST_MakePoint(p_lng, p_lat)::geography) asc;
+    and extensions.ST_DWithin(c.location, extensions.ST_MakePoint(p_lng, p_lat)::extensions.geography, p_radius_m)
+  order by extensions.ST_Distance(c.location, extensions.ST_MakePoint(p_lng, p_lat)::extensions.geography) asc;
 $$;
 
 grant execute on function public.clubs_within(double precision, double precision, double precision) to anon, authenticated;
