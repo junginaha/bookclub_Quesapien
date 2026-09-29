@@ -3,8 +3,12 @@
 -- extensions + KPI 이벤트 테이블 (§B4)
 -- ============================================================
 
-create extension if not exists postgis;
-create extension if not exists vector;
+create schema if not exists extensions;
+
+-- Security: extension-owned objects such as spatial_ref_sys must not land in the
+-- exposed public schema. Supabase recommends a dedicated extension schema.
+create extension if not exists postgis with schema extensions;
+create extension if not exists vector with schema extensions;
 
 create table public.events (
   id bigint generated always as identity primary key,
