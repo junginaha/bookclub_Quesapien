@@ -1,91 +1,101 @@
 -- Qusapience Supabase security advisor response
--- Alert: rls_disabled_in_public (project pgstyeddzbjoijmmnuuw)
--- Prepared: 2026-09-30 KST
+-- Project: pgstyeddzbjoijmmnuuw
+-- Verified: 2026-09-30 KST
 --
--- PURPOSE
---   1) Identify the exact public table(s) with RLS disabled.
---   2) Inspect grants and policies before changing anything.
---   3) Verify the result after a table-specific fix.
+-- CONFIRMED LIVE FINDING
+--   Supabase Security Advisor still reports exactly one rls_disabled_in_public:
+--     public.spatial_ref_sys
+--   This is the PostGIS coordinate-reference catalog (about 8,500 rows), not an
+--   application customer-data table.
 --
--- SAFETY
---   All executable statements in this file are read-only.
---   Do not apply the commented remediation template until the table's intended
---   public/authenticated access has been compared with application code and
---   the matching migration. Enabling RLS without a required policy can break
---   production reads or writes.
+--   postgis version: 3.3.7
+--   extension schema: public
+--   extension relocatable: false
+--   table owner: supabase_admin
+--
+-- IMPORTANT
+--   Do NOT blindly enable RLS from an ordinary postgres session. The extension
+--   owns this table and the live application uses PostGIS geography/distance
+--   functions. Supabase's own Advisor warns that enabling RLS without the
+--   required policies can block access.
+--
+-- PREFERRED PERMANENT FIX
+--   Move PostGIS out of the exposed public schema into extensions.
+--   Supabase documents that PostGIS >= 2.3 is not normally relocatable. For an
+--   existing project, use a backup + dependency-aware migration, or ask
+--   Supabase Support to relocate the extension. The repository's clean-install
+--   migrations now create PostGIS in extensions and schema-qualify geo types/functions.
+--
+-- ============================================================
+-- 1. READ-ONLY VERIFICATION
+-- ============================================================
 
--- A. Critical finding: public base tables with RLS disabled
-SELECT
-  n.nspname AS schema_name,
-  c.relname AS table_name,
-  c.relrowsecurity AS rls_enabled,
-  c.relforcerowsecurity AS rls_forced,
-  pg_size_pretty(pg_total_relation_size(c.oid)) AS total_size
-FROM pg_class AS c
-JOIN pg_namespace AS n ON n.oid = c.relnamespace
-WHERE n.nspname = 'public'
-  AND c.relkind IN ('r', 'p')
-  AND c.relrowsecurity = false
-ORDER BY c.relname;
+select
+  e.extname,
+  e.extversion,
+  n.nspname as extension_schema,
+  e.extrelocatable
+from pg_extension e
+join pg_namespace n on n.oid = e.extnamespace
+where e.extname = 'postgis';
 
--- B. Grants that can expose public-schema tables to API roles
-SELECT
-  table_schema,
-  table_name,
+select
+  c.relname as table_name,
+  c.relrowsecurity as rls_enabled,
+  pg_get_userbyid(c.relowner) as owner,
+  c.relacl::text as acl
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public'
+  and c.relname = 'spatial_ref_sys';
+
+select
   grantee,
   privilege_type
-FROM information_schema.role_table_grants
-WHERE table_schema = 'public'
-  AND grantee IN ('PUBLIC', 'anon', 'authenticated')
-ORDER BY table_name, grantee, privilege_type;
+from information_schema.role_table_grants
+where table_schema = 'public'
+  and table_name = 'spatial_ref_sys'
+  and grantee in ('PUBLIC', 'anon', 'authenticated', 'service_role')
+order by grantee, privilege_type;
 
--- C. Existing policies (compare the affected table with its migration)
-SELECT
-  schemaname,
-  tablename,
-  policyname,
-  permissive,
-  roles,
-  cmd,
-  qual,
-  with_check
-FROM pg_policies
-WHERE schemaname = 'public'
-ORDER BY tablename, policyname;
-
--- D. Public-schema SECURITY DEFINER functions need separate review because
---    they can bypass caller privileges when their implementation allows it.
-SELECT
-  n.nspname AS schema_name,
-  p.proname AS function_name,
-  pg_get_function_identity_arguments(p.oid) AS arguments,
-  p.prosecdef AS security_definer
-FROM pg_proc AS p
-JOIN pg_namespace AS n ON n.oid = p.pronamespace
-WHERE n.nspname = 'public'
-  AND p.prosecdef = true
-ORDER BY p.proname;
-
--- E. Table-specific remediation template (INTENTIONALLY COMMENTED OUT)
+-- ============================================================
+-- 2. INTERIM RLS OPTION — SUPPORT / OWNER-LEVEL EXECUTION ONLY
+-- ============================================================
+-- Use only if Supabase Support advises keeping PostGIS in public temporarily.
+-- Preserve read access required by PostGIS, block all client writes.
 --
--- BEGIN;
--- ALTER TABLE public.REPLACE_WITH_VERIFIED_TABLE ENABLE ROW LEVEL SECURITY;
+-- alter table public.spatial_ref_sys enable row level security;
 --
--- Choose grants and policies from the table's actual product contract.
--- Do not blanket-revoke public access from public-content tables.
--- For a verified service-only intake table, the matching pattern may be:
--- REVOKE ALL ON TABLE public.REPLACE_WITH_VERIFIED_TABLE
---   FROM PUBLIC, anon, authenticated;
--- GRANT ALL ON TABLE public.REPLACE_WITH_VERIFIED_TABLE TO service_role;
--- COMMIT;
+-- drop policy if exists "spatial_ref_sys_read_only" on public.spatial_ref_sys;
+-- create policy "spatial_ref_sys_read_only"
+--   on public.spatial_ref_sys
+--   for select
+--   to anon, authenticated
+--   using (true);
 --
--- Then rerun sections A-C and run:
---   node --env-file=.env.local scripts/rls-pentest.mjs
--- Finally smoke-test the affected live read/write flow.
+-- revoke insert, update, delete, truncate, references, trigger
+--   on table public.spatial_ref_sys
+--   from anon, authenticated;
+--
+-- This SQL is intentionally commented because the live table is owned by
+-- supabase_admin. The ordinary postgres role in this project cannot change its
+-- ACL/RLS reliably, and running this without owner/support privileges is not a
+-- valid production remediation.
 
--- Repository audit note:
--- The 29 application tables created by supabase/migrations/001-021 each have
--- an ENABLE ROW LEVEL SECURITY statement in source. If section A returns one
--- of those tables, the live database is probably behind or drifted from the
--- repository migration state. If it returns a different table, locate its
--- creator/consumer before defining policies or grants.
+-- ============================================================
+-- 3. POST-FIX VERIFICATION
+-- ============================================================
+-- Expected permanent state:
+--   A) PostGIS schema = extensions
+--   B) public.spatial_ref_sys no longer exists
+--   C) Security Advisor no longer reports rls_disabled_in_public
+--
+-- Functional smoke test used before/after:
+-- select *
+-- from public.nearby_book_clubs(37.5665, 126.9780, 30.0)
+-- limit 3;
+--
+-- Repository linkage is confirmed by:
+--   supabase/.temp/project-ref
+--   supabase/.temp/linked-project.json
+-- both pointing to pgstyeddzbjoijmmnuuw / Qusapience.
