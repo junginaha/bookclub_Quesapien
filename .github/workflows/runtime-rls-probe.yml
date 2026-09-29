@@ -5,7 +5,7 @@ on:
   push:
     branches: [main]
     paths:
-      - ".github/workflows/runtime-rls-probe.yml"
+      - ".github/workflows/runtime-rls-probe.yml"\n      - "src/app/api/internal/rls-probe-20260930/route.ts"
 
 permissions:
   contents: read
