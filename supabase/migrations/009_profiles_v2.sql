@@ -7,7 +7,7 @@
 alter table public.profiles
   add column if not exists nickname text,
   add column if not exists phone text,                              -- E.164
-  add column if not exists home_region geography(point, 4326),
+  add column if not exists home_region extensions.geography(point, 4326),
   add column if not exists is_operator boolean not null default false,
   add column if not exists privacy_consented_at timestamptz,
   add column if not exists phone_consented_at timestamptz,
