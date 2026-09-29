@@ -221,19 +221,19 @@ export default function ClubsAdminClient() {
 
   if (!authed) {
     return (
-      <div style={{ minHeight: "100vh", background: "#F4EFE5", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100vh", background: "#F2E4C4", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <form onSubmit={handleLogin} style={{ background: "#fff", border: "1px solid #e0d9cc", borderRadius: "16px", padding: "40px", width: "360px", boxShadow: "0 8px 32px rgba(0,0,0,.08)" }}>
           <div style={{ fontSize: "22px", fontWeight: 600, marginBottom: "8px", color: "#2a1f14" }}>북클럽 관리</div>
-          <div style={{ fontSize: "13px", color: "#8a7968", marginBottom: "24px" }}>관리자 키를 입력해주세요</div>
+          <div style={{ fontSize: "13px", color: "#7a5f45", marginBottom: "24px" }}>관리자 키를 입력해주세요</div>
           <input
             type="password"
             value={keyInput}
             onChange={(e) => setKeyInput(e.target.value)}
             placeholder="관리자 키"
             autoFocus
-            style={{ width: "100%", padding: "10px 14px", border: "1px solid #d8d0c4", borderRadius: "8px", fontSize: "14px", outline: "none", marginBottom: "12px", boxSizing: "border-box" }}
+            style={{ width: "100%", padding: "10px 14px", border: "1px solid #d8bd8c", borderRadius: "8px", fontSize: "14px", outline: "none", marginBottom: "12px", boxSizing: "border-box" }}
           />
-          <button type="submit" style={{ width: "100%", padding: "11px", background: "#5E4632", color: "#fff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: "pointer" }}>
+          <button type="submit" style={{ width: "100%", padding: "11px", background: "#A4481C", color: "#fff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: "pointer" }}>
             입장
           </button>
           <div style={{ marginTop: "16px", fontSize: "12px", color: "#a09080", textAlign: "center" }}>
@@ -245,21 +245,21 @@ export default function ClubsAdminClient() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F4EFE5", padding: "40px 20px" }}>
+    <div style={{ minHeight: "100vh", background: "#F2E4C4", padding: "40px 20px" }}>
       <div style={{ maxWidth: "800px", margin: "0 auto" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "32px" }}>
-          <Link href="/" style={{ color: "#5E4632", textDecoration: "none", fontSize: "13px" }}>← 홈</Link>
+          <Link href="/" style={{ color: "#A4481C", textDecoration: "none", fontSize: "13px" }}>← 홈</Link>
           <div style={{ fontSize: "22px", fontWeight: 600, color: "#2a1f14" }}>북클럽 상세정보 관리</div>
-          {loading && <span style={{ fontSize: "12px", color: "#8a7968" }}>불러오는 중…</span>}
+          {loading && <span style={{ fontSize: "12px", color: "#7a5f45" }}>불러오는 중…</span>}
         </div>
 
         {/* Tabs + 새 북클럽 추가 */}
         <div style={{ display: "flex", gap: "8px", marginBottom: "24px", flexWrap: "wrap", alignItems: "center" }}>
           {(["main", "mini"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)} style={{
-              padding: "8px 20px", borderRadius: "9999px", border: "1px solid #d8d0c4",
-              background: tab === t ? "#5E4632" : "#fff", color: tab === t ? "#fff" : "#5E4632",
+              padding: "8px 20px", borderRadius: "9999px", border: "1px solid #d8bd8c",
+              background: tab === t ? "#A4481C" : "#fff", color: tab === t ? "#fff" : "#A4481C",
               fontSize: "13px", fontWeight: 500, cursor: "pointer",
             }}>
               {t === "main" ? `메인 북클럽 (${clubs.filter(c => !c.is_mini).length})` : `미니 북클럽 (${clubs.filter(c => c.is_mini).length})`}
@@ -267,8 +267,8 @@ export default function ClubsAdminClient() {
           ))}
           <button onClick={() => setAddingNew((v) => !v)} style={{
             marginLeft: "auto", padding: "8px 20px", borderRadius: "9999px",
-            border: "1px solid #5E4632", background: addingNew ? "#5E4632" : "#fff",
-            color: addingNew ? "#fff" : "#5E4632", fontSize: "13px", fontWeight: 600, cursor: "pointer",
+            border: "1px solid #A4481C", background: addingNew ? "#A4481C" : "#fff",
+            color: addingNew ? "#fff" : "#A4481C", fontSize: "13px", fontWeight: 600, cursor: "pointer",
           }}>
             + 새 북클럽 추가
           </button>
@@ -287,8 +287,8 @@ export default function ClubsAdminClient() {
               </div>
             </div>
             <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-              <button onClick={() => setAddingNew(false)} style={{ padding: "9px 20px", border: "1px solid #d8d0c4", borderRadius: "8px", background: "none", fontSize: "13px", cursor: "pointer", color: "#5E4632" }}>취소</button>
-              <button onClick={handleAddNew} style={{ padding: "9px 24px", background: "#5E4632", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
+              <button onClick={() => setAddingNew(false)} style={{ padding: "9px 20px", border: "1px solid #d8bd8c", borderRadius: "8px", background: "none", fontSize: "13px", cursor: "pointer", color: "#A4481C" }}>취소</button>
+              <button onClick={handleAddNew} style={{ padding: "9px 24px", background: "#A4481C", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
                 만들고 세부내용 입력하기
               </button>
             </div>
@@ -319,11 +319,11 @@ export default function ClubsAdminClient() {
                       <span style={{ fontSize: "12px", color: "#4CAF50", fontWeight: 500 }}>{saveMsg[club.slug]}</span>
                     )}
                     {hasData && !isOpen && (
-                      <span style={{ fontSize: "12px", color: "#8a7968" }}>
+                      <span style={{ fontSize: "12px", color: "#7a5f45" }}>
                         {[club.host_name, club.schedule, club.location].filter(Boolean).join(" · ")}
                       </span>
                     )}
-                    <span style={{ fontSize: "18px", color: "#8a7968", lineHeight: 1 }}>{isOpen ? "−" : "+"}</span>
+                    <span style={{ fontSize: "18px", color: "#7a5f45", lineHeight: 1 }}>{isOpen ? "−" : "+"}</span>
                   </div>
                 </div>
 
@@ -427,11 +427,11 @@ export default function ClubsAdminClient() {
                         </select>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: "16px", paddingTop: "22px" }}>
-                        <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#5E4632", cursor: "pointer" }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#A4481C", cursor: "pointer" }}>
                           <input type="checkbox" checked={form.author_hosts ?? false} onChange={(e) => setForm((f) => ({ ...f, author_hosts: e.target.checked }))} />
                           저자 직접 진행
                         </label>
-                        <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#5E4632", cursor: "pointer" }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#A4481C", cursor: "pointer" }}>
                           <input type="checkbox" checked={form.encore_eligible ?? false} onChange={(e) => setForm((f) => ({ ...f, encore_eligible: e.target.checked }))} />
                           앵콜 대상
                         </label>
@@ -446,10 +446,10 @@ export default function ClubsAdminClient() {
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end", marginTop: "16px" }}>
-                      <button onClick={() => setExpanded(null)} style={{ padding: "9px 20px", border: "1px solid #d8d0c4", borderRadius: "8px", background: "none", fontSize: "13px", cursor: "pointer", color: "#5E4632" }}>
+                      <button onClick={() => setExpanded(null)} style={{ padding: "9px 20px", border: "1px solid #d8bd8c", borderRadius: "8px", background: "none", fontSize: "13px", cursor: "pointer", color: "#A4481C" }}>
                         취소
                       </button>
-                      <button onClick={() => handleSave(club.slug)} disabled={saving} style={{ padding: "9px 24px", background: "#5E4632", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer", opacity: saving ? 0.7 : 1 }}>
+                      <button onClick={() => handleSave(club.slug)} disabled={saving} style={{ padding: "9px 24px", background: "#A4481C", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer", opacity: saving ? 0.7 : 1 }}>
                         {saving ? "저장 중…" : "저장하기"}
                       </button>
                     </div>
@@ -461,8 +461,8 @@ export default function ClubsAdminClient() {
         </div>
 
         {/* Info box */}
-        <div style={{ marginTop: "32px", padding: "16px 20px", background: "rgba(94,70,50,.06)", borderRadius: "10px", fontSize: "12px", color: "#8a7968", lineHeight: 1.7 }}>
-          <strong style={{ color: "#5E4632" }}>안내</strong><br />
+        <div style={{ marginTop: "32px", padding: "16px 20px", background: "rgba(164, 72, 28,.06)", borderRadius: "10px", fontSize: "12px", color: "#7a5f45", lineHeight: 1.7 }}>
+          <strong style={{ color: "#A4481C" }}>안내</strong><br />
           • Supabase 스키마가 적용되면 데이터가 DB에 저장됩니다.<br />
           • 스키마 미적용 시 데이터는 저장되지 않습니다. SQL Editor에서 schema.sql을 먼저 실행해주세요.<br />
           • 초록 점 = 정보 입력됨 / 회색 점 = 미입력
@@ -473,11 +473,11 @@ export default function ClubsAdminClient() {
 }
 
 const labelStyle: React.CSSProperties = {
-  display: "block", fontSize: "12px", color: "#8a7968", marginBottom: "4px", fontWeight: 500,
+  display: "block", fontSize: "12px", color: "#7a5f45", marginBottom: "4px", fontWeight: 500,
 };
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", padding: "9px 12px", border: "1px solid #d8d0c4", borderRadius: "8px",
+  width: "100%", padding: "9px 12px", border: "1px solid #d8bd8c", borderRadius: "8px",
   fontSize: "13.5px", outline: "none", background: "#faf8f4", boxSizing: "border-box",
   fontFamily: "inherit",
 };

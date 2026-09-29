@@ -81,7 +81,7 @@ export default function ProfileOnboardingClient({
     }}>
       <div style={{ width: "100%", maxWidth: 420, display: "flex", flexDirection: "column", gap: 20 }}>
         <div style={{ textAlign: "center" }}>
-          <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 6, fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>
+          <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 6, fontFamily: 'Georgia, serif', fontStyle: "italic" }}>
             거의 다 왔어요
           </p>
           <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
@@ -123,7 +123,7 @@ export default function ProfileOnboardingClient({
               type="button" onClick={handleUseLocation} disabled={geoLoading}
               style={{
                 width: "100%", padding: "11px 0", borderRadius: 10, fontSize: 13.5,
-                background: region ? "rgba(94,70,50,0.08)" : "white",
+                background: region ? "rgba(164, 72, 28,0.08)" : "white",
                 border: "1.5px solid var(--line)", color: region ? "var(--accent)" : "var(--ink-soft)",
                 cursor: geoLoading ? "not-allowed" : "pointer",
                 fontFamily: "var(--font-noto-sans-kr), sans-serif",

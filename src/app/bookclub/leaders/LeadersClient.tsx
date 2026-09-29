@@ -47,7 +47,7 @@ const LEADERS: Leader[] = [
     books_read: 34,
     rating: 4.8,
     tags: ["관계", "사과", "회복"],
-    color: "#553C2A",
+    color: "#7E3514",
     bio: "사회학을 전공했고 비폭력 대화(NVC)를 공부했습니다. 이 자리는 잘 말하는 사람이 아니라 잘 듣는 사람이 빛나는 곳이어야 한다고 생각합니다.",
     booktalk_slugs: ["혼자라는-감각"],
   },
@@ -91,7 +91,7 @@ export default function LeadersClient() {
       {/* Hero */}
       <section style={{ padding: "72px 0 56px", borderBottom: "1px solid var(--line-soft)", background: "linear-gradient(to bottom, var(--bg-soft), var(--bg))" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px,4vw,48px)" }}>
-          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--muted)", fontFamily: '"EB Garamond",Georgia,serif', fontStyle: "normal", marginBottom: 20 }}>
+          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--muted)", fontFamily: 'var(--font-display),Georgia,serif', fontStyle: "normal", marginBottom: 20 }}>
             Leaders — 리더 소개
           </div>
           <h1 style={{ fontFamily: "var(--font-noto-serif-kr),Georgia,serif", fontSize: "clamp(28px,5vw,52px)", fontWeight: 400, lineHeight: 1.2, letterSpacing: "-0.02em", color: "var(--ink)", marginBottom: 16 }}>
@@ -124,7 +124,7 @@ export default function LeadersClient() {
                     border: "1px solid var(--line-soft)",
                     background: isHovered ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.35)",
                     transition: "background 0.25s, box-shadow 0.25s, transform 0.25s",
-                    boxShadow: isHovered ? "0 12px 40px -8px rgba(28,31,38,0.12)" : "none",
+                    boxShadow: isHovered ? "0 12px 40px -8px rgba(43, 29, 20,0.12)" : "none",
                     transform: isHovered ? "translateY(-2px)" : "none",
                   }}
                   className="leader-grid"

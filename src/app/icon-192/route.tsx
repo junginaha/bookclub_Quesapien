@@ -9,7 +9,7 @@ export async function GET() {
         style={{
           width: 192,
           height: 192,
-          background: "#1C1F26",
+          background: "#2B1D14",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -26,12 +26,12 @@ export async function GET() {
           width: 60,
           height: 60,
           borderRadius: "50%",
-          background: "rgba(176,138,74,0.15)",
+          background: "rgba(198, 138, 30,0.15)",
         }} />
         {/* Mark */}
         <div style={{
           fontSize: 72,
-          color: "#B08A4A",
+          color: "#C68A1E",
           fontStyle: "italic",
           fontFamily: "serif",
           lineHeight: 1,
@@ -46,7 +46,7 @@ export async function GET() {
           left: 0,
           right: 0,
           height: 5,
-          background: "linear-gradient(90deg, #B08A4A, #5E4632)",
+          background: "linear-gradient(90deg, #C68A1E, #A4481C)",
           borderRadius: "0 0 40px 40px",
         }} />
       </div>

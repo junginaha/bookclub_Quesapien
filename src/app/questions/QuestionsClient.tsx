@@ -224,7 +224,7 @@ export default function QuestionsClient({
         background: "linear-gradient(to bottom, var(--bg-soft) 0%, var(--bg) 100%)",
       }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
-          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--muted)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic", marginBottom: 18 }}>
+          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--muted)", fontFamily: 'Georgia, serif', fontStyle: "italic", marginBottom: 18 }}>
             Questions — 질문
           </div>
           <h1 style={{
@@ -234,7 +234,7 @@ export default function QuestionsClient({
             marginBottom: "clamp(14px, 2.5vw, 28px)",
           }}>
             좋은 질문은{" "}
-            <em style={{ fontStyle: "normal", fontWeight: 600, color: "var(--accent)", background: "linear-gradient(90deg, var(--accent), #B08A4A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>좋은 사람</em>을 데려옵니다.
+            <em style={{ fontStyle: "normal", fontWeight: 600, color: "var(--accent)", background: "linear-gradient(90deg, var(--accent), #C68A1E)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>좋은 사람</em>을 데려옵니다.
           </h1>
 
           {/* 검색 + 질문 작성 버튼 통합 */}
@@ -313,10 +313,10 @@ export default function QuestionsClient({
                     position: "relative", overflow: "hidden",
                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
                   }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 40px rgba(28,31,38,0.25)"; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 40px rgba(43, 29, 20,0.25)"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
                   >
-                    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 70% 60% at 90% 10%, rgba(176,138,74,0.18), transparent 60%)" }} />
+                    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 70% 60% at 90% 10%, rgba(198, 138, 30,0.18), transparent 60%)" }} />
                     <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(16px, 2.5vw, 24px)", fontWeight: 400, lineHeight: 1.6, color: "var(--cream-on-dark)", marginBottom: "clamp(12px, 2vw, 24px)", position: "relative" }}>
                       {today.content}
                     </p>
@@ -358,7 +358,7 @@ export default function QuestionsClient({
                           onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.95)"; (e.currentTarget as HTMLElement).style.transform = "translateX(3px)"; }}
                           onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = i === 0 ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.3)"; (e.currentTarget as HTMLElement).style.transform = "translateX(0)"; }}
                         >
-                          <span className="q-pop-num" style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 28, fontStyle: "italic", color: "var(--accent)", opacity: i === 0 ? 0.9 : 0.3, lineHeight: 1, flexShrink: 0, minWidth: 28, textAlign: "center" }}>
+                          <span className="q-pop-num" style={{ fontFamily: 'Georgia, serif', fontSize: 28, fontStyle: "italic", color: "var(--accent)", opacity: i === 0 ? 0.9 : 0.3, lineHeight: 1, flexShrink: 0, minWidth: 28, textAlign: "center" }}>
                             {i + 1}
                           </span>
                           <div className="q-pop-content" style={{ flex: 1, minWidth: 0 }}>
@@ -580,7 +580,7 @@ export default function QuestionsClient({
 
               {askStatus === "sent" ? (
                 <div style={{ textAlign: "center", padding: "20px 0" }}>
-                  <div style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 36, color: "var(--accent)", marginBottom: 10 }}>?</div>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: 36, color: "var(--accent)", marginBottom: 10 }}>?</div>
                   <p style={{ fontSize: 14, color: "var(--ink-soft)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>질문이 잘 전달됐어요.</p>
                   <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>누군가의 마음에 닿을 거예요.</p>
                 </div>

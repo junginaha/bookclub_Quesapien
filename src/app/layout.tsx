@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_KR, Noto_Serif_KR, EB_Garamond } from "next/font/google";
+import { Noto_Sans_KR, Noto_Serif_KR, Fraunces } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
@@ -11,7 +11,8 @@ import KeycapSound from "@/components/common/KeycapSound";
 
 const notoSansKR = Noto_Sans_KR({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"], variable: "--font-noto-sans-kr", display: "swap" });
 const notoSerifKR = Noto_Serif_KR({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700", "900"], variable: "--font-noto-serif-kr", display: "swap" });
-const ebGaramond = EB_Garamond({ subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"], variable: "--font-eb-garamond", display: "swap" });
+// 70s retro display face — soft, wonky Cooper-era serif (SOFT/WONK axes set in globals.css).
+const fraunces = Fraunces({ subsets: ["latin"], style: ["normal", "italic"], axes: ["SOFT", "WONK", "opsz"], variable: "--font-display", display: "swap" });
 // 배민 주아체 — 키캡 버튼(.btn-keycap) 전용. 예전 jsDelivr CSS 링크는 404였고 렌더를
 // 막고 있었다. 자체 호스팅 + preload 끔: 키캡이 있는 페이지에서만 내려받는다.
 const bmjua = localFont({ src: "../../public/fonts/BMJUA.woff", variable: "--font-bmjua", display: "swap", preload: false });
@@ -42,18 +43,18 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   width: "device-width", initialScale: 1, maximumScale: 5,
-  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F4EFE5" }, { media: "(prefers-color-scheme: dark)", color: "#1C1F26" }],
+  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F2E4C4" }, { media: "(prefers-color-scheme: dark)", color: "#2B1D14" }],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="ko" className={`${notoSansKR.variable} ${notoSerifKR.variable} ${ebGaramond.variable} ${bmjua.variable}`}>
+  return <html lang="ko" className={`${notoSansKR.variable} ${notoSerifKR.variable} ${fraunces.variable} ${bmjua.variable}`}>
     <body className="min-h-screen antialiased">
       <JsonLd data={orgSchema()} />
       <JsonLd data={websiteSchema()} />
       <script dangerouslySetInnerHTML={{ __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}` }} />
       <KeycapSound />
       <AuthProvider>{children}</AuthProvider>
-      <Toaster position="bottom-center" toastOptions={{ style: { background: "#1C1F26", color: "#ECE3CF", border: "none", borderRadius: "12px", fontFamily: "var(--font-noto-sans-kr)" } }} />
+      <Toaster position="bottom-center" toastOptions={{ style: { background: "#2B1D14", color: "#F2E3C2", border: "none", borderRadius: "12px", fontFamily: "var(--font-noto-sans-kr)" } }} />
     </body>
   </html>;
 }

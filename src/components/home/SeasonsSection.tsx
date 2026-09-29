@@ -54,8 +54,8 @@ const SEASON_QUESTIONS = [
 ];
 
 const STATUS_COLORS: Record<PastSeason["status"], { bg: string; color: string }> = {
-  완료: { bg: "rgba(94,70,50,0.08)", color: "var(--accent)" },
-  진행중: { bg: "rgba(176,138,74,0.12)", color: "var(--gold)" },
+  완료: { bg: "rgba(164, 72, 28,0.08)", color: "var(--accent)" },
+  진행중: { bg: "rgba(198, 138, 30,0.12)", color: "var(--gold)" },
   준비중: { bg: "rgba(123,114,104,0.08)", color: "var(--muted)" },
   모집예정: { bg: "rgba(123,114,104,0.06)", color: "var(--muted-2)" },
 };
@@ -122,7 +122,7 @@ export default function SeasonsSection() {
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
                   color: "var(--gold)",
-                  fontFamily: "\"EB Garamond\", Georgia, serif",
+                  fontFamily: "var(--font-display), Georgia, serif",
                   fontStyle: "italic",
                 }}
               >
@@ -155,7 +155,7 @@ export default function SeasonsSection() {
             </h3>
             <p
               style={{
-                fontFamily: "\"EB Garamond\", var(--font-eb-garamond), Georgia, serif",
+                fontFamily: "var(--font-display), Georgia, serif",
                 fontStyle: "italic",
                 fontSize: "16px",
                 color: "var(--muted)",
@@ -231,7 +231,7 @@ export default function SeasonsSection() {
                 >
                   <span
                     style={{
-                      fontFamily: "\"EB Garamond\", Georgia, serif",
+                      fontFamily: "var(--font-display), Georgia, serif",
                       fontStyle: "italic",
                       fontSize: "14px",
                       color: "var(--muted-2)",
@@ -283,7 +283,7 @@ export default function SeasonsSection() {
                 >
                   <span
                     style={{
-                      fontFamily: "\"EB Garamond\", Georgia, serif",
+                      fontFamily: "var(--font-display), Georgia, serif",
                       fontStyle: "italic",
                       fontSize: "13px",
                       color: "var(--muted)",
@@ -315,7 +315,7 @@ export default function SeasonsSection() {
                     style={{
                       fontSize: "12px",
                       color: "var(--muted-2)",
-                      fontFamily: "\"EB Garamond\", Georgia, serif",
+                      fontFamily: "var(--font-display), Georgia, serif",
                       fontStyle: "italic",
                     }}
                   >

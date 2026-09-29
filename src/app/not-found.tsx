@@ -29,7 +29,7 @@ export default function NotFound() {
         letterSpacing: "0.28em",
         textTransform: "uppercase",
         color: "var(--muted)",
-        fontFamily: '"EB Garamond", Georgia, serif',
+        fontFamily: 'Georgia, serif',
         fontStyle: "italic",
         marginBottom: 16,
       }}>

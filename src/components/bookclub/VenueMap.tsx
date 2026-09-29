@@ -12,7 +12,7 @@ function MapFallback({ label }: { label: string }) {
       <svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M24 4c-7.7 0-14 6.1-14 13.6C10 27.9 24 44 24 44s14-16.1 14-26.4C38 10.1 31.7 4 24 4Z"
-          fill="#5E4632"
+          fill="#A4481C"
         />
         <circle cx="24" cy="17.5" r="5.5" fill="#fff" />
       </svg>
@@ -49,7 +49,7 @@ export default function VenueMap({ lat, lng, label }: { lat: number; lng: number
 
         const icon = L.divIcon({
           className: "lnd-map-pin",
-          html: `<span style="display:block;width:26px;height:26px;border-radius:50% 50% 50% 0;background:#5E4632;transform:rotate(-45deg);box-shadow:0 3px 10px rgba(28,31,38,0.35);border:2px solid #fff;"></span>`,
+          html: `<span style="display:block;width:26px;height:26px;border-radius:50% 50% 50% 0;background:#A4481C;transform:rotate(-45deg);box-shadow:0 3px 10px rgba(43, 29, 20,0.35);border:2px solid #fff;"></span>`,
           iconSize: [26, 26],
           iconAnchor: [13, 26],
         });

@@ -158,7 +158,7 @@ export default function AdminMeetingsClient({ initialClubs }: { initialClubs: Cl
               onClick={() => setSelectedClubId(club.id)}
               style={{
                 textAlign: "left", padding: "10px 12px", borderRadius: 8, fontSize: 13.5,
-                background: selectedClubId === club.id ? "rgba(94,70,50,0.08)" : "transparent",
+                background: selectedClubId === club.id ? "rgba(164, 72, 28,0.08)" : "transparent",
                 color: selectedClubId === club.id ? "var(--accent)" : "var(--ink-soft)",
                 border: "none", cursor: "pointer",
               }}

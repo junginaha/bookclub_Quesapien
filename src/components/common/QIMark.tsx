@@ -24,24 +24,24 @@ export function QIMark({ size = "md", animate = true }: QIMarkProps) {
     <div style={{
       width: s.container, height: s.container,
       borderRadius: s.radius,
-      background: "var(--bg-ink, #14181F)",
+      background: "var(--bg-ink, #22170F)",
       display: "flex", alignItems: "center", justifyContent: "center",
       position: "relative",
-      boxShadow: "0 4px 20px -8px rgba(28,31,38,0.4)",
+      boxShadow: "0 4px 20px -8px rgba(43, 29, 20,0.4)",
       flexShrink: 0,
     }}>
       {/* 배경 글로우 */}
       <div style={{
         position: "absolute", inset: -2,
         borderRadius: s.radius + 2,
-        background: "radial-gradient(circle at 40% 40%, rgba(176,138,74,0.15), transparent 70%)",
+        background: "radial-gradient(circle at 40% 40%, rgba(198, 138, 30,0.15), transparent 70%)",
         pointerEvents: "none",
       }} />
 
       <div style={{ display: "flex", alignItems: "baseline", gap: 1, position: "relative" }}>
         <span style={{
-          color: "var(--accent, #5E4632)",
-          fontFamily: '"EB Garamond", Georgia, serif',
+          color: "var(--accent, #A4481C)",
+          fontFamily: 'Georgia, serif',
           fontStyle: "normal",
           fontSize: s.q,
           lineHeight: 1,
@@ -51,7 +51,7 @@ export function QIMark({ size = "md", animate = true }: QIMarkProps) {
         }}>?</span>
         <span style={{
           color: "rgba(255,255,255,0.85)",
-          fontFamily: '"EB Garamond", Georgia, serif',
+          fontFamily: 'Georgia, serif',
           fontStyle: "normal",
           fontSize: s.bang,
           lineHeight: 1,

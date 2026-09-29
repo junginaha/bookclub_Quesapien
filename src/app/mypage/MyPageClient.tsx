@@ -12,10 +12,10 @@ import { computeDNA, DEFAULT_DNA } from "@/lib/question-dna";
 type SessionWithQ = SessionRow & { question?: any };
 
 const DNA_TYPES = [
-  { key: "existential", label: "실존", color: "#5E4632", defaultPct: 40 },
-  { key: "relational", label: "관계", color: "#2C5364", defaultPct: 25 },
-  { key: "creative", label: "창작", color: "#4A5568", defaultPct: 20 },
-  { key: "practical", label: "실용", color: "#5C6B3A", defaultPct: 15 },
+  { key: "existential", label: "실존", color: "#A4481C", defaultPct: 40 },
+  { key: "relational", label: "관계", color: "#4F6B4A", defaultPct: 25 },
+  { key: "creative", label: "창작", color: "#5A4636", defaultPct: 20 },
+  { key: "practical", label: "실용", color: "#6B6B2E", defaultPct: 15 },
 ];
 
 const MEMBERSHIP_TIERS = [
@@ -24,7 +24,7 @@ const MEMBERSHIP_TIERS = [
     name: "QReader",
     subtitle: "독자를 위한 멤버십",
     price: "월 9,900원",
-    color: "#1B2536",
+    color: "#3A2616",
     benefits: ["독서 기록 무제한", "질문 저장 및 컬렉션", "전체 아카이브 열람", "AI 요약 기능", "북토크 후기 열람"],
   },
   {
@@ -32,7 +32,7 @@ const MEMBERSHIP_TIERS = [
     name: "QLeader",
     subtitle: "리더를 위한 멤버십",
     price: "월 29,900원",
-    color: "#553C2A",
+    color: "#7E3514",
     benefits: ["QReader 모든 혜택", "북토크 개설 권한", "참가자 관리 대시보드", "AI 발제문 자동 생성", "운영 통계 리포트", "전담 지원"],
     isPopular: true,
   },
@@ -198,7 +198,7 @@ export default function MyPageClient({ profile, myReviews, mySessions, onboardin
               }}>
                 <div style={{
                   position: "absolute", inset: 0, pointerEvents: "none",
-                  background: "radial-gradient(ellipse 60% 80% at 90% 10%, rgba(176,138,74,0.18), transparent)",
+                  background: "radial-gradient(ellipse 60% 80% at 90% 10%, rgba(198, 138, 30,0.18), transparent)",
                 }} />
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, position: "relative" }}>
                   <Sparkles size={16} style={{ color: "var(--gold)" }} />
@@ -248,7 +248,7 @@ export default function MyPageClient({ profile, myReviews, mySessions, onboardin
                     { href: "/questions/create", icon: <MessageSquare size={16} />, label: "질문 작성하기", color: "var(--ink)" },
                     { href: "/bookclub", icon: <BookOpen size={16} />, label: "북클럽 참여하기", color: "var(--accent)" },
                     { href: "/giants", icon: "?", label: "발제 생성기", color: "var(--bg-navy)" },
-                    { href: "/onboarding", icon: <Sparkles size={16} />, label: "프로필 업데이트", color: "#5C6B3A" },
+                    { href: "/onboarding", icon: <Sparkles size={16} />, label: "프로필 업데이트", color: "#6B6B2E" },
                   ].map((action) => (
                     <Link key={action.href} href={action.href} style={{ textDecoration: "none" }}>
                       <div style={{
@@ -357,7 +357,7 @@ export default function MyPageClient({ profile, myReviews, mySessions, onboardin
                     <div style={{ fontSize: 12, color: "var(--muted)", display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
                       <Calendar size={12} /> {formatDate(s.date)}
                     </div>
-                    <div style={{ fontSize: 11, padding: "3px 8px", borderRadius: 9999, display: "inline-block", background: s.status === "upcoming" ? "rgba(94,70,50,0.1)" : "var(--bg-warm)", color: s.status === "upcoming" ? "var(--accent)" : "var(--muted)" }}>
+                    <div style={{ fontSize: 11, padding: "3px 8px", borderRadius: 9999, display: "inline-block", background: s.status === "upcoming" ? "rgba(164, 72, 28,0.1)" : "var(--bg-warm)", color: s.status === "upcoming" ? "var(--accent)" : "var(--muted)" }}>
                       {s.status === "upcoming" ? "예정" : s.status === "live" ? "진행 중" : "종료"}
                     </div>
                   </div>
@@ -401,7 +401,7 @@ export default function MyPageClient({ profile, myReviews, mySessions, onboardin
                   <div style={{ padding: 32 }}>
                     <div style={{ marginBottom: 24 }}>
                       <h3 style={{
-                        fontFamily: '"EB Garamond", Georgia, serif',
+                        fontFamily: 'Georgia, serif',
                         fontSize: 28, fontStyle: "italic",
                         color: tier.isPopular ? "white" : "var(--ink)",
                         marginBottom: 4,

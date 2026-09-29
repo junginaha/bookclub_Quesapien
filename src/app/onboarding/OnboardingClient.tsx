@@ -131,7 +131,7 @@ export default function OnboardingClient() {
 
       {/* Header */}
       <div style={{ padding: "24px clamp(20px, 4vw, 48px)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic", fontSize: 20, color: "var(--accent)" }}>
+        <div style={{ fontFamily: 'Georgia, serif', fontStyle: "italic", fontSize: 20, color: "var(--accent)" }}>
           ?!
         </div>
         <div style={{ fontSize: 13, color: "var(--muted)" }}>
@@ -147,7 +147,7 @@ export default function OnboardingClient() {
         <div style={{ maxWidth: 560, width: "100%" }}>
           <div style={{
             fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase",
-            color: "var(--muted)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic",
+            color: "var(--muted)", fontFamily: 'Georgia, serif', fontStyle: "italic",
             marginBottom: 24,
           }}>
             Question {String(step + 1).padStart(2, "0")}
@@ -199,7 +199,7 @@ export default function OnboardingClient() {
                       padding: "16px 20px",
                       borderRadius: 12, textAlign: "left",
                       fontSize: 15, color: isSelected ? "var(--accent)" : "var(--ink-soft)",
-                      background: isSelected ? "rgba(94,70,50,0.06)" : "rgba(255,255,255,0.5)",
+                      background: isSelected ? "rgba(164, 72, 28,0.06)" : "rgba(255,255,255,0.5)",
                       border: `1.5px solid ${isSelected ? "var(--accent)" : "var(--line-soft)"}`,
                       cursor: "pointer", transition: "all 0.2s",
                       fontFamily: "var(--font-noto-sans-kr), sans-serif",

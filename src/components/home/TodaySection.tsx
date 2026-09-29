@@ -111,7 +111,7 @@ export default function TodaySection() {
               >
                 <em
                   style={{
-                    fontFamily: "\"EB Garamond\", Georgia, serif",
+                    fontFamily: "var(--font-display), Georgia, serif",
                     fontStyle: "italic",
                     color: "var(--accent)",
                     fontSize: "1.15em",
@@ -133,7 +133,7 @@ export default function TodaySection() {
                 <div key={stat.label}>
                   <p
                     style={{
-                      fontFamily: "\"EB Garamond\", Georgia, serif",
+                      fontFamily: "var(--font-display), Georgia, serif",
                       fontSize: "20px",
                       fontWeight: 600,
                       color: "var(--accent)",
@@ -170,7 +170,7 @@ export default function TodaySection() {
                   >
                     <em
                       style={{
-                        fontFamily: "\"EB Garamond\", Georgia, serif",
+                        fontFamily: "var(--font-display), Georgia, serif",
                         fontStyle: "italic",
                         fontSize: "13px",
                         color: "var(--accent)",
@@ -216,7 +216,7 @@ export default function TodaySection() {
               >
                 <span
                   style={{
-                    fontFamily: "\"EB Garamond\", Georgia, serif",
+                    fontFamily: "var(--font-display), Georgia, serif",
                     fontStyle: "italic",
                     fontSize: "28px",
                     color: "var(--line)",

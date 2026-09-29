@@ -53,8 +53,8 @@ export default function Footer() {
               onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.75")}
               onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
               <div style={{ display: "flex", gap: 1, fontSize: 20 }}>
-                <span style={{ color: "var(--accent)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>?</span>
-                <span style={{ color: "rgba(255,255,255,0.8)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>!</span>
+                <span style={{ color: "var(--accent)", fontFamily: 'Georgia, serif', fontStyle: "italic" }}>?</span>
+                <span style={{ color: "rgba(255,255,255,0.8)", fontFamily: 'Georgia, serif', fontStyle: "italic" }}>!</span>
               </div>
               <span style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 13.5, fontWeight: 500, color: "rgba(255,255,255,0.7)", letterSpacing: "0.03em" }}>
                 질문하는 사람들
@@ -64,7 +64,7 @@ export default function Footer() {
               질문으로 연결되는 지적 커뮤니티.<br />
               서초구 선정 미래혁신형 북클럽.
             </p>
-            <p style={{ fontSize: 12.5, color: "rgba(163,154,140,0.4)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic", marginTop: 16 }}>
+            <p style={{ fontSize: 12.5, color: "rgba(163,154,140,0.4)", fontFamily: 'Georgia, serif', fontStyle: "italic", marginTop: 16 }}>
               &ldquo;좋은 질문은 좋은 사람을 데려옵니다.&rdquo;
             </p>
           </div>
@@ -108,13 +108,13 @@ export default function Footer() {
             <a
               href="mailto:junginaha@qsapiens.com"
               style={{
-                color: "rgba(176,138,74,0.65)",
+                color: "rgba(198, 138, 30,0.65)",
                 textDecoration: "none",
                 transition: "color 0.2s",
                 fontWeight: 500,
               }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(176,138,74,1)"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(176,138,74,0.65)"; }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(198, 138, 30,1)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(198, 138, 30,0.65)"; }}
             >
               junginaha@qsapiens.com
             </a>
@@ -133,7 +133,7 @@ export default function Footer() {
               <Link href="/privacy" style={{ fontSize: 12, color: "rgba(163,154,140,0.5)", textDecoration: "none" }}>개인정보처리방침</Link>
               <Link href="/terms" style={{ fontSize: 12, color: "rgba(163,154,140,0.5)", textDecoration: "none" }}>이용약관</Link>
             </div>
-            <p style={{ fontSize: 12, color: "rgba(163,154,140,0.3)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>
+            <p style={{ fontSize: 12, color: "rgba(163,154,140,0.3)", fontFamily: 'Georgia, serif', fontStyle: "italic" }}>
               <span aria-hidden="true" style={{ position: "absolute", opacity: 0, pointerEvents: "none", fontSize: 0 }}>질문 → 책 → 대화 → 사람 → 성장</span>
             </p>
           </div>

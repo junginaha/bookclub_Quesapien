@@ -36,7 +36,7 @@ export default function CTASection() {
               질문은 가장{" "}
               <em
                 style={{
-                  fontFamily: "\"EB Garamond\", var(--font-eb-garamond), Georgia, serif",
+                  fontFamily: "var(--font-display), Georgia, serif",
                   fontStyle: "italic",
                   color: "var(--gold)",
                 }}
@@ -73,7 +73,7 @@ export default function CTASection() {
               누군가는{" "}
               <em
                 style={{
-                  fontFamily: "\"EB Garamond\", Georgia, serif",
+                  fontFamily: "var(--font-display), Georgia, serif",
                   fontStyle: "italic",
                   color: "var(--gold)",
                 }}
@@ -85,7 +85,7 @@ export default function CTASection() {
               누군가는{" "}
               <em
                 style={{
-                  fontFamily: "\"EB Garamond\", Georgia, serif",
+                  fontFamily: "var(--font-display), Georgia, serif",
                   fontStyle: "italic",
                   color: "var(--gold)",
                 }}

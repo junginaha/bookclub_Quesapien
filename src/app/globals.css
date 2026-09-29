@@ -2,39 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* BMJUA for Hangul only — Latin/digits in headings fall through to Fraunces. */
+@font-face {
+  font-family: "Retro Hangul";
+  src: url("/fonts/BMJUA.woff") format("woff");
+  font-display: swap;
+  unicode-range: U+1100-11FF, U+3130-318F, U+AC00-D7A3;
+}
+
 /* ─── Design Tokens ───────────────────────────────────────────── */
 :root {
-  --bg: #F4EFE5;
-  --bg-soft: #ECE5D7;
-  --bg-warm: #E5DCC9;
-  --bg-ink: #14181F;
-  --bg-navy: #1B2536;
-  --ink: #1C1F26;
-  --ink-soft: #2A2E37;
-  --muted: #7B7268;
-  --muted-2: #A39A8C;
-  --line: #D9CFBC;
-  --line-soft: #E5DDCB;
-  --accent: #5E4632;
-  --gold: #B08A4A;
-  --cream-on-dark: #ECE3CF;
+  --bg: #F2E4C4;
+  --bg-soft: #EAD7AE;
+  --bg-warm: #E1C993;
+  --bg-ink: #22170F;
+  --bg-navy: #3A2616;
+  --ink: #2B1D14;
+  --ink-soft: #3D2A1E;
+  --muted: #7A5F45;
+  --muted-2: #A88C68;
+  --line: #D8BD8C;
+  --line-soft: #E6D0A4;
+  --accent: #A4481C;
+  --gold: #C68A1E;
+  --cream-on-dark: #F2E3C2;
   --gutter: clamp(1.5rem, 5vw, 6rem);
 
   /* 키캡 버튼(.btn-keycap) 전용 토큰 — 전체 UI로 확산 금지, §C2 */
-  --q-cobalt: #2338E0;
-  --q-cobalt-deep: #1424A8;
-  --q-glow: #4D6BFF;
-  --q-ivory: #F5EFD8;
+  --q-cobalt: #C4622D;
+  --q-cobalt-deep: #8E3E17;
+  --q-glow: #E8873A;
+  --q-ivory: #F5E6C4;
 
   /* Shadcn compatibility */
-  --background: 40 20% 92%;
-  --foreground: 220 13% 13%;
-  --card: 0 0% 100%;
+  --background: 42 66% 86%;
+  --foreground: 24 37% 12%;
+  --card: 42 70% 92%;
   --card-foreground: 220 13% 13%;
   --popover: 0 0% 100%;
   --popover-foreground: 220 13% 13%;
-  --primary: 220 13% 13%;
-  --primary-foreground: 40 20% 98%;
+  --primary: 20 71% 38%;
+  --primary-foreground: 42 70% 92%;
   --secondary: 40 15% 94%;
   --secondary-foreground: 220 13% 13%;
   --muted-hsl: 40 15% 94%;
@@ -43,9 +51,9 @@
   --accent-foreground: 220 13% 13%;
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
-  --border: 40 15% 85%;
+  --border: 38 48% 70%;
   --input: 40 15% 85%;
-  --ring: 220 13% 13%;
+  --ring: 20 70% 38%;
   --radius: 0.75rem;
 }
 
@@ -68,13 +76,13 @@
 @keyframes breatheGlow {
   0%, 100% {
     box-shadow:
-      0 0 16px rgba(28, 31, 38, 0.25),
-      0 0 32px rgba(28, 31, 38, 0.1);
+      0 0 16px rgba(43, 29, 20, 0.25),
+      0 0 32px rgba(43, 29, 20, 0.1);
   }
   50% {
     box-shadow:
-      0 0 32px rgba(28, 31, 38, 0.45),
-      0 0 64px rgba(28, 31, 38, 0.2);
+      0 0 32px rgba(43, 29, 20, 0.45),
+      0 0 64px rgba(43, 29, 20, 0.2);
   }
 }
 
@@ -145,9 +153,9 @@
     inset: 0;
     z-index: 200;
     pointer-events: none;
-    opacity: 0.35;
+    opacity: 0.42;
     mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.4  0 0 0 0 0.35  0 0 0 0 0.25  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.3  0 0 0 0 0.15  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
     background-repeat: repeat;
     background-size: 220px 220px;
   }
@@ -160,9 +168,9 @@
     z-index: 199;
     pointer-events: none;
     background:
-      radial-gradient(ellipse 70% 50% at 15% 20%, rgba(176, 138, 74, 0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 85% 80%, rgba(94, 70, 50, 0.05) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(244, 239, 229, 0.02) 0%, transparent 70%);
+      radial-gradient(ellipse 70% 50% at 15% 20%, rgba(198, 138, 30, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 85% 80%, rgba(164, 72, 28, 0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(242, 228, 196, 0.02) 0%, transparent 70%);
   }
 
   h1, h2, h3 {
@@ -170,6 +178,15 @@
     letter-spacing: -0.01em;
     text-wrap: balance;
   }
+  /* 70s retro poster: chunky rounded display type for the big headlines.
+     !important because most headings set their family inline. */
+  h1, h2 {
+    font-family: "Retro Hangul", var(--font-display), var(--font-noto-serif-kr), serif !important;
+    font-weight: 400 !important;
+    letter-spacing: -0.005em;
+  }
+  /* Fraunces soft/wonky axes = Cooper-era 70s feel; ignored by other faces. */
+  body { font-variation-settings: "SOFT" 100, "WONK" 1; }
   p {
     text-wrap: pretty;
   }
@@ -181,7 +198,7 @@
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--muted);
-  font-family: "EB Garamond", var(--font-eb-garamond), "Georgia", serif;
+  font-family: var(--font-display), "Georgia", serif;
   font-style: italic;
 }
 
@@ -224,8 +241,8 @@
 
 /* ─── Nav Glow Animation ───────────────────────────────────────── */
 @keyframes navGlow {
-  0%, 100% { text-shadow: 0 0 8px rgba(176,138,74,0); }
-  50% { text-shadow: 0 0 12px rgba(176,138,74,0.6), 0 0 24px rgba(176,138,74,0.3); }
+  0%, 100% { text-shadow: 0 0 8px rgba(198, 138, 30,0); }
+  50% { text-shadow: 0 0 12px rgba(198, 138, 30,0.6), 0 0 24px rgba(198, 138, 30,0.3); }
 }
 .nav-glow {
   animation: navGlow 3s ease-in-out infinite;
@@ -348,7 +365,7 @@
       linear-gradient(148deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0) 40%);
 
     /* 크림 아이보리 + 1px 크리스프 엠보스 — /design-refs/keycap-button.png 대조 결과
-       순백이 아니라 --q-ivory(#F5EFD8) 크림 톤, §C2 */
+       순백이 아니라 --q-ivory(#F5E6C4) 크림 톤, §C2 */
     color: var(--q-ivory) !important;
     text-shadow: 0 1px 0 rgba(6,10,62,0.60);
     border: none;
@@ -446,7 +463,7 @@
   }
 
   .card-base:hover {
-    box-shadow: 0 8px 32px rgba(28, 31, 38, 0.08);
+    box-shadow: 0 8px 32px rgba(43, 29, 20, 0.08);
     transform: translateY(-2px);
   }
 }
@@ -497,7 +514,7 @@
   user-select: none;
 
   box-shadow:
-    5px 5px 10px rgba(94,70,50,0.16),
+    5px 5px 10px rgba(164, 72, 28,0.16),
     -5px -5px 10px rgba(255,255,255,0.85);
   transition: box-shadow .18s ease, transform .18s ease;
   animation: btnPillNeuGlow 3.6s ease-in-out infinite;
@@ -511,34 +528,34 @@
   content: "";
   position: absolute;
   top: 0; bottom: 0; left: -100%; width: 60%;
-  background: linear-gradient(100deg, transparent 0%, rgba(94,70,50,0.22) 50%, transparent 100%);
+  background: linear-gradient(100deg, transparent 0%, rgba(164, 72, 28,0.22) 50%, transparent 100%);
   animation: btnPillNeuShimmer 4.4s ease-in-out infinite;
   pointer-events: none;
 }
 .btn-pill-neu:hover {
   transform: translateY(-2px);
   box-shadow:
-    3px 3px 7px rgba(94,70,50,0.18),
+    3px 3px 7px rgba(164, 72, 28,0.18),
     -3px -3px 7px rgba(255,255,255,0.9);
 }
 .btn-pill-neu:active {
   transform: translateY(0);
   box-shadow:
-    inset 3px 3px 7px rgba(94,70,50,0.22),
+    inset 3px 3px 7px rgba(164, 72, 28,0.22),
     inset -3px -3px 7px rgba(255,255,255,0.7);
 }
 @keyframes btnPillNeuShimmer { 0%, 20% { left: -100%; } 70%, 100% { left: 180%; } }
 @keyframes btnPillNeuGlow {
   0%, 100% {
     box-shadow:
-      5px 5px 10px rgba(94,70,50,0.16),
+      5px 5px 10px rgba(164, 72, 28,0.16),
       -5px -5px 10px rgba(255,255,255,0.85);
   }
   50% {
     box-shadow:
-      5px 5px 14px rgba(94,70,50,0.24),
+      5px 5px 14px rgba(164, 72, 28,0.24),
       -5px -5px 14px rgba(255,255,255,0.95),
-      0 0 20px -4px rgba(176,138,74,0.35);
+      0 0 20px -4px rgba(198, 138, 30,0.35);
   }
 }
 
@@ -565,7 +582,7 @@
   }
 
   .font-garamond {
-    font-family: "EB Garamond", var(--font-eb-garamond), "Georgia", serif;
+    font-family: var(--font-display), "Georgia", serif;
   }
 
   .font-serif-kr {
@@ -589,3 +606,14 @@
 .grid-responsive { grid-template-columns: 1fr 360px; }
 @media (max-width: 900px) { .grid-responsive { grid-template-columns: 1fr !important; } }
 @media (max-width: 900px) { .sidebar-hide { display: none !important; } }
+
+/* ─── 70s retro poster stripe under the site header ─── */
+header[data-site-header]::after,
+.lp-nav.scrolled::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -6px;
+  height: 6px;
+  background: linear-gradient(to bottom, #C4622D 0 33.3%, #D9A441 33.3% 66.6%, #6B6B2E 66.6% 100%);
+  pointer-events: none;
+}

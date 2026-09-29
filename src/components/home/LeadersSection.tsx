@@ -99,7 +99,7 @@ export default function LeadersSection() {
                 >
                   <span
                     style={{
-                      fontFamily: "\"EB Garamond\", var(--font-eb-garamond), Georgia, serif",
+                      fontFamily: "var(--font-display), Georgia, serif",
                       fontStyle: "italic",
                       fontSize: "24px",
                       color: "var(--accent)",
@@ -122,7 +122,7 @@ export default function LeadersSection() {
                   </p>
                   <p
                     style={{
-                      fontFamily: "\"EB Garamond\", Georgia, serif",
+                      fontFamily: "var(--font-display), Georgia, serif",
                       fontStyle: "italic",
                       fontSize: "13px",
                       color: "var(--muted)",
@@ -147,7 +147,7 @@ export default function LeadersSection() {
                     position: "absolute",
                     top: "12px",
                     left: "0",
-                    fontFamily: "\"EB Garamond\", Georgia, serif",
+                    fontFamily: "var(--font-display), Georgia, serif",
                     fontSize: "48px",
                     color: "var(--line)",
                     lineHeight: 1,

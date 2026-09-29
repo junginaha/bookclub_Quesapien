@@ -6,7 +6,7 @@ export default function GiantsClient() {
   return (
     <div style={{
       minHeight: "76vh",
-      background: "#f4efe5",
+      background: "#f2e4c4",
       padding: "clamp(48px, 7vw, 84px) 0 110px",
     }}>
       <div style={{

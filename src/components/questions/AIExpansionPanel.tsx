@@ -17,9 +17,9 @@ const SECTION_CONFIG: {
   color: string;
   prefix: string;
 }[] = [
-  { key: "related", label: "관련 질문", color: "#5E4632", prefix: "—" },
-  { key: "opposite", label: "반대 질문", color: "#2C5364", prefix: "↔" },
-  { key: "deepening", label: "심화 질문", color: "#4A5568", prefix: "▽" },
+  { key: "related", label: "관련 질문", color: "#A4481C", prefix: "—" },
+  { key: "opposite", label: "반대 질문", color: "#4F6B4A", prefix: "↔" },
+  { key: "deepening", label: "심화 질문", color: "#5A4636", prefix: "▽" },
 ];
 
 export default function AIExpansionPanel({

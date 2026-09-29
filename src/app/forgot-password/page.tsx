@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
           </h1>
         </div>
 
-        <div style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", border: "1px solid var(--line-soft)", borderRadius: 20, padding: "32px 28px", boxShadow: "0 8px 40px -16px rgba(28,31,38,.12)" }}>
+        <div style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", border: "1px solid var(--line-soft)", borderRadius: 20, padding: "32px 28px", boxShadow: "0 8px 40px -16px rgba(43, 29, 20,.12)" }}>
           <ForgotPasswordForm />
         </div>
       </div>

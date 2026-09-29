@@ -130,7 +130,7 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
             <span
               style={{
                 color: "var(--accent)",
-                fontFamily: '"EB Garamond", Georgia, serif',
+                fontFamily: 'Georgia, serif',
                 fontStyle: "normal",
                 animation: "markBreathe 3.8s ease-in-out infinite",
                 transformOrigin: "center",
@@ -141,7 +141,7 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
             <span
               style={{
                 color: "var(--ink)",
-                fontFamily: '"EB Garamond", Georgia, serif',
+                fontFamily: 'Georgia, serif',
                 fontStyle: "normal",
                 animation: "markBob 2.6s ease-in-out infinite",
                 transformOrigin: "center",
@@ -158,7 +158,7 @@ export default function IntroSplash({ onEnter }: { onEnter: () => void }) {
                   gridArea: "1 / 1",
                   whiteSpace: "nowrap",
                   fontFamily: i === 1
-                    ? '"EB Garamond", Georgia, serif'
+                    ? 'Georgia, serif'
                     : "var(--font-noto-serif-kr), Georgia, serif",
                   fontSize: i === 1 ? 14.5 : 13.5,
                   fontWeight: i === 1 ? 400 : 500,

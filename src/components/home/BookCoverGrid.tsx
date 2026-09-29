@@ -33,7 +33,7 @@ function BookFallbackIcon({ background }: { background: string }) {
 
 // 표지가 없는 세션의 대체 배경색. 실제 표지가 생기기 전까지 카드마다
 // 다른 색으로 구분되게 한다(2차 지시 대응 당시 결정 유지).
-const FLAT_COLORS = ["#1B2536", "#8B5E3C", "#5C6B3A", "#4A5568", "#6B4A3A"];
+const FLAT_COLORS = ["#3A2616", "#8B5E3C", "#6B6B2E", "#5A4636", "#6B4A3A"];
 function flatColorFor(slug: string): string {
   let hash = 0;
   for (let i = 0; i < slug.length; i++) hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
