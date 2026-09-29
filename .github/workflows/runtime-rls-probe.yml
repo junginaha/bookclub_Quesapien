@@ -5,7 +5,8 @@ on:
   push:
     branches: [main]
     paths:
-      - ".github/workflows/runtime-rls-probe.yml"\n      - "src/app/api/internal/rls-probe-20260930/route.ts"
+      - ".github/workflows/runtime-rls-probe.yml"
+      - "src/app/api/internal/rls-probe-20260930/route.ts"
 
 permissions:
   contents: read
@@ -26,7 +27,11 @@ jobs:
           ok=0
           for attempt in $(seq 1 72); do
             for url in "${urls[@]}"; do
-              code=$(curl -L --silent --show-error                 --output /tmp/rls-probe.json                 --write-out '%{http_code}'                 --max-time 20                 "$url" || true)
+              code=$(curl -L --silent --show-error \
+                --output /tmp/rls-probe.json \
+                --write-out '%{http_code}' \
+                --max-time 20 \
+                "$url" || true)
 
               if [ "$code" = "200" ]; then
                 echo "PROBE_URL=$url"
