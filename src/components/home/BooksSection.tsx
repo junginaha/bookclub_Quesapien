@@ -23,7 +23,7 @@ interface BookMini {
 const MAIN_BOOKS: BookMain[] = [
   {
     id: 1,
-    coverStyle: "linear-gradient(150deg, #1B2536 0%, #2A3A50 100%)",
+    coverStyle: "linear-gradient(150deg, #3A2616 0%, #2A3A50 100%)",
     title: "파친코",
     author: "이민진",
     tag: "#이민사",
@@ -33,7 +33,7 @@ const MAIN_BOOKS: BookMain[] = [
   },
   {
     id: 2,
-    coverStyle: "linear-gradient(150deg, #ECE5D7 0%, #D9CFBC 100%)",
+    coverStyle: "linear-gradient(150deg, #EAD7AE 0%, #D8BD8C 100%)",
     title: "채식주의자",
     author: "한강",
     tag: "#소설",
@@ -84,14 +84,14 @@ const MAIN_BOOKS: BookMain[] = [
 ];
 
 const MINI_COVERS = [
-  "linear-gradient(150deg, #1B2536 0%, #2A3A50 100%)",
-  "linear-gradient(150deg, #ECE5D7 0%, #D9CFBC 100%)",
+  "linear-gradient(150deg, #3A2616 0%, #2A3A50 100%)",
+  "linear-gradient(150deg, #EAD7AE 0%, #D8BD8C 100%)",
   "linear-gradient(150deg, #4A5240 0%, #6B7260 100%)",
   "linear-gradient(150deg, #7A3B2A 0%, #9A5040 100%)",
   "linear-gradient(150deg, #2E3060 0%, #484A80 100%)",
   "linear-gradient(150deg, #5A7060 0%, #7A9080 100%)",
-  "linear-gradient(150deg, #3D2B1F 0%, #5E4632 100%)",
-  "linear-gradient(150deg, #B08A4A 0%, #C9A96E 100%)",
+  "linear-gradient(150deg, #3D2B1F 0%, #A4481C 100%)",
+  "linear-gradient(150deg, #C68A1E 0%, #C9A96E 100%)",
   "linear-gradient(150deg, #2A1F14 0%, #4A3526 100%)",
   "linear-gradient(150deg, #1C3440 0%, #2E5060 100%)",
   "linear-gradient(150deg, #4A2040 0%, #6A3060 100%)",
@@ -171,13 +171,13 @@ export default function BooksSection() {
         >
           {MAIN_BOOKS.map((book) => {
             const isDark =
-              book.coverStyle.includes("#1B2536") ||
+              book.coverStyle.includes("#3A2616") ||
               book.coverStyle.includes("#4A5240") ||
               book.coverStyle.includes("#7A3B2A") ||
               book.coverStyle.includes("#2E3060") ||
               book.coverStyle.includes("#5A7060");
-            const textColor = isDark ? "rgba(236,227,207,0.9)" : "var(--ink)";
-            const subColor = isDark ? "rgba(236,227,207,0.55)" : "var(--muted)";
+            const textColor = isDark ? "rgba(242, 227, 194,0.9)" : "var(--ink)";
+            const subColor = isDark ? "rgba(242, 227, 194,0.55)" : "var(--muted)";
 
             return (
               <div
@@ -203,7 +203,7 @@ export default function BooksSection() {
                       letterSpacing: "0.2em",
                       textTransform: "uppercase",
                       color: subColor,
-                      fontFamily: "\"EB Garamond\", Georgia, serif",
+                      fontFamily: "var(--font-display), Georgia, serif",
                       fontStyle: "italic",
                       marginBottom: "8px",
                     }}
@@ -233,7 +233,7 @@ export default function BooksSection() {
                     style={{
                       fontSize: "11px",
                       color: "var(--accent)",
-                      fontFamily: "\"EB Garamond\", Georgia, serif",
+                      fontFamily: "var(--font-display), Georgia, serif",
                       fontStyle: "italic",
                       marginBottom: "10px",
                     }}
@@ -288,7 +288,7 @@ export default function BooksSection() {
               cursor: "pointer",
               letterSpacing: "0.06em",
               transition: "border-color 0.2s, color 0.2s",
-              fontFamily: "\"EB Garamond\", Georgia, serif",
+              fontFamily: "var(--font-display), Georgia, serif",
               fontStyle: "italic",
             }}
             onMouseEnter={(e) => {

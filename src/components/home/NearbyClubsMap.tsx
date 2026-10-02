@@ -6,17 +6,17 @@ import "leaflet/dist/leaflet.css";
 
 // 카드/도트 색상과 동일한 팔레트 — landing.css .lp-nearby-dot.* 와 통일
 const COLOR_MAP: Record<string, string> = {
-  navy: "#1B2536",
+  navy: "#3A2616",
   cream: "#8B7A5E",
   rust: "#9B4A2E",
-  olive: "#5C6B3A",
-  dusk: "#4A5568",
+  olive: "#6B6B2E",
+  dusk: "#5A4636",
   sage: "#7A9E7E",
   terra: "#B07B5C",
-  mauve: "#8C6B72",
+  mauve: "#B07B5C",
   fog: "#9CA3AF",
-  ink: "#1C1F26",
-  ochre: "#B08A4A",
+  ink: "#2B1D14",
+  ochre: "#C68A1E",
   smoke: "#6B7280",
 };
 
@@ -78,7 +78,7 @@ export default function NearbyClubsMap({
         radius: 7,
         color: "#fff",
         weight: 2,
-        fillColor: "#1C1F26",
+        fillColor: "#2B1D14",
         fillOpacity: 1,
       })
         .addTo(map)
@@ -87,7 +87,7 @@ export default function NearbyClubsMap({
       const bounds = L.latLngBounds([[userLat, userLng]]);
 
       clubs.forEach((c) => {
-        const color = COLOR_MAP[c.color ?? ""] ?? "#5E4632";
+        const color = COLOR_MAP[c.color ?? ""] ?? "#A4481C";
         const seatsLeft = (c.maxParticipants ?? 8) - (c.currentParticipants ?? 0);
 
         const icon = L.divIcon({
@@ -97,7 +97,7 @@ export default function NearbyClubsMap({
             border-radius:50% 50% 50% 0;
             background:${color};
             transform: rotate(-45deg);
-            box-shadow: 0 3px 10px rgba(28,31,38,0.35);
+            box-shadow: 0 3px 10px rgba(43, 29, 20,0.35);
             border: 2px solid #fff;
           "></span>`,
           iconSize: [26, 26],
@@ -108,9 +108,9 @@ export default function NearbyClubsMap({
         const marker = L.marker([c.lat, c.lng], { icon }).addTo(map);
         marker.bindPopup(
           `<div style="font-family:var(--lp-serif-ko,'Noto Serif KR',serif); min-width:150px;">
-             <strong style="display:block; margin-bottom:3px; color:#1C1F26;">${escapeHtml(c.title)}</strong>
-             ${c.location ? `<span style="font-size:12px; color:#7B7268;">${escapeHtml(c.location)}</span><br/>` : ""}
-             <span style="font-size:12px; color:#5E4632;">${c.distKm.toFixed(1)}km · ${seatsLeft}자리 남음</span>
+             <strong style="display:block; margin-bottom:3px; color:#2B1D14;">${escapeHtml(c.title)}</strong>
+             ${c.location ? `<span style="font-size:12px; color:#7A5F45;">${escapeHtml(c.location)}</span><br/>` : ""}
+             <span style="font-size:12px; color:#A4481C;">${c.distKm.toFixed(1)}km · ${seatsLeft}자리 남음</span>
            </div>`
         );
         marker.on("click", () => onOpenRef.current(c.slug));

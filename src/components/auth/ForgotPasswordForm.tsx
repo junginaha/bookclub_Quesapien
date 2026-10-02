@@ -32,7 +32,7 @@ export default function ForgotPasswordForm() {
   if (done) {
     return (
       <div style={{ textAlign: "center", padding: "8px 0" }}>
-        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(94,70,50,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(164, 72, 28,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
           <Mail size={24} style={{ color: "var(--accent)" }} />
         </div>
         <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 17, color: "var(--ink)", marginBottom: 10, fontWeight: 500 }}>

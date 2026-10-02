@@ -360,7 +360,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
             </Link>
 
             <div style={{ maxWidth: 720 }}>
-              <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "normal", marginBottom: 16 }}>
+              <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", fontFamily: 'Georgia, serif', fontStyle: "normal", marginBottom: 16 }}>
                 {giant.nationality} · {giant.birth_year}–{giant.death_year ?? "현재"}
               </div>
               <h1 style={{
@@ -450,7 +450,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                         display: "flex", alignItems: "flex-start", gap: 12,
                       }}>
                         <span style={{
-                          fontFamily: '"EB Garamond", Georgia, serif',
+                          fontFamily: 'Georgia, serif',
                           fontSize: 28, fontStyle: "normal",
                           color: giant.color, opacity: 0.4,
                           lineHeight: 1, flexShrink: 0,
@@ -528,7 +528,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                         onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.4)"; }}
                       >
                         <span style={{
-                          fontFamily: '"EB Garamond", Georgia, serif',
+                          fontFamily: 'Georgia, serif',
                           fontSize: 32, fontStyle: "normal",
                           color: giant.color, opacity: 0.35, flexShrink: 0, lineHeight: 1,
                         }}>
@@ -576,7 +576,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                         el.style.transform = "translateX(0)";
                       }}
                     >
-                      <span style={{ fontSize: 16, color: giant.color, flexShrink: 0, fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "normal" }}>{cap.mark}</span>
+                      <span style={{ fontSize: 16, color: giant.color, flexShrink: 0, fontFamily: 'Georgia, serif', fontStyle: "normal" }}>{cap.mark}</span>
                       <div>
                         <div style={{ fontSize: 13.5, fontWeight: 500, color: "var(--ink)", marginBottom: 2, fontFamily: "var(--font-noto-serif-kr), Georgia, serif", letterSpacing: "-0.005em" }}>
                           {cap.label}
@@ -705,7 +705,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {discussResult.discussion_questions.map((q, i) => (
                         <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start", padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.6)", border: "1px solid var(--line-soft)" }}>
-                          <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 24, color: giant.color, opacity: 0.5, lineHeight: 1, flexShrink: 0 }}>{i + 1}</span>
+                          <span style={{ fontFamily: 'Georgia, serif', fontSize: 24, color: giant.color, opacity: 0.5, lineHeight: 1, flexShrink: 0 }}>{i + 1}</span>
                           <p style={{ fontSize: 15, color: "var(--ink-soft)", lineHeight: 1.7 }}>{q}</p>
                         </div>
                       ))}
@@ -970,7 +970,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                 <div style={{
                   fontSize: 11.5, color: "var(--muted)", margin: "8px 0",
                   display: "flex", alignItems: "center", gap: 6,
-                  fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "normal",
+                  fontFamily: 'Georgia, serif', fontStyle: "normal",
                 }}>
                   <span style={{ opacity: 0.5 }}>—</span>
                   저서 원문 기반: 『{gutendexTitle}』 (Project Gutenberg)
@@ -988,7 +988,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                 }}>
                   <div style={{
                     fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
-                    color: giant.color, marginBottom: 14, fontFamily: '"EB Garamond", Georgia, serif',
+                    color: giant.color, marginBottom: 14, fontFamily: 'Georgia, serif',
                   }}>
                     거인의 논제 — {giant.name}이 던지는 질문
                   </div>
@@ -1016,7 +1016,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                           onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.85)"; }}
                           onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.5)"; }}
                         >
-                          <span style={{ color: giant.color, fontFamily: '"EB Garamond", Georgia, serif', fontSize: 16, flexShrink: 0, marginTop: 1 }}>
+                          <span style={{ color: giant.color, fontFamily: 'Georgia, serif', fontSize: 16, flexShrink: 0, marginTop: 1 }}>
                             {i === 0 ? "①" : "②"}
                           </span>
                           {q}
@@ -1040,12 +1040,12 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
               {/* Input */}
               <form onSubmit={handleSubmit} style={{
                 position: "sticky", bottom: 24,
-                background: "rgba(244,239,229,0.95)",
+                background: "rgba(242, 228, 196,0.95)",
                 backdropFilter: "blur(12px)",
                 borderRadius: 16,
                 border: "1px solid var(--line-soft)",
                 padding: "12px 16px",
-                boxShadow: "0 8px 32px -8px rgba(28,31,38,0.12)",
+                boxShadow: "0 8px 32px -8px rgba(43, 29, 20,0.12)",
               }}>
                 <div style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
                   <textarea
@@ -1125,7 +1125,7 @@ export default function GiantDetailClient({ giant }: { giant: Giant }) {
                           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                             {discResult.discussion_questions.map((q, i) => (
                               <div key={i} style={{ display: "flex", gap: 12, padding: "12px 16px", borderRadius: 10, background: "rgba(255,255,255,0.5)", border: "1px solid var(--line-soft)" }}>
-                                <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 20, color: giant.color, opacity: 0.5, flexShrink: 0, lineHeight: 1 }}>{i + 1}</span>
+                                <span style={{ fontFamily: 'Georgia, serif', fontSize: 20, color: giant.color, opacity: 0.5, flexShrink: 0, lineHeight: 1 }}>{i + 1}</span>
                                 <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.65 }}>{q}</p>
                               </div>
                             ))}

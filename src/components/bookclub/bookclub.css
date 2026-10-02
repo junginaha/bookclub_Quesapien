@@ -44,7 +44,7 @@
   gap: 28px;
 }
 .qc-sidebar-mark {
-  font-family: var(--font-eb-garamond, Georgia, serif);
+  font-family: var(--font-display, Georgia, serif);
   font-style: italic;
   font-size: 30px;
   color: var(--gold);
@@ -335,7 +335,7 @@
   .qc-card { transition: none; }
 }
 .qc-card-link { transition: box-shadow 0.15s ease; }
-.qc-card-link:hover { box-shadow: 0 4px 16px rgba(28,31,38,0.08); }
+.qc-card-link:hover { box-shadow: 0 4px 16px rgba(43, 29, 20,0.08); }
 
 .qc-card-cover {
   flex: 0 0 auto;
@@ -452,7 +452,7 @@
 .qd-handed-by { font-size: 12.5px; color: var(--muted); }
 .qd-divider { height: 1px; background: var(--line); border: none; margin: 4px 0; }
 .qd-brand { display: flex; align-items: center; gap: 10px; }
-.qd-brand-mark { font-family: var(--font-eb-garamond, Georgia, serif); font-style: italic; color: var(--gold); font-size: 22px; }
+.qd-brand-mark { font-family: var(--font-display, Georgia, serif); font-style: italic; color: var(--gold); font-size: 22px; }
 .qd-brand-name { font-size: 13.5px; font-weight: 600; color: var(--ink); }
 .qd-side-links { display: flex; flex-direction: column; gap: 4px; }
 .qd-side-links a { font-size: 12.5px; color: var(--accent); text-decoration: underline; }
@@ -601,7 +601,7 @@
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(20, 24, 31, 0.45);
+  background: rgba(34, 23, 15, 0.45);
   display: flex;
   align-items: flex-end;
 }
@@ -671,7 +671,7 @@
 .qd-cover-sm {
   width: 118px;
   border-radius: 2px;
-  box-shadow: 0 14px 30px -22px rgba(28,31,38,.5);
+  box-shadow: 0 14px 30px -22px rgba(43, 29, 20,.5);
 }
 .qd-title { font-size: clamp(25px,4vw,38px); font-weight: 600; letter-spacing: -.025em; }
 .qd-reason { max-width: 66ch; font-size: 15.5px; line-height: 1.95; }

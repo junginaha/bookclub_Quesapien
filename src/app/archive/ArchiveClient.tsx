@@ -36,7 +36,7 @@ const LEADER_CASES = [
     name: "정해린",
     role: "시즌 04 진행자",
     philosophy: "정답보다 진심을 믿습니다. 우리는 결론을 미루는 연습 중입니다.",
-    color: "#5E4632",
+    color: "#A4481C",
     question: "당신이 가장 오래 미뤄둔 감정은 무엇인가요?",
     story: "처음 북클럽을 열었을 때 저는 '잘 진행해야 한다'는 생각으로 가득했어요. 그런데 4시즌이 지나고 나서야 알았어요. 가장 좋은 북클럽은 내가 사라질 때 시작된다는 걸. 참여자들이 제 질문을 잊고 서로의 눈을 보기 시작할 때, 그때가 진짜였어요.",
     season: "Season 04 · 2026년 봄",
@@ -48,7 +48,7 @@ const LEADER_CASES = [
     name: "서민준",
     role: "시즌 03 진행자",
     philosophy: "조용한 사람의 한 문장은 시끄러운 사람의 한 시간보다 길게 남습니다.",
-    color: "#2C5364",
+    color: "#4F6B4A",
     question: "당신이 마지막으로 누군가에게 진심으로 사과한 건 언제였나요?",
     story: "외로움 시즌 3주차에 한 참여자가 말했어요. '누군가 내 이야기를 이렇게 끝까지 들어준 건 처음이에요.' 저는 아무 말도 하지 않았는데요. 그 침묵이 제가 줄 수 있는 가장 깊은 경청이었다고 생각해요.",
     season: "Season 03 · 2025년 겨울",
@@ -154,7 +154,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
         background: "linear-gradient(to bottom, var(--bg-soft), var(--bg))",
       }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
-          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--muted)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "normal", marginBottom: 20 }}>
+          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--muted)", fontFamily: 'Georgia, serif', fontStyle: "normal", marginBottom: 20 }}>
             Archiving — 아카이빙
           </div>
           <h1 style={{
@@ -327,7 +327,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                           <span style={{
                             fontSize: 11, padding: "2px 8px", borderRadius: 9999,
-                            background: review.is_approved ? "rgba(94,70,50,0.1)" : "rgba(245,158,11,0.1)",
+                            background: review.is_approved ? "rgba(164, 72, 28,0.1)" : "rgba(245,158,11,0.1)",
                             color: review.is_approved ? "var(--accent)" : "#B45309",
                             letterSpacing: "0.06em", textTransform: "uppercase",
                           }}>
@@ -457,7 +457,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                     padding: "16px 20px", borderRadius: 10,
                     background: `${c.color}0A`, border: `1px solid ${c.color}22`,
                   }}>
-                    <div style={{ fontSize: 10.5, letterSpacing: "0.2em", textTransform: "uppercase", color: c.color, marginBottom: 6, fontFamily: '"EB Garamond", Georgia, serif' }}>
+                    <div style={{ fontSize: 10.5, letterSpacing: "0.2em", textTransform: "uppercase", color: c.color, marginBottom: 6, fontFamily: 'Georgia, serif' }}>
                       Change
                     </div>
                     <p style={{ fontSize: 14, color: "var(--ink)", lineHeight: 1.65, fontFamily: "var(--font-noto-serif-kr), Georgia, serif" }}>
@@ -481,7 +481,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                 display: "flex", gap: 20, alignItems: "flex-start",
               }}>
                 <span style={{
-                  fontFamily: '"EB Garamond", Georgia, serif',
+                  fontFamily: 'Georgia, serif',
                   fontSize: 36, fontStyle: "normal",
                   color: "var(--accent)", opacity: 0.3,
                   lineHeight: 1, flexShrink: 0,
@@ -573,7 +573,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                             background: "rgba(255,255,255,0.5)",
                             border: "1px solid var(--line-soft)",
                           }}>
-                            <span style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 22, fontStyle: "normal", color: "var(--accent)", opacity: 0.4, lineHeight: 1, flexShrink: 0, minWidth: 20 }}>
+                            <span style={{ fontFamily: 'Georgia, serif', fontSize: 22, fontStyle: "normal", color: "var(--accent)", opacity: 0.4, lineHeight: 1, flexShrink: 0, minWidth: 20 }}>
                               {String(i + 1)}
                             </span>
                             <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.6 }}>{q}</p>

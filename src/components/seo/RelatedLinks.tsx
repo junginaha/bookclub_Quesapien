@@ -31,10 +31,10 @@ const TYPE_LABELS: Record<RelatedItem["type"], string> = {
 const TYPE_COLORS: Record<RelatedItem["type"], string> = {
   question: "var(--accent)",
   book: "var(--gold)",
-  review: "#5C6B3A",
-  booktalk: "#2C5364",
-  giant: "#553C2A",
-  leader: "#4A5568",
+  review: "#6B6B2E",
+  booktalk: "#4F6B4A",
+  giant: "#7E3514",
+  leader: "#5A4636",
 };
 
 export default function RelatedLinks({ items, title = "관련 콘텐츠" }: RelatedLinksProps) {
@@ -62,7 +62,7 @@ export default function RelatedLinks({ items, title = "관련 콘텐츠" }: Rela
           letterSpacing: "0.2em",
           textTransform: "uppercase",
           color: "var(--muted-2)",
-          fontFamily: '"EB Garamond", Georgia, serif',
+          fontFamily: 'Georgia, serif',
           fontStyle: "italic",
           marginBottom: 16,
         }}

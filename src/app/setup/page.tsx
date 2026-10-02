@@ -90,36 +90,36 @@ export default function SetupPage() {
   ) : null;
 
   return (
-    <div style={{ minHeight:"100vh", background:"#14181F", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 20px" }}>
+    <div style={{ minHeight:"100vh", background:"#22170F", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 20px" }}>
       <div style={{ width:"100%", maxWidth:460 }}>
 
         {/* 헤더 */}
         <div style={{ textAlign:"center", marginBottom:28 }}>
-          <div style={{ fontSize:28, fontFamily:"Georgia, serif", color:"#B08A4A", marginBottom:6 }}>?!</div>
-          <h1 style={{ fontSize:18, fontWeight:500, color:"#ECE3CF", margin:0 }}>관리자 설정 · 절대자</h1>
+          <div style={{ fontSize:28, fontFamily:"Georgia, serif", color:"#C68A1E", marginBottom:6 }}>?!</div>
+          <h1 style={{ fontSize:18, fontWeight:500, color:"#F2E3C2", margin:0 }}>관리자 설정 · 절대자</h1>
         </div>
 
         {/* 1. 계정 생성 */}
         <div style={card}>
-          <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#B08A4A", marginBottom:12 }}>
+          <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#C68A1E", marginBottom:12 }}>
             Step 1 — 관리자 계정
           </p>
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:14, padding:"10px 14px", background:"rgba(0,0,0,0.25)", borderRadius:8 }}>
-            <span style={{ fontSize:12, color:"rgba(236,227,207,0.4)" }}>이메일</span>
-            <code style={{ fontSize:12, color:"#ECE3CF", userSelect:"all" }}>{ADMIN_EMAIL}</code>
+            <span style={{ fontSize:12, color:"rgba(242, 227, 194,0.4)" }}>이메일</span>
+            <code style={{ fontSize:12, color:"#F2E3C2", userSelect:"all" }}>{ADMIN_EMAIL}</code>
           </div>
-          <p style={{ fontSize:12, color:"rgba(236,227,207,0.5)", lineHeight:1.7, marginBottom:14, padding:"10px 14px", background:"rgba(0,0,0,0.25)", borderRadius:8 }}>
+          <p style={{ fontSize:12, color:"rgba(242, 227, 194,0.5)", lineHeight:1.7, marginBottom:14, padding:"10px 14px", background:"rgba(0,0,0,0.25)", borderRadius:8 }}>
             보안 강화로 비밀번호는 이 페이지에 표시되지 않습니다. 서버에서
             <code style={{ margin: "0 4px" }}>ADMIN_BOOTSTRAP_PASSWORD</code>
             환경변수를 임시로 설정한 뒤, <code style={{ margin: "0 4px" }}>x-admin-key</code> 헤더(서비스 롤 키)를 포함해
             <code style={{ margin: "0 4px" }}>/api/admin/setup</code>을 직접 호출하세요.
           </p>
-          <button style={btn("#B08A4A")} onClick={handleAccount} disabled={accountStatus==="loading"}>
+          <button style={btn("#C68A1E")} onClick={handleAccount} disabled={accountStatus==="loading"}>
             {accountStatus==="loading" ? "처리 중…" : accountStatus==="done" ? "✓ 완료" : "계정 생성 / 비밀번호 재설정 안내 보기"}
           </button>
           <StatusBadge s={accountStatus} msg={accountMsg} />
           {accountStatus==="done" && (
-            <Link href="/login" style={{ display:"block", textAlign:"center", fontSize:13, color:"#B08A4A", marginTop:8 }}>
+            <Link href="/login" style={{ display:"block", textAlign:"center", fontSize:13, color:"#C68A1E", marginTop:8 }}>
               → 로그인 페이지로
             </Link>
           )}
@@ -130,7 +130,7 @@ export default function SetupPage() {
           <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#EF4444", marginBottom:8 }}>
             ⚡ 강제 즉시 삭제 (DB ilike 검색)
           </p>
-          <p style={{ fontSize:12, color:"rgba(236,227,207,0.4)", lineHeight:1.6, marginBottom:12 }}>
+          <p style={{ fontSize:12, color:"rgba(242, 227, 194,0.4)", lineHeight:1.6, marginBottom:12 }}>
             박상현·에겐남 포함 내용, 캐나다 법률, ICT교육, 상공회의소, 에스트로겐, 사랑이란... 등<br/>
             <strong style={{ color:"rgba(239,68,68,0.8)" }}>질문·답변 테이블 모두 ilike로 즉시 삭제</strong>
           </p>
@@ -145,7 +145,7 @@ export default function SetupPage() {
           <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#EF4444", marginBottom:8 }}>
             Step 2 — 스팸 데이터 삭제
           </p>
-          <p style={{ fontSize:12, color:"rgba(236,227,207,0.4)", lineHeight:1.6, marginBottom:12 }}>
+          <p style={{ fontSize:12, color:"rgba(242, 227, 194,0.4)", lineHeight:1.6, marginBottom:12 }}>
             박상현, 에겐남, 캐나다 법률, ICT교육, 상공회의소, 에스트로겐 등 잘못된 데이터 삭제
           </p>
           <button style={btn("#EF4444")} onClick={handleCleanup} disabled={cleanStatus==="loading"}>
@@ -159,7 +159,7 @@ export default function SetupPage() {
           <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#8B5CF6", marginBottom:8 }}>
             Step 3 — 중복 제거
           </p>
-          <p style={{ fontSize:12, color:"rgba(236,227,207,0.4)", lineHeight:1.6, marginBottom:12 }}>
+          <p style={{ fontSize:12, color:"rgba(242, 227, 194,0.4)", lineHeight:1.6, marginBottom:12 }}>
             같은 내용의 중복 질문·답변 자동 정리 (최초 1개 유지)
           </p>
           <button style={btn("#8B5CF6")} onClick={handleDedup} disabled={dedupStatus==="loading"}>
@@ -169,12 +169,12 @@ export default function SetupPage() {
         </div>
 
         {/* 전체 한번에 실행 */}
-        <div style={{ ...card, background: "rgba(176,138,74,0.08)", border: "1px solid rgba(176,138,74,0.25)" }}>
-          <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#B08A4A", marginBottom:8 }}>
+        <div style={{ ...card, background: "rgba(198, 138, 30,0.08)", border: "1px solid rgba(198, 138, 30,0.25)" }}>
+          <p style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#C68A1E", marginBottom:8 }}>
             🚀 전체 한번에 실행
           </p>
           <button
-            style={btn("#B08A4A")}
+            style={btn("#C68A1E")}
             onClick={async () => {
               await handleAccount();
               await handleForceDelete();
@@ -188,9 +188,9 @@ export default function SetupPage() {
 
         {/* 관리자 페이지 / 사이트 링크 */}
         <div style={{ display:"flex", gap:16, justifyContent:"center", marginTop:8 }}>
-          <Link href="/admin" style={{ fontSize:13, color:"rgba(176,138,74,0.7)", textDecoration:"none" }}>관리자 페이지 →</Link>
-          <Link href="/" style={{ fontSize:13, color:"rgba(236,227,207,0.4)", textDecoration:"none" }}>메인으로 →</Link>
-          <Link href="/questions" style={{ fontSize:13, color:"rgba(236,227,207,0.4)", textDecoration:"none" }}>질문 페이지 →</Link>
+          <Link href="/admin" style={{ fontSize:13, color:"rgba(198, 138, 30,0.7)", textDecoration:"none" }}>관리자 페이지 →</Link>
+          <Link href="/" style={{ fontSize:13, color:"rgba(242, 227, 194,0.4)", textDecoration:"none" }}>메인으로 →</Link>
+          <Link href="/questions" style={{ fontSize:13, color:"rgba(242, 227, 194,0.4)", textDecoration:"none" }}>질문 페이지 →</Link>
         </div>
 
       </div>

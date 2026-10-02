@@ -59,7 +59,7 @@ export default function AskSection() {
           {/* Pen label */}
           <p
             style={{
-              fontFamily: "\"EB Garamond\", Georgia, serif",
+              fontFamily: "var(--font-display), Georgia, serif",
               fontStyle: "italic",
               fontSize: "13px",
               color: "rgba(163,154,140,0.7)",
@@ -96,7 +96,7 @@ export default function AskSection() {
                 outline: "none",
                 transition: "border-color 0.25s, box-shadow 0.25s",
                 boxShadow: focused
-                  ? "0 0 0 3px rgba(176,138,74,0.15)"
+                  ? "0 0 0 3px rgba(198, 138, 30,0.15)"
                   : "none",
               }}
             />
@@ -117,7 +117,7 @@ export default function AskSection() {
           >
             <p
               style={{
-                fontFamily: "\"EB Garamond\", Georgia, serif",
+                fontFamily: "var(--font-display), Georgia, serif",
                 fontStyle: "italic",
                 fontSize: "14px",
                 color: "rgba(163,154,140,0.55)",

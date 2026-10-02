@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-end",
-          background: "#1C1F26",
+          background: "#2B1D14",
           padding: "72px 80px",
           position: "relative",
         }}
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
             right: 0,
             width: "60%",
             height: "60%",
-            background: "radial-gradient(ellipse at top right, rgba(176,138,74,0.25), transparent 70%)",
+            background: "radial-gradient(ellipse at top right, rgba(198, 138, 30,0.25), transparent 70%)",
           }}
         />
         {/* Mark */}
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
             top: 64,
             left: 80,
             fontSize: 56,
-            color: "#B08A4A",
+            color: "#C68A1E",
             fontStyle: "italic",
             fontFamily: "serif",
             letterSpacing: "-2px",
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
             top: 72,
             left: 148,
             fontSize: 18,
-            color: "rgba(236,227,207,0.6)",
+            color: "rgba(242, 227, 194,0.6)",
             fontFamily: "sans-serif",
             letterSpacing: "2px",
           }}
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
         <div
           style={{
             fontSize: title.length > 30 ? 48 : 60,
-            color: "rgba(236,227,207,0.95)",
+            color: "rgba(242, 227, 194,0.95)",
             fontFamily: "serif",
             lineHeight: 1.25,
             marginBottom: 20,
@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
             left: 0,
             right: 0,
             height: 4,
-            background: "linear-gradient(90deg, #B08A4A, #5E4632, transparent)",
+            background: "linear-gradient(90deg, #C68A1E, #A4481C, transparent)",
           }}
         />
       </div>

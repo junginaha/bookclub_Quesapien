@@ -57,7 +57,7 @@ export default function LoginPage() {
           border: "1px solid var(--line-soft)",
           borderRadius: 20,
           padding: "32px 28px",
-          boxShadow: "0 8px 40px -16px rgba(28,31,38,.12)",
+          boxShadow: "0 8px 40px -16px rgba(43, 29, 20,.12)",
         }}>
           <Suspense fallback={null}>
             <LoginForm />

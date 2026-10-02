@@ -91,7 +91,7 @@ export default function HeroSection() {
             letterSpacing: "0.3em",
             textTransform: "uppercase",
             color: "var(--muted-2)",
-            fontFamily: "\"EB Garamond\", Georgia, serif",
+            fontFamily: "var(--font-display), Georgia, serif",
             fontStyle: "italic",
             writingMode: "vertical-rl",
             textOrientation: "mixed",
@@ -161,7 +161,7 @@ export default function HeroSection() {
               좋은{" "}
               <em
                 style={{
-                  fontFamily: "\"EB Garamond\", var(--font-eb-garamond), Georgia, serif",
+                  fontFamily: "var(--font-display), Georgia, serif",
                   fontStyle: "italic",
                   color: "var(--accent)",
                   position: "relative",
@@ -250,7 +250,7 @@ export default function HeroSection() {
                 textDecoration: "none",
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
-                fontFamily: "\"EB Garamond\", Georgia, serif",
+                fontFamily: "var(--font-display), Georgia, serif",
                 fontStyle: "italic",
                 transition: "color 0.2s",
               }}
@@ -264,7 +264,7 @@ export default function HeroSection() {
               style={{
                 fontSize: "13px",
                 color: "var(--muted-2)",
-                fontFamily: "\"EB Garamond\", Georgia, serif",
+                fontFamily: "var(--font-display), Georgia, serif",
                 fontStyle: "italic",
               }}
             >
@@ -306,7 +306,7 @@ export default function HeroSection() {
               fontSize: "12px",
               color: "var(--muted)",
               textDecoration: "none",
-              fontFamily: "\"EB Garamond\", Georgia, serif",
+              fontFamily: "var(--font-display), Georgia, serif",
               fontStyle: "italic",
             }}
           >

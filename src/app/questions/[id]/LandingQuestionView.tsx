@@ -87,7 +87,7 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
       }}>
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
-          background: "radial-gradient(ellipse 60% 60% at 90% 10%, rgba(176,138,74,0.15), transparent 60%)",
+          background: "radial-gradient(ellipse 60% 60% at 90% 10%, rgba(198, 138, 30,0.15), transparent 60%)",
         }} />
         {/* 헤더 행: 라벨 + 관리자 버튼 */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, position: "relative" }}>
@@ -225,7 +225,7 @@ export function LandingQuestionView({ question, answers: initialAnswers }: Props
                 display: "grid", gridTemplateColumns: "80px 1fr auto", gap: 16, alignItems: "start",
               }}>
                 <div>
-                  <p style={{ fontFamily: '"EB Garamond", Georgia, serif', fontSize: 15, color: "var(--accent)", fontStyle: "normal" }}>
+                  <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: "var(--accent)", fontStyle: "normal" }}>
                     {a.author_name ?? "익명"}
                   </p>
                   {a.created_at && (

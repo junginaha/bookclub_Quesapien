@@ -78,7 +78,7 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
             {(["질문하는 사람들", "Qsapiens"] as const).map((w, i) => (
               <span key={w} style={{
                 gridArea: "1 / 1", whiteSpace: "nowrap",
-                fontFamily: i === 1 ? '"EB Garamond", Georgia, serif' : "var(--lp-serif-ko)",
+                fontFamily: i === 1 ? 'Georgia, serif' : "var(--lp-serif-ko)",
                 fontStyle: i === 1 ? "italic" : "normal",
                 fontWeight: i === 1 ? 400 : 600,
                 fontSize: i === 1 ? 15 : 19,

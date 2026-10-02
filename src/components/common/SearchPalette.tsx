@@ -22,9 +22,9 @@ const STATIC_RESULTS: SearchResult[] = [
 
 const TYPE_COLORS: Record<string, string> = {
   question: "var(--accent)",
-  booktalk: "#2C5364",
-  giant: "#553C2A",
-  archive: "#5C6B3A",
+  booktalk: "#4F6B4A",
+  giant: "#7E3514",
+  archive: "#6B6B2E",
   page: "var(--muted)",
 };
 
@@ -109,11 +109,11 @@ export default function SearchPalette() {
       {/* Palette overlay */}
       {open && (
         <div
-          style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(28,31,38,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "10vh", padding: "10vh 16px 0" }}
+          style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(43, 29, 20,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "10vh", padding: "10vh 16px 0" }}
           onClick={closePalette}
         >
           <div
-            style={{ width: "100%", maxWidth: 560, background: "var(--bg)", borderRadius: 16, overflow: "hidden", boxShadow: "0 40px 80px -20px rgba(28,31,38,0.4)", border: "1px solid var(--line-soft)" }}
+            style={{ width: "100%", maxWidth: 560, background: "var(--bg)", borderRadius: 16, overflow: "hidden", boxShadow: "0 40px 80px -20px rgba(43, 29, 20,0.4)", border: "1px solid var(--line-soft)" }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Search input */}
@@ -148,7 +148,7 @@ export default function SearchPalette() {
                     onMouseEnter={() => setSelectedIdx(i)}
                     style={{
                       width: "100%", display: "flex", alignItems: "center", gap: 12,
-                      padding: "12px 20px", background: i === selectedIdx ? "rgba(94,70,50,0.06)" : "none",
+                      padding: "12px 20px", background: i === selectedIdx ? "rgba(164, 72, 28,0.06)" : "none",
                       border: "none", borderBottom: "1px solid var(--line-soft)", cursor: "pointer",
                       textAlign: "left", transition: "background 0.1s",
                     }}

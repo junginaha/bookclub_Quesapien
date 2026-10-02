@@ -97,7 +97,7 @@ export default function TestimonialsSection() {
               <div>
                 <p
                   style={{
-                    fontFamily: "\"EB Garamond\", var(--font-eb-garamond), Georgia, serif",
+                    fontFamily: "var(--font-display), Georgia, serif",
                     fontStyle: "italic",
                     fontSize: "18px",
                     color: "var(--accent)",
@@ -134,7 +134,7 @@ export default function TestimonialsSection() {
               <div style={{ textAlign: "right" }}>
                 <p
                   style={{
-                    fontFamily: "\"EB Garamond\", var(--font-eb-garamond), Georgia, serif",
+                    fontFamily: "var(--font-display), Georgia, serif",
                     fontStyle: "italic",
                     fontSize: "13px",
                     color: "var(--muted-2)",

@@ -135,11 +135,12 @@ export default function Header() {
 
   // Transparent on landing unless scrolled > 30px or hovered
   const showOpaque = scrolled || hovered || !isLanding;
-  const headerBg = showOpaque ? "rgba(244, 239, 229, 0.95)" : "transparent";
+  const headerBg = showOpaque ? "rgba(242, 228, 196, 0.95)" : "transparent";
   const headerBorder = showOpaque ? "1px solid var(--line)" : "1px solid transparent";
 
   return (
     <header
+      data-site-header
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -162,14 +163,14 @@ export default function Header() {
             <div style={{ display: "flex", alignItems: "center", gap: 1, fontSize: 20, lineHeight: 1 }}>
               <span style={{
                 color: "var(--accent)",
-                fontFamily: '"EB Garamond", Georgia, serif',
+                fontFamily: 'Georgia, serif',
                 fontStyle: "normal",
                 animation: "markBreathe 3.8s ease-in-out infinite",
                 transformOrigin: "center",
               }}>?</span>
               <span style={{
                 color: "var(--ink)",
-                fontFamily: '"EB Garamond", Georgia, serif',
+                fontFamily: 'Georgia, serif',
                 fontStyle: "normal",
                 animation: "markBob 2.6s ease-in-out infinite",
                 transformOrigin: "center",
@@ -233,11 +234,11 @@ export default function Header() {
                       left: "50%",
                       transform: "translateX(-50%)",
                       minWidth: 200,
-                      background: "rgba(244,239,229,0.98)",
+                      background: "rgba(242, 228, 196,0.98)",
                       backdropFilter: "blur(20px)",
                       border: "1px solid var(--line)",
                       borderRadius: 12,
-                      boxShadow: "0 24px 60px -16px rgba(28,31,38,.18)",
+                      boxShadow: "0 24px 60px -16px rgba(43, 29, 20,.18)",
                       padding: "8px 0",
                       zIndex: 200,
                     }}
@@ -260,7 +261,7 @@ export default function Header() {
                           textDecoration: "none",
                           transition: "background 0.15s",
                         }}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(28,31,38,0.04)"; }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(43, 29, 20,0.04)"; }}
                         onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                       >
                         {s.label}
@@ -305,9 +306,9 @@ export default function Header() {
                 {profileOpen && (
                   <div style={{
                     position: "absolute", top: "calc(100% + 8px)", right: 0,
-                    minWidth: 200, background: "rgba(244,239,229,0.98)",
+                    minWidth: 200, background: "rgba(242, 228, 196,0.98)",
                     backdropFilter: "blur(20px)", border: "1px solid var(--line)",
-                    borderRadius: 14, boxShadow: "0 24px 60px -16px rgba(28,31,38,.18)",
+                    borderRadius: 14, boxShadow: "0 24px 60px -16px rgba(43, 29, 20,.18)",
                     padding: "8px 0", zIndex: 200,
                   }}>
                     <div style={{ padding: "10px 16px 8px", borderBottom: "1px solid var(--line-soft)" }}>
@@ -327,7 +328,7 @@ export default function Header() {
                         textDecoration: "none", transition: "background .15s",
                         fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
                       }}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(28,31,38,0.04)"; }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(43, 29, 20,0.04)"; }}
                         onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                       >
                         <span style={{ color: "var(--muted)" }}>{item.icon}</span>
@@ -408,7 +409,7 @@ export default function Header() {
       {/* Mobile Menu */}
       {mobileOpen && (
         <div style={{
-          background: "rgba(244, 239, 229, 0.98)",
+          background: "rgba(242, 228, 196, 0.98)",
           backdropFilter: "blur(20px)",
           borderTop: "1px solid var(--line)",
           padding: "12px 0 24px",
