@@ -9,6 +9,7 @@ const checks = [
   { path: '/', expected: 200, text: 'Qsapiens' },
   { path: '/bookclub/met-guard', expected: 200, text: '패트릭 브링리' },
   { path: '/giants', expected: 200, text: '발제' },
+  { path: '/archive', expected: 200, text: '기록' },
   // Empty input must stop before any AI call or application/database write.
   { path: '/api/discussion/generate', expected: 400, code: 'missing_input', body: {} },
 ];

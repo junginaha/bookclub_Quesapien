@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { excludeDemoReviews } from "@/lib/publicReviews";
 
 export async function GET() {
   try {
@@ -11,7 +12,7 @@ export async function GET() {
       .eq("is_approved", true)
       .order("created_at", { ascending: false })
       .limit(60);
-    return NextResponse.json({ reviews: data ?? [] });
+    return NextResponse.json({ reviews: excludeDemoReviews(data ?? []) });
   } catch {
     return NextResponse.json({ reviews: [] });
   }

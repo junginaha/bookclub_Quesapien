@@ -8,11 +8,14 @@ import { BookOpen, MessageSquare, FileText, Calendar, Heart } from "lucide-react
 import { formatDate } from "@/lib/utils";
 import AISummaryBlock from "@/components/seo/AISummaryBlock";
 import AIReviewSummary from "@/components/archive/AIReviewSummary";
+import ArchiveVideo from "@/components/archive/ArchiveVideo";
+import "./editorial-archive.css";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Review = any;
 
 type TabType = "reviews" | "mine" | "cases" | "questions" | "discussions" | "talks";
+const PUBLIC_TABS = new Set(["reviews", "mine", "discussions"]);
 
 const STATIC_QUESTIONS = [
   { id: "aq1", content: "당신은 마지막으로 언제, 진심으로 울었나요?", author_name: "편집팀", likes: 1284, answers_count: 72, created_at: "2026-05-22" },
@@ -70,11 +73,13 @@ const LEADER_CASES = [
 
 export default function ArchiveClient({ initialReviews }: { initialReviews: Review[] }) {
   const searchParams = useSearchParams();
-  const initialTab = (searchParams.get("tab") as TabType | null) ?? (searchParams.get("mine") === "true" ? "mine" : "reviews");
+  const requestedTab = searchParams.get("tab");
+  const initialTab: TabType = requestedTab && PUBLIC_TABS.has(requestedTab) ? requestedTab as TabType : searchParams.get("mine") === "true" ? "mine" : "reviews";
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [photoFilter, setPhotoFilter] = useState<"all" | "text" | "photo" | "video">("all");
   const [myReviews, setMyReviews] = useState<Review[]>([]);
   const [myLoading, setMyLoading] = useState(false);
+  const [myLoaded, setMyLoaded] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [discussions, setDiscussions] = useState<Review[]>([]);
@@ -84,20 +89,21 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
 
   useEffect(() => {
     const tab = searchParams.get("tab") as TabType | null;
-    if (tab) setActiveTab(tab);
+    if (tab && PUBLIC_TABS.has(tab)) setActiveTab(tab);
     else if (searchParams.get("mine") === "true") setActiveTab("mine");
+    else setActiveTab("reviews");
   }, [searchParams]);
 
   useEffect(() => {
-    if (activeTab === "mine" && myReviews.length === 0 && !myLoading) {
+    if (activeTab === "mine" && !myLoaded && !myLoading) {
       setMyLoading(true);
       fetch("/api/archive/mine")
         .then((r) => r.json())
         .then((d) => { setMyReviews(d.reviews ?? []); })
         .catch(() => {})
-        .finally(() => setMyLoading(false));
+        .finally(() => { setMyLoading(false); setMyLoaded(true); });
     }
-  }, [activeTab, myReviews.length, myLoading]);
+  }, [activeTab, myLoaded, myLoading]);
 
   useEffect(() => {
     if (activeTab !== "discussions") return;
@@ -138,62 +144,23 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
   const TABS = [
     { key: "reviews" as const, label: "후기 아카이브", icon: <Heart size={14} />, count: initialReviews.length },
     { key: "mine" as const, label: "내 아카이브", icon: <Heart size={14} />, count: myReviews.length || undefined },
-    { key: "cases" as const, label: "진행자 사례", icon: <MessageSquare size={14} />, count: LEADER_CASES.length },
-    { key: "questions" as const, label: "질문 아카이브", icon: <MessageSquare size={14} />, count: STATIC_QUESTIONS.length },
     { key: "discussions" as const, label: "발제문 아카이브", icon: <FileText size={14} />, count: discussionsLoaded ? discussions.length : undefined },
-    { key: "talks" as const, label: "북토크 기록", icon: <BookOpen size={14} />, count: STATIC_TALKS.length },
   ];
 
   return (
-    <div style={{ background: "var(--bg)" }}>
+    <div className="archive-editorial" style={{ background: "var(--bg)" }}>
 
-      {/* ── Hero ── */}
-      <section style={{
-        padding: "72px 0 56px",
-        borderBottom: "1px solid var(--line-soft)",
-        background: "linear-gradient(to bottom, var(--bg-soft), var(--bg))",
-      }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
-          <div style={{ fontSize: 11.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--muted)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "normal", marginBottom: 20 }}>
-            Archiving — 아카이빙
-          </div>
-          <h1 style={{
-            fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
-            fontSize: "clamp(28px, 5vw, 52px)",
-            fontWeight: 400, lineHeight: 1.2, letterSpacing: "-0.02em",
-            color: "var(--ink)", marginBottom: 16,
-          }}>
-            질문과 독서의<br />
-            <span style={{ color: "var(--accent)", fontWeight: 600 }}>기록</span>.
-          </h1>
-          <p style={{ fontSize: 16, color: "var(--muted)", lineHeight: 1.75, maxWidth: 480, marginBottom: 40 }}>
-            지나간 시즌의 질문들, 후기들, 발제문들, 그리고 북토크의 기록.
-            우리가 함께 쌓아온 지적 자산.
-          </p>
-
-          <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
-            {[
-              { value: `${initialReviews.length}+`, label: "후기" },
-              { value: `${STATIC_QUESTIONS.length}+`, label: "아카이브 질문" },
-              { value: String(totalLikes), label: "공감 수" },
-            ].map((s) => (
-              <div key={s.label}>
-                <div style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: 28, fontWeight: 400, color: "var(--ink)" }}>
-                  {s.value}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+      <section className="archive-journal-hero">
+        <div><span className="journal-eyebrow">QSAPIENS / OUR JOURNAL</span><h1>모임은 끝나도,<br />이야기는 남습니다.</h1><p>함께 읽은 책, 마음에 남은 질문, 서로에게서 발견한 생각.<br />글과 사진, 영상으로 이어지는 우리의 기록입니다.</p></div>
+        <Link href="/#testify" className="journal-cta">나의 기록 남기기 ↗</Link>
       </section>
-
       {/* ── Tab Navigation ── */}
       <div style={{ borderBottom: "1px solid var(--line-soft)", background: "var(--bg)", overflowX: "auto" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)", display: "flex" }}>
           {TABS.map((tab) => (
             <button
               key={tab.key}
+              aria-pressed={activeTab === tab.key}
               onClick={() => setActiveTab(tab.key)}
               style={{
                 display: "flex", alignItems: "center", gap: 6,
@@ -206,7 +173,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
               }}
             >
               {tab.icon} {tab.label}
-              <span style={{ fontSize: 11, color: "var(--muted-2)", marginLeft: 2 }}>({tab.count})</span>
+              {tab.count !== undefined && <span style={{ fontSize: 11, color: "var(--muted-2)", marginLeft: 2 }}>({tab.count})</span>}
             </button>
           ))}
         </div>
@@ -259,20 +226,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                         <Image src={review.photo_url} alt="후기 사진" fill style={{ objectFit: "cover" }} sizes="(max-width:640px) 100vw, 33vw" />
                       </div>
                     )}
-                    {review.video_url && !review.photo_url && (
-                      <div style={{ position: "relative", overflow: "hidden", background: "#000", borderRadius: "12px 12px 0 0" }}>
-                        {review.video_url.includes("youtube.com") || review.video_url.includes("youtu.be") ? (
-                          <iframe
-                            src={review.video_url.replace("watch?v=", "embed/").replace("youtu.be/", "www.youtube.com/embed/")}
-                            style={{ width: "100%", height: 192, border: "none" }}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          />
-                        ) : (
-                          <video src={review.video_url} controls style={{ width: "100%", maxHeight: 240 }} />
-                        )}
-                      </div>
-                    )}
+                    {review.video_url && <ArchiveVideo key={review.video_url} url={review.video_url} title={`${review.author_name || "참여자"}의 모임 기록`} />}
                     <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "white" }}>

@@ -1,0 +1,8 @@
+.archive-editorial { --bg:#f8f5ed; --bg-soft:#eceee3; --ink:#20392f; --muted:#657060; --muted-2:#69725f; --accent:#254c3d; --line-soft:#d6dccd; }
+.archive-editorial :focus-visible { outline:3px solid #b77f39; outline-offset:4px; }
+.archive-journal-hero { padding:64px max(24px,calc((100vw - 1184px)/2)); border-bottom:1px solid #d6dccd; background:#eceee3; display:flex; align-items:flex-end; justify-content:space-between; gap:32px; }
+.archive-journal-hero .journal-eyebrow { color:#657060; font-size:10px; letter-spacing:.16em; }
+.archive-journal-hero h1 { font:500 clamp(30px,4.5vw,54px)/1.45 var(--font-noto-serif-kr),serif; letter-spacing:-.04em; color:#20392f; margin:20px 0; }
+.archive-journal-hero p { font-size:14px; line-height:1.9; color:#657060; }
+.journal-cta { display:inline-block; padding:15px 22px; color:#fff9ee; background:#254c3d; border-radius:3px; font-size:13px; text-decoration:none; white-space:nowrap; }
+@media(max-width:600px) { .archive-journal-hero { padding:36px 20px; flex-direction:column; align-items:flex-start; gap:16px; } }

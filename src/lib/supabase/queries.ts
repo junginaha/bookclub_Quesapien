@@ -1,4 +1,5 @@
 import { createClient } from "./server";
+import { excludeDemoReviews } from "@/lib/publicReviews";
 
 // ─── Questions ────────────────────────────────────────────────
 export async function getQuestions(limit = 20) {
@@ -162,11 +163,11 @@ export async function getArchiveReviews(limit = 60) {
     .select("id, type, content, author_name, photo_url, video_url, likes, created_at")
     .eq("is_approved", true)
     .order("created_at", { ascending: false })
-    .limit(limit);
-  return (data ?? []) as {
+    .limit(Math.max(60, limit));
+  return excludeDemoReviews((data ?? []) as {
     id: string; type: string; content: string; author_name: string;
     photo_url: string | null; video_url: string | null; likes: number; created_at: string;
-  }[];
+  }[]).slice(0, limit);
 }
 
 // ─── Reviews ───────────────────────────────────────────────────
