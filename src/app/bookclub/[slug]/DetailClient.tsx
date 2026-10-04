@@ -150,6 +150,12 @@ export default function DetailClient({
 
         <VenueCard venue={session.venue} />
 
+        <section className="qd-questions" aria-labelledby="qd-before-title">
+          <h2 className="qd-questions-title" id="qd-before-title">신청 전에 확인해 주세요</h2>
+          <p className="qd-question">『{session.bookTitle}』를 읽고, 아래 발제 중 함께 나누고 싶은 질문을 골라 오세요. 책 준비와 진행 방식이 궁금하면 <a href="mailto:junginaha@qsapiens.com">운영자에게 문의</a>해 주세요.</p>
+          <p className="qd-question">참여비는 {feeText}입니다. 대기 신청은 참여 확정이 아니며, 자리가 나면 별도로 안내합니다. {session.fee > 0 || session.feeLabelOverride ? <>결제 전에는 <a href="mailto:junginaha@qsapiens.com">운영자에게 취소·환불 기준을 확인</a>해 주세요. </> : null}<Link href="/terms">이용약관</Link>에서 현재 안내 상태를 확인할 수 있습니다.</p>
+        </section>
+
         {session.agendaPreview.length > 0 && (
           <div className="qd-questions">
             <h2 className="qd-questions-title">『{session.bookTitle}』 발제 질문 미리보기</h2>
@@ -162,7 +168,7 @@ export default function DetailClient({
         {isSessionPast ? (
           <div className="qd-apply">
             <div className="qd-apply-title">지난 모임이에요</div>
-            <p className="qd-apply-sub">이날의 이야기를 기록으로 남겨두었어요.</p>
+            <p className="qd-apply-sub">{session.archiveSlug ? "이날의 이야기를 기록으로 남겨두었어요." : "공개할 모임 기록을 정리하고 있어요."}</p>
             {session.archiveSlug ? (
               <Link href={`/archive/${session.archiveSlug}`} className="qd-archive-link">그날의 기록 보기</Link>
             ) : (

@@ -83,7 +83,7 @@ export default function ApplyForm({
     if (result.kind === "confirmed") {
       return (
         <div className="qd-form-success">
-          <p className="qd-form-msg">자리를 확인했습니다. 참여 신청이 완료됐습니다.</p>
+          <p className="qd-form-msg">{fee > 0 ? "참여 신청을 접수했습니다. 참여비 결제는 아래에서 진행해 주세요." : "자리를 확인했습니다. 참여 신청이 완료됐습니다."}</p>
           {fee > 0 ? (
             <>
               <Script src="https://lite.payapp.kr/public/api/v2/payapp-lite.js" strategy="afterInteractive" />

@@ -58,7 +58,7 @@ export default async function QuestionsPage() {
 
       {/* Stage 4: AI Friendly Definition Block */}
       <DefinitionBlock
-        definition="질문하는 사람들의 질문 아카이브. 매일 한 개의 오늘의 질문이 등록되며, 커뮤니티 구성원이 자신의 질문을 남길 수 있다. 좋은 질문은 북토크 주제로 이어진다."
+        definition="질문하는 사람들의 질문 아카이브입니다. 공개된 오늘의 질문·인기 질문·최근 질문을 살펴보고 자신의 질문을 남길 수 있습니다. 질문을 바탕으로 책과 북토크 주제를 탐색합니다."
         entityType="QuestionArchive"
       />
 
