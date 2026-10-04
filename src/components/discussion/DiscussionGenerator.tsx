@@ -219,7 +219,7 @@ export default function DiscussionGenerator({ variant }: DiscussionGeneratorProp
               <div><span>10 QUESTIONS</span><h3>이 책에서만 나올 수 있는 질문</h3></div>
               <div className="dg-output-actions">
                 <button type="button" onClick={copyAll}>{copied ? <Check size={14}/> : <Copy size={14}/>} {copied ? "복사됨" : "전체 복사"}</button>
-                <button type="button" onClick={() => void generate()}><RefreshCw size={14}/> 다시 만들기</button>
+                <button type="button" onClick={() => { setResult(null); setStatus("idle"); }}><RefreshCw size={14}/> 책·난이도 바꾸기</button>
               </div>
             </div>
             <ol className="dg-question-list">
