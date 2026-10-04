@@ -12,6 +12,7 @@ import {
   sortByStart,
 } from "@/lib/bookclub/selectors";
 import type { BookClubSession } from "@/lib/bookclub/types";
+import { activeGuides } from "@/content/ai-guides";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 
@@ -54,6 +55,10 @@ export function GET() {
 - [발제 생성기](${SITE_URL}/giants): 책 제목을 넣으면 독서모임용 발제 질문을 만들어 주는 도구
 - [아카이브](${SITE_URL}/archive): 지난 모임의 후기·발제 기록
 - [사이트맵](${SITE_URL}/sitemap.xml)
+
+## 참여 안내
+
+${activeGuides().map((g) => `- [${g.title}](${SITE_URL}/guide/${g.slug}): ${g.description}`).join("\n")}
 
 ## 예정 모임
 

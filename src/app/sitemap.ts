@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { BOOKCLUB_SESSIONS } from "@/lib/bookclub/data";
+import { guideSitemapEntries } from "@/lib/guide-sitemap";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 
@@ -76,5 +77,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
-  return [...staticPages, ...bookclubPages, ...(await fetchDynamicEntries())];
+  return [...staticPages, ...bookclubPages, ...guideSitemapEntries(), ...(await fetchDynamicEntries())];
 }

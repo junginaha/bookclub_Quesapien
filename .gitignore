@@ -14,3 +14,4 @@ tsconfig.tsbuildinfo
 # pnpm build로 재검증하며 생긴 pnpm 전용 파일은 커밋 대상이 아니다.
 pnpm-lock.yaml
 pnpm-workspace.yaml
+geo-*.csv
