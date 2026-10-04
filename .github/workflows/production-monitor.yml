@@ -1,0 +1,30 @@
+name: Qsapiens production monitor
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/check-production.mjs
+      - .github/workflows/production-monitor.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qsapiens-production-monitor
+  cancel-in-progress: false
+
+jobs:
+  availability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check public pages and input validation without AI calls
+        run: node scripts/check-production.mjs
