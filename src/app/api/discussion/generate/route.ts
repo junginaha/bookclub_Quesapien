@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { reusableDiscussion, DiscussionPausedError } from "@/lib/reusableDiscussion";
 import {
   buildDiscussion,
   DiscussionEngineError,
@@ -46,10 +47,16 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const result = await buildDiscussion(bookInput);
+    const result = await reusableDiscussion(bookInput);
     const discussionId = await saveDiscussion(bookInput, result);
     return NextResponse.json({ result, discussionId });
   } catch (err) {
+    if (err instanceof DiscussionPausedError) {
+      return NextResponse.json({ error: "저장된 발제가 없는 책은 현재 새로 만들 수 없습니다. 기존 발제를 이용하거나 잠시 후 다시 시도해주세요.", code: "generation_paused" }, { status: 503 });
+    }
+    if (err instanceof Error && err.message === "discussion_busy") {
+      return NextResponse.json({ error: "요청이 많습니다. 잠시 후 다시 시도해주세요.", code: "rate_limited" }, { status: 429 });
+    }
     if (err instanceof DiscussionEngineError) {
       const status = err.code === "config_missing" ? 503 : (err.code === "insufficient_description" || err.code === "book_not_verified" || err.code === "background_not_verified") ? 422 : 502;
       console.error(`Discussion generate error [${err.code}]:`, err.message);
