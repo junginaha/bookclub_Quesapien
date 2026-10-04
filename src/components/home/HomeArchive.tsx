@@ -83,8 +83,8 @@ export default function HomeArchive() {
           <label>이름<input value={name} onChange={event => setName(event.target.value)} maxLength={50} placeholder="미입력 시 익명" autoComplete="nickname" /></label>
           <label>내용<textarea value={content} onChange={event => setContent(event.target.value)} required maxLength={4000} rows={4} /></label>
           {kind !== "text" && <label>파일 · {kind === "photo" ? "사진 10MB" : "영상 50MB"} 이하<input key={kind} ref={inputRef} type="file" accept={(kind === "photo" ? PHOTO_TYPES : VIDEO_TYPES).join(",")} onChange={event => { setFile(event.target.files?.[0] ?? null); uploaded.current = null; }} /></label>}
-          {kind === "video" && !file && <label>또는 YouTube·Vimeo 링크<input type="url" value={videoLink} onChange={event => setVideoLink(event.target.value)} placeholder="https://" /></label>}
-          {kind !== "text" && <p className={styles.hint}>첨부 파일은 공개 링크로 저장됩니다.</p>}
+          {kind === "video" && !file && <label>또는 YouTube·Vimeo 링크<input type="url" value={videoLink} onChange={event => setVideoLink(event.target.value)} placeholder="YouTube 영상 주소를 붙여넣으세요" /></label>}
+          {kind !== "text" && <p className={styles.hint}>사진·영상은 공개됩니다. 등장하는 분들의 공개 동의를 받은 기록만 첨부해 주세요.</p>}
           <div className={styles.actions}><button className={styles.primary} type="submit" disabled={busy || !content.trim()}>{busy ? "저장 중…" : "기록 저장"}</button></div>
         </fieldset>
         {message && <p role={saved ? "status" : "alert"} className={styles.notice}>{message} {saved && <Link href={isPublic ? "/archive" : "/archive?mine=true"}>저장된 기록 보기</Link>}</p>}

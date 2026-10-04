@@ -1,179 +1,44 @@
 "use client";
-
-import { useEffect, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
+import { getStatus, formatCompactSchedule, feeLabel } from "@/lib/bookclub/selectors";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
-import MiniBookSpread from "./MiniBookSpread";
+import BookCoverImage from "./BookCoverImage";
 import HomeArchive from "./HomeArchive";
+import ReviewGallery, { type PublicReview } from "./ReviewGallery";
 import "./landing.css";
-import styles from "./home-tools.module.css";
+import styles from "./editorial.module.css";
+export interface LandingQuestion { id: string; content: string; author_name: string; likes: number; saves: number; answers_count: number; }
 
-export interface LandingQuestion {
-  id: string;
-  content: string;
-  author_name: string;
-  likes: number;
-  saves: number;
-  answers_count: number;
-}
-
-export default function LandingPage({ bookclubSessions = [] }: { bookclubSessions?: BookClubSession[] }) {
-  const [navBtnIdx, setNavBtnIdx] = useState(0);
-  const [navBtnFading, setNavBtnFading] = useState(false);
-  const [howToOpen, setHowToOpen] = useState(false);
-  const guide = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    let transition: ReturnType<typeof setTimeout> | undefined;
-    const interval = setInterval(() => {
-      setNavBtnFading(true);
-      transition = setTimeout(() => { setNavBtnIdx(i => (i + 1) % 2); setNavBtnFading(false); }, 300);
-    }, 3000);
-    return () => { clearInterval(interval); clearTimeout(transition); };
-  }, []);
-
-  useEffect(() => {
-    const nav = document.getElementById("lp-nav");
-    const onScroll = () => nav?.classList.toggle("scrolled", window.scrollY > 30);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    const elements = document.querySelectorAll("#top .lp-reveal");
-    if (!("IntersectionObserver" in window)) {
-      elements.forEach(element => element.classList.add("visible"));
-      return;
-    }
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-    elements.forEach(element => observer.observe(element));
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (howToOpen && !guide.current?.open) guide.current?.showModal();
-    if (!howToOpen && guide.current?.open) guide.current.close();
-  }, [howToOpen]);
-
-  return (
-    <div className="lp">
-      <div className="lp-grain" aria-hidden="true" />
-      <div className="lp-grain-light" aria-hidden="true" />
-      <nav className="lp-nav" id="lp-nav">
-        <a href="#top" className="lp-wordmark">
-          <span className="wm-mark" aria-hidden="true">
-            <span className="wm-q">?</span><span className="wm-bang">!</span>
-          </span>
-          <span style={{ display: "inline-grid" }}>
-            {(["질문하는 사람들", "Qsapiens"] as const).map((w, i) => (
-              <span key={w} style={{
-                gridArea: "1 / 1", whiteSpace: "nowrap",
-                fontFamily: i === 1 ? '"EB Garamond", Georgia, serif' : "var(--lp-serif-ko)",
-                fontStyle: i === 1 ? "italic" : "normal",
-                fontWeight: i === 1 ? 400 : 600,
-                fontSize: i === 1 ? 15 : 19,
-                letterSpacing: i === 1 ? "0.06em" : "-0.012em",
-                transition: "opacity 0.4s ease, transform 0.4s cubic-bezier(.2,.8,.2,1)",
-                opacity: navBtnIdx === i && !navBtnFading ? 1 : 0,
-                transform: navBtnIdx === i && !navBtnFading ? "translateY(0)" : navBtnIdx === i ? "translateY(-4px)" : "translateY(4px)",
-              }} aria-hidden={navBtnIdx !== i}>{w}</span>
-            ))}
-          </span>
-        </a>
-        <div className="lp-nav-links">
-          <a href="/questions">질문</a>
-          <a href="/bookclub">북클럽</a>
-          <a href="/archive">아카이빙</a>
-          <a href="/giants">거인의 어깨</a>
-        </div>
-        <div style={{ position: "relative", width: 100, height: 40, overflow: "visible" }}>
-          {[
-            { href: "/login", label: "로그인", filled: false },
-            { href: "/signup", label: "함께 읽기", filled: true },
-          ].map((btn, i) => (
-            <a
-              key={btn.href}
-              href={btn.href}
-              className={btn.filled ? "btn-pill-neu btn-pill-neu-accent" : "btn-pill-neu"}
-              tabIndex={navBtnIdx === i ? 0 : -1}
-              aria-hidden={navBtnIdx !== i}
-              style={{
-                position: "absolute", inset: 0,
-                display: "flex",
-                transition: "opacity .3s ease, transform .3s ease, box-shadow .18s ease",
-                opacity: navBtnIdx === i && !navBtnFading ? 1 : 0,
-                transform: navBtnIdx === i && !navBtnFading ? "translateY(0)" : navBtnIdx === i ? "translateY(-5px)" : "translateY(5px)",
-                pointerEvents: navBtnIdx === i ? "auto" : "none",
-              }}
-            >
-              <span>{btn.label}</span>
-            </a>
-          ))}
-        </div>
-      </nav>
-      <main>
-        <section className="lp-hero" id="top">
-          <div className="lp-hero-inner">
-            <div className="lp-hero-meta">
-              <div className="lp-eyebrow">서초구 선정 미래혁신형 북클럽</div>
-              <div className="lp-right" />
-            </div>
-            {/* 버튼은 h1 밖에 둔다(제목 텍스트에 링크 문구가 섞이지 않도록). h1을 inline으로
-                흘려 버튼이 "데려옵니다" 바로 옆 같은 줄에 오게 한다 — landing.css .lp-hero-headline */}
-            <div className="lp-hero-headline">
-              <h1 className="lp-h-display">
-                <span className="lp-reveal"><span>좋은 <span className="lp-em">질문</span>은</span></span>{" "}
-                <span className="lp-reveal"><span>좋은 사람을</span></span>{" "}
-                <span className="lp-reveal lp-reveal-last"><span>데려옵니다</span></span>
-              </h1>
-              <a href="/bookclub" className="lp-hero-bookclub-btn">
-                <span>북클럽 둘러보기</span>
-              </a>
-            </div>
-            <div className="lp-hero-sub">
-              <p>
-                <span className="lp-kw">질문</span>으로{" "}
-                <span className="lp-kw k2">연결</span>되는 미래혁신형{" "}
-                <span className="lp-kw k3">북클럽</span>.<br />
-                <span className="lp-kw k4">사람들</span>이 가장 깊은 이야기를 나눠요.
-              </p>
-            </div>
-          </div>
-          <div className="lp-scroll-cue"><span className="sc-line" /></div>
-          <div className="lp-hero-entry-cta">
-            <button type="button" onClick={() => setHowToOpen(v => !v)} aria-expanded={howToOpen} aria-controls="how-it-works-panel" className="lp-hero-entry-btn">
-              <span className="lp-hero-entry-text">처음 온 당신에게</span>
-              <ChevronDown size={15} className={`lp-hero-entry-arrow${howToOpen ? " lp-hero-entry-arrow--open" : ""}`} />
-            </button>
-          </div>
-        </section>
-        <HomeCalendarLocationHub sessions={bookclubSessions} />
-        <MiniBookSpread sessions={bookclubSessions} />
-        <HomeArchive />
-        <section className={`${styles.section} ${styles.generator}`} id="final" aria-labelledby="discussion-title">
-          <div className={styles.sectionHead}><h2 id="discussion-title">발제 · 거인의 어깨</h2><a className={styles.secondary} href="/giants">전체 발제 도구</a></div>
-          <DiscussionGenerator variant="landing" />
-        </section>
-      </main>
-      <footer className="lp-footer">
-        <div className="lp-foot-inner"><span className="lp-foot-mark">질문하는 사람들</span><span className="lp-foot-copy">© 2026 Qsapiens.</span></div>
-      </footer>
-      <dialog ref={guide} id="how-it-works-panel" className={styles.dialog} onClose={() => setHowToOpen(false)} aria-labelledby="guide-title">
-        <h2 id="guide-title">처음 온 당신에게</h2>
-        <p>캘린더에서 날짜를 고른 뒤, 책과 장소를 확인하고 참여를 신청하세요.</p>
-        <p>혼자 오셔도, 처음이셔도 괜찮습니다.</p>
-        <button type="button" onClick={() => setHowToOpen(false)}>닫기</button>
-      </dialog>
-    </div>
-  );
+export default function LandingPage({ bookclubSessions = [], reviews = [] }: { bookclubSessions?: BookClubSession[]; reviews?: PublicReview[] }) {
+  const upcoming = [...bookclubSessions].filter(session => getStatus(session) === "open").sort((a,b) => Date.parse(a.startsAt)-Date.parse(b.startsAt));
+  const featured = upcoming[0];
+  return <div className={`lp ${styles.page}`}>
+    <a className={styles.skip} href="#main-content">본문으로 건너뛰기</a>
+    <header className={styles.header}>
+      <Link href="/" className={styles.brand} aria-label="큐사피엔스 홈"><span className={styles.brandMark}>?!</span><span>질문하는 사람들<small>Qsapiens · READ. ASK. CONNECT.</small></span></Link>
+      <nav className={styles.nav} aria-label="주 메뉴"><a href="#meetings">북클럽</a><a href="#records">모임의 기록</a><Link href="/giants">발제 도구</Link></nav>
+      <Link href="/login" className={styles.login}>로그인 ↗</Link>
+    </header>
+    <main id="main-content">
+      <section className={styles.hero} aria-labelledby="hero-title">
+        <div className={styles.heroCopy}><span className={styles.eyebrow}>서초구 선정 미래혁신형 북클럽</span><h1 id="hero-title">좋은 질문은<br />좋은 <em>사람</em>을<br />데려옵니다<span>.</span></h1><p>책 한 권에서 시작해, 서로의 세계로.<br />질문으로 연결되는 우리의 북클럽.</p><div className={styles.heroActions}><a className={styles.primary} href="#meetings">함께 읽을 모임 찾기 <span>↗</span></a><a className={styles.textLink} href="#first-visit">처음 오셨나요?</a></div></div>
+        <aside className={styles.heroFeature} aria-label="다음 모집 중인 모임"><div className={styles.featureTop}><span>NEXT CHAPTER</span><span>함께 읽는 다음 책</span></div>{featured ? <>
+          <Link href={`/bookclub/${featured.slug}`} className={styles.featureCover}><BookCoverImage title={featured.bookTitle} author={featured.author} coverUrl={featured.coverUrl} priority /></Link>
+          <div className={styles.featureInfo}><span className={styles.eyebrow}>모집 중 · {featured.feeLabelOverride || feeLabel(featured.fee)}</span><h2><Link href={`/bookclub/${featured.slug}`}>{featured.bookTitle}</Link></h2><p>{formatCompactSchedule(featured.startsAt, featured.endsAt)}</p><p>{featured.venue.name}</p><Link className={styles.textLink} href={`/bookclub/${featured.slug}#apply`}>이 모임에 참여하기 ↗</Link></div>
+        </> : <div className={styles.featureInfo}><h2>다음 만남을<br />준비하고 있습니다.</h2><Link href="/bookclub" className={styles.textLink}>북클럽 살펴보기 ↗</Link></div>}</aside>
+      </section>
+      <div className={styles.manifesto}><span>READ TOGETHER</span><p>같은 책을 읽어도, 우리는 다른 이야기를 나눕니다.</p><span>THINK FURTHER ↗</span></div>
+      <section className={styles.meetings} id="meetings" aria-labelledby="meeting-heading"><div className={styles.sectionHead}><div><span className={styles.eyebrow}>01 / THE NEXT MEETING</span><h2 id="meeting-heading">다음 만남을 골라보세요.</h2></div><Link href="/bookclub" className={styles.textLink}>전체 모임 보기 ↗</Link></div><p className={styles.sectionLead}>일정과 장소를 확인하고, 마음이 가는 책으로 시작하세요.</p>
+        {upcoming.length > 0 && <div className={styles.meetingGrid}>{upcoming.slice(0,3).map((session,index) => <Link key={session.slug} className={styles.meetingCard} href={`/bookclub/${session.slug}`}><span className={styles.cardNumber}>0{index+1} <span>모집 중 ↗</span></span><h3>{session.bookTitle}</h3><p className={styles.author}>{session.author}</p><p className={styles.meetingQuestion}>{session.leadQuestion || session.summary}</p><div className={styles.cardMeta}><span>{formatCompactSchedule(session.startsAt,session.endsAt)}</span><span>{session.venue.name}</span><strong>{session.feeLabelOverride || feeLabel(session.fee)}</strong></div></Link>)}</div>}
+        <details className={styles.calendar}><summary>달력으로 일정 살펴보기 <span>＋</span></summary><HomeCalendarLocationHub sessions={bookclubSessions} /></details>
+      </section>
+      <section className={styles.firstVisit} id="first-visit" aria-labelledby="first-heading"><div><span className={styles.eyebrow}>A PLACE FOR YOUR QUESTIONS</span><h2 id="first-heading">혼자 오셔도,<br />처음이셔도 괜찮습니다.</h2></div><ol><li><span>01</span><div><h3>책과 모임을 고르고</h3><p>일정, 장소, 참여비와 준비 사항을 확인하세요.</p></div></li><li><span>02</span><div><h3>서로의 생각을 만나고</h3><p>하나의 책을 서로 다른 질문으로 읽습니다.</p></div></li><li><span>03</span><div><h3>나의 이야기를 남겨요</h3><p>마음에 남은 생각을 기록하고 다음 만남으로 이어가세요.</p></div></li></ol></section>
+      <ReviewGallery reviews={reviews} />
+      <div className={styles.writeRecord}><HomeArchive /></div>
+      <section className={styles.tools} aria-labelledby="discussion-title"><div className={styles.sectionHead}><div><span className={styles.eyebrow}>03 / A QUESTION TO BEGIN</span><h2 id="discussion-title">대화의 시작은 좋은 질문.</h2></div><Link href="/giants" className={styles.textLink}>발제 도구 열기 ↗</Link></div><details><summary>함께 나눌 질문 준비하기 ＋</summary><DiscussionGenerator variant="landing" /></details></section>
+    </main>
+    <footer className={styles.footer}><div><span className={styles.brandMark}>?!</span><h2>다음 질문에서<br />다시 만나요.</h2></div><div><Link href="/bookclub">북클럽</Link><Link href="/archive">모임의 기록</Link><Link href="/privacy">개인정보처리방침</Link><Link href="/terms">이용약관</Link><small>© {new Date().getFullYear()} Qsapiens. 질문하는 사람들.</small></div></footer>
+  </div>;
 }

@@ -1,0 +1,9 @@
+.media { background:#173b32; color:#fffaf0; }
+.media iframe { display:block; width:100%; aspect-ratio:16/9; border:0; }
+.media button.preview.preview { width:100%; aspect-ratio:16/9; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:24px; color:#fffaf0; background:radial-gradient(ellipse at top right,#355b47,transparent),#173b32; border:0; cursor:pointer; font:inherit; }
+.label { font-size:10px; letter-spacing:.15em; opacity:.8; }
+.play { display:grid; place-items:center; width:52px; height:52px; padding-left:3px; border:1px solid #b6c8b2; border-radius:50%; font-size:17px; }
+.preview small { font-size:10px; color:#c8d2c0; }
+.watch { display:block; padding:12px 18px; font-size:12px; text-decoration:underline; }
+.native { width:100%; max-height:320px; background:#173b32; }
+.preview:focus-visible,.watch:focus-visible { outline:3px solid #dfb96d; outline-offset:-4px; }
