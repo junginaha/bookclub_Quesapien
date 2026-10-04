@@ -8,7 +8,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 export const metadata: Metadata = buildMetadata({
   title: "거인의 어깨 — 북토크 발제 생성기",
   description:
-    "책 제목·저자·책 소개를 바탕으로 사상가의 관점을 연결해 북토크 질문 초안 10개를 만듭니다. AI가 제안한 해석과 인용은 원문과 대조해 사용하세요.",
+    "책 제목·저자·책 소개를 바탕으로 사상가의 관점을 연결해 북토크 질문 초안 10개를 구성합니다. 모임에 맞게 다듬고 복사해 활용하세요.",
   path: "/giants",
   type: "website",
   keywords: ["발제 생성기", "북클럽 발제", "북토크 질문", "책 토론", "거인의 어깨"],
@@ -20,7 +20,7 @@ const appLd = {
   name: "거인의 어깨 — 북토크 발제 생성기",
   applicationCategory: "UtilitiesApplication",
   description:
-    "책 제목·저자·책 소개를 바탕으로 사상가의 관점을 연결해 북토크 질문 초안 10개를 만드는 AI 도구. 해석과 인용은 사용자가 원문과 대조합니다.",
+    "책 제목·저자·책 소개와 사상가의 관점을 연결해 대화 시작·심화 토론·마무리 질문 초안 10개를 구성하는 AI 도구.",
   url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com"}/giants`,
 };
 
