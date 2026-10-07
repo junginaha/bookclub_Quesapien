@@ -125,7 +125,10 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
         <section className="lp-hero" id="top">
           <div className="lp-hero-inner">
             <div className="lp-hero-meta">
-              <div className="lp-eyebrow">서초구 선정 미래혁신형 북클럽</div>
+              <div>
+                <div className="lp-eyebrow">서초구 선정 미래혁신형 북클럽</div>
+                <p className="lp-support-caption">서초구 커뮤니티 지원사업을 받은 북클럽입니다</p>
+              </div>
               <div className="lp-right" />
             </div>
             {/* 버튼은 h1 밖에 둔다(제목 텍스트에 링크 문구가 섞이지 않도록). h1을 inline으로

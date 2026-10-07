@@ -228,6 +228,8 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 }
 .lp-hero-inner { max-width: var(--lp-max); margin: 0 auto; width: 100%; position: relative; }
 .lp-hero-meta { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--lp-sp6); }
+/* 배지 아래 보조 설명: 배지 글자 시작점(가로선 28px + 간격 14px)에 맞춤, 상시 노출 */
+.lp-support-caption { margin: 4px 0 0; padding-left: 42px; font-family: var(--lp-sans); font-size: 12.5px; line-height: 1.5; color: var(--lp-muted); word-break: keep-all; }
 .lp-hero-meta .lp-right { text-align: right; font-family: var(--lp-serif); color: var(--lp-muted); font-size: var(--lp-sm); letter-spacing: 0.04em; line-height: 1.6; }
 .lp-hero h1 { max-width: 16ch; }
 .lp-hero h1 .lp-reveal { display: block; overflow: hidden; }
