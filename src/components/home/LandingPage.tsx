@@ -127,7 +127,7 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
             <div className="lp-hero-meta">
               <div>
                 <div className="lp-eyebrow">서초구 선정 미래혁신형 북클럽</div>
-                <p className="lp-support-caption">서초구 커뮤니티 지원사업을 받은 북클럽입니다</p>
+                <p className="lp-support-caption">서초구 커뮤니티 지원사업</p>
               </div>
               <div className="lp-right" />
             </div>
