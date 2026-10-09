@@ -32,8 +32,31 @@ export async function getReservedCounts(slugs: string[]): Promise<Record<string,
   return Object.fromEntries(entries);
 }
 
-/** 세션 배열 + 실시간 reserved를 합쳐서 반환한다 — 서버 컴포넌트에서만 호출. */
+/**
+ * "다시 함께 읽어요" 활성 신청 수(bookclub_encore_counts 뷰, 023 마이그레이션).
+ * 뷰가 아직 없거나 DB 연결 실패 시 null — 화면은 숫자를 숨기고 신청만 받는다
+ * (집계를 모르는데 0명으로 보여주지 않는다 — 참여자 수 임의 표기 금지).
+ */
+export async function getEncoreCounts(): Promise<Record<string, number> | null> {
+  try {
+    const db = createServiceClient() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    const { data, error } = await db.from("bookclub_encore_counts").select("club_slug, encore_count");
+    if (error || !data) throw error ?? new Error("no data");
+    return Object.fromEntries((data as Array<{ club_slug: string; encore_count: number }>).map((r) => [r.club_slug, r.encore_count]));
+  } catch {
+    return null;
+  }
+}
+
+/** 세션 배열 + 실시간 reserved(+앵콜 집계)를 합쳐서 반환한다 — 서버 컴포넌트에서만 호출. */
 export async function getSessionsWithReserved(): Promise<BookClubSession[]> {
-  const counts = await getReservedCounts(BOOKCLUB_SESSIONS.map((s) => s.slug));
-  return BOOKCLUB_SESSIONS.map((s) => ({ ...s, reserved: counts[s.slug] ?? 0 }));
+  const [counts, encore] = await Promise.all([
+    getReservedCounts(BOOKCLUB_SESSIONS.map((s) => s.slug)),
+    getEncoreCounts(),
+  ]);
+  return BOOKCLUB_SESSIONS.map((s) => ({
+    ...s,
+    reserved: counts[s.slug] ?? 0,
+    encoreCount: encore ? encore[s.slug] ?? 0 : undefined,
+  }));
 }

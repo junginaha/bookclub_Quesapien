@@ -289,7 +289,6 @@ export const BOOKCLUB_SESSIONS: BookClubSession[] = [
     summary:
       "노벨문학상까지 받은 철학자가 90여 년 전에 진지하게 주장했습니다. 우리는 일을 너무 많이 한다고요.\n투표에서 가장 많은 표를 받은 책이었고, 그날 우리는 꽤 성실하게 게으름을 옹호했습니다.",
     agendaPreview: [],
-    encoreCount: 0, // TODO(unicorn): 영문 slug 기준 앵콜 집계 배선 필요(아래 selectors.ts 주석 참조)
   },
   {
     id: "museum-for-me",
@@ -306,7 +305,6 @@ export const BOOKCLUB_SESSIONS: BookClubSession[] = [
     leadQuestion: "",
     summary: "그림 앞에서 잠깐 멈췄을 뿐인데, 그게 나를 위한 시간이었다는 걸 알게 된 날.\n정여울 작가의 『오직 나를 위한 미술관』과 함께한 아침이었어요.",
     agendaPreview: [],
-    encoreCount: 0, // TODO(unicorn): 위와 동일
   },
 ];
 

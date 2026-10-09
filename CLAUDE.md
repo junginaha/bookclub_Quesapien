@@ -246,3 +246,12 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 - 실제 홈은 `LandingPage.tsx`(`HeroSection.tsx`는 미사용). 배지 `.lp-eyebrow` 아래에 `.lp-support-caption` "서초구 커뮤니티 지원사업" 상시 노출 추가(10-08 문구 축약). 배지·헤드라인 스타일 변경 없음.
 - 12.5px, `--lp-muted`, 배지와 4px 간격, 배지 글자 시작점에 맞춰 42px 들여쓰기. 배지-헤드라인 간격은 `.lp-hero-meta` margin 그대로.
 - 360·400·1280px에서 한 줄, 가로 넘침 없음 확인(로컬 dev 서버 + 헤드리스 브라우저).
+
+### 2026-10-10 — 홈 '함께 읽어요' 3단 재구성 · 앵콜 실연락처 · 히치하이커 독서여행
+- 홈 캘린더 아래 `MiniBookSpread`를 **지금 함께 읽어요(예정 회차, data.ts 자동) / 다시 함께 읽어요(지난 책 앵콜, n/5명) / 지난 북클럽(접기 목록)** 3단으로 재구성. 히어로·캘린더·전역 CSS 변경 없음.
+- **앵콜 결함 수정**: 기존 앵콜은 연락처를 해시로만 저장해 5명이 모여도 연락 불가였고, `landing_book_clubs` UUID에 묶여 data.ts slug 세션은 404였다. `023_encore_by_slug_with_contact.sql`(club_slug·contact_value·notify_channel(email/sms/call)·집계 뷰 `bookclub_encore_counts`·알림 기록 `bookclub_encore_rounds`, 원문 컬럼 anon/authenticated revoke)로 교체. `/api/bookclub/encore` slug 기준 재작성, 5명 도달 시 운영자 메일 1회(Resend, 연락처 원문 미포함). 공용 `EncoreForm` — 홈·지난 모임 상세·Timeline 공용.
+- `/api/admin/bookclub-encore`: 연락처 원문을 내보내므로 **환경변수 ADMIN_KEY(12자 이상)가 실제로 설정된 경우에만** 응답(저장소 하드코딩 기본키로는 열리지 않음). CSV는 BOM·수식주입 방지.
+- 아카이빙: 텍스트 기록만 남기고(사진·영상 업로드 제거) "영상으로 이어가는 이야기" — `BookClubSession.youtubeUrl`(유튜브 도메인만 허용) 채워진 모임을 목록화, 대화는 영상 댓글로. 현재 실제 영상 URL 없음 → "준비 중" 표기.
+- 히치하이커: `/reading-journey/2026-2027-hitchhiker`, 콘텐츠 단일 출처 `src/lib/journey/hitchhiker.ts`. 공지 1/2/3 공개일 10-01/11-01/12-01 KST, 미공개 본문은 서버에서 제거(revalidate 1h). 로드맵 월별 테마는 공지 3 공개 후 노출. `scheduleConfirmed=false` → 의향만 받음, Event 스키마 없음. 참여 의향/관심 저장 `024_reading_journey_interests.sql` + `/api/reading-journey/interest`(등록·집계·상태확인).
+- **⚠ 운영자 액션**: 023·024를 Supabase SQL 에디터에서 순서대로 실행해야 신청 저장·집계가 동작(미적용 시 API 503, 화면은 숫자 숨김). RESEND_API_KEY·ADMIN_EMAILS·ADMIN_KEY 확인.
+- 검증: tsc 통과, `npm run build` 통과(샌드박스는 Google Fonts 차단 → mocked font로 빌드), discussion-reuse 테스트 7/7, 320/375/390/430/1280px 가로 넘침 없음(Playwright). `next lint`는 저장소에 ESLint 설정이 없어 실행 불가(기존 상태). 라이브 DB 저장 테스트는 이 환경에서 불가.
