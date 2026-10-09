@@ -137,3 +137,37 @@ export async function sendTodayQuestionEmail(to: string, name: string, question:
     return { success: false, error: err };
   }
 }
+
+// ─── 다시 함께 읽어요: 기준 인원 도달 → 운영자 알림 ─────────────
+// 연락처 원문은 메일에 싣지 않는다. 운영자는 관리자 API(/api/admin/bookclub-encore)에서 확인.
+export interface EncoreThresholdEmailData {
+  to: string[];
+  bookTitle: string;
+  slug: string;
+  count: number;
+  threshold: number;
+}
+
+const escapeHtml = (value: string) =>
+  value.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] ?? c);
+
+export async function sendEncoreThresholdEmail(data: EncoreThresholdEmailData) {
+  if (!process.env.RESEND_API_KEY) return { success: false, reason: "no_api_key" as const };
+  if (!data.to.length) return { success: false, reason: "no_recipient" as const };
+  try {
+    const title = escapeHtml(data.bookTitle);
+    const { error } = await getResend().emails.send({
+      from: FROM,
+      to: data.to,
+      subject: `[다시 함께 읽어요] 『${data.bookTitle}』 ${data.count}명 모임 — 재개설 검토`,
+      html: `<p>『${title}』 다시 함께 읽기 신청이 <strong>${data.count}명</strong>(기준 ${data.threshold}명)에 도달했습니다.</p>
+<p>새 일정을 등록한 뒤, 신청자가 선택한 방법(이메일·문자·전화)으로 안내해 주세요.</p>
+<p><a href="${SITE_URL}/bookclub/${encodeURIComponent(data.slug)}">모임 페이지</a> · 신청자 목록: 관리자 API <code>/api/admin/bookclub-encore?slug=${encodeURIComponent(data.slug)}</code></p>`,
+    });
+    if (error) throw error;
+    return { success: true as const };
+  } catch (err) {
+    console.error("[email] encore threshold send failed:", err);
+    return { success: false, error: err };
+  }
+}

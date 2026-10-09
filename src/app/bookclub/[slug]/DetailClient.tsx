@@ -15,9 +15,11 @@ import {
   formatWeekdayFull,
   getStatus,
   isPast,
+  ENCORE_THRESHOLD,
 } from "@/lib/bookclub/selectors";
 import ApplyForm from "@/components/bookclub/ApplyForm";
 import NotifyForm from "@/components/bookclub/NotifyForm";
+import EncoreForm from "@/components/bookclub/EncoreForm";
 import ApplyPanel from "@/components/bookclub/ApplyPanel";
 import VenueCard from "@/components/bookclub/VenueCard";
 import MiniCalendar, { type CalendarClub } from "@/components/bookclub/MiniCalendar";
@@ -174,6 +176,15 @@ export default function DetailClient({
             ) : (
               <span className="qd-archive-link is-disabled">정리 중입니다</span>
             )}
+            <div className="qd-encore" style={{ marginTop: 20 }}>
+              <div className="qd-apply-title">다시 함께 읽어요</div>
+              <p className="qd-apply-sub">
+                {typeof session.encoreCount === "number" && session.encoreCount > 0
+                  ? `지금 ${session.encoreCount}명이 기다리고 있어요. ${ENCORE_THRESHOLD}명이 모이면 새 모임을 엽니다.`
+                  : `이 책을 다시 읽고 싶다면 신청해 주세요. ${ENCORE_THRESHOLD}명이 모이면 새 모임을 엽니다.`}
+              </p>
+              <EncoreForm slug={session.slug} bookTitle={session.bookTitle} />
+            </div>
           </div>
         ) : (
           <ApplyPanel

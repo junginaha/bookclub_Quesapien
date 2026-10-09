@@ -33,7 +33,8 @@ export interface BookClubSession {
   bookSourceUrl?: string;
   bookSourceLabel?: string;
   agendaPreview: string[]; // 발제 미리보기. 없으면 빈 배열(화면에서 섹션 숨김)
-  encoreCount?: number; // past 전용 — TODO(unicorn): 영문 slug 기준 앵콜 요청 집계 배선 필요
+  encoreCount?: number; // past 전용 — 렌더 시 getEncoreCounts()로 채움. undefined = 집계 불가(숫자 숨김)
+  youtubeUrl?: string; // 모임 영상(유튜브) — 댓글로 대화를 이어가는 링크. 실제 영상이 올라온 뒤에만 채운다
   archiveSlug?: string;
   // TODO(unicorn): 대기열 정원 데이터가 아직 없다(운영자 확인 필요). 생기면
   // 채워 넣으면 isWaitlistFull()이 자동으로 "정원 마감 + 대기도 마감" 상태를

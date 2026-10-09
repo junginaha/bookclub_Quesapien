@@ -12,6 +12,7 @@ export const revalidate = 3600;
 const STATIC_PATHS: { path: string; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number }[] = [
   { path: "", changeFrequency: "daily", priority: 1.0 },
   { path: "/bookclub", changeFrequency: "daily", priority: 0.95 },
+  { path: "/reading-journey/2026-2027-hitchhiker", changeFrequency: "weekly", priority: 0.85 },
   { path: "/questions", changeFrequency: "daily", priority: 0.9 },
   { path: "/giants", changeFrequency: "weekly", priority: 0.8 },
   { path: "/archive", changeFrequency: "weekly", priority: 0.8 },

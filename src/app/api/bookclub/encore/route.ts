@@ -1,29 +1,75 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { hashContact } from "@/lib/bookclub-server";
-import { ENCORE_THRESHOLD as DEFAULT_ENCORE_THRESHOLD, encoreCopy } from "@/lib/bookclub/selectors";
+import { ENCORE_THRESHOLD, encoreCopy, isPast } from "@/lib/bookclub/selectors";
+import { getSession } from "@/lib/bookclub/data";
+import { sendEncoreThresholdEmail } from "@/lib/email";
+import { ADMIN_EMAILS } from "@/lib/admin";
+
+// "다시 함께 읽어요" 앵콜 신청 — 세션 slug 기준(data.ts 단일 출처).
+// 연락처 원문은 개인정보 동의 후에만 저장하고, 응답·클라이언트에는 절대 돌려주지 않는다.
+
+type Channel = "email" | "sms" | "call";
+const CHANNELS: Channel[] = ["email", "sms", "call"];
+const TABLE = "landing_book_club_encore_requests";
 
 interface EncoreBody {
-  clubSlug: string;
-  contactMethod?: "email" | "phone";
+  clubSlug?: string;
+  notifyChannel?: Channel;
+  contactMethod?: "email" | "phone"; // 구 클라이언트 호환
   contactValue?: string;
+  name?: string;
   privacyConsent?: boolean;
   preferredArea?: string;
   preferredTime?: string;
   participationIntent?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function resolveClub(db: any, clubSlug: string) {
-  const { data } = await (db as any)
-    .from("landing_book_clubs")
-    .select("id, encore_threshold")
-    .eq("slug", clubSlug)
-    .maybeSingle();
-  return data as { id: string; encore_threshold?: number } | null;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE_RE = /^01[016789]\d{7,8}$/;
+
+function normalizeContact(channel: Channel, raw: string): string | null {
+  const value = raw.trim();
+  if (channel === "email") return EMAIL_RE.test(value) && value.length <= 254 ? value.toLowerCase() : null;
+  const digits = value.replace(/\D/g, "");
+  return PHONE_RE.test(digits) ? digits : null;
 }
 
-// 앵콜 요청 등록 — 로그인 사용자는 user_id로, 게스트는 연락처 해시로 중복을 막는다.
+function clip(value: unknown, max: number): string | null {
+  if (typeof value !== "string") return null;
+  const v = value.trim();
+  return v ? v.slice(0, max) : null;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function activeCount(db: any, slug: string): Promise<number> {
+  const { count } = await db.from(TABLE).select("id", { count: "exact", head: true }).eq("club_slug", slug).eq("status", "active");
+  return count ?? 0;
+}
+
+/** 기준 인원에 처음 도달한 순간 운영자에게 한 번만 메일. 실패해도 신청 자체는 성공. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function maybeNotifyOperator(db: any, slug: string, count: number) {
+  if (count < ENCORE_THRESHOLD) return;
+  try {
+    const { data: round } = await db.from("bookclub_encore_rounds").select("operator_notified_at").eq("club_slug", slug).maybeSingle();
+    if (round?.operator_notified_at) return;
+    const session = getSession(slug);
+    const result = await sendEncoreThresholdEmail({
+      to: ADMIN_EMAILS.filter(Boolean),
+      bookTitle: session?.bookTitle ?? slug,
+      slug,
+      count,
+      threshold: ENCORE_THRESHOLD,
+    });
+    if (result.success) {
+      await db.from("bookclub_encore_rounds").upsert({ club_slug: slug, operator_notified_at: new Date().toISOString(), notified_count: count });
+    }
+  } catch {
+    /* 알림 실패는 다음 신청 때 재시도된다 */
+  }
+}
+
 export async function POST(request: NextRequest) {
   let body: EncoreBody;
   try {
@@ -31,74 +77,81 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "잘못된 요청입니다." }, { status: 400 });
   }
-  if (!body.clubSlug) {
-    return NextResponse.json({ error: "clubSlug가 필요합니다." }, { status: 400 });
+
+  const slug = typeof body.clubSlug === "string" ? body.clubSlug : "";
+  const session = slug ? getSession(slug) : undefined;
+  if (!session) return NextResponse.json({ error: "북클럽을 찾을 수 없습니다." }, { status: 404 });
+  if (!isPast(session)) {
+    return NextResponse.json({ error: "아직 진행 중인 모임입니다. 참여 신청을 이용해 주세요." }, { status: 409 });
+  }
+
+  const channel: Channel | undefined =
+    body.notifyChannel && CHANNELS.includes(body.notifyChannel)
+      ? body.notifyChannel
+      : body.contactMethod === "email" ? "email" : body.contactMethod === "phone" ? "sms" : undefined;
+  if (!channel) return NextResponse.json({ error: "연락 받을 방법을 선택해 주세요." }, { status: 400 });
+
+  const contact = normalizeContact(channel, body.contactValue ?? "");
+  if (!contact) {
+    return NextResponse.json(
+      { error: channel === "email" ? "이메일 주소를 확인해 주세요." : "휴대전화 번호를 확인해 주세요. (예: 010-1234-5678)" },
+      { status: 400 }
+    );
+  }
+  if (body.privacyConsent !== true) {
+    return NextResponse.json({ error: "개인정보 수집·이용에 동의해 주세요." }, { status: 400 });
   }
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const db = createServiceClient();
+  const db = createServiceClient() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const contactHash = hashContact(contact);
 
-  const club = await resolveClub(db, body.clubSlug);
-  if (!club) return NextResponse.json({ error: "북클럽을 찾을 수 없습니다." }, { status: 404 });
+  try {
+    const { data: existing } = await db
+      .from(TABLE).select("id")
+      .eq("club_slug", slug).eq("status", "active").eq("contact_hash", contactHash)
+      .maybeSingle();
 
-  let contactHash: string | null = null;
-  if (!user) {
-    if (!body.contactMethod || !body.contactValue?.trim()) {
-      return NextResponse.json({ error: "연락처(이메일 또는 전화번호)를 입력해주세요." }, { status: 400 });
+    if (!existing) {
+      const { error: insertError } = await db.from(TABLE).insert({
+        club_slug: slug,
+        user_id: user?.id ?? null,
+        contact_method: channel === "email" ? "email" : "phone",
+        notify_channel: channel,
+        contact_value: contact,
+        contact_hash: contactHash,
+        contact_name: clip(body.name, 40),
+        privacy_consented_at: new Date().toISOString(),
+        preferred_area: clip(body.preferredArea, 40),
+        preferred_time: clip(body.preferredTime, 40),
+        participation_intent: clip(body.participationIntent, 60),
+      });
+      if (insertError) {
+        // 동시 요청으로 유니크 인덱스에 걸린 경우는 '이미 신청'으로 취급.
+        if (insertError.code !== "23505") throw insertError;
+      }
     }
-    if (!body.privacyConsent) {
-      return NextResponse.json({ error: "개인정보 수집에 동의해주세요." }, { status: 400 });
-    }
-    contactHash = hashContact(body.contactValue);
-  }
 
-  // 중복 확인 (활성 요청만)
-  const dupQuery = (db as any)
-    .from("landing_book_club_encore_requests")
-    .select("id")
-    .eq("club_id", club.id)
-    .eq("status", "active");
-  const { data: existing } = user
-    ? await dupQuery.eq("user_id", user.id).maybeSingle()
-    : await dupQuery.eq("contact_hash", contactHash).maybeSingle();
+    const count = await activeCount(db, slug);
+    if (!existing) await maybeNotifyOperator(db, slug, count);
 
-  if (!existing) {
-    const { error: insertError } = await (db as any).from("landing_book_club_encore_requests").insert({
-      club_id: club.id,
-      user_id: user?.id ?? null,
-      contact_method: user ? null : body.contactMethod,
-      contact_hash: contactHash,
-      privacy_consented_at: user ? null : new Date().toISOString(),
-      preferred_area: body.preferredArea ?? null,
-      preferred_time: body.preferredTime ?? null,
-      participation_intent: body.participationIntent ?? null,
+    return NextResponse.json({
+      status: "ok",
+      alreadyRequested: !!existing,
+      count,
+      threshold: ENCORE_THRESHOLD,
+      message: existing
+        ? "이미 함께 읽기 신청을 남기셨어요."
+        : `신청이 접수되었습니다.\n${ENCORE_THRESHOLD}명이 모이면 선택하신 방법으로 연락드릴게요.`,
+      thresholdCopy: encoreCopy(count, ENCORE_THRESHOLD),
     });
-    if (insertError) {
-      return NextResponse.json({ error: "앵콜 요청 저장에 실패했어요. 다시 시도해주세요." }, { status: 500 });
-    }
+  } catch {
+    return NextResponse.json({ error: "신청을 저장하지 못했어요. 잠시 후 다시 시도해 주세요." }, { status: 503 });
   }
-
-  const { count } = await (db as any)
-    .from("landing_book_club_encore_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("club_id", club.id)
-    .eq("status", "active");
-
-  const threshold = club.encore_threshold ?? DEFAULT_ENCORE_THRESHOLD;
-  return NextResponse.json({
-    status: "ok",
-    alreadyRequested: !!existing,
-    count: count ?? 0,
-    threshold,
-    message: existing
-      ? "이미 앵콜 요청을 남기셨어요."
-      : "앵콜 요청이 접수되었습니다.\n새 일정이 열리면 가장 먼저 알려드릴게요.",
-    thresholdCopy: encoreCopy(count ?? 0, threshold),
-  });
 }
 
-// 앵콜 요청 취소 — 로그인 사용자는 세션으로, 게스트는 연락처를 다시 입력해 본인 확인.
+// 신청 취소 — 신청 시 입력한 연락처로 본인 확인.
 export async function DELETE(request: NextRequest) {
   let body: EncoreBody;
   try {
@@ -106,55 +159,33 @@ export async function DELETE(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "잘못된 요청입니다." }, { status: 400 });
   }
-  if (!body.clubSlug) {
-    return NextResponse.json({ error: "clubSlug가 필요합니다." }, { status: 400 });
-  }
+  const slug = typeof body.clubSlug === "string" ? body.clubSlug : "";
+  if (!slug || !getSession(slug)) return NextResponse.json({ error: "북클럽을 찾을 수 없습니다." }, { status: 404 });
+  const raw = body.contactValue?.trim();
+  if (!raw) return NextResponse.json({ error: "취소하려면 신청 시 입력한 연락처가 필요합니다." }, { status: 400 });
+  const contact = normalizeContact(raw.includes("@") ? "email" : "sms", raw);
+  if (!contact) return NextResponse.json({ error: "연락처를 확인해 주세요." }, { status: 400 });
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const db = createServiceClient();
-
-  const club = await resolveClub(db, body.clubSlug);
-  if (!club) return NextResponse.json({ error: "북클럽을 찾을 수 없습니다." }, { status: 404 });
-
-  if (!user && !body.contactValue?.trim()) {
-    return NextResponse.json({ error: "취소하려면 신청 시 입력한 연락처가 필요합니다." }, { status: 400 });
-  }
-
-  const cancelQuery = (db as any)
-    .from("landing_book_club_encore_requests")
-    .update({ status: "canceled" })
-    .eq("club_id", club.id)
-    .eq("status", "active");
-
-  const { error } = user
-    ? await cancelQuery.eq("user_id", user.id)
-    : await cancelQuery.eq("contact_hash", hashContact(body.contactValue!));
-
+  const db = createServiceClient() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const { error } = await db.from(TABLE).update({ status: "canceled" })
+    .eq("club_slug", slug).eq("status", "active").eq("contact_hash", hashContact(contact));
   if (error) return NextResponse.json({ error: "취소에 실패했어요." }, { status: 500 });
-  return NextResponse.json({ status: "ok" });
+  return NextResponse.json({ status: "ok", count: await activeCount(db, slug) });
 }
 
-// 로그인 사용자 본인의 신청 여부 확인 (게스트는 클라이언트 localStorage로 낙관적 처리)
+// 공개 집계 — ?slugs=a,b,c → { counts: { a: 3, ... }, threshold } (개수만, 개인정보 없음)
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const clubSlug = searchParams.get("clubSlug");
-  if (!clubSlug) return NextResponse.json({ error: "clubSlug가 필요합니다." }, { status: 400 });
-
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ requested: false });
-
-  const { data: club } = await supabase.from("landing_book_clubs").select("id").eq("slug", clubSlug).maybeSingle();
-  if (!club) return NextResponse.json({ requested: false });
-
-  const { data } = await supabase
-    .from("landing_book_club_encore_requests")
-    .select("id")
-    .eq("club_id", (club as { id: string }).id)
-    .eq("user_id", user.id)
-    .eq("status", "active")
-    .maybeSingle();
-
-  return NextResponse.json({ requested: !!data });
+  const slugs = (new URL(request.url).searchParams.get("slugs") ?? "")
+    .split(",").map((s) => s.trim()).filter((s) => s && getSession(s)).slice(0, 50);
+  if (!slugs.length) return NextResponse.json({ counts: {}, threshold: ENCORE_THRESHOLD });
+  try {
+    const db = createServiceClient() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    const { data, error } = await db.from("bookclub_encore_counts").select("club_slug, encore_count").in("club_slug", slugs);
+    if (error) throw error;
+    const counts: Record<string, number> = Object.fromEntries(slugs.map((s) => [s, 0]));
+    for (const row of (data ?? []) as Array<{ club_slug: string; encore_count: number }>) counts[row.club_slug] = row.encore_count;
+    return NextResponse.json({ counts, threshold: ENCORE_THRESHOLD }, { headers: { "Cache-Control": "no-store" } });
+  } catch {
+    return NextResponse.json({ counts: null, threshold: ENCORE_THRESHOLD }, { status: 503 });
+  }
 }

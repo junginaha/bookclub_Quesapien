@@ -1,0 +1,76 @@
+/* 함께 읽어요 3단(지금 · 다시 · 지난) — home-tools.module.css 톤(네이비 #173b75, 라인 #d9d5cd) 계승 */
+.block { margin-top: 8px; }
+.block + .block { margin-top: 48px; padding-top: 32px; border-top: 1px solid #d9d5cd; }
+.blockHead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.blockHead h3 { margin: 0; font: 500 clamp(19px, 2.2vw, 24px)/1.4 var(--font-noto-serif-kr), serif; color: #173b75; word-break: keep-all; }
+.more { font-size: 12.5px; color: #756c62; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; min-height: 44px; display: inline-flex; align-items: center; }
+.blockLead { max-width: 640px; margin: -6px 0 20px; color: #756c62; font-size: 13.5px; line-height: 1.75; word-break: keep-all; }
+
+.encoreGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.encoreCard { display: grid; gap: 14px; align-content: start; min-width: 0; padding: 18px; border: 1px solid #d9d5cd; background: #fff; }
+.encoreTop { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; align-items: start; }
+.encoreCover { display: block; width: 64px; aspect-ratio: 2 / 3; overflow: hidden; background: #f3efe7; }
+.encoreCover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.encoreText { min-width: 0; }
+.encoreText h4 { margin: 0; font: 500 16px/1.45 var(--font-noto-serif-kr), serif; color: #173b75; overflow-wrap: anywhere; word-break: keep-all; }
+.encoreText h4 a { color: inherit; text-decoration: none; }
+.encoreText h4 a:hover { text-decoration: underline; }
+.author { margin: 4px 0 0; font-size: 12px; color: #756c62; }
+.question { margin: 8px 0 0; font-size: 12.5px; line-height: 1.65; color: #4a4540; word-break: keep-all; }
+
+.progress { display: grid; gap: 6px; }
+.progressLabel { display: flex; justify-content: space-between; font-size: 12px; color: #756c62; }
+.progressLabel strong { color: #173b75; font-weight: 700; }
+.bar { height: 6px; background: #eeeae2; overflow: hidden; }
+.bar span { display: block; height: 100%; background: #173b75; transition: width .3s ease; }
+.ready { margin: 2px 0 0; font-size: 12px; color: #173b75; }
+
+.pastList { margin-top: 40px; border-top: 1px solid #d9d5cd; border-bottom: 1px solid #d9d5cd; }
+.pastList > summary { display: flex; align-items: center; gap: 8px; min-height: 52px; cursor: pointer; font-size: 15px; color: #173b75; list-style: none; }
+.pastList > summary::-webkit-details-marker { display: none; }
+.pastList > summary::after { content: "+"; margin-left: auto; color: #756c62; }
+.pastList[open] > summary::after { content: "−"; }
+.pastList > summary span { font-size: 12px; color: #756c62; }
+.pastList ol { list-style: none; margin: 0; padding: 0 0 12px; }
+.pastList li + li { border-top: 1px dashed #e5e0d6; }
+.pastList li a { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 4px 16px; align-items: baseline; padding: 12px 0; min-height: 44px; color: #34383e; text-decoration: none; font-size: 13px; }
+.pastList li a:hover strong { text-decoration: underline; }
+.pastList li strong { font-weight: 500; color: #173b75; overflow-wrap: anywhere; }
+.pastList li span, .pastList li time { color: #756c62; font-size: 12px; }
+
+@media (max-width: 640px) {
+  .encoreGrid { grid-template-columns: minmax(0, 1fr); }
+  .pastList li a { grid-template-columns: minmax(0, 1fr); }
+  .block + .block { margin-top: 36px; padding-top: 24px; }
+}
+
+/* 아카이빙 · 영상 링크 목록 */
+.videoList { list-style: none; margin: 0; padding: 0; border-top: 1px solid #d9d5cd; }
+.videoList li { border-bottom: 1px solid #d9d5cd; }
+.videoList a { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 14px 0; min-height: 44px; color: #34383e; text-decoration: none; font-size: 13px; }
+.videoList strong { font-weight: 500; color: #173b75; overflow-wrap: anywhere; }
+.videoList span { color: #756c62; font-size: 12px; }
+.videoList a:hover strong { text-decoration: underline; }
+
+/* 추천 독서여행 카드(히치하이커 2026→2027) — 절제된 궤도 아이콘 하나 */
+.journey { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; align-items: center; gap: 18px; margin: 0 0 40px; padding: 18px 20px; border: 1px solid #d9d5cd; background: #fffdf8; color: #34383e; text-decoration: none; min-width: 0; }
+.journey:hover { border-color: #173b75; }
+.journey:focus-visible { outline: 2px solid #6c63d9; outline-offset: 3px; }
+.journeyArt { display: block; width: 72px; color: #173b75; }
+.journeyArt svg { display: block; width: 100%; height: auto; }
+.journeyText { display: grid; gap: 6px; min-width: 0; }
+.journeyBadge { justify-self: start; padding: 3px 8px; border: 1px solid #173b75; color: #173b75; font-size: 11px; font-weight: 600; }
+.journeyText strong { font: 500 clamp(17px, 2vw, 20px)/1.45 var(--font-noto-serif-kr), serif; color: #173b75; overflow-wrap: anywhere; word-break: keep-all; }
+.journeyText small { font-size: 12.5px; line-height: 1.6; color: #756c62; overflow-wrap: anywhere; }
+.journeyCta { font-size: 13px; font-weight: 600; color: #173b75; white-space: nowrap; }
+@media (max-width: 560px) {
+  .journey { grid-template-columns: 52px minmax(0, 1fr); gap: 14px; padding: 16px; }
+  .journeyArt { width: 52px; }
+  .journeyCta { grid-column: 2; }
+}
+
+/* 앵콜 카드의 작은 표지 대체(표지 이미지가 없을 때) */
+.miniFallback { display: flex; flex-direction: column; justify-content: flex-end; width: 100%; height: 100%; padding: 6px; background: #173b75; border-left: 3px solid #112c59; color: #fff; }
+.miniFallback span { font: 500 9.5px/1.3 var(--font-noto-serif-kr), serif; overflow-wrap: anywhere; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.miniFallback small { display: none; }
