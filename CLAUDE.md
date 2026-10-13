@@ -246,3 +246,11 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 - 실제 홈은 `LandingPage.tsx`(`HeroSection.tsx`는 미사용). 배지 `.lp-eyebrow` 아래에 `.lp-support-caption` "서초구 커뮤니티 지원사업" 상시 노출 추가(10-08 문구 축약). 배지·헤드라인 스타일 변경 없음.
 - 12.5px, `--lp-muted`, 배지와 4px 간격, 배지 글자 시작점에 맞춰 42px 들여쓰기. 배지-헤드라인 간격은 `.lp-hero-meta` margin 그대로.
 - 360·400·1280px에서 한 줄, 가로 넘침 없음 확인(로컬 dev 서버 + 헤드리스 브라우저).
+
+### 2026-10-14 — 홈 재구성: 지금 열리는 북클럽 / 당신을 기다리는 북클럽
+- 운영자 지시: 홈(질문하는 사람들)만 유지하고 구조 재편. 달력·내 근처 찾기 유지, 거인의 어깨 발제 생성기 제외, 아카이빙은 유튜브·블로그 링크로 최소화.
+- 홈 순서: 히어로 → `NowOpenBookclubs`(지금 바로 참여하기/달력에서 보기/내 근처에서 찾기 + 예정 모임만) → 달력(`HomeCalendarLocationHub`, `qs:find-nearby` 이벤트로 근처 찾기 실행) → `WaitingBookclubs` → `RecordLinks`.
+- 당신을 기다리는 북클럽: `src/lib/bookclub/waiting.ts`에 지난 모임 6권 큐레이션 + 책별 엄선 발제 5개. 대기 명단은 기존 `bookclub_waitlist`에 `club_slug = "encore:<id>"`로 저장(신규 마이그레이션 없음), 5명(ENCORE_THRESHOLD) 모이면 출발. 새 기획(kind "new")은 운영자가 책·설명을 확정하면 배열에 추가.
+- 거인의 어깨: 홈·헤더·푸터·검색·마이페이지·질문상세·아카이브·사이트맵·llms.txt에서 링크 제거, `/giants/*`는 미들웨어에서 홈으로 308. 코드(api/giants 등)는 삭제하지 않음.
+- 아카이빙 링크 주소는 `NEXT_PUBLIC_YOUTUBE_URL`, `NEXT_PUBLIC_BLOG_URL`(https만). 미설정 시 섹션 숨김 — **운영자 주소 확정 필요**.
+- 검증: 타입체크·빌드 통과(폰트는 샌드박스 네트워크 제한으로 mock), 로컬 서버 렌더 200, 390/1280px 가로 넘침 0, /giants 308 확인. 라이브 DB 미연결이라 대기 명단 저장·인원 집계는 실환경 미검증.

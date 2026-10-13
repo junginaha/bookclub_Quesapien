@@ -8,6 +8,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/bookclub/data";
+import { isWaitingKey } from "@/lib/bookclub/waiting";
 import { isPast } from "@/lib/bookclub/selectors";
 
 const RATE_WINDOW_MS = 10 * 60 * 1000;
@@ -131,7 +132,9 @@ export async function joinBookClubWaitlist(input: {
   if (!name || name.length > 80) return { ok: false, error: "이름을 확인해 주세요." };
   if (phone.length < 9 || phone.length > 15) return { ok: false, error: "휴대전화 번호를 확인해 주세요." };
 
-  if (input.clubSlug && !getSession(input.clubSlug)) {
+  // "encore:<id>"는 '당신을 기다리는 북클럽' 대기 명단(5명 모이면 출발).
+  const isWaiting = !!input.clubSlug && isWaitingKey(input.clubSlug);
+  if (input.clubSlug && !isWaiting && !getSession(input.clubSlug)) {
     return { ok: false, error: "모임 정보를 찾을 수 없습니다." };
   }
 
@@ -145,7 +148,8 @@ export async function joinBookClubWaitlist(input: {
     if (error) return { ok: false, error: "처리 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요." };
 
     const kind = (data as { kind?: string } | null)?.kind;
-    if (input.clubSlug) revalidatePath(`/bookclub/${input.clubSlug}`);
+    if (isWaiting) revalidatePath("/");
+    else if (input.clubSlug) revalidatePath(`/bookclub/${input.clubSlug}`);
     revalidatePath("/bookclub");
 
     if (kind === "joined") return { ok: true, kind: "joined" };

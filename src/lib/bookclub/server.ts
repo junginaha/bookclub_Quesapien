@@ -37,3 +37,20 @@ export async function getSessionsWithReserved(): Promise<BookClubSession[]> {
   const counts = await getReservedCounts(BOOKCLUB_SESSIONS.map((s) => s.slug));
   return BOOKCLUB_SESSIONS.map((s) => ({ ...s, reserved: counts[s.slug] ?? 0 }));
 }
+
+/** '당신을 기다리는 북클럽' 대기 인원 — bookclub_waitlist에서 "encore:<id>" 기준 집계. 실패 시 0. */
+export async function getWaitingCounts(keys: string[]): Promise<Record<string, number>> {
+  try {
+    const db = createServiceClient();
+    const entries = await Promise.all(keys.map(async (key) => {
+      const { count, error } = await db
+        .from("bookclub_waitlist")
+        .select("id", { count: "exact", head: true })
+        .eq("club_slug", key);
+      return [key, error || count === null ? 0 : count] as const;
+    }));
+    return Object.fromEntries(entries);
+  } catch {
+    return Object.fromEntries(keys.map((key) => [key, 0]));
+  }
+}

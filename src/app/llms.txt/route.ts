@@ -52,7 +52,7 @@ export function GET() {
 - [홈](${SITE_URL}/): 다가오는 모임 일정과 위치
 - [북클럽](${SITE_URL}/bookclub): 전체 모임 목록(예정·지난 모임)
 - [질문](${SITE_URL}/questions): 커뮤니티가 남긴 질문 모음
-- [발제 생성기](${SITE_URL}/giants): 책 제목을 넣으면 독서모임용 발제 질문을 만들어 주는 도구
+- [당신을 기다리는 북클럽](${SITE_URL}/#waiting): 다시 읽고 싶은 지난 북클럽에 이름을 올리면 5명이 모일 때 새 일정을 여는 대기 명단
 - [아카이브](${SITE_URL}/archive): 지난 모임의 후기·발제 기록
 - [사이트맵](${SITE_URL}/sitemap.xml)
 

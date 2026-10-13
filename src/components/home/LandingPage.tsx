@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import type { BookClubSession } from "@/lib/bookclub/types";
-import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
-import MiniBookSpread from "./MiniBookSpread";
-import HomeArchive from "./HomeArchive";
+import NowOpenBookclubs from "./NowOpenBookclubs";
+import WaitingBookclubs from "./WaitingBookclubs";
+import RecordLinks from "./RecordLinks";
 import "./landing.css";
 import styles from "./home-tools.module.css";
 
@@ -19,7 +19,10 @@ export interface LandingQuestion {
   answers_count: number;
 }
 
-export default function LandingPage({ bookclubSessions = [] }: { bookclubSessions?: BookClubSession[] }) {
+export default function LandingPage({ bookclubSessions = [], waitingCounts = {} }: {
+  bookclubSessions?: BookClubSession[];
+  waitingCounts?: Record<string, number>;
+}) {
   const [navBtnIdx, setNavBtnIdx] = useState(0);
   const [navBtnFading, setNavBtnFading] = useState(false);
   const [howToOpen, setHowToOpen] = useState(false);
@@ -91,10 +94,9 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
           </span>
         </a>
         <div className="lp-nav-links">
-          <a href="/questions">질문</a>
-          <a href="/bookclub">북클럽</a>
-          <a href="/archive">아카이빙</a>
-          <a href="/giants">거인의 어깨</a>
+          <a href="#now">지금 열리는 북클럽</a>
+          <a href="#calendar">달력</a>
+          <a href="#waiting">기다리는 북클럽</a>
         </div>
         <div style={{ position: "relative", width: 100, height: 40, overflow: "visible" }}>
           {[
@@ -160,20 +162,18 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
             </button>
           </div>
         </section>
+        <NowOpenBookclubs sessions={bookclubSessions} />
         <HomeCalendarLocationHub sessions={bookclubSessions} />
-        <MiniBookSpread sessions={bookclubSessions} />
-        <HomeArchive />
-        <section className={`${styles.section} ${styles.generator}`} id="final" aria-labelledby="discussion-title">
-          <div className={styles.sectionHead}><h2 id="discussion-title">발제 · 거인의 어깨</h2><a className={styles.secondary} href="/giants">전체 발제 도구</a></div>
-          <DiscussionGenerator variant="landing" />
-        </section>
+        <WaitingBookclubs counts={waitingCounts} />
+        <RecordLinks />
       </main>
       <footer className="lp-footer">
         <div className="lp-foot-inner"><span className="lp-foot-mark">질문하는 사람들</span><span className="lp-foot-copy">© 2026 Qsapiens.</span></div>
       </footer>
       <dialog ref={guide} id="how-it-works-panel" className={styles.dialog} onClose={() => setHowToOpen(false)} aria-labelledby="guide-title">
         <h2 id="guide-title">처음 온 당신에게</h2>
-        <p>캘린더에서 날짜를 고른 뒤, 책과 장소를 확인하고 참여를 신청하세요.</p>
+        <p>지금 열리는 북클럽에서 책과 날짜를 고르고 참여를 신청하세요.</p>
+        <p>원하는 책이 지금 없다면, 기다리는 북클럽에 이름을 올려 주세요. 5명이 모이면 출발합니다.</p>
         <p>혼자 오셔도, 처음이셔도 괜찮습니다.</p>
         <button type="button" onClick={() => setHowToOpen(false)}>닫기</button>
       </dialog>
