@@ -24,7 +24,18 @@ function bookclubRedirect(request: NextRequest): NextResponse | null {
   return NextResponse.redirect(url, 308);
 }
 
+// 거인의 어깨(발제 생성기)는 서비스에서 내렸다 — 기존 링크·검색 유입은 홈으로 보낸다.
+function giantsRedirect(request: NextRequest): NextResponse | null {
+  if (!/^\/giants(\/|$)/.test(request.nextUrl.pathname)) return null;
+  const url = request.nextUrl.clone();
+  url.pathname = "/";
+  url.search = "";
+  return NextResponse.redirect(url, 308);
+}
+
 export async function middleware(request: NextRequest) {
+  const giants = giantsRedirect(request);
+  if (giants) return giants;
   const redirect = bookclubRedirect(request);
   if (redirect) return redirect;
   return await updateSession(request);

@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
 import { dateKey, formatCompactSchedule, getStatus, isWaitlistFull, seatsLeft } from "@/lib/bookclub/selectors";
 import styles from "./linen-calendar.module.css";
 import NearbyBookclubMap from "./NearbyBookclubMap";
+import { FIND_NEARBY_EVENT } from "./NowOpenBookclubs";
 
 const DAYS = [
   { en: "Sun", ko: "일요일" }, { en: "Mon", ko: "월요일" },
@@ -131,6 +132,15 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
     );
   }
+
+  // "지금 열리는 북클럽"의 '내 근처에서 찾기' 버튼이 보내는 이벤트로도 실행한다.
+  const findNearbyRef = useRef(findNearbyClub);
+  useEffect(() => { findNearbyRef.current = findNearbyClub; });
+  useEffect(() => {
+    const onFind = () => findNearbyRef.current();
+    window.addEventListener(FIND_NEARBY_EVENT, onFind);
+    return () => window.removeEventListener(FIND_NEARBY_EVENT, onFind);
+  }, []);
 
   const selectNearbySession = useCallback((session: BookClubSession) => {
     const key = dateKey(session.startsAt);

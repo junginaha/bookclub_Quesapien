@@ -13,7 +13,6 @@ const STATIC_PATHS: { path: string; changeFrequency: MetadataRoute.Sitemap[numbe
   { path: "", changeFrequency: "daily", priority: 1.0 },
   { path: "/bookclub", changeFrequency: "daily", priority: 0.95 },
   { path: "/questions", changeFrequency: "daily", priority: 0.9 },
-  { path: "/giants", changeFrequency: "weekly", priority: 0.8 },
   { path: "/archive", changeFrequency: "weekly", priority: 0.8 },
   { path: "/clubs", changeFrequency: "weekly", priority: 0.7 },
   { path: "/quiz", changeFrequency: "monthly", priority: 0.5 },

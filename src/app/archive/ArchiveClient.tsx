@@ -514,7 +514,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
         {activeTab === "discussions" && (
           <div>
             <p style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.75, maxWidth: 560, marginBottom: 24 }}>
-              거인의 어깨에서 생성된 발제문 모음이에요. 책 제목, 주제, 인물명으로 검색해보세요.
+              지금까지 저장된 발제문 모음이에요. 책 제목이나 주제로 검색해보세요.
             </p>
             <div style={{
               display: "flex", alignItems: "center", gap: 10,
@@ -535,7 +535,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
               <div style={{ textAlign: "center", padding: "80px 0", color: "var(--muted)", fontFamily: "var(--font-noto-serif-kr), Georgia, serif", lineHeight: 1.75 }}>
                 {discussionQuery
                   ? "검색 결과가 없어요."
-                  : <>아직 저장된 발제가 없어요.<br /><Link href="/giants" style={{ color: "var(--accent)" }}>거인의 어깨에서 발제 만들어보기 →</Link></>}
+                  : "아직 저장된 발제가 없어요."}
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -554,7 +554,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
                       </h3>
                       <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12 }}>
                         {d.giant_slug ? (
-                          <Link href={`/giants/${d.giant_slug}`} style={{ color: "var(--accent)", textDecoration: "none" }}>{d.giant_name}</Link>
+                          <span style={{ color: "var(--accent)" }}>{d.giant_name}</span>
                         ) : (
                           <span style={{ color: "var(--accent)" }}>{d.giant_name}</span>
                         )}

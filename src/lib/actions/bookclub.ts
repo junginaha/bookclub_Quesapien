@@ -8,6 +8,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/bookclub/data";
+import { isDemandKey, isRequestKey } from "@/lib/bookclub/demand";
 import { isPast } from "@/lib/bookclub/selectors";
 
 const RATE_WINDOW_MS = 10 * 60 * 1000;
@@ -131,7 +132,9 @@ export async function joinBookClubWaitlist(input: {
   if (!name || name.length > 80) return { ok: false, error: "이름을 확인해 주세요." };
   if (phone.length < 9 || phone.length > 15) return { ok: false, error: "휴대전화 번호를 확인해 주세요." };
 
-  if (input.clubSlug && !getSession(input.clubSlug)) {
+  // encore:/genre:/request: 키는 정해진 모임이 아닌 수요 수집(대기 명단·장르 알림·책 요청).
+  const isWaiting = !!input.clubSlug && isDemandKey(input.clubSlug);
+  if (input.clubSlug && !isWaiting && !getSession(input.clubSlug)) {
     return { ok: false, error: "모임 정보를 찾을 수 없습니다." };
   }
 
@@ -145,7 +148,8 @@ export async function joinBookClubWaitlist(input: {
     if (error) return { ok: false, error: "처리 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요." };
 
     const kind = (data as { kind?: string } | null)?.kind;
-    if (input.clubSlug) revalidatePath(`/bookclub/${input.clubSlug}`);
+    if (isWaiting) revalidatePath("/");
+    else if (input.clubSlug) revalidatePath(`/bookclub/${input.clubSlug}`);
     revalidatePath("/bookclub");
 
     if (kind === "joined") return { ok: true, kind: "joined" };
@@ -153,5 +157,20 @@ export async function joinBookClubWaitlist(input: {
     return { ok: false, error: "결과를 확인하지 못했습니다." };
   } catch {
     return { ok: false, error: "연결하지 못했습니다." };
+  }
+}
+
+/** 수요 키별 대기 인원(개수만, 개인정보 없음). 책 요청 화면에서 "n명이 요청" 표시용. */
+export async function getDemandCount(key: string): Promise<number> {
+  if (!isRequestKey(key) || !databaseConfigured()) return 0;
+  try {
+    const db = createServiceClient();
+    const { count, error } = await db
+      .from("bookclub_waitlist")
+      .select("id", { count: "exact", head: true })
+      .eq("club_slug", key);
+    return error || count === null ? 0 : count;
+  } catch {
+    return 0;
   }
 }

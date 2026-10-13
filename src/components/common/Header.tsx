@@ -27,25 +27,6 @@ const navItems = [
       { href: "/bookclub", label: "북토크 일정" },
     ],
   },
-  {
-    href: "/archive",
-    label: "아카이빙",
-    desc: "질문과 독서의 기록",
-    sub: [
-      { href: "/archive", label: "후기 아카이브" },
-      { href: "/archive/reviews", label: "리뷰 아카이브" },
-    ],
-  },
-  {
-    href: "/giants",
-    label: "거인의 어깨",
-    desc: "위대한 사유자들과의 대화",
-    sub: [
-      { href: "/giants", label: "인물 탐색" },
-      { href: "/giants?category=philosopher", label: "철학자" },
-      { href: "/giants?category=author", label: "작가" },
-    ],
-  },
 ];
 
 export default function Header() {

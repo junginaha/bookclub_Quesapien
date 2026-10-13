@@ -10,7 +10,6 @@ const SECTIONS = [
       { href: "/clubs", label: "내 근처 북클럽" },
       { href: "/bookclub", label: "북클럽" },
       { href: "/archive", label: "아카이빙" },
-      { href: "/giants", label: "거인의 어깨" },
     ],
   },
   {

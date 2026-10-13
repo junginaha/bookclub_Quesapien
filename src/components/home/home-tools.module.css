@@ -308,3 +308,80 @@
   .bookLink:active .coverScene { opacity: .96; }
 }
 @media (max-width:720px) { .bookLink { max-width:none; } }
+
+/* 2026-10 홈 재구성 — 지금 열리는 북클럽 / 당신을 기다리는 북클럽 / 기록 링크 */
+.statusOpen { color: #2f6b4f; }
+.nowActions { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; }
+.nowList { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.nowItem { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 16px; padding: 16px; border: 1px solid var(--tool-line); background: #fffdf8; }
+.nowCover { display: block; aspect-ratio: 2 / 3; overflow: hidden; background: #e8dfd1; box-shadow: 0 10px 18px -14px rgba(49,38,28,.6); }
+.nowCover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nowCover .coverFallback { padding: 8px 7px; overflow: hidden; }
+.nowCover .coverFallback span { font-size: 11px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.nowCover .coverFallback small { font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nowBody { min-width: 0; display: flex; flex-direction: column; }
+.nowBody h3 { margin: 0 0 6px; font: 600 17px/1.45 var(--font-noto-serif-kr), serif; color: var(--tool-blue); word-break: keep-all; }
+.nowBody h3 a { color: inherit; text-decoration: none; }
+.nowMeta { margin: 0 0 10px; color: var(--tool-muted); font-size: 12.5px; line-height: 1.7; }
+.nowLink { margin-top: auto; align-self: flex-start; color: var(--tool-blue); font-size: 13px; font-weight: 600; text-decoration: none; border-bottom: 1px solid currentColor; }
+
+.waitGrid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.waitCard { display: flex; flex-direction: column; gap: 12px; padding: 20px; border: 1px solid var(--tool-line); background: #fff; }
+.waitTop { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; align-items: start; }
+.waitTop .nowCover { width: 64px; }
+.waitBadge { display: inline-block; margin-bottom: 6px; padding: 2px 8px; border: 1px solid #c9b79f; color: #8c6c50; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; }
+.waitTop h3 { margin: 0 0 2px; font: 600 17px/1.45 var(--font-noto-serif-kr), serif; color: var(--tool-blue); word-break: keep-all; }
+.waitAuthor { margin: 0; color: var(--tool-muted); font-size: 12px; }
+.waitPitch { margin: 0; color: #4a4f57; font-size: 13.5px; line-height: 1.7; word-break: keep-all; }
+.waitProgress { display: grid; gap: 6px; }
+.waitBar { height: 6px; background: #ece5d7; overflow: hidden; }
+.waitBar span { display: block; height: 100%; background: var(--tool-blue); transition: width .4s ease; }
+.waitCount { margin: 0; color: var(--tool-muted); font-size: 12px; }
+.waitCount strong { color: var(--tool-blue); }
+.waitQuestions > summary { cursor: pointer; color: var(--tool-blue); font-size: 13px; font-weight: 600; padding: 6px 0; }
+.waitQuestions ol { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 8px; color: #34383e; font-size: 13px; line-height: 1.65; word-break: keep-all; }
+.waitJoin { margin-top: auto; }
+.waitJoin > summary { list-style: none; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; width: 100%; padding: 10px 16px; background: var(--tool-blue); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+.waitJoin > summary::-webkit-details-marker { display: none; }
+.waitJoin[open] > summary { background: #fff; color: var(--tool-blue); border: 1px solid var(--tool-line); }
+.waitJoin :global(.qc-notify-form) { margin-top: 10px; border-radius: 0; }
+.waitNote { margin: 20px 0 0; color: var(--tool-muted); font-size: 12px; line-height: 1.7; }
+
+.records { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-top: 28px; padding-bottom: 28px; }
+.records h2 { margin: 0; font: 500 15px/1.5 var(--font-noto-sans-kr), sans-serif; color: var(--tool-muted); }
+.records a { color: var(--tool-blue); font-size: 13px; font-weight: 600; text-decoration: none; border-bottom: 1px solid currentColor; }
+
+@media (max-width: 560px) {
+  .nowList, .waitGrid { grid-template-columns: 1fr; }
+  .nowItem { grid-template-columns: 72px minmax(0, 1fr); }
+  .nowActions > * { flex: 1 1 auto; }
+}
+
+/* 장르 칩 · 읽고 싶은 책 찾기 */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 20px; }
+.section .chips button.chip { min-height: 36px; padding: 6px 14px; border: 1px solid var(--tool-line); border-radius: 999px; background: #fff; color: #4a4f57; font-size: 12.5px; font-weight: 500; cursor: pointer; }
+.section .chips button.chip[aria-pressed="true"] { background: var(--tool-blue); border-color: var(--tool-blue); color: #fff; }
+.section .chips button.chip:hover:not([aria-pressed="true"]) { background: #f4f3fc; }
+.genreTag { display: inline-block; margin-left: 6px; color: #8c6c50; font-size: 10.5px; font-weight: 600; }
+.search { display: flex; gap: 8px; max-width: 640px; }
+.search input { flex: 1; min-width: 0; min-height: 48px; padding: 10px 14px; border: 1px solid var(--tool-line); border-radius: 0; background: #fff; font: inherit; font-size: 15px; color: #34383e; }
+.search input:focus { outline: 2px solid var(--tool-violet); outline-offset: 1px; }
+.searchGroup { margin-top: 24px; }
+.searchGroup h3 { margin: 0 0 10px; color: var(--tool-muted); font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+.searchList { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 640px; }
+.searchItem { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid var(--tool-line); background: #fff; }
+.searchItem .nowCover { width: 44px; }
+.searchItem strong { display: block; color: var(--tool-blue); font: 600 14.5px/1.45 var(--font-noto-serif-kr), serif; word-break: keep-all; }
+.searchItem small { color: var(--tool-muted); font-size: 12px; }
+.searchItem a, .section .searchItem button.linkButton { white-space: nowrap; color: var(--tool-blue); font-size: 12.5px; font-weight: 600; text-decoration: none; border: 0; border-bottom: 1px solid currentColor; background: none; padding: 0; cursor: pointer; }
+.requestPanel { grid-column: 1 / -1; }
+.requestPanel :global(.qc-notify-form) { border-radius: 0; }
+@media (max-width: 560px) {
+  .searchItem { grid-template-columns: 40px minmax(0, 1fr); }
+  .searchItem > .linkButton, .searchItem > a { grid-column: 2; justify-self: start; }
+}
+.section .search button[type="submit"] { min-height: 48px; padding: 10px 20px; background: var(--tool-blue); color: #fff; border: 1px solid var(--tool-blue); font-size: 14px; font-weight: 600; cursor: pointer; }
+.waitJoin :global(.qc-notify-form) > div, .requestPanel :global(.qc-notify-form) > div { display: grid; gap: 4px; }
+.waitJoin :global(.qc-notify-form input:not([type="checkbox"])), .requestPanel :global(.qc-notify-form input:not([type="checkbox"])) { width: 100%; min-height: 44px; border-radius: 0; font-size: 15px; }
+.requestPanel { margin-top: 4px; }
+.section .nowActions button.secondary { background: #fff; border: 1px solid var(--tool-line); color: var(--tool-blue); font-size: 13px; font-weight: 600; min-height: 44px; padding: 10px 16px; }
