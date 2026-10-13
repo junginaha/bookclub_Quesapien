@@ -356,3 +356,32 @@
   .nowItem { grid-template-columns: 72px minmax(0, 1fr); }
   .nowActions > * { flex: 1 1 auto; }
 }
+
+/* 장르 칩 · 읽고 싶은 책 찾기 */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 20px; }
+.section .chips button.chip { min-height: 36px; padding: 6px 14px; border: 1px solid var(--tool-line); border-radius: 999px; background: #fff; color: #4a4f57; font-size: 12.5px; font-weight: 500; cursor: pointer; }
+.section .chips button.chip[aria-pressed="true"] { background: var(--tool-blue); border-color: var(--tool-blue); color: #fff; }
+.section .chips button.chip:hover:not([aria-pressed="true"]) { background: #f4f3fc; }
+.genreTag { display: inline-block; margin-left: 6px; color: #8c6c50; font-size: 10.5px; font-weight: 600; }
+.search { display: flex; gap: 8px; max-width: 640px; }
+.search input { flex: 1; min-width: 0; min-height: 48px; padding: 10px 14px; border: 1px solid var(--tool-line); border-radius: 0; background: #fff; font: inherit; font-size: 15px; color: #34383e; }
+.search input:focus { outline: 2px solid var(--tool-violet); outline-offset: 1px; }
+.searchGroup { margin-top: 24px; }
+.searchGroup h3 { margin: 0 0 10px; color: var(--tool-muted); font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+.searchList { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 640px; }
+.searchItem { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid var(--tool-line); background: #fff; }
+.searchItem .nowCover { width: 44px; }
+.searchItem strong { display: block; color: var(--tool-blue); font: 600 14.5px/1.45 var(--font-noto-serif-kr), serif; word-break: keep-all; }
+.searchItem small { color: var(--tool-muted); font-size: 12px; }
+.searchItem a, .section .searchItem button.linkButton { white-space: nowrap; color: var(--tool-blue); font-size: 12.5px; font-weight: 600; text-decoration: none; border: 0; border-bottom: 1px solid currentColor; background: none; padding: 0; cursor: pointer; }
+.requestPanel { grid-column: 1 / -1; }
+.requestPanel :global(.qc-notify-form) { border-radius: 0; }
+@media (max-width: 560px) {
+  .searchItem { grid-template-columns: 40px minmax(0, 1fr); }
+  .searchItem > .linkButton, .searchItem > a { grid-column: 2; justify-self: start; }
+}
+.section .search button[type="submit"] { min-height: 48px; padding: 10px 20px; background: var(--tool-blue); color: #fff; border: 1px solid var(--tool-blue); font-size: 14px; font-weight: 600; cursor: pointer; }
+.waitJoin :global(.qc-notify-form) > div, .requestPanel :global(.qc-notify-form) > div { display: grid; gap: 4px; }
+.waitJoin :global(.qc-notify-form input:not([type="checkbox"])), .requestPanel :global(.qc-notify-form input:not([type="checkbox"])) { width: 100%; min-height: 44px; border-radius: 0; font-size: 15px; }
+.requestPanel { margin-top: 4px; }
+.section .nowActions button.secondary { background: #fff; border: 1px solid var(--tool-line); color: var(--tool-blue); font-size: 13px; font-weight: 600; min-height: 44px; padding: 10px 16px; }

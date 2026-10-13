@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { genreLabel, genreOf, type GenreId } from "@/lib/bookclub/genres";
+import GenreChips from "./GenreChips";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { formatCompactSchedule, getStatus, isWaitlistFull, seatsLeft } from "@/lib/bookclub/selectors";
 import BookCoverImage from "./BookCoverImage";
@@ -21,6 +24,9 @@ export default function NowOpenBookclubs({ sessions }: { sessions: BookClubSessi
     .filter((s) => Number.isFinite(Date.parse(s.startsAt)) && getStatus(s) !== "past")
     .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
   const nextOpen = upcoming.find((s) => getStatus(s) === "open");
+  const [genre, setGenre] = useState<GenreId | "all">("all");
+  const available = new Set(upcoming.map((s) => genreOf(s.slug)).filter((g): g is GenreId => !!g));
+  const shown = genre === "all" ? upcoming : upcoming.filter((s) => genreOf(s.slug) === genre);
 
   function findNearby() {
     document.getElementById("calendar")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -47,12 +53,15 @@ export default function NowOpenBookclubs({ sessions }: { sessions: BookClubSessi
         <button type="button" className={styles.secondary} onClick={findNearby}>내 근처에서 찾기</button>
       </div>
 
+      <GenreChips available={available} value={genre} onChange={setGenre} label="지금 열리는 북클럽 장르" />
+
       {upcoming.length === 0 ? (
         <p className={styles.muted}>다음 모임을 준비하고 있습니다. 아래 기다리는 북클럽에 이름을 올려 주세요.</p>
       ) : (
         <ul className={styles.nowList}>
-          {upcoming.map((session) => {
+          {shown.map((session) => {
             const status = getStatus(session);
+            const g = genreOf(session.slug);
             return (
               <li key={session.slug} className={styles.nowItem}>
                 <Link className={styles.nowCover} href={`/bookclub/${session.slug}`} aria-label={`${session.bookTitle} 북클럽 상세 보기`}>
@@ -64,7 +73,9 @@ export default function NowOpenBookclubs({ sessions }: { sessions: BookClubSessi
                   />
                 </Link>
                 <div className={styles.nowBody}>
-                  <p className={`${styles.status}${status === "open" ? ` ${styles.statusOpen}` : ""}`}>{statusLabel(session)}</p>
+                  <p className={`${styles.status}${status === "open" ? ` ${styles.statusOpen}` : ""}`}>
+                    {statusLabel(session)}{g && <span className={styles.genreTag}>{genreLabel(g)}</span>}
+                  </p>
                   <h3><Link href={`/bookclub/${session.slug}`}>{session.bookTitle}</Link></h3>
                   <p className={styles.nowMeta}>
                     {session.author}

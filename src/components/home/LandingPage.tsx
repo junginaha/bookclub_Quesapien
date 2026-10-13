@@ -7,6 +7,7 @@ import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
 import NowOpenBookclubs from "./NowOpenBookclubs";
 import WaitingBookclubs from "./WaitingBookclubs";
 import RecordLinks from "./RecordLinks";
+import BookFinder from "./BookFinder";
 import "./landing.css";
 import styles from "./home-tools.module.css";
 
@@ -97,6 +98,7 @@ export default function LandingPage({ bookclubSessions = [], waitingCounts = {} 
           <a href="#now">지금 열리는 북클럽</a>
           <a href="#calendar">달력</a>
           <a href="#waiting">기다리는 북클럽</a>
+          <a href="#find">책 찾기</a>
         </div>
         <div style={{ position: "relative", width: 100, height: 40, overflow: "visible" }}>
           {[
@@ -165,6 +167,7 @@ export default function LandingPage({ bookclubSessions = [], waitingCounts = {} 
         <NowOpenBookclubs sessions={bookclubSessions} />
         <HomeCalendarLocationHub sessions={bookclubSessions} />
         <WaitingBookclubs counts={waitingCounts} />
+        <BookFinder sessions={bookclubSessions} />
         <RecordLinks />
       </main>
       <footer className="lp-footer">

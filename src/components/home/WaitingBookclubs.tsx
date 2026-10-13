@@ -1,6 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import NotifyForm from "@/components/bookclub/NotifyForm";
+import { genreKey } from "@/lib/bookclub/demand";
+import { genreLabel, genreOf, type GenreId } from "@/lib/bookclub/genres";
+import GenreChips from "./GenreChips";
 import "@/components/bookclub/bookclub.css";
 import { ENCORE_THRESHOLD } from "@/lib/bookclub/selectors";
 import { WAITING_CLUBS, originalSession, waitlistKey } from "@/lib/bookclub/waiting";
@@ -10,6 +14,15 @@ import styles from "./home-tools.module.css";
 // 당신을 기다리는 북클럽 — 반응이 좋았던 지난 북클럽 + 새로 기획한 북클럽을
 // 대기 명단으로 열어두고, 5명이 모이면 일정을 잡아 출발한다.
 export default function WaitingBookclubs({ counts }: { counts: Record<string, number> }) {
+  const [genre, setGenre] = useState<GenreId | "all">("all");
+  // 책 찾기에서 #wait-<id>로 넘어올 때 필터에 가려지지 않도록 전체로 되돌린다.
+  useEffect(() => {
+    const onHash = () => { if (window.location.hash.startsWith("#wait-")) setGenre("all"); };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  const available = new Set(WAITING_CLUBS.map((c) => genreOf(c.id)).filter((g): g is GenreId => !!g));
+  const shown = genre === "all" ? WAITING_CLUBS : WAITING_CLUBS.filter((c) => genreOf(c.id) === genre);
   return (
     <section className={styles.section} id="waiting" aria-labelledby="waiting-title">
       <div className={styles.sectionHead}>
@@ -22,15 +35,18 @@ export default function WaitingBookclubs({ counts }: { counts: Record<string, nu
         </div>
       </div>
 
+      <GenreChips available={available} value={genre} onChange={setGenre} label="기다리는 북클럽 장르" />
+
       <ul className={styles.waitGrid}>
-        {WAITING_CLUBS.map((club) => {
+        {shown.map((club) => {
+          const g = genreOf(club.id);
           const key = waitlistKey(club);
           const count = counts[key] ?? 0;
           const percent = Math.min(100, Math.round((count / ENCORE_THRESHOLD) * 100));
           const session = originalSession(club);
           const ready = count >= ENCORE_THRESHOLD;
           return (
-            <li key={club.id} className={styles.waitCard}>
+            <li key={club.id} id={`wait-${club.id}`} className={styles.waitCard}>
               <div className={styles.waitTop}>
                 <span className={styles.nowCover} aria-hidden="true">
                   <BookCoverImage
@@ -42,6 +58,7 @@ export default function WaitingBookclubs({ counts }: { counts: Record<string, nu
                 </span>
                 <div>
                   <span className={styles.waitBadge}>{club.kind === "encore" ? "앵콜" : "새 기획"}</span>
+                  {g && <span className={styles.genreTag}>{genreLabel(g)}</span>}
                   <h3>{club.bookTitle}</h3>
                   <p className={styles.waitAuthor}>{club.author}</p>
                 </div>
@@ -78,7 +95,11 @@ export default function WaitingBookclubs({ counts }: { counts: Record<string, nu
 
               <details className={styles.waitJoin}>
                 <summary>함께 기다리기</summary>
-                <NotifyForm clubSlug={key} mode="encore" />
+                <NotifyForm
+                  clubSlug={key}
+                  mode="encore"
+                  genreInterest={g ? { key: genreKey(g), label: genreLabel(g) } : undefined}
+                />
               </details>
             </li>
           );

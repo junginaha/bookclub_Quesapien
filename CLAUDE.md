@@ -254,3 +254,7 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 - 거인의 어깨: 홈·헤더·푸터·검색·마이페이지·질문상세·아카이브·사이트맵·llms.txt에서 링크 제거, `/giants/*`는 미들웨어에서 홈으로 308. 코드(api/giants 등)는 삭제하지 않음.
 - 아카이빙 링크 주소는 `NEXT_PUBLIC_YOUTUBE_URL`, `NEXT_PUBLIC_BLOG_URL`(https만). 미설정 시 섹션 숨김 — **운영자 주소 확정 필요**.
 - 검증: 타입체크·빌드 통과(폰트는 샌드박스 네트워크 제한으로 mock), 로컬 서버 렌더 200, 390/1280px 가로 넘침 0, /giants 308 확인. 라이브 DB 미연결이라 대기 명단 저장·인원 집계는 실환경 미검증.
+- (같은 날 추가) 장르 칩: `src/lib/bookclub/genres.ts`(문학·사회·정치·인문·심리·예술·에세이·경제·실용, slug→장르 매핑). 두 섹션에 실제 있는 장르만 칩 노출. 장르 전용 랜딩은 장르당 4권 이상일 때.
+- 수요 키 정리(`src/lib/bookclub/demand.ts`): `bookclub_waitlist.club_slug`에 `encore:<id>` / `genre:<장르>` / `request:<ISBN> 제목 / 저자`. 대기 신청 폼의 "다른 ○○ 북클럽도 알려주세요"(기본 해제) 체크 시 genre 키도 등록.
+- 읽고 싶은 책 찾기(`BookFinder`, `/api/book-search` 카카오→네이버→구글): 우리 책이면 신청/기다리기로 연결, 없으면 "이 책 요청하기"(5명 모이면 개설 검토), 검색 결과 없으면 입력 그대로 요청. 요청 인원은 `getDemandCount` 서버 액션(개수만).
+- 운영자 확인용 조회 예: `select club_slug, count(*) from bookclub_waitlist where club_slug like 'request:%' group by 1 order by 2 desc;`
