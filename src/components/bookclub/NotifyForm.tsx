@@ -10,7 +10,7 @@ export default function NotifyForm({
   mode,
 }: {
   clubSlug: string | null;
-  mode: "notify" | "waitlist";
+  mode: "notify" | "waitlist" | "interest";
 }) {
   const nameId = useId();
   const phoneId = useId();
@@ -49,7 +49,9 @@ export default function NotifyForm({
         {result.kind === "joined"
           ? mode === "waitlist"
             ? "대기자로 등록했어요. 자리가 나면 안내드릴게요."
-            : "알림을 등록했어요."
+            : mode === "interest"
+              ? "등록했어요. 이 책 모임이 열리면 가장 먼저 알려드릴게요."
+              : "알림을 등록했어요."
           : "이미 등록하셨어요."}
       </p>
     );
@@ -59,7 +61,7 @@ export default function NotifyForm({
     <form
       className="qc-notify-form"
       onSubmit={handleSubmit}
-      aria-label={mode === "waitlist" ? "대기자 등록" : "알림 받기"}
+      aria-label={mode === "waitlist" ? "대기자 등록" : mode === "interest" ? "읽고 싶어요 등록" : "알림 받기"}
       data-club-slug={clubSlug ?? "all"}
     >
       <div>
@@ -80,7 +82,7 @@ export default function NotifyForm({
         style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
       />
       <Button type="submit" variant="outline" className="w-full" disabled={!valid || submitting} aria-disabled={!valid || submitting}>
-        {submitting ? "확인 중…" : mode === "waitlist" ? "대기자로 등록" : "알림 받기"}
+        {submitting ? "확인 중…" : mode === "waitlist" ? "대기자로 등록" : mode === "interest" ? "모임 열리면 알림 받기" : "알림 받기"}
       </Button>
       {result && "error" in result && <p className="qc-notify-status" style={{ color: "#9B4A2E" }}>{result.error}</p>}
     </form>

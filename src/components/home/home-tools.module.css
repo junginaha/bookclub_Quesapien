@@ -308,3 +308,13 @@
   .bookLink:active .coverScene { opacity: .96; }
 }
 @media (max-width:720px) { .bookLink { max-width:none; } }
+
+/* 2026-10 오픈 예정 북모임(투표 후보) — 기존 책 그리드 톤 그대로 재사용 */
+.upcomingFilters { display: flex; flex-wrap: wrap; gap: 8px; margin: -8px 0 24px; }
+.upcomingFilter, .upcomingFilterActive {
+  min-height: 36px; padding: 6px 14px; font-size: 12.5px; cursor: pointer;
+  border: 1px solid var(--tool-line); background: #fff; color: #756c62;
+}
+.upcomingFilterActive { background: #173b75; border-color: #173b75; color: #fff; }
+.upcomingPitch { margin: 8px 2px 12px; color: #5f574f; font-size: 12.5px; line-height: 1.7; word-break: keep-all; }
+.section li.bookLink .secondary { width: 100%; }

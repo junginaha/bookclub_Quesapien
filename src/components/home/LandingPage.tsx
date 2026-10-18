@@ -6,6 +6,7 @@ import type { BookClubSession } from "@/lib/bookclub/types";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
 import MiniBookSpread from "./MiniBookSpread";
+import UpcomingReads from "./UpcomingReads";
 import HomeArchive from "./HomeArchive";
 import "./landing.css";
 import styles from "./home-tools.module.css";
@@ -162,6 +163,7 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
         </section>
         <HomeCalendarLocationHub sessions={bookclubSessions} />
         <MiniBookSpread sessions={bookclubSessions} />
+        <UpcomingReads />
         <HomeArchive />
         <section className={`${styles.section} ${styles.generator}`} id="final" aria-labelledby="discussion-title">
           <div className={styles.sectionHead}><h2 id="discussion-title">발제 · 거인의 어깨</h2><a className={styles.secondary} href="/giants">전체 발제 도구</a></div>

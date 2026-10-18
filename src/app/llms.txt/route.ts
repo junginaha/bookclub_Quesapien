@@ -13,6 +13,7 @@ import {
 } from "@/lib/bookclub/selectors";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { activeGuides } from "@/content/ai-guides";
+import { UPCOMING_BOOKS } from "@/lib/bookclub/upcoming";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 
@@ -63,6 +64,12 @@ ${activeGuides().map((g) => `- [${g.title}](${SITE_URL}/guide/${g.slug}): ${g.de
 ## 예정 모임
 
 ${upcoming.length ? upcoming.map(sessionLines).join("\n") : "- 현재 공개된 예정 모임이 없습니다."}
+
+## 오픈 예정 북모임 (일정 미정 · 투표 중)
+
+회원 추천으로 고른 다음 책 후보입니다. ${SITE_URL}/#upcoming 에서 "읽고 싶어요"를 등록하면 모임이 열릴 때 안내합니다.
+
+${UPCOMING_BOOKS.map((b) => `- 『${b.bookTitle}』${b.author ? ` (${b.author})` : ""} — ${b.pitch}`).join("\n")}
 
 ## 지난 모임
 
