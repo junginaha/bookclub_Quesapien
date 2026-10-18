@@ -29,7 +29,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
     bookTitle: "에덴의 동쪽",
     author: "존 스타인벡",
     genre: "소설",
-    pitch: "넷플릭스 시리즈로 만나기 전에 원작부터. 두 세대에 걸친 형제 이야기로 선택과 자유의지를 묻는 고전.",
+    pitch: "10월 넷플릭스 시리즈로 공개된 원작. 두 세대에 걸친 형제 이야기로 선택과 자유의지를 묻는 고전.",
   },
   {
     slug: "next-captains-of-the-wreck",
@@ -69,6 +69,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
     slug: "next-youth-reading",
     bookTitle: "청춘의 독서",
     author: "유시민",
+    publisher: "웅진지식하우스",
     genre: "인문",
     pitch: "『맹자』 『사기』 『자유론』 『역사란 무엇인가』 『대위의 딸』까지, 세상을 바꾼 고전을 다시 읽는 독서 에세이.",
   },
@@ -76,8 +77,10 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
     slug: "next-gracian-reading-people",
     bookTitle: "그라시안의 사람을 읽는 눈",
     author: "발타자르 그라시안",
+    translator: "김철 편역",
+    publisher: "히읏",
     genre: "인문",
-    pitch: "17세기 스페인 수도사가 남긴 처세의 잠언. 사람을 알아보고 관계를 지키는 오래된 지혜.",
+    pitch: "착한 사람 증후군에서 벗어나고 싶다면. 17세기 스페인 예수회 신부가 남긴 사람과 관계에 관한 잠언.",
   },
   {
     slug: "next-snake-brain",
@@ -121,7 +124,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
     translator: "강승영",
     publisher: "은행나무",
     genre: "에세이",
-    pitch: "월든 호숫가 오두막에서 보낸 2년. 덜 갖고 더 깊이 사는 법을 묻는 고전.",
+    pitch: "월든 호숫가 오두막에서 보낸 2년여의 기록. 덜 갖고 더 깊이 사는 법을 묻는 고전.",
   },
   {
     slug: "next-the-wager",
@@ -149,13 +152,6 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
     publisher: "어크로스",
     genre: "사회",
     pitch: "마주 앉은 대화, 손글씨, 기다림. 기술이 대신하면서 사라져 가는 경험들과 그 의미를 짚는 책.",
-  },
-  {
-    slug: "next-good-person-syndrome",
-    bookTitle: "착한 사람 증후군에서 벗어나세요",
-    author: "", // TODO(unicorn): 추천자에게 저자·출판사 확인 — 서점 검색에서 동일 제목 미확인
-    genre: "심리",
-    pitch: "거절하지 못하고 남의 기대에 맞추느라 지친 마음을 돌아보는 책.",
   },
 ];
 
