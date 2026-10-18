@@ -8,6 +8,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/bookclub/data";
+import { getUpcomingBook } from "@/lib/bookclub/upcoming";
 import { isPast } from "@/lib/bookclub/selectors";
 
 const RATE_WINDOW_MS = 10 * 60 * 1000;
@@ -131,7 +132,7 @@ export async function joinBookClubWaitlist(input: {
   if (!name || name.length > 80) return { ok: false, error: "이름을 확인해 주세요." };
   if (phone.length < 9 || phone.length > 15) return { ok: false, error: "휴대전화 번호를 확인해 주세요." };
 
-  if (input.clubSlug && !getSession(input.clubSlug)) {
+  if (input.clubSlug && !getSession(input.clubSlug) && !getUpcomingBook(input.clubSlug)) {
     return { ok: false, error: "모임 정보를 찾을 수 없습니다." };
   }
 

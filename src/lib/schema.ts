@@ -214,6 +214,27 @@ export function bookclubItemListSchema(sessions: { slug: string; title: string }
   };
 }
 
+// 오픈 예정 북모임(투표 후보) — 일정 미정이라 Event가 아닌 Book ItemList로 표기
+export function upcomingBooksSchema(books: { bookTitle: string; author: string; publisher?: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${SITE_URL}/#upcoming`,
+    name: "오픈 예정 북모임 — 질문하는 사람들",
+    itemListElement: books.map((b, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "Book",
+        name: b.bookTitle,
+        ...(b.author ? { author: { "@type": "Person", name: b.author } } : {}),
+        ...(b.publisher ? { publisher: { "@type": "Organization", name: b.publisher } } : {}),
+        inLanguage: "ko",
+      },
+    })),
+  };
+}
+
 // ─── Person (Leader / Thinker) ────────────────────────────────
 interface PersonSchemaInput {
   slug: string;

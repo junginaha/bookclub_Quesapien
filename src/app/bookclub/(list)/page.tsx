@@ -3,7 +3,9 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import BookingCalendar from "@/components/bookclub/BookingCalendar";
 import { buildMetadata } from "@/lib/metadata";
-import { breadcrumbSchema, bookclubItemListSchema } from "@/lib/schema";
+import { breadcrumbSchema, bookclubItemListSchema, upcomingBooksSchema } from "@/lib/schema";
+import UpcomingReads from "@/components/home/UpcomingReads";
+import { UPCOMING_BOOKS } from "@/lib/bookclub/upcoming";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getSessionsWithReserved } from "@/lib/bookclub/server";
 
@@ -18,9 +20,9 @@ export const dynamic = "force-dynamic";
 export default async function BookClubPage() {
   const sessions = await getSessionsWithReserved();
   return <>
-    <JsonLd data={[breadcrumbSchema([{ name: "홈", href: "/" }, { name: "북클럽", href: "/bookclub" }]), bookclubItemListSchema(sessions)]} />
+    <JsonLd data={[breadcrumbSchema([{ name: "홈", href: "/" }, { name: "북클럽", href: "/bookclub" }]), bookclubItemListSchema(sessions), upcomingBooksSchema(UPCOMING_BOOKS)]} />
     <Header />
-    <main><BookingCalendar sessions={sessions} /></main>
+    <main><BookingCalendar sessions={sessions} /><UpcomingReads /></main>
     <Footer />
   </>;
 }

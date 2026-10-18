@@ -254,3 +254,11 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 - 모임 상세: "안내받아해 주세요" 비문 수정, 대기 문구는 정원 마감 시에만, `qd-book-intro` 중복 섹션 제거(OpenBook 펼침면에 동일 내용).
 - 홈 달력 요일 한글화. 홈 '함께 읽는 책'의 예정/지난 혼재는 홈 구조 재편 결정과 묶여 있어 미변경.
 - tsc 통과. `next build`는 샌드박스에서 Google Fonts fetch 실패로 로컬 확인 불가 — Vercel 배포 결과로 확인 필요.
+
+### 2026-10-19 — 오픈 예정 북모임(북토크 투표 후보 10권)
+- 운영자 요청: 잼잼 북클럽 회원 추천 도서를 "오픈 예정 북모임"으로 사이트에 게시.
+- `src/lib/bookclub/upcoming.ts` 신규 — 일정 미정 후보라 `BOOKCLUB_SESSIONS`와 분리. 투표로 확정되면 해당 책을 세션으로 옮기고 여기서 삭제.
+- `UpcomingReads` 섹션: 홈('함께 읽는 책' 아래, `#upcoming`)과 `/bookclub`(달력 아래). 장르 필터 + 책별 "읽고 싶어요" → 기존 `bookclub_waitlist`에 `club_slug=next-*`로 저장(DB 변경 없음). `joinBookClubWaitlist`가 upcoming slug도 허용. `NotifyForm`에 `interest` 모드 추가.
+- SEO/AEO/GEO: `/bookclub`에 Book ItemList JSON-LD, `/llms.txt`에 "오픈 예정 북모임" 섹션.
+- 서지는 서점 검색·표지 사진으로 확인한 값만. 『착한 사람 증후군에서 벗어나세요』는 서점에서 동일 제목 미확인 → 저자 "확인 중" 표기(TODO).
+- tsc 통과, 로컬 dev(placeholder env)에서 `/`·`/bookclub`·`/llms.txt` 렌더와 390px 가로 넘침 없음 확인. 표지는 운영 환경 표지 조회로 표시(로컬은 타이포 폴백).
