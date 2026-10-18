@@ -156,7 +156,7 @@ export default function HomeCalendarLocationHub({ sessions, headingLevel = 2 }: 
           </div>
           <table className={styles.calendarTable}>
             <caption className={styles.srOnly}>{year}년 {monthNumber}월 북클럽 일정</caption>
-            <thead><tr>{DAYS.map(day => <th key={day.en} scope="col" aria-label={day.ko}><span lang="en">{day.en}</span></th>)}</tr></thead>
+            <thead><tr>{DAYS.map(day => <th key={day.en} scope="col" aria-label={day.ko}><span>{day.ko.charAt(0)}</span></th>)}</tr></thead>
             <tbody>{monthDays(year, monthNumber - 1).map((week, index) => <tr key={index}>{week.map((day, column) => {
               const key = day ? `${month}-${pad(day)}` : "";
               const hasEvent = eventDays.has(key);

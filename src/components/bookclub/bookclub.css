@@ -731,3 +731,9 @@
 .qd-book-intro h2 { margin:7px 0 12px; font-size:20px; line-height:1.4; font-weight:600; }
 .qd-book-intro p { margin:0; max-width:65ch; font-size:14px; line-height:1.9; word-break:keep-all; }
 .qd-book-intro a { display:inline-block; margin-top:12px; color:var(--muted); font-size:10.5px; text-underline-offset:3px; }
+
+/* 신청 폼 개인정보 동의 (2026-10-17) */
+.qd-consent { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; line-height: 1.6; color: var(--muted); }
+.qd-consent input { margin-top: 3px; width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--accent); }
+.qd-consent strong { color: var(--ink); font-weight: 600; }
+.qd-consent a { text-decoration: underline; }

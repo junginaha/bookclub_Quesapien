@@ -40,7 +40,9 @@ export default function ApplyForm({
     { kind: "confirmed" | "just_filled_waitlisted" | "duplicate" } | { error: string } | null
   >(null);
 
-  const valid = name.trim().length > 0 && phone.trim().length >= 9;
+  const consentId = useId();
+  const [consent, setConsent] = useState(false);
+  const valid = name.trim().length > 0 && phone.trim().length >= 9 && consent;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -106,6 +108,13 @@ export default function ApplyForm({
       <div className="qd-field"><label htmlFor={phoneId}>휴대전화</label><input id={phoneId} value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" inputMode="tel" required /></div>
       <div className="qd-field"><label htmlFor={emailId}>이메일 (선택)</label><input id={emailId} type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></div>
       <div className="qd-field"><label htmlFor={noteId}>전하고 싶은 말 (선택)</label><textarea id={noteId} rows={3} value={note} onChange={(e) => setNote(e.target.value)} /></div>
+      <div className="qd-consent">
+        <input id={consentId} type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} required />
+        <label htmlFor={consentId}>
+          <strong>[필수] 개인정보 수집·이용 동의</strong> — 이름·휴대전화·이메일을 모임 안내와 결제·환불 확인에 사용하고, 목적 달성 후 파기합니다. <a href="/privacy" target="_blank" rel="noreferrer">자세히</a>
+          {fee > 0 ? <> · <a href="/terms#refund" target="_blank" rel="noreferrer">환불 규정</a>을 확인했습니다.</> : null}
+        </label>
+      </div>
       <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position:"absolute", left:"-9999px", width:1, height:1, opacity:0 }} />
       <Button type="submit" variant="primary" className="self-start max-[480px]:self-stretch max-[480px]:w-full" disabled={!valid || submitting}>
         {submitting ? "확인 중…" : fee > 0 ? "참여 신청 후 결제" : "참여 신청"}

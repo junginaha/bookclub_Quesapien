@@ -110,7 +110,7 @@ export default function DetailClient({
         </div>
         <div className="qd-side-links">
           <a href="mailto:junginaha@qsapiens.com">문의하기</a>
-          <Link href="/terms">환불 규정</Link>
+          <Link href="/terms#refund">환불 규정</Link>
         </div>
       </aside>
 
@@ -133,27 +133,17 @@ export default function DetailClient({
           <div><dt>자리</dt><dd>{status === "open" ? seatsLeft(session) + "자리 남음" : status === "full" ? "대기 신청" : "상세 확인"}</dd></div>
         </dl>
 
-        <p className="qd-reason">{session.summary}</p>
+        {/* 책 소개(bookIntro)가 없으면 OpenBook 펼침면이 이미 summary를 보여주므로 중복 노출하지 않는다. */}
+        {session.bookIntro && <p className="qd-reason">{session.summary}</p>}
 
-        {session.bookIntro && (
-          <section className="qd-book-intro" aria-labelledby="qd-book-intro-title">
-            <span>ABOUT THE BOOK</span>
-            <h2 id="qd-book-intro-title">한마디로, 이런 책입니다</h2>
-            <p>{session.bookIntro}</p>
-            {session.bookSourceUrl && (
-              <a href={session.bookSourceUrl} target="_blank" rel="noreferrer">
-                {session.bookSourceLabel ?? "책 정보 확인"} ↗
-              </a>
-            )}
-          </section>
-        )}
+        {/* 책 소개(bookIntro)와 출처 링크는 OpenBook 펼침면에 이미 있어 별도 섹션으로 반복하지 않는다. */}
 
         <VenueCard venue={session.venue} />
 
         <section className="qd-questions" aria-labelledby="qd-before-title">
           <h2 className="qd-questions-title" id="qd-before-title">신청 전에 확인해 주세요</h2>
           <p className="qd-question">『{session.bookTitle}』를 읽고, 아래 발제 중 함께 나누고 싶은 질문을 골라 오세요. 책 준비와 진행 방식이 궁금하면 <a href="mailto:junginaha@qsapiens.com">운영자에게 문의</a>해 주세요.</p>
-          <p className="qd-question">참여비는 {feeText}입니다. 대기 등록을 하시면 자리가 날 때 참여 안내를 받습니다. {session.fee > 0 || session.feeLabelOverride ? <>결제 전에는 <a href="mailto:junginaha@qsapiens.com">운영자에게 취소·환불 기준을 안내받아</a>해 주세요. </> : null}<Link href="/terms">이용약관</Link>에서 서비스 이용 안내를 확인할 수 있습니다.</p>
+          <p className="qd-question">참여비는 {feeText}입니다. {status === "full" ? "대기 등록을 하시면 자리가 날 때 참여 안내를 받습니다. " : null}{session.fee > 0 ? <>모임 3일 전까지 취소하면 전액, 2일 전~전날은 50% 환불되며 당일 취소·불참은 환불되지 않습니다. 자세한 기준은 <Link href="/terms#refund">환불 규정</Link>에서 확인해 주세요.</> : <><Link href="/terms">이용약관</Link>에서 서비스 이용 안내를 확인할 수 있습니다.</>}</p>
         </section>
 
         {session.agendaPreview.length > 0 && (
