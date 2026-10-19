@@ -318,3 +318,14 @@
 .upcomingFilterActive { background: #173b75; border-color: #173b75; color: #fff; }
 .upcomingPitch { margin: 8px 2px 12px; color: #5f574f; font-size: 12.5px; line-height: 1.7; word-break: keep-all; }
 .section li.bookLink .secondary { width: 100%; }
+.upcomingCount { margin: -4px 2px 12px; color: #8c6c50; font-size: 11.5px; line-height: 1.6; word-break: keep-all; }
+.upcomingRecommend { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 24px 40px; align-items: start; margin-top: 48px; padding-top: 40px; border-top: 1px solid var(--tool-line); }
+.upcomingRecommend h3 { margin: 0; font: 500 clamp(20px, 2.4vw, 26px)/1.4 var(--font-noto-serif-kr), serif; color: var(--tool-blue); }
+.upcomingRecommend :global(.qc-notify-form) > div:not(:global(.qd-consent)) { display: grid; gap: 4px; }
+.bookLink :global(.qc-notify-form) > div:not(:global(.qd-consent)) { display: grid; gap: 4px; }
+@media (max-width: 720px) { .upcomingRecommend { grid-template-columns: 1fr; } }
+.bookLink :global(.qc-notify-form), .upcomingRecommend :global(.qc-notify-form) { min-width: 0; }
+.bookLink :global(.qc-notify-form) { padding: 10px; }
+.bookLink :global(.qc-notify-form) input:not([type="checkbox"]),
+.upcomingRecommend :global(.qc-notify-form) input:not([type="checkbox"]) { width: 100%; min-width: 0; box-sizing: border-box; }
+.bookLink :global(.qd-consent) { font-size: 11.5px; }

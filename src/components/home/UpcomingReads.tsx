@@ -4,10 +4,13 @@ import { useState } from "react";
 import { UPCOMING_BOOKS, UPCOMING_GENRES, type UpcomingBook } from "@/lib/bookclub/upcoming";
 import NotifyForm from "@/components/bookclub/NotifyForm";
 import BookCoverImage from "./BookCoverImage";
+import RecommendBookForm from "./RecommendBookForm";
+import { interestCopy } from "@/lib/bookclub/interest";
 import styles from "./home-tools.module.css";
+import "@/components/bookclub/bookclub.css";
 
 /** 오픈 예정 북모임 — 투표 후보 책. 일정 미정이라 상세 페이지 대신 "읽고 싶어요" 등록만 받는다. */
-export default function UpcomingReads() {
+export default function UpcomingReads({ counts = {} }: { counts?: Record<string, number> }) {
   const [genre, setGenre] = useState<(typeof UPCOMING_GENRES)[number]>("전체");
   const [openSlug, setOpenSlug] = useState<string | null>(null);
   const books = genre === "전체" ? UPCOMING_BOOKS : UPCOMING_BOOKS.filter((b) => b.genre === genre);
@@ -51,6 +54,7 @@ export default function UpcomingReads() {
               <small>{book.genre} · 일정 투표 중</small>
             </span>
             <p className={styles.upcomingPitch}>{book.pitch}</p>
+            <p className={styles.upcomingCount}>{interestCopy(counts[book.slug] ?? 0)}</p>
             {openSlug === book.slug ? (
               <NotifyForm clubSlug={book.slug} mode="interest" />
             ) : (
@@ -66,6 +70,16 @@ export default function UpcomingReads() {
           </li>
         ))}
       </ul>
+
+      <div className={styles.upcomingRecommend} id="recommend">
+        <div>
+          <h3>함께 읽고 싶은 책 추천하기</h3>
+          <p className={styles.sectionLead}>
+            목록에 없는 책이 있나요? 읽고 싶은 책을 추천해 주세요. 같은 책을 고른 분이 5명 모이면 북토크를 열고 연락드려요.
+          </p>
+        </div>
+        <RecommendBookForm />
+      </div>
     </section>
   );
 }

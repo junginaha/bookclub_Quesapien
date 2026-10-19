@@ -20,7 +20,7 @@ export interface LandingQuestion {
   answers_count: number;
 }
 
-export default function LandingPage({ bookclubSessions = [] }: { bookclubSessions?: BookClubSession[] }) {
+export default function LandingPage({ bookclubSessions = [], interestCounts = {} }: { bookclubSessions?: BookClubSession[]; interestCounts?: Record<string, number> }) {
   const [navBtnIdx, setNavBtnIdx] = useState(0);
   const [navBtnFading, setNavBtnFading] = useState(false);
   const [howToOpen, setHowToOpen] = useState(false);
@@ -163,7 +163,7 @@ export default function LandingPage({ bookclubSessions = [] }: { bookclubSession
         </section>
         <HomeCalendarLocationHub sessions={bookclubSessions} />
         <MiniBookSpread sessions={bookclubSessions} />
-        <UpcomingReads />
+        <UpcomingReads counts={interestCounts} />
         <HomeArchive />
         <section className={`${styles.section} ${styles.generator}`} id="final" aria-labelledby="discussion-title">
           <div className={styles.sectionHead}><h2 id="discussion-title">발제 · 거인의 어깨</h2><a className={styles.secondary} href="/giants">전체 발제 도구</a></div>

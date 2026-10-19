@@ -10,6 +10,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/bookclub/data";
 import { getUpcomingBook } from "@/lib/bookclub/upcoming";
 import { isPast } from "@/lib/bookclub/selectors";
+import { buildRecSlug, titleKey } from "@/lib/bookclub/interest";
 
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT = 8;
@@ -107,8 +108,8 @@ export async function applyToBookClub(input: {
 }
 
 export type WaitlistResult =
-  | { ok: true; kind: "joined" }
-  | { ok: true; kind: "duplicate" }
+  | { ok: true; kind: "joined"; count?: number }
+  | { ok: true; kind: "duplicate"; count?: number }
   | { ok: false; error: string };
 
 export async function joinBookClubWaitlist(input: {
@@ -149,8 +150,72 @@ export async function joinBookClubWaitlist(input: {
     if (input.clubSlug) revalidatePath(`/bookclub/${input.clubSlug}`);
     revalidatePath("/bookclub");
 
-    if (kind === "joined") return { ok: true, kind: "joined" };
-    if (kind === "duplicate") return { ok: true, kind: "duplicate" };
+    const count = input.clubSlug?.startsWith("next-") ? await countInterest(input.clubSlug) : undefined;
+    if (kind === "joined") return { ok: true, kind: "joined", count };
+    if (kind === "duplicate") return { ok: true, kind: "duplicate", count };
+    return { ok: false, error: "결과를 확인하지 못했습니다." };
+  } catch {
+    return { ok: false, error: "연결하지 못했습니다." };
+  }
+}
+
+/** 같은 책(next-* slug 또는 rec: 제목 키)에 등록한 고유 번호 수. 실패하면 undefined. */
+async function countInterest(slugOrRecPrefix: string): Promise<number | undefined> {
+  try {
+    const db = createServiceClient();
+    const q = db.from("bookclub_waitlist").select("phone");
+    const { data, error } = slugOrRecPrefix.startsWith("rec:")
+      ? await q.like("club_slug", `${slugOrRecPrefix}|%`)
+      : await q.eq("club_slug", slugOrRecPrefix);
+    if (error) return undefined;
+    return new Set((data ?? []).map((r: { phone: string }) => r.phone)).size;
+  } catch {
+    return undefined;
+  }
+}
+
+/** "함께 읽고 싶은 책 추천하기" — 목록에 없는 책을 추천. 같은 제목이 5명 모이면 운영자가 연락한다. */
+export async function recommendBook(input: {
+  title: string;
+  author: string;
+  name: string;
+  phone: string;
+  website: string;
+}): Promise<WaitlistResult> {
+  if (input.website.trim()) return { ok: false, error: "요청을 확인하지 못했습니다." };
+  if (await isRateLimited()) return { ok: false, error: "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요." };
+  if (!databaseConfigured()) return { ok: false, error: "연결이 준비되지 않았습니다." };
+
+  const title = input.title.trim();
+  const author = input.author.trim();
+  const name = input.name.trim();
+  const phone = normalizePhone(input.phone);
+  if (!title || title.length > 80 || !titleKey(title)) return { ok: false, error: "책 제목을 확인해 주세요." };
+  if (author.length > 60) return { ok: false, error: "저자 이름을 확인해 주세요." };
+  if (!name || name.length > 80) return { ok: false, error: "이름을 확인해 주세요." };
+  if (phone.length < 9 || phone.length > 15) return { ok: false, error: "휴대전화 번호를 확인해 주세요." };
+
+  const slug = buildRecSlug(title, author);
+  try {
+    const db = createServiceClient();
+    // 같은 제목 키에 이미 등록한 번호면 중복 처리(저자 표기가 달라도 한 책으로 본다)
+    const { data: existing } = await db
+      .from("bookclub_waitlist")
+      .select("id")
+      .like("club_slug", `rec:${titleKey(title)}|%`)
+      .eq("phone", phone)
+      .limit(1);
+    if (existing && existing.length) {
+      return { ok: true, kind: "duplicate", count: await countInterest(`rec:${titleKey(title)}`) };
+    }
+    const { data, error } = await db.rpc("join_bookclub_waitlist", { p_club_slug: slug, p_name: name, p_phone: phone });
+    if (error) return { ok: false, error: "처리 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요." };
+    const kind = (data as { kind?: string } | null)?.kind;
+    revalidatePath("/");
+    revalidatePath("/bookclub");
+    const count = await countInterest(`rec:${titleKey(title)}`);
+    if (kind === "joined") return { ok: true, kind: "joined", count };
+    if (kind === "duplicate") return { ok: true, kind: "duplicate", count };
     return { ok: false, error: "결과를 확인하지 못했습니다." };
   } catch {
     return { ok: false, error: "연결하지 못했습니다." };

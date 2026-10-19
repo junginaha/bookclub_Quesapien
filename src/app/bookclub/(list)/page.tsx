@@ -7,7 +7,7 @@ import { breadcrumbSchema, bookclubItemListSchema, upcomingBooksSchema } from "@
 import UpcomingReads from "@/components/home/UpcomingReads";
 import { UPCOMING_BOOKS } from "@/lib/bookclub/upcoming";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getSessionsWithReserved } from "@/lib/bookclub/server";
+import { getInterestCounts, getSessionsWithReserved } from "@/lib/bookclub/server";
 
 export const metadata: Metadata = buildMetadata({
   title: "북클럽 일정 — 질문하는 사람들",
@@ -18,11 +18,11 @@ export const metadata: Metadata = buildMetadata({
 export const dynamic = "force-dynamic";
 
 export default async function BookClubPage() {
-  const sessions = await getSessionsWithReserved();
+  const [sessions, interestCounts] = await Promise.all([getSessionsWithReserved(), getInterestCounts()]);
   return <>
     <JsonLd data={[breadcrumbSchema([{ name: "홈", href: "/" }, { name: "북클럽", href: "/bookclub" }]), bookclubItemListSchema(sessions), upcomingBooksSchema(UPCOMING_BOOKS)]} />
     <Header />
-    <main><BookingCalendar sessions={sessions} /><UpcomingReads /></main>
+    <main><BookingCalendar sessions={sessions} /><UpcomingReads counts={interestCounts} /></main>
     <Footer />
   </>;
 }
