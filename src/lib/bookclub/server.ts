@@ -3,6 +3,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { BOOKCLUB_SESSIONS } from "./data";
 import type { BookClubSession } from "./types";
+import { interestKey } from "./interest";
 
 // Supabase(bookclub_applications) 연결 실패 시에만 쓰는 폴백 — 운영자가 확인해 준 값.
 // DB 우선 조회 원칙은 getReservedCount()가 지킨다(하드코딩 금지, §작업원칙4).
@@ -36,4 +37,29 @@ export async function getReservedCounts(slugs: string[]): Promise<Record<string,
 export async function getSessionsWithReserved(): Promise<BookClubSession[]> {
   const counts = await getReservedCounts(BOOKCLUB_SESSIONS.map((s) => s.slug));
   return BOOKCLUB_SESSIONS.map((s) => ({ ...s, reserved: counts[s.slug] ?? 0 }));
+}
+
+/**
+ * "함께 읽고 싶은 책" 관심 인원 — 키별 고유 전화번호 수(next-* 카드 + rec: 회원 추천).
+ * 개인정보는 반환하지 않는다. 연결 실패 시 빈 객체(화면은 인원 숫자 없이 기본 문구).
+ */
+export async function getInterestCounts(): Promise<Record<string, number>> {
+  try {
+    const db = createServiceClient();
+    const [next, rec] = await Promise.all([
+      db.from("bookclub_waitlist").select("club_slug, phone").like("club_slug", "next-%"),
+      db.from("bookclub_waitlist").select("club_slug, phone").like("club_slug", "rec:%"),
+    ]);
+    if (next.error || rec.error) throw next.error ?? rec.error;
+    const sets = new Map<string, Set<string>>();
+    for (const row of [...(next.data ?? []), ...(rec.data ?? [])] as { club_slug: string; phone: string }[]) {
+      const key = interestKey(row.club_slug);
+      if (!key) continue;
+      if (!sets.has(key)) sets.set(key, new Set());
+      sets.get(key)!.add(row.phone);
+    }
+    return Object.fromEntries([...sets].map(([k, v]) => [k, v.size]));
+  } catch {
+    return {};
+  }
 }
