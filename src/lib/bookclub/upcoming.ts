@@ -153,6 +153,15 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
     genre: "사회",
     pitch: "마주 앉은 대화, 손글씨, 기다림. 기술이 대신하면서 사라져 가는 경험들과 그 의미를 짚는 책.",
   },
+  {
+    slug: "next-saving-baghdad-zoo",
+    bookTitle: "바그다드 동물원 구하기",
+    author: "로렌스 앤서니·그레이엄 스펜스",
+    translator: "고상숙",
+    publisher: "뜨인돌",
+    genre: "에세이",
+    pitch: "이라크 전쟁 한복판, 굶주린 동물들을 살리러 바그다드로 들어간 한 남자의 실화.",
+  },
 ];
 
 export const UPCOMING_GENRES = ["전체", "소설", "인문", "사회", "심리", "역사", "에세이"] as const;
