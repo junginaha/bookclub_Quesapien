@@ -8,7 +8,7 @@ import styles from "./home-tools.module.css";
 
 export default function MiniBookSpread({ sessions }: { sessions: BookClubSession[] }) {
   const unique = new Map<string, BookClubSession>();
-  // 진행 중·예정 모임만 — 지난 모임은 다음 섹션(EncoreReads, 5명 모이면 다시 열기)으로 간다
+  // 진행 중·예정 모임만 — 지난 모임은 다음 섹션(ReunionReads, 우리 다시 만나요)으로 간다
   const ordered = sessions
     .filter((s) => getStatus(s) !== "past")
     .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));

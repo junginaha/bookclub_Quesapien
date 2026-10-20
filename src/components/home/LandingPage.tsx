@@ -6,8 +6,8 @@ import type { BookClubSession } from "@/lib/bookclub/types";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
 import MiniBookSpread from "./MiniBookSpread";
-import UpcomingReads from "./UpcomingReads";
-import EncoreReads from "./EncoreReads";
+import ReunionReads from "./ReunionReads";
+import { GIANTS_ENABLED } from "@/lib/features";
 import HomeArchive from "./HomeArchive";
 import "./landing.css";
 import styles from "./home-tools.module.css";
@@ -96,7 +96,7 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
           <a href="/questions">질문</a>
           <a href="/bookclub">북클럽</a>
           <a href="/archive">아카이빙</a>
-          <a href="/giants">거인의 어깨</a>
+          {GIANTS_ENABLED && <a href="/giants">거인의 어깨</a>}
         </div>
         <div style={{ position: "relative", width: 100, height: 40, overflow: "visible" }}>
           {[
@@ -164,13 +164,14 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
         </section>
         <HomeCalendarLocationHub sessions={bookclubSessions} />
         <MiniBookSpread sessions={bookclubSessions} />
-        <EncoreReads sessions={bookclubSessions} counts={interestCounts} />
-        <UpcomingReads counts={interestCounts} />
+        <ReunionReads sessions={bookclubSessions} counts={interestCounts} />
         <HomeArchive />
+        {GIANTS_ENABLED && (
         <section className={`${styles.section} ${styles.generator}`} id="final" aria-labelledby="discussion-title">
           <div className={styles.sectionHead}><h2 id="discussion-title">발제 · 거인의 어깨</h2><a className={styles.secondary} href="/giants">전체 발제 도구</a></div>
           <DiscussionGenerator variant="landing" />
         </section>
+        )}
       </main>
       <footer className="lp-footer">
         <div className="lp-foot-inner"><span className="lp-foot-mark">질문하는 사람들</span><span className="lp-foot-copy">© 2026 Qsapiens.</span></div>

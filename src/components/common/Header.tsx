@@ -7,8 +7,9 @@ import { Menu, X, LogOut, User, ChevronDown, Archive, Settings } from "lucide-re
 import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
 import SearchPalette from "./SearchPalette";
+import { GIANTS_ENABLED } from "@/lib/features";
 
-const navItems = [
+const allNavItems = [
   {
     href: "/questions",
     label: "질문",
@@ -47,6 +48,8 @@ const navItems = [
     ],
   },
 ];
+
+const navItems = allNavItems.filter((item) => GIANTS_ENABLED || item.href !== "/giants");
 
 export default function Header() {
   const router = useRouter();

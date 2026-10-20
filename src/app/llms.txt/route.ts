@@ -14,6 +14,7 @@ import {
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { activeGuides } from "@/content/ai-guides";
 import { UPCOMING_BOOKS } from "@/lib/bookclub/upcoming";
+import { GIANTS_ENABLED } from "@/lib/features";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 
@@ -53,8 +54,7 @@ export function GET() {
 - [홈](${SITE_URL}/): 다가오는 모임 일정과 위치
 - [북클럽](${SITE_URL}/bookclub): 전체 모임 목록(예정·지난 모임)
 - [질문](${SITE_URL}/questions): 커뮤니티가 남긴 질문 모음
-- [발제 생성기](${SITE_URL}/giants): 책 제목을 넣으면 독서모임용 발제 질문을 만들어 주는 도구
-- [아카이브](${SITE_URL}/archive): 지난 모임의 후기·발제 기록
+${GIANTS_ENABLED ? `- [발제 생성기](${SITE_URL}/giants): 책 제목을 넣으면 독서모임용 발제 질문을 만들어 주는 도구\n` : ""}- [아카이브](${SITE_URL}/archive): 지난 모임의 후기·발제 기록
 - [사이트맵](${SITE_URL}/sitemap.xml)
 
 ## 참여 안내

@@ -1,3 +1,4 @@
+import { GIANTS_ENABLED } from "@/lib/features";
 import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { BOOKCLUB_SESSIONS } from "@/lib/bookclub/data";
@@ -13,7 +14,7 @@ const STATIC_PATHS: { path: string; changeFrequency: MetadataRoute.Sitemap[numbe
   { path: "", changeFrequency: "daily", priority: 1.0 },
   { path: "/bookclub", changeFrequency: "daily", priority: 0.95 },
   { path: "/questions", changeFrequency: "daily", priority: 0.9 },
-  { path: "/giants", changeFrequency: "weekly", priority: 0.8 },
+  ...(GIANTS_ENABLED ? [{ path: "/giants", changeFrequency: "weekly" as const, priority: 0.8 }] : []),
   { path: "/archive", changeFrequency: "weekly", priority: 0.8 },
   { path: "/clubs", changeFrequency: "weekly", priority: 0.7 },
   { path: "/quiz", changeFrequency: "monthly", priority: 0.5 },
