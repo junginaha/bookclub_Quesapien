@@ -150,7 +150,11 @@ export async function joinBookClubWaitlist(input: {
     if (input.clubSlug) revalidatePath(`/bookclub/${input.clubSlug}`);
     revalidatePath("/bookclub");
 
-    const count = input.clubSlug?.startsWith("next-") ? await countInterest(input.clubSlug) : undefined;
+    const pastSession = input.clubSlug ? getSession(input.clubSlug) : undefined;
+    const count =
+      input.clubSlug && (input.clubSlug.startsWith("next-") || (pastSession && isPast(pastSession)))
+        ? await countInterest(input.clubSlug)
+        : undefined;
     if (kind === "joined") return { ok: true, kind: "joined", count };
     if (kind === "duplicate") return { ok: true, kind: "duplicate", count };
     return { ok: false, error: "결과를 확인하지 못했습니다." };

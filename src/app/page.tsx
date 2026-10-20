@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import LandingPage from "@/components/home/LandingPage";
 import { buildMetadata } from "@/lib/metadata";
 import { getInterestCounts, getSessionsWithReserved } from "@/lib/bookclub/server";
+import { BOOKCLUB_SESSIONS } from "@/lib/bookclub/data";
+import { isPast } from "@/lib/bookclub/types";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = buildMetadata({
@@ -12,6 +14,7 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function HomePage() {
-  const [sessions, interestCounts] = await Promise.all([getSessionsWithReserved(), getInterestCounts()]);
+  const pastSlugs = BOOKCLUB_SESSIONS.filter(isPast).map((s) => s.slug);
+  const [sessions, interestCounts] = await Promise.all([getSessionsWithReserved(), getInterestCounts(pastSlugs)]);
   return <LandingPage bookclubSessions={sessions} interestCounts={interestCounts} />;
 }

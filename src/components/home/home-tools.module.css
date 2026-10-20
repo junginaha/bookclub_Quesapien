@@ -275,47 +275,24 @@
   isolation: isolate;
   transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease;
 }
-.coverScene {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  opacity: 0;
-  overflow: hidden;
-  background: #e9e0d3;
-  transition: opacity .24s ease;
-}
-.coverScene img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  filter: saturate(.94) contrast(.97) brightness(1.04);
-  transform: scale(1.025);
-  transition: transform .4s cubic-bezier(.2,.8,.2,1);
-}
 .bookLink:hover .coverVisual,
 .bookLink:focus-visible .coverVisual {
   transform: translateY(-7px) scale(1.035);
   box-shadow: 0 24px 42px -25px rgba(49,38,28,.72), 8px 9px 0 -4px #d7c7b0;
 }
-.bookLink:hover .coverScene,
-.bookLink:focus-visible .coverScene { opacity: .96; }
-.bookLink:hover .coverScene img,
-.bookLink:focus-visible .coverScene img { transform: scale(1.06); }
 .bookLink:focus-visible { outline: 2px solid #8b735c; outline-offset: 5px; }
 @media (hover:none) {
   .bookLink:active .coverVisual { transform: scale(1.025); }
-  .bookLink:active .coverScene { opacity: .96; }
 }
 @media (max-width:720px) { .bookLink { max-width:none; } }
 
 /* 2026-10 오픈 예정 북모임(투표 후보) — 기존 책 그리드 톤 그대로 재사용 */
 .upcomingFilters { display: flex; flex-wrap: wrap; gap: 8px; margin: -8px 0 24px; }
-.upcomingFilter, .upcomingFilterActive {
+div.upcomingFilters > button.upcomingFilter, div.upcomingFilters > button.upcomingFilterActive, .upcomingFilter, .upcomingFilterActive {
   min-height: 36px; padding: 6px 14px; font-size: 12.5px; cursor: pointer;
   border: 1px solid var(--tool-line); background: #fff; color: #756c62;
 }
-.upcomingFilterActive { background: #173b75; border-color: #173b75; color: #fff; }
+div.upcomingFilters > button.upcomingFilterActive, .upcomingFilterActive { background: #173b75; border-color: #173b75; color: #fff; }
 .upcomingPitch { margin: 8px 2px 12px; color: #5f574f; font-size: 12.5px; line-height: 1.7; word-break: keep-all; }
 .section li.bookLink .secondary { width: 100%; }
 .upcomingCount { margin: -4px 2px 12px; color: #8c6c50; font-size: 11.5px; line-height: 1.6; word-break: keep-all; }
@@ -329,3 +306,19 @@
 .bookLink :global(.qc-notify-form) input:not([type="checkbox"]),
 .upcomingRecommend :global(.qc-notify-form) input:not([type="checkbox"]) { width: 100%; min-width: 0; box-sizing: border-box; }
 .bookLink :global(.qd-consent) { font-size: 11.5px; }
+.encoreCoverLink { display: block; color: inherit; text-decoration: none; }
+.encoreCoverLink:hover .coverVisual { transform: translateY(-4px); }
+
+/* 카드형 목록(오픈 예정·앵콜) — 버튼을 카드 바닥에 맞춰 줄을 가지런히 */
+li.bookLink { display: flex; flex-direction: column; height: 100%; }
+li.bookLink > .cardAction { margin-top: auto; }
+/* 홈 .lp button 리셋(landing.css)보다 우선하도록 li.bookLink > button 으로 한정 */
+li.bookLink > button.cardAction, .cardAction {
+  display: inline-flex; align-items: center; justify-content: center; width: 100%;
+  min-height: 44px; padding: 10px 16px; cursor: pointer;
+  background: #fff; border: 1px solid var(--tool-line); color: var(--tool-blue);
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  transition: background .18s ease, border-color .18s ease;
+}
+li.bookLink > button.cardAction:hover { background: #f7f2e9; border-color: #b9ab98; }
+.cardAction:focus-visible { outline: 2px solid var(--tool-violet); outline-offset: 3px; }

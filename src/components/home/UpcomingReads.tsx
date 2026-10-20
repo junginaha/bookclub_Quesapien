@@ -46,7 +46,7 @@ export default function UpcomingReads({ counts = {} }: { counts?: Record<string,
         {books.map((book) => (
           <li key={book.slug} className={styles.bookLink}>
             <span className={styles.coverVisual}>
-              <BookCoverImage title={book.bookTitle} author={book.author} fallbackClassName={styles.coverFallback} />
+              <BookCoverImage title={book.bookTitle} author={book.author} />
             </span>
             <span className={styles.coverMeta}>
               <strong>{book.bookTitle}</strong>
@@ -56,11 +56,13 @@ export default function UpcomingReads({ counts = {} }: { counts?: Record<string,
             <p className={styles.upcomingPitch}>{book.pitch}</p>
             <p className={styles.upcomingCount}>{interestCopy(counts[book.slug] ?? 0)}</p>
             {openSlug === book.slug ? (
-              <NotifyForm clubSlug={book.slug} mode="interest" />
+              <div style={{ marginTop: "auto" }}>
+                <NotifyForm clubSlug={book.slug} mode="interest" />
+              </div>
             ) : (
               <button
                 type="button"
-                className={styles.secondary}
+                className={styles.cardAction}
                 onClick={() => setOpenSlug(book.slug)}
                 aria-label={`${book.bookTitle} 읽고 싶어요`}
               >
