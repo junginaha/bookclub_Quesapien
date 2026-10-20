@@ -20,7 +20,7 @@ type Item =
   | { kind: "past"; key: string; session: BookClubSession }
   | { kind: "next"; key: string; book: UpcomingBook };
 
-const FILTERS = ["전체", "지난 북클럽", ...UPCOMING_GENRES.filter((g) => g !== "전체")] as const;
+const FILTERS = UPCOMING_GENRES;
 type Filter = (typeof FILTERS)[number];
 
 export default function ReunionReads({
@@ -48,11 +48,7 @@ export default function ReunionReads({
   const next: Item[] = UPCOMING_BOOKS.map((b) => ({ kind: "next", key: b.slug, book: b }));
 
   const items =
-    filter === "전체"
-      ? [...past, ...next]
-      : filter === "지난 북클럽"
-        ? past
-        : next.filter((i) => i.kind === "next" && i.book.genre === filter);
+    filter === "전체" ? [...past, ...next] : next.filter((i) => i.kind === "next" && i.book.genre === filter);
 
   return (
     <section className={styles.section} id="encore" aria-labelledby="encore-title">
@@ -97,14 +93,14 @@ export default function ReunionReads({
               <span className={styles.coverMeta}>
                 <strong>{title}</strong>
                 <small>{isPast ? author : credit(item.book)}</small>
-                <small>{isPast ? "지난 북클럽" : item.book.genre}</small>
+                {!isPast && <small>{item.book.genre}</small>}
               </span>
             </>
           );
           return (
             <li key={item.key} className={styles.bookLink}>
               {isPast ? (
-                <Link href={"/bookclub/" + item.session.slug} className={styles.encoreCoverLink} aria-label={`${title} 지난 북클럽 보기`}>
+                <Link href={"/bookclub/" + item.session.slug} className={styles.encoreCoverLink} aria-label={`${title} 북클럽 보기`}>
                   {cover}
                 </Link>
               ) : (
@@ -121,9 +117,9 @@ export default function ReunionReads({
                   type="button"
                   className={styles.cardAction}
                   onClick={() => setOpenKey(item.key)}
-                  aria-label={`${title} ${isPast ? "다시 읽고 싶어요" : "읽고 싶어요"}`}
+                  aria-label={`${title} 읽고 싶어요`}
                 >
-                  {isPast ? "다시 읽고 싶어요" : "읽고 싶어요"}
+                  읽고 싶어요
                 </button>
               )}
             </li>
