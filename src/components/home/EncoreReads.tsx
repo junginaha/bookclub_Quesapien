@@ -39,9 +39,9 @@ export default function EncoreReads({
       <div className={styles.sectionHead}>
         <div>
           <span className={styles.eyebrow}>ENCORE</span>
-          <h2 id="encore-title">5명이 모이면 다시 열어요</h2>
+          <h2 id="encore-title">우리 다시 만나요</h2>
           <p className={styles.sectionLead}>
-            지난 북클럽을 놓치셨나요? 다시 읽고 싶은 책에 등록해 주세요. 같은 책을 고른 분이 5명 모이면 앵콜 북클럽을 열고 연락드려요.
+            지난 북클럽을 놓치셨나요? 다시 이야기를 나누고 싶다면 알려주세요. 취향이 같은 5분이 모이면 앵콜 북클럽을 열고 연결해드려요.
           </p>
         </div>
       </div>
