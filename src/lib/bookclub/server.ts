@@ -40,20 +40,25 @@ export async function getSessionsWithReserved(): Promise<BookClubSession[]> {
 }
 
 /**
- * "함께 읽고 싶은 책" 관심 인원 — 키별 고유 전화번호 수(next-* 카드 + rec: 회원 추천).
+ * "함께 읽고 싶은 책" 관심 인원 — 키별 고유 전화번호 수(next-* 카드 + rec: 회원 추천 + 지난 모임 앵콜).
  * 개인정보는 반환하지 않는다. 연결 실패 시 빈 객체(화면은 인원 숫자 없이 기본 문구).
  */
-export async function getInterestCounts(): Promise<Record<string, number>> {
+export async function getInterestCounts(sessionSlugs: string[] = []): Promise<Record<string, number>> {
   try {
     const db = createServiceClient();
-    const [next, rec] = await Promise.all([
+    const [next, rec, past] = await Promise.all([
       db.from("bookclub_waitlist").select("club_slug, phone").like("club_slug", "next-%"),
       db.from("bookclub_waitlist").select("club_slug, phone").like("club_slug", "rec:%"),
+      sessionSlugs.length
+        ? db.from("bookclub_waitlist").select("club_slug, phone").in("club_slug", sessionSlugs)
+        : Promise.resolve({ data: [], error: null }),
     ]);
-    if (next.error || rec.error) throw next.error ?? rec.error;
+    if (next.error || rec.error || past.error) throw next.error ?? rec.error ?? past.error;
     const sets = new Map<string, Set<string>>();
-    for (const row of [...(next.data ?? []), ...(rec.data ?? [])] as { club_slug: string; phone: string }[]) {
-      const key = interestKey(row.club_slug);
+    const rows = [...(next.data ?? []), ...(rec.data ?? []), ...(past.data ?? [])] as { club_slug: string; phone: string }[];
+    for (const row of rows) {
+      // 지난 모임 slug는 그대로 키로 쓴다(앵콜 관심 인원)
+      const key = sessionSlugs.includes(row.club_slug) ? row.club_slug : interestKey(row.club_slug);
       if (!key) continue;
       if (!sets.has(key)) sets.set(key, new Set());
       sets.get(key)!.add(row.phone);

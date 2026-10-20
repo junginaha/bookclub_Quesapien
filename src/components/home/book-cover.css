@@ -1,0 +1,56 @@
+/* 표지 이미지가 없거나 불러오지 못할 때 쓰는 타이포그래피 표지 — 모든 책 카드 공용.
+   책마다 제목으로 정해지는 차분한 색 하나를 쓰고, 종이 질감·책등 그림자·작은 표식을 넣는다. */
+.q-typecover {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14% 12% 11% 16%;
+  box-sizing: border-box;
+  overflow: hidden;
+  container-type: inline-size;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.22) 0, rgba(0,0,0,.06) 5%, rgba(255,255,255,.08) 6.5%, transparent 9%),
+    radial-gradient(120% 90% at 85% 0%, rgba(255,255,255,.14), transparent 55%),
+    var(--q-cover-bg, #173b75);
+  color: var(--q-cover-ink, #f5efd8);
+  text-align: left;
+}
+.q-typecover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .18;
+  background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0 1px, transparent 1px 3px);
+  mix-blend-mode: overlay;
+}
+.q-typecover__rule { display: block; width: 28%; height: 1px; background: currentColor; opacity: .55; }
+.q-typecover__title {
+  display: block;
+  font-family: var(--font-noto-serif-kr), "Noto Serif KR", serif;
+  font-weight: 600;
+  font-size: clamp(13px, 11cqi, 26px);
+  line-height: 1.38;
+  letter-spacing: -.01em;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.q-typecover__author {
+  display: block;
+  font-size: clamp(9.5px, 6cqi, 12px);
+  line-height: 1.45;
+  opacity: .78;
+  word-break: keep-all;
+}
+.q-typecover__mark {
+  display: block;
+  font-size: clamp(8px, 4.6cqi, 10px);
+  letter-spacing: .22em;
+  font-style: normal;
+  opacity: .55;
+}

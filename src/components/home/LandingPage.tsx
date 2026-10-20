@@ -7,6 +7,7 @@ import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
 import MiniBookSpread from "./MiniBookSpread";
 import UpcomingReads from "./UpcomingReads";
+import EncoreReads from "./EncoreReads";
 import HomeArchive from "./HomeArchive";
 import "./landing.css";
 import styles from "./home-tools.module.css";
@@ -163,6 +164,7 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
         </section>
         <HomeCalendarLocationHub sessions={bookclubSessions} />
         <MiniBookSpread sessions={bookclubSessions} />
+        <EncoreReads sessions={bookclubSessions} counts={interestCounts} />
         <UpcomingReads counts={interestCounts} />
         <HomeArchive />
         <section className={`${styles.section} ${styles.generator}`} id="final" aria-labelledby="discussion-title">

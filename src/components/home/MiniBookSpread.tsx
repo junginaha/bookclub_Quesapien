@@ -6,21 +6,12 @@ import { formatMonthDay, getStatus } from "@/lib/bookclub/selectors";
 import BookCoverImage from "./BookCoverImage";
 import styles from "./home-tools.module.css";
 
-const SCENES = [
-  "/images/bookclub/warm-group.webp",
-  "/images/bookclub/actual-group.webp",
-];
-
 export default function MiniBookSpread({ sessions }: { sessions: BookClubSession[] }) {
   const unique = new Map<string, BookClubSession>();
-  const ordered = [...sessions].sort((a, b) => {
-    const aPast = getStatus(a) === "past";
-    const bPast = getStatus(b) === "past";
-    if (aPast !== bPast) return aPast ? 1 : -1;
-    return aPast
-      ? Date.parse(b.startsAt) - Date.parse(a.startsAt)
-      : Date.parse(a.startsAt) - Date.parse(b.startsAt);
-  });
+  // 진행 중·예정 모임만 — 지난 모임은 다음 섹션(EncoreReads, 5명 모이면 다시 열기)으로 간다
+  const ordered = sessions
+    .filter((s) => getStatus(s) !== "past")
+    .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
 
   for (const session of ordered) {
     const key = session.bookTitle + "\u0000" + session.author;
@@ -41,8 +32,7 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
         <p className={styles.muted}>다음 책을 고르고 있습니다.</p>
       ) : (
         <div className={styles.bookGrid}>
-          {[...unique.values()].map((session, index) => {
-            const scene = SCENES[index];
+          {[...unique.values()].map((session) => {
             return (
               <Link
                 className={styles.bookLink}
@@ -55,19 +45,13 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
                     title={session.bookTitle}
                     author={session.author}
                     coverUrl={session.coverUrl}
-                    fallbackClassName={styles.coverFallback}
                   />
-                  {scene && (
-                    <span className={styles.coverScene} aria-hidden="true">
-                      <img src={scene} alt="" loading="lazy" />
-                    </span>
-                  )}
                 </span>
                 <span className={styles.coverMeta}>
                   <strong>{session.bookTitle}</strong>
                   <small>{session.author}</small>
                   <small>
-                    {formatMonthDay(session.startsAt)} · {getStatus(session) === "past" ? "지난 모임" : session.venue.name}
+                    {formatMonthDay(session.startsAt)} · {session.venue.name}
                   </small>
                 </span>
               </Link>
