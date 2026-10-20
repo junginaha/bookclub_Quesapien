@@ -2,24 +2,23 @@
 
 import { useId, useState } from "react";
 import { recommendBook } from "@/lib/actions/bookclub";
-import { INTEREST_THRESHOLD, interestCopy } from "@/lib/bookclub/interest";
-import { ConsentField } from "@/components/bookclub/NotifyForm";
-import { Button } from "@/components/ui/button";
+import { interestCopy } from "@/lib/bookclub/interest";
+import InterestFields, { EMPTY_INTEREST, interestValid, type InterestValues } from "./InterestFields";
+import "./interest-form.css";
 
-/** 함께 읽고 싶은 책 추천하기 — 같은 책을 고른 사람이 5명 모이면 운영자가 연락한다. */
+/** 함께 읽고 싶은 책 추천하기 — 책 제목·저자 + "읽고 싶어요"와 같은 신청서 형식 */
 export default function RecommendBookForm() {
-  const ids = { title: useId(), author: useId(), name: useId(), phone: useId(), consent: useId() };
+  const titleId = useId();
+  const authorId = useId();
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [values, setValues] = useState<InterestValues>(EMPTY_INTEREST);
   const [website, setWebsite] = useState("");
-  const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState<{ kind: "joined" | "duplicate"; count?: number; title: string } | null>(null);
+  const [done, setDone] = useState<{ kind: string; count?: number; title: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const valid = title.trim().length > 0 && name.trim().length > 0 && phone.trim().length >= 9 && consent;
+  const valid = title.trim().length > 0 && interestValid(values);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -27,7 +26,7 @@ export default function RecommendBookForm() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await recommendBook({ title, author, name, phone, website });
+      const res = await recommendBook({ title, author, ...values, website });
       if (!res.ok) {
         setError(res.error);
         return;
@@ -40,18 +39,20 @@ export default function RecommendBookForm() {
 
   if (done) {
     return (
-      <div className="qc-notify-form" role="status">
-        <p className="qc-notify-status">
-          『{done.title}』 {done.kind === "joined" ? "추천을 받았어요." : "이미 추천하셨어요."}{" "}
-          {done.count != null ? interestCopy(done.count) : `같은 책을 고른 분이 ${INTEREST_THRESHOLD}명이 되면 연락드릴게요.`}
+      <div className="qif-inline" role="status">
+        <p className="qif-done">
+          『{done.title}』 {done.kind === "joined" ? "추천을 받았어요." : "이미 추천하셨어요."}
+          <br />
+          {interestCopy(done.count ?? 0)}
         </p>
         <button
           type="button"
-          className="qc-notify-btn is-outline"
+          className="qif-submit"
           onClick={() => {
             setDone(null);
             setTitle("");
             setAuthor("");
+            setValues((v) => ({ ...v, memo: "" }));
           }}
         >
           다른 책도 추천하기
@@ -61,24 +62,16 @@ export default function RecommendBookForm() {
   }
 
   return (
-    <form className="qc-notify-form" onSubmit={handleSubmit} aria-label="함께 읽고 싶은 책 추천하기">
-      <div>
-        <label htmlFor={ids.title}>책 제목 (필수)</label>
-        <input id={ids.title} value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} required />
+    <form className="qif-inline qif-form" onSubmit={handleSubmit} aria-label="함께 읽고 싶은 책 추천하기">
+      <div className="qif-field">
+        <label htmlFor={titleId}>책 제목</label>
+        <input id={titleId} className="qif-input" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} required />
       </div>
-      <div>
-        <label htmlFor={ids.author}>저자</label>
-        <input id={ids.author} value={author} onChange={(e) => setAuthor(e.target.value)} maxLength={60} />
+      <div className="qif-field">
+        <label htmlFor={authorId}>저자 (선택)</label>
+        <input id={authorId} className="qif-input" value={author} onChange={(e) => setAuthor(e.target.value)} maxLength={60} />
       </div>
-      <div>
-        <label htmlFor={ids.name}>이름</label>
-        <input id={ids.name} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" required />
-      </div>
-      <div>
-        <label htmlFor={ids.phone}>휴대전화</label>
-        <input id={ids.phone} value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" inputMode="tel" required />
-      </div>
-      <ConsentField id={ids.consent} checked={consent} onChange={setConsent} />
+      <InterestFields values={values} onChange={setValues} />
       <input
         type="text"
         value={website}
@@ -88,10 +81,10 @@ export default function RecommendBookForm() {
         aria-hidden="true"
         style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
       />
-      <Button type="submit" className="w-full" disabled={!valid || submitting} aria-disabled={!valid || submitting}>
-        {submitting ? "확인 중…" : "이 책 추천하기"}
-      </Button>
-      {error && <p className="qc-notify-status" style={{ color: "#9B4A2E" }}>{error}</p>}
+      <button type="submit" className="qif-submit" disabled={!valid || submitting}>
+        {submitting ? "보내는 중…" : "이 책 추천하기"}
+      </button>
+      {error && <p className="qif-error" role="alert">{error}</p>}
     </form>
   );
 }

@@ -1,0 +1,59 @@
+/* "읽고 싶어요" 신청서 — 운영자가 보낸 문의 폼 형식(이름·답변 방법·전화번호·남기실 말·동의) */
+.qif-dialog {
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  padding: 0;
+  border: 1px solid #d9d5cd;
+  border-radius: 4px;
+  background: #fff;
+  color: #27313d;
+  box-shadow: 0 30px 60px -30px rgba(23, 33, 52, .45);
+}
+.qif-dialog::backdrop { background: rgba(20, 22, 26, .5); }
+.qif-inner { padding: 28px 24px 24px; overflow-y: auto; max-height: calc(100dvh - 50px); box-sizing: border-box; }
+.qif-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.qif-title { margin: 0; font: 600 22px/1.4 var(--font-noto-serif-kr), serif; color: #27313d; word-break: keep-all; }
+.qif-close { flex: none; width: 40px; height: 40px; margin: -8px -8px 0 0; border: 0; background: none; color: #4a4f57; cursor: pointer; font-size: 26px; line-height: 1; }
+.qif-lead { margin: 8px 0 20px; color: #6b6f76; font-size: 14.5px; line-height: 1.6; word-break: keep-all; }
+.qif-form { display: grid; gap: 18px; }
+.qif-field { display: grid; gap: 8px; }
+.qif-field > label { font-size: 14px; color: #3b4048; }
+.qif-input, .qif-select, .qif-textarea {
+  width: 100%; box-sizing: border-box; font: inherit; font-size: 16px; color: #27313d;
+  padding: 13px 14px; border: 1px solid #ccd3de; border-radius: 6px; background: #fff;
+}
+.qif-input::placeholder, .qif-textarea::placeholder { color: #9aa1ab; }
+.qif-input:focus, .qif-select:focus, .qif-textarea:focus { outline: 2px solid #173b75; outline-offset: 0; border-color: #173b75; }
+.qif-select {
+  appearance: none; padding-right: 44px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232b4fd1' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+.qif-textarea { min-height: 120px; resize: vertical; line-height: 1.6; }
+.qif-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: -4px; }
+.qif-voice { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 6px 4px; color: #3b4048; font: inherit; font-size: 14px; cursor: pointer; }
+.qif-voice[aria-pressed="true"] { color: #9b4a2e; }
+.qif-count { margin-left: auto; color: #8a9099; font-size: 13px; }
+.qif-consent { display: flex; align-items: flex-start; gap: 10px; font-size: 14.5px; color: #3b4048; line-height: 1.5; cursor: pointer; }
+.qif-consent input { width: 20px; height: 20px; margin: 1px 0 0; flex: none; accent-color: #173b75; }
+.qif-note { margin: -8px 0 0 30px; color: #8a9099; font-size: 12.5px; line-height: 1.6; word-break: keep-all; }
+.qif-note a { color: inherit; text-decoration: underline; }
+.qif-submit {
+  width: 100%; min-height: 50px; border: 0; border-radius: 6px; cursor: pointer;
+  background: #173b75; color: #fff; font: inherit; font-size: 16px; font-weight: 600;
+}
+.qif-submit:disabled { background: #b8bfca; cursor: not-allowed; }
+.qif-error { margin: 0; color: #9b4a2e; font-size: 13.5px; line-height: 1.5; }
+.qif-done { margin: 4px 0 20px; color: #27313d; font-size: 15px; line-height: 1.7; word-break: keep-all; }
+.qif-inline { background: #fff; border: 1px solid #d9d5cd; border-radius: 4px; padding: 22px 20px; }
+
+/* 홈 .lp button / form 리셋(landing.css)보다 우선하도록 클래스를 겹쳐 쓴다 */
+.qif-inline.qif-inline { background: #fff; }
+button.qif-submit.qif-submit {
+  width: 100%; min-height: 50px; border: 0; border-radius: 6px; cursor: pointer;
+  background: #173b75; color: #fff; font-size: 16px; font-weight: 600;
+}
+button.qif-submit.qif-submit:disabled { background: #b8bfca; color: #fff; cursor: not-allowed; }
+button.qif-voice.qif-voice { border: 0; background: none; color: #3b4048; padding: 6px 4px; }
+button.qif-voice.qif-voice[aria-pressed="true"] { color: #9b4a2e; }
+button.qif-close.qif-close { border: 0; background: none; color: #4a4f57; font-size: 26px; }

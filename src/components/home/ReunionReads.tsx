@@ -6,7 +6,7 @@ import type { BookClubSession } from "@/lib/bookclub/types";
 import { cardBlurb, getStatus } from "@/lib/bookclub/selectors";
 import { UPCOMING_BOOKS, UPCOMING_GENRES, type UpcomingBook } from "@/lib/bookclub/upcoming";
 import { interestCopy } from "@/lib/bookclub/interest";
-import NotifyForm from "@/components/bookclub/NotifyForm";
+import InterestDialog from "./InterestDialog";
 import BookCoverImage from "./BookCoverImage";
 import RecommendBookForm from "./RecommendBookForm";
 import styles from "./home-tools.module.css";
@@ -32,6 +32,7 @@ export default function ReunionReads({
 }) {
   const [filter, setFilter] = useState<Filter>("전체");
   const [openKey, setOpenKey] = useState<string | null>(null);
+  const [liveCounts, setLiveCounts] = useState<Record<string, number>>({});
 
   // 지난 모임 — 같은 책은 가장 최근 회차 하나만
   const seen = new Set<string>();
@@ -107,12 +108,8 @@ export default function ReunionReads({
                 cover
               )}
               {blurb && <p className={styles.upcomingPitch}>{blurb}</p>}
-              <p className={styles.upcomingCount}>{interestCopy(counts[item.key] ?? 0)}</p>
-              {openKey === item.key ? (
-                <div style={{ marginTop: "auto" }}>
-                  <NotifyForm clubSlug={item.key} mode="interest" />
-                </div>
-              ) : (
+              <div className={styles.cardFoot}>
+                <p className={styles.cardFootCopy}>{interestCopy(liveCounts[item.key] ?? counts[item.key] ?? 0)}</p>
                 <button
                   type="button"
                   className={styles.cardAction}
@@ -121,7 +118,14 @@ export default function ReunionReads({
                 >
                   읽고 싶어요
                 </button>
-              )}
+              </div>
+              <InterestDialog
+                clubSlug={item.key}
+                bookTitle={title}
+                open={openKey === item.key}
+                onClose={() => setOpenKey(null)}
+                onDone={(c) => c != null && setLiveCounts((m) => ({ ...m, [item.key]: c }))}
+              />
             </li>
           );
         })}
