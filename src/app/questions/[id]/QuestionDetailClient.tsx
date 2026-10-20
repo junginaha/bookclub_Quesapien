@@ -17,6 +17,7 @@ import type { Question } from "@/types";
 import AISummaryBlock from "@/components/seo/AISummaryBlock";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 import AIExpansionPanel from "@/components/questions/AIExpansionPanel";
+import { GIANTS_ENABLED } from "@/lib/features";
 
 interface Props {
   questionId: string;
@@ -226,7 +227,7 @@ export default function QuestionDetailClient({ questionId, seedQuestion, initial
           items={[
             { label: "모든 질문 보기", href: "/questions", type: "question" },
             { label: "북클럽 참여하기", href: "/bookclub", type: "booktalk" },
-            { label: "거인의 어깨에서 탐구", href: "/giants", type: "giant" },
+            ...(GIANTS_ENABLED ? [{ label: "거인의 어깨에서 탐구", href: "/giants", type: "giant" as const }] : []),
             { label: "후기 아카이브", href: "/archive", type: "review" },
           ]}
         />

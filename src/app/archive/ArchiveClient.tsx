@@ -8,6 +8,7 @@ import { BookOpen, MessageSquare, FileText, Calendar, Heart } from "lucide-react
 import { formatDate } from "@/lib/utils";
 import AISummaryBlock from "@/components/seo/AISummaryBlock";
 import AIReviewSummary from "@/components/archive/AIReviewSummary";
+import { GIANTS_ENABLED } from "@/lib/features";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Review = any;
@@ -140,7 +141,7 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
     { key: "mine" as const, label: "내 아카이브", icon: <Heart size={14} />, count: myReviews.length || undefined },
     { key: "cases" as const, label: "진행자 사례", icon: <MessageSquare size={14} />, count: LEADER_CASES.length },
     { key: "questions" as const, label: "질문 아카이브", icon: <MessageSquare size={14} />, count: STATIC_QUESTIONS.length },
-    { key: "discussions" as const, label: "발제문 아카이브", icon: <FileText size={14} />, count: discussionsLoaded ? discussions.length : undefined },
+    ...(GIANTS_ENABLED ? [{ key: "discussions" as const, label: "발제문 아카이브", icon: <FileText size={14} />, count: discussionsLoaded ? discussions.length : undefined }] : []),
     { key: "talks" as const, label: "북토크 기록", icon: <BookOpen size={14} />, count: STATIC_TALKS.length },
   ];
 

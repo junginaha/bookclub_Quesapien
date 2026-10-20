@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/utils";
 import { logoutAction } from "@/lib/actions/auth";
 import type { ProfileRow, ReviewRow, SessionRow } from "@/lib/supabase/types";
 import { computeDNA, DEFAULT_DNA } from "@/lib/question-dna";
+import { GIANTS_ENABLED } from "@/lib/features";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type SessionWithQ = SessionRow & { question?: any };
@@ -247,7 +248,7 @@ export default function MyPageClient({ profile, myReviews, mySessions, onboardin
                   {[
                     { href: "/questions/create", icon: <MessageSquare size={16} />, label: "질문 작성하기", color: "var(--ink)" },
                     { href: "/bookclub", icon: <BookOpen size={16} />, label: "북클럽 참여하기", color: "var(--accent)" },
-                    { href: "/giants", icon: "?", label: "발제 생성기", color: "var(--bg-navy)" },
+                    ...(GIANTS_ENABLED ? [{ href: "/giants", icon: "?", label: "발제 생성기", color: "var(--bg-navy)" }] : []),
                     { href: "/onboarding", icon: <Sparkles size={16} />, label: "프로필 업데이트", color: "#5C6B3A" },
                   ].map((action) => (
                     <Link key={action.href} href={action.href} style={{ textDecoration: "none" }}>

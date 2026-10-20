@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { GIANTS_ENABLED } from "@/lib/features";
 
 const SECTIONS = [
   {
@@ -10,7 +11,7 @@ const SECTIONS = [
       { href: "/clubs", label: "내 근처 북클럽" },
       { href: "/bookclub", label: "북클럽" },
       { href: "/archive", label: "아카이빙" },
-      { href: "/giants", label: "거인의 어깨" },
+      ...(GIANTS_ENABLED ? [{ href: "/giants", label: "거인의 어깨" }] : []),
     ],
   },
   {

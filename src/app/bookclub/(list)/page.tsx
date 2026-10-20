@@ -4,7 +4,9 @@ import Footer from "@/components/common/Footer";
 import BookingCalendar from "@/components/bookclub/BookingCalendar";
 import { buildMetadata } from "@/lib/metadata";
 import { breadcrumbSchema, bookclubItemListSchema, upcomingBooksSchema } from "@/lib/schema";
-import UpcomingReads from "@/components/home/UpcomingReads";
+import ReunionReads from "@/components/home/ReunionReads";
+import { BOOKCLUB_SESSIONS } from "@/lib/bookclub/data";
+import { isPast } from "@/lib/bookclub/types";
 import { UPCOMING_BOOKS } from "@/lib/bookclub/upcoming";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getInterestCounts, getSessionsWithReserved } from "@/lib/bookclub/server";
@@ -18,11 +20,12 @@ export const metadata: Metadata = buildMetadata({
 export const dynamic = "force-dynamic";
 
 export default async function BookClubPage() {
-  const [sessions, interestCounts] = await Promise.all([getSessionsWithReserved(), getInterestCounts()]);
+  const pastSlugs = BOOKCLUB_SESSIONS.filter(isPast).map((s) => s.slug);
+  const [sessions, interestCounts] = await Promise.all([getSessionsWithReserved(), getInterestCounts(pastSlugs)]);
   return <>
     <JsonLd data={[breadcrumbSchema([{ name: "홈", href: "/" }, { name: "북클럽", href: "/bookclub" }]), bookclubItemListSchema(sessions), upcomingBooksSchema(UPCOMING_BOOKS)]} />
     <Header />
-    <main><BookingCalendar sessions={sessions} /><UpcomingReads counts={interestCounts} /></main>
+    <main><BookingCalendar sessions={sessions} /><ReunionReads sessions={sessions} counts={interestCounts} /></main>
     <Footer />
   </>;
 }

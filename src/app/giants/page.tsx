@@ -4,6 +4,8 @@ import Footer from "@/components/common/Footer";
 import GiantsClient from "./GiantsClient";
 import { buildMetadata } from "@/lib/metadata";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { redirect } from "next/navigation";
+import { GIANTS_ENABLED } from "@/lib/features";
 
 export const metadata: Metadata = buildMetadata({
   title: "거인의 어깨 — 북토크 발제 생성기",
@@ -25,6 +27,7 @@ const appLd = {
 };
 
 export default function GiantsPage() {
+  if (!GIANTS_ENABLED) redirect("/");
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
       <JsonLd data={appLd} />

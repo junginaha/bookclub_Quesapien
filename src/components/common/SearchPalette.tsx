@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X, ArrowRight, BookOpen, MessageSquare } from "lucide-react";
+import { GIANTS_ENABLED } from "@/lib/features";
 
 interface SearchResult {
   type: "question" | "booktalk" | "giant" | "archive" | "page";
@@ -12,13 +13,14 @@ interface SearchResult {
   icon: React.ReactNode;
 }
 
-const STATIC_RESULTS: SearchResult[] = [
+const ALL_STATIC_RESULTS: SearchResult[] = [
   { type: "page", label: "질문 탐색", sub: "오늘의 질문 · 인기 질문", href: "/questions", icon: <MessageSquare size={14} /> },
   { type: "page", label: "북클럽 일정", sub: "진행 중인 북토크", href: "/bookclub", icon: <BookOpen size={14} /> },
   { type: "giant", label: "거인의 어깨", sub: "책이나 문장으로 발제 10개 생성하기", href: "/giants", icon: <Search size={14} /> },
   { type: "page", label: "아카이빙", sub: "후기 · 질문 · 발제문 기록", href: "/archive", icon: <BookOpen size={14} /> },
   { type: "page", label: "질문 작성", sub: "당신의 질문을 남겨보세요", href: "/questions/create", icon: <MessageSquare size={14} /> },
 ];
+const STATIC_RESULTS = ALL_STATIC_RESULTS.filter((r) => GIANTS_ENABLED || r.href !== "/giants");
 
 const TYPE_COLORS: Record<string, string> = {
   question: "var(--accent)",
