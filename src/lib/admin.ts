@@ -1,10 +1,11 @@
+// Vercel에 ADMIN_EMAILS가 빈 문자열로 들어가 있어도 운영자 기본 계정은 들어올 수 있게 한다.
 export const ADMIN_EMAILS = (
-  process.env.ADMIN_EMAILS ?? "junginaha@gmail.com,kimjungin@qsapiens.com"
-).split(",").map((e) => e.trim());
+  process.env.ADMIN_EMAILS?.trim() || "junginaha@gmail.com,kimjungin@qsapiens.com"
+).split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
 
 export function isAdminEmail(email: string | null | undefined): boolean {
   if (!email) return false;
-  return ADMIN_EMAILS.includes(email);
+  return ADMIN_EMAILS.includes(email.trim().toLowerCase());
 }
 
 /**
