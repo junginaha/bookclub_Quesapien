@@ -184,9 +184,13 @@ export async function recommendBook(input: {
   author: string;
   name: string;
   phone: string;
+  method?: string;
+  memo?: string;
+  consent?: boolean;
   website: string;
 }): Promise<WaitlistResult> {
   if (input.website.trim()) return { ok: false, error: "요청을 확인하지 못했습니다." };
+  if (input.consent === false) return { ok: false, error: "개인정보 수집·이용에 동의해 주세요." };
   if (await isRateLimited()) return { ok: false, error: "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요." };
   if (!databaseConfigured()) return { ok: false, error: "연결이 준비되지 않았습니다." };
 
@@ -212,15 +216,85 @@ export async function recommendBook(input: {
     if (existing && existing.length) {
       return { ok: true, kind: "duplicate", count: await countInterest(`rec:${titleKey(title)}`) };
     }
-    const { data, error } = await db.rpc("join_bookclub_waitlist", { p_club_slug: slug, p_name: name, p_phone: phone });
-    if (error) return { ok: false, error: "처리 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요." };
-    const kind = (data as { kind?: string } | null)?.kind;
+    const res = await saveInterest(db, slug, name, phone, input.method, input.memo);
+    if (!res.ok) return { ok: false, error: "처리 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요." };
+    const kind = res.kind;
     revalidatePath("/");
     revalidatePath("/bookclub");
     const count = await countInterest(`rec:${titleKey(title)}`);
     if (kind === "joined") return { ok: true, kind: "joined", count };
     if (kind === "duplicate") return { ok: true, kind: "duplicate", count };
     return { ok: false, error: "결과를 확인하지 못했습니다." };
+  } catch {
+    return { ok: false, error: "연결하지 못했습니다." };
+  }
+}
+
+
+const CONTACT_METHODS = ["sms", "kakao", "call"] as const;
+
+/**
+ * 관심 등록 저장 — 023의 join_bookclub_interest(답변 방법·남기실 말 포함)를 먼저 쓰고,
+ * 운영 DB에 아직 023이 없으면 021의 join_bookclub_waitlist(이름·번호만)로 저장한다.
+ */
+async function saveInterest(
+  db: ReturnType<typeof createServiceClient>,
+  slug: string,
+  name: string,
+  phone: string,
+  method?: string,
+  memo?: string,
+): Promise<{ ok: true; kind?: string } | { ok: false }> {
+  const m = CONTACT_METHODS.includes(method as (typeof CONTACT_METHODS)[number]) ? method : "sms";
+  const v2 = await db.rpc("join_bookclub_interest", {
+    p_club_slug: slug,
+    p_name: name,
+    p_phone: phone,
+    p_method: m,
+    p_memo: (memo ?? "").trim().slice(0, 500),
+  });
+  if (!v2.error) return { ok: true, kind: (v2.data as { kind?: string } | null)?.kind };
+  const v1 = await db.rpc("join_bookclub_waitlist", { p_club_slug: slug, p_name: name, p_phone: phone });
+  if (!v1.error) return { ok: true, kind: (v1.data as { kind?: string } | null)?.kind };
+  console.error("[bookclub] interest save failed", { v2: v2.error?.message, v1: v1.error?.message });
+  return { ok: false };
+}
+
+/** "읽고 싶어요" — 오픈 예정 책(next-*)·지난 모임 slug에 관심 등록. 같은 책 5명이 모이면 운영자가 연락. */
+export async function registerInterest(input: {
+  clubSlug: string;
+  name: string;
+  phone: string;
+  method: string;
+  memo: string;
+  consent: boolean;
+  website: string;
+}): Promise<WaitlistResult> {
+  if (input.website.trim()) return { ok: false, error: "요청을 확인하지 못했습니다." };
+  if (!input.consent) return { ok: false, error: "개인정보 수집·이용에 동의해 주세요." };
+  if (await isRateLimited()) return { ok: false, error: "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요." };
+  if (!databaseConfigured()) return { ok: false, error: "연결이 준비되지 않았습니다." };
+
+  const name = input.name.trim();
+  const phone = normalizePhone(input.phone);
+  if (!name || name.length > 80) return { ok: false, error: "이름을 확인해 주세요." };
+  if (phone.length < 9 || phone.length > 15) return { ok: false, error: "전화번호를 확인해 주세요." };
+  if (input.memo.length > 500) return { ok: false, error: "남기실 말은 500자까지 적을 수 있어요." };
+
+  const session = getSession(input.clubSlug);
+  if (!getUpcomingBook(input.clubSlug) && !(session && isPast(session))) {
+    return { ok: false, error: "책 정보를 찾을 수 없습니다." };
+  }
+
+  try {
+    const db = createServiceClient();
+    const res = await saveInterest(db, input.clubSlug, name, phone, input.method, input.memo);
+    if (!res.ok) return { ok: false, error: "처리 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요." };
+    revalidatePath("/");
+    revalidatePath("/bookclub");
+    const count = await countInterest(input.clubSlug);
+    if (res.kind === "duplicate") return { ok: true, kind: "duplicate", count };
+    return { ok: true, kind: "joined", count };
   } catch {
     return { ok: false, error: "연결하지 못했습니다." };
   }

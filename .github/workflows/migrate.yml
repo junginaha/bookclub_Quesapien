@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - "supabase/migrations/020_real_bookclub_reservations.sql"
+      - "supabase/migrations/021_bookclub_applications.sql"
+      - "supabase/migrations/023_bookclub_interest_v2.sql"
       - ".github/workflows/migrate.yml"
 
 permissions:
@@ -32,30 +34,33 @@ jobs:
             exit 1
           fi
 
-      - name: Apply the idempotent reservation migration
+      - name: Apply the idempotent migrations (020, 021, 023)
         run: |
-          jq -n --rawfile query supabase/migrations/020_real_bookclub_reservations.sql \
-            '{query: $query, read_only: false}' > /tmp/supabase-migration.json
+          for f in 020_real_bookclub_reservations 021_bookclub_applications 023_bookclub_interest_v2; do
+            echo "Applying $f"
+            jq -n --rawfile query "supabase/migrations/$f.sql" \
+              '{query: $query, read_only: false}' > /tmp/supabase-migration.json
 
-          status=$(curl --silent --show-error \
-            --output /tmp/supabase-migration-response.json \
-            --write-out '%{http_code}' \
-            --request POST \
-            --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-            --header "Content-Type: application/json" \
-            --data-binary @/tmp/supabase-migration.json \
-            "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF/database/query")
+            status=$(curl --silent --show-error \
+              --output /tmp/supabase-migration-response.json \
+              --write-out '%{http_code}' \
+              --request POST \
+              --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+              --header "Content-Type: application/json" \
+              --data-binary @/tmp/supabase-migration.json \
+              "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF/database/query")
 
-          if [ "$status" != "201" ]; then
-            echo "Migration API returned HTTP $status"
-            jq -r '.message // .error // "Unknown migration error"' /tmp/supabase-migration-response.json
-            exit 1
-          fi
+            if [ "$status" != "201" ]; then
+              echo "Migration API returned HTTP $status for $f"
+              jq -r '.message // .error // "Unknown migration error"' /tmp/supabase-migration-response.json
+              exit 1
+            fi
+          done
 
       - name: Verify reservation database objects
         run: |
           jq -n '{
-            query: "select to_regclass('"'"'public.landing_book_club_signups'"'"') is not null as has_signups, to_regprocedure('"'"'public.reserve_book_club_spot(uuid,text,text,text,boolean,boolean)'"'"') is not null as has_reserve_rpc",
+            query: "select to_regclass('"'"'public.landing_book_club_signups'"'"') is not null as has_signups, to_regprocedure('"'"'public.reserve_book_club_spot(uuid,text,text,text,boolean,boolean)'"'"') is not null as has_reserve_rpc, to_regclass('"'"'public.bookclub_waitlist'"'"') is not null as has_waitlist, to_regprocedure('"'"'public.join_bookclub_interest(text,text,text,text,text)'"'"') is not null as has_interest_rpc",
             read_only: true
           }' > /tmp/supabase-verify.json
 
@@ -66,4 +71,4 @@ jobs:
             --data-binary @/tmp/supabase-verify.json \
             "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF/database/query")
 
-          echo "$response" | jq -e '.[0].has_signups == true and .[0].has_reserve_rpc == true' > /dev/null
+          echo "$response" | jq -e '.[0].has_signups == true and .[0].has_reserve_rpc == true and .[0].has_waitlist == true and .[0].has_interest_rpc == true' > /dev/null

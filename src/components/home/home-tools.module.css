@@ -322,3 +322,13 @@ li.bookLink > button.cardAction, .cardAction {
 }
 li.bookLink > button.cardAction:hover { background: #f7f2e9; border-color: #b9ab98; }
 .cardAction:focus-visible { outline: 2px solid var(--tool-violet); outline-offset: 3px; }
+/* 카드 바닥: 안내 문구를 버튼 바로 위에 붙인다 */
+.cardFoot { margin-top: auto; display: grid; gap: 6px; padding-top: 4px; }
+.cardFootCopy { margin: 0; color: #8c6c50; font-size: 12px; line-height: 1.5; text-align: center; word-break: keep-all; }
+li.bookLink > .cardFoot > button.cardAction {
+  display: inline-flex; align-items: center; justify-content: center; width: 100%;
+  min-height: 44px; padding: 10px 16px; cursor: pointer;
+  background: #fff; border: 1px solid var(--tool-line); color: var(--tool-blue);
+  font-size: 13px; font-weight: 600; font-family: inherit;
+}
+li.bookLink > .cardFoot > button.cardAction:hover { background: #f7f2e9; border-color: #b9ab98; }

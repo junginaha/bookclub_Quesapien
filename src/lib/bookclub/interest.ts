@@ -37,7 +37,7 @@ export function interestKey(slug: string): string | null {
 
 /** 카드·완료 문구. 실제 집계값만 쓴다(0이면 인원 숫자를 노출하지 않음). */
 export function interestCopy(count: number): string {
-  if (count >= INTEREST_THRESHOLD) return `${count}명이 모였어요. 북토크 일정을 준비해 연락드릴게요.`;
-  if (count > 0) return `지금 ${count}명이 함께 읽고 싶어해요 · ${INTEREST_THRESHOLD}명이 모이면 알려드려요`;
-  return `${INTEREST_THRESHOLD}명이 모이면 북토크를 열고 알려드려요`;
+  if (count >= INTEREST_THRESHOLD) return "책친구들이 모였어요. 북토크 일정을 준비해 연락드릴게요.";
+  if (count > 0) return `지금 ${count}명이 함께 읽고 싶어해요 · 책친구들이 모이면 알려드려요`;
+  return "책친구들이 모이면 알려드려요";
 }

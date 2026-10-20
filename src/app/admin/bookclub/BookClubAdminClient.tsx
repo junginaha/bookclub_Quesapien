@@ -23,6 +23,8 @@ export interface WaitlistRow {
   phone: string;
   created_at: string;
   notified_at: string | null;
+  contact_method?: string | null;
+  memo?: string | null;
 }
 
 interface ClubInfo {
@@ -51,6 +53,7 @@ function downloadCsv(filename: string, csv: string) {
   URL.revokeObjectURL(url);
 }
 
+const METHOD_LABEL: Record<string, string> = { sms: "휴대폰 문자", kakao: "카카오톡", call: "전화" };
 const cellStyle: CSSProperties = { padding: "8px 10px", fontSize: 13, borderBottom: "1px solid var(--line)", color: "var(--ink)" };
 const headStyle: CSSProperties = { ...cellStyle, fontWeight: 700, color: "var(--muted)", fontSize: 11.5, textTransform: "uppercase" };
 
@@ -237,6 +240,8 @@ export default function BookClubAdminClient({
                     <tr>
                       <th style={headStyle}>이름</th>
                       <th style={headStyle}>전화</th>
+                      <th style={headStyle}>답변 방법</th>
+                      <th style={headStyle}>남기신 말</th>
                       <th style={headStyle}>등록일</th>
                     </tr>
                   </thead>
@@ -245,6 +250,8 @@ export default function BookClubAdminClient({
                       <tr key={w.id}>
                         <td style={cellStyle}>{w.name}</td>
                         <td style={cellStyle}>{w.phone}</td>
+                        <td style={cellStyle}>{METHOD_LABEL[w.contact_method ?? ""] ?? ""}</td>
+                        <td style={cellStyle}>{w.memo ?? ""}</td>
                         <td style={cellStyle}>{new Date(w.created_at).toLocaleString("ko-KR")}</td>
                       </tr>
                     ))}
@@ -257,7 +264,7 @@ export default function BookClubAdminClient({
                 onClick={() =>
                   downloadCsv(
                     `함께읽기-${g.label.slice(0, 20)}.csv`,
-                    toCsv(["이름", "전화", "등록일"], g.rows.map((w) => [w.name, w.phone, new Date(w.created_at).toLocaleString("ko-KR")]))
+                    toCsv(["이름", "전화", "답변 방법", "남기신 말", "등록일"], g.rows.map((w) => [w.name, w.phone, METHOD_LABEL[w.contact_method ?? ""] ?? "", w.memo ?? "", new Date(w.created_at).toLocaleString("ko-KR")]))
                   )
                 }
               >

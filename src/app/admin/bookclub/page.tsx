@@ -27,7 +27,7 @@ export default async function BookClubAdminPage() {
         .order("created_at", { ascending: false }),
       db
         .from("bookclub_waitlist")
-        .select("id, club_slug, name, phone, created_at, notified_at")
+        .select("*")
         .order("created_at", { ascending: false }),
     ]);
     if (appErr || waitErr) throw appErr ?? waitErr;
