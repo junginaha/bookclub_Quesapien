@@ -8,6 +8,7 @@ on:
       - "supabase/migrations/020_real_bookclub_reservations.sql"
       - "supabase/migrations/021_bookclub_applications.sql"
       - "supabase/migrations/023_bookclub_interest_v2.sql"
+      - "supabase/migrations/024_reading_journey_interests.sql"
       - ".github/workflows/migrate.yml"
 
 permissions:
@@ -34,9 +35,9 @@ jobs:
             exit 1
           fi
 
-      - name: Apply the idempotent migrations (020, 021, 023)
+      - name: Apply the idempotent migrations (020, 021, 023, 024)
         run: |
-          for f in 020_real_bookclub_reservations 021_bookclub_applications 023_bookclub_interest_v2; do
+          for f in 020_real_bookclub_reservations 021_bookclub_applications 023_bookclub_interest_v2 024_reading_journey_interests; do
             echo "Applying $f"
             jq -n --rawfile query "supabase/migrations/$f.sql" \
               '{query: $query, read_only: false}' > /tmp/supabase-migration.json

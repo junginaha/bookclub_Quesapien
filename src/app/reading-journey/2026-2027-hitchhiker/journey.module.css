@@ -1,0 +1,123 @@
+/* 은하수 히치하이커 독서여행 — 기존 Qsapiens 톤(네이비 #173b75 · 아이보리 · 노토 세리프) 계승.
+   우주 테마는 궤도 선 하나로만 절제한다. 별·네온·애니메이션 없음. */
+.page {
+  --j-navy: #173b75;
+  --j-ink: #34383e;
+  --j-muted: #6b6259;
+  --j-line: #d9d5cd;
+  --j-paper: #fffdf8;
+  width: min(760px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 112px 0 96px; /* 고정 헤더(약 65px) 아래로 */
+  color: var(--j-ink);
+  font-family: var(--font-noto-sans-kr), sans-serif;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+}
+
+.hero { position: relative; padding: 0 0 48px; border-bottom: 1px solid var(--j-line); }
+.orbit { position: absolute; top: 8px; right: 0; width: 96px; color: var(--j-navy); }
+.orbit svg { display: block; width: 100%; height: auto; }
+.eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 20px; padding-right: 104px; font: 700 10.5px/1.4 var(--font-noto-sans-kr), sans-serif; letter-spacing: .14em; color: #8c6c50; }
+.badge { padding: 4px 9px; border: 1px solid var(--j-navy); color: var(--j-navy); letter-spacing: .02em; font-size: 11.5px; }
+.headline { margin: 0; padding-right: 96px; font: 500 clamp(28px, 6.2vw, 46px)/1.32 var(--font-noto-serif-kr), serif; color: var(--j-navy); letter-spacing: -.01em; }
+.sub { margin: 18px 0 0; white-space: pre-line; font-size: clamp(15px, 2.3vw, 17px); line-height: 1.85; color: var(--j-ink); }
+.heroCta, .noticeCta, .submit {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 20px;
+  background: var(--j-navy); color: #fff; border: 1px solid var(--j-navy); border-radius: 0;
+  font: 600 14px/1.3 var(--font-noto-sans-kr), sans-serif; text-decoration: none; cursor: pointer; text-align: center;
+}
+.heroCta { margin-top: 28px; }
+.heroCta:hover, .noticeCta:hover, .submit:hover:not(:disabled) { background: #284d86; }
+.submit:disabled { opacity: .5; cursor: default; }
+.secondary { min-height: 44px; padding: 10px 16px; background: #fff; color: var(--j-navy); border: 1px solid var(--j-line); border-radius: 0; font: 600 13px/1.3 var(--font-noto-sans-kr), sans-serif; cursor: pointer; }
+.page a:focus-visible, .page button:focus-visible, .page summary:focus-visible, .page input:focus-visible { outline: 2px solid #6c63d9; outline-offset: 2px; }
+
+.facts { display: grid; gap: 0; margin: 28px 0 0; border-top: 1px solid var(--j-line); }
+.facts > div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--j-line); font-size: 14px; line-height: 1.7; }
+.facts dt { color: var(--j-muted); font-size: 12.5px; }
+.facts dd { margin: 0; }
+.facts small { color: var(--j-muted); }
+
+.section { padding: 48px 0 0; }
+.h2 { margin: 0 0 20px; font: 500 clamp(21px, 3.4vw, 27px)/1.4 var(--font-noto-serif-kr), serif; color: var(--j-navy); }
+.h2 small { margin-left: 8px; padding: 2px 8px; border: 1px solid var(--j-line); font: 600 11.5px/1.6 var(--font-noto-sans-kr), sans-serif; color: var(--j-muted); vertical-align: middle; }
+.note { margin: 18px 0 0; font-size: 13px; line-height: 1.8; color: var(--j-muted); }
+.note a { color: var(--j-navy); text-decoration: underline; text-underline-offset: 3px; }
+
+/* 로드맵 — 모바일 세로 타임라인, 넓은 화면 4열 */
+.roadmap { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 2px solid var(--j-navy); }
+.roadmap li { display: grid; align-content: start; gap: 10px; padding: 18px 16px 18px 0; }
+.roadmap li + li { padding-left: 16px; border-left: 1px solid var(--j-line); }
+.month { font: 500 22px/1.2 var(--font-noto-serif-kr), serif; color: var(--j-navy); }
+.roadmap strong { display: block; font-size: 14.5px; font-weight: 600; }
+.roadmap p { margin: 4px 0 0; font-size: 13.5px; line-height: 1.65; }
+.roadmap small { display: block; margin-top: 6px; font-size: 11.5px; line-height: 1.55; color: var(--j-muted); }
+
+.philosophy { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.philosophy li { padding: 14px 16px; background: var(--j-paper); border-left: 3px solid var(--j-navy); font: 500 15.5px/1.7 var(--font-noto-serif-kr), serif; }
+
+/* 공지 — 접어서 읽기 */
+.notices { display: grid; gap: 10px; }
+.notice { border: 1px solid var(--j-line); background: #fff; }
+.notice > summary { display: grid; gap: 6px; padding: 18px 44px 18px 18px; cursor: pointer; list-style: none; position: relative; min-height: 44px; }
+.notice > summary::-webkit-details-marker { display: none; }
+.notice > summary::after { content: "+"; position: absolute; right: 18px; top: 18px; color: var(--j-muted); font-size: 18px; }
+.notice[open] > summary::after { content: "−"; }
+.notice > summary strong { font: 500 17px/1.5 var(--font-noto-serif-kr), serif; color: var(--j-navy); }
+.noticeLabel { font-size: 11.5px; color: var(--j-muted); letter-spacing: .04em; }
+.noticeBody { padding: 4px 18px 22px; border-top: 1px dashed var(--j-line); }
+.noticeBody p { margin: 16px 0 0; white-space: pre-line; font-size: 15px; line-height: 1.95; }
+.noticeCta { margin-top: 22px; }
+.noticeLocked { display: grid; gap: 6px; padding: 16px 18px; background: #faf8f4; color: var(--j-muted); }
+.noticeLocked strong { font-size: 14px; font-weight: 500; }
+
+/* 참여 */
+.join { display: grid; gap: 20px; }
+.joinState { padding: 16px 18px; background: var(--j-paper); border: 1px solid var(--j-line); }
+.joinStatus { margin: 0; font-size: 14px; line-height: 1.75; }
+.counts { margin: 8px 0 0; font-size: 13px; color: var(--j-muted); }
+.counts strong { color: var(--j-navy); }
+.form { display: grid; gap: 16px; }
+.choice { margin: 0; padding: 0; border: 0; min-width: 0; }
+.choice legend { padding: 0; margin-bottom: 8px; font-size: 13.5px; font-weight: 600; color: var(--j-navy); }
+.choiceRow2, .choiceRow3 { display: grid; gap: 6px; }
+.choiceRow2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.choiceRow3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.choice label { position: relative; display: block; }
+.choice input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.choice span { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 8px; border: 1px solid var(--j-line); background: #fff; font-size: 13.5px; text-align: center; line-height: 1.4; }
+.choice input:checked + span { background: var(--j-navy); border-color: var(--j-navy); color: #fff; }
+.choice input:focus-visible + span { outline: 2px solid #6c63d9; outline-offset: 2px; }
+.field { display: grid; gap: 6px; font-size: 13.5px; }
+.field small { color: var(--j-muted); font-weight: 400; }
+.field input { width: 100%; min-width: 0; min-height: 48px; padding: 10px 12px; border: 1px solid var(--j-line); border-radius: 0; background: #fff; color: var(--j-ink); font: inherit; font-size: 16px; }
+.consent { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; line-height: 1.65; color: var(--j-muted); }
+.consent input { flex: none; width: 18px; height: 18px; margin-top: 2px; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.ok { margin: 0; white-space: pre-line; font-size: 13.5px; line-height: 1.75; color: var(--j-navy); }
+.error { margin: 0; font-size: 13.5px; line-height: 1.6; color: #b42318; }
+.statusBox { border-top: 1px solid var(--j-line); border-bottom: 1px solid var(--j-line); }
+.statusBox > summary { min-height: 48px; display: flex; align-items: center; cursor: pointer; font-size: 14px; color: var(--j-navy); }
+.statusForm { display: grid; gap: 12px; padding: 4px 0 18px; }
+.statusForm button { justify-self: start; }
+
+.faq { display: grid; border-top: 1px solid var(--j-line); }
+.faq details { border-bottom: 1px solid var(--j-line); }
+.faq summary { min-height: 52px; display: flex; align-items: center; cursor: pointer; font-size: 15px; font-weight: 500; color: var(--j-navy); padding: 12px 0; }
+.faq p { margin: 0 0 16px; font-size: 14px; line-height: 1.8; }
+
+@media (max-width: 720px) {
+  .roadmap { grid-template-columns: minmax(0, 1fr); border-top: 0; border-left: 2px solid var(--j-navy); }
+  .roadmap li, .roadmap li + li { grid-template-columns: 56px minmax(0, 1fr); padding: 14px 0 14px 16px; border-left: 0; }
+  .roadmap li + li { border-top: 1px solid var(--j-line); }
+}
+@media (max-width: 420px) {
+  .page { width: calc(100% - 32px); padding-top: 88px; }
+  .orbit { width: 64px; }
+  .eyebrow { padding-right: 70px; }
+  .headline { padding-right: 0; }
+  .facts > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .heroCta, .submit { width: 100%; }
+  .choiceRow2 { grid-template-columns: minmax(0, 1fr); }
+}
