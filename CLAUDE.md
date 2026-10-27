@@ -312,3 +312,11 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 - `LoginForm` OAuth `redirectTo`에 `?next=`를 실어 콜백·온보딩까지 복귀 경로 유지(기존엔 유실됐음).
 - **자리표시 표지 차단**: 운영 화면에서 교보문고 'no image'(연회색+로고)가 표지로 떴음(실기기 제보). `/api/book-cover`가 상위 후보 3개를 sharp로 64px 축소해 채널 표준편차 < 22면 자리표시로 보고 건너뜀(실측: 교보 자리표시 ≈9.5, 실제 표지 ≈41–54). 검사 실패 시엔 표지를 믿는다(과잉 차단 방지). 없으면 기존 타이포 표지.
 - 검증: tsc 통과, 로컬 dev 390px 상세·시트 렌더 확인(가로 넘침 없음). 실제 로그인 복귀·결제·완료 화면은 운영 배포 후 확인 필요.
+
+### 2026-10-27 — v3 M3·M5: 북클럽 찾기(리스트·지도·달력), 로그인 v3, 내 북클럽
+- `/bookclub` → `ClubsV3`(리스트·지도·달력 세그먼트, `?view=map|calendar`; 필터 전체/모집 중/주말/평일 저녁/온라인; 지난 북클럽 접기). 지도는 `ClubsMap`(Leaflet, 좌표 있는 모임만 핀, 위치 권한은 지도 탭에서만 요청·거절해도 동작). 빈 상태마다 다음 행동(함께 열기·전체 보기·다음 달). 구 `BookingCalendar`/`ReunionReads`는 이 페이지에서 제거(파일은 보존). 홈 히어로 CTA는 `/bookclub?view=map`·`?view=calendar`로, 홈의 `HomeCalendarLocationHub`는 제거(중복).
+- 날짜 뱃지("오늘/내일/이번 주") 버그 수정: 경과 시간이 아니라 KST 날짜 차이로 계산(`dateKey`).
+- `/login` → `LoginV3`(카카오·구글 두 버튼, "이름만 가져와요", `next`가 북클럽이면 '돌아갈 곳' 카드, 이메일 로그인은 접힘). 구 `LoginForm`은 접힌 패널 안에서 그대로 사용.
+- `/mypage` → `MyClubsV3`(내 북클럽: 다가오는 예약·대기, 함께 열기로 한 책, 함께 읽었던 책, 1탭 취소 "괜찮아요. 다음에 또 뵈어요", 프로필 수정·로그아웃). 데이터는 `src/lib/actions/my-bookclub.ts`: 예약은 `bookclub_applications.phone`(프로필 전화 기준) 조회, 취소는 status='canceled'(DB 변경 없음). 구 마이페이지는 `/mypage/legacy`(질문 DNA·후기·탈퇴)로 이동.
+- 미구현(다음 PR): M4 날짜 투표·5명 트리거(마이그레이션 필요 — `MASTER_v3.md §10`), M5 알림(D-3/D-1 알림톡·문자), `/bookclub/leaders`·`/bookclub/manage`·`/archive`·`/questions`의 v3 톤 적용, `/clubs`(M1 미사용 라우트) 정리.
+- 검증: tsc 통과, 로컬 dev 390px 리스트·지도·달력·로그인 렌더(가로 넘침 없음), `/mypage` 미로그인 → `/login?next=/mypage` 리다이렉트 확인. 저장소에 ESLint 설정이 없어 lint는 생략(이전 세션과 동일).

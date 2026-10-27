@@ -3,10 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
-import { formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, seatsLeft, sortByStart } from "@/lib/bookclub/selectors";
+import { dateKey, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, seatsLeft, sortByStart } from "@/lib/bookclub/selectors";
 import { UPCOMING_BOOKS, UPCOMING_GENRES, type UpcomingBook } from "@/lib/bookclub/upcoming";
 import { INTEREST_THRESHOLD } from "@/lib/bookclub/interest";
-import HomeCalendarLocationHub from "@/components/home/HomeCalendarLocationHub";
 import InterestDialog from "@/components/home/InterestDialog";
 import RecommendBookForm from "@/components/home/RecommendBookForm";
 import "./home-v3.css";
@@ -35,8 +34,10 @@ function seatCopy(left: number) {
 }
 
 function daysUntil(iso: string) {
-  const d = (new Date(iso).getTime() - Date.now()) / 86_400_000;
-  return Math.ceil(d);
+  // KST 날짜 기준(시각 무관): 오늘 19시 모임은 "오늘", 자정 넘기면 "내일".
+  const [y1, m1, d1] = dateKey(iso).split("-").map(Number);
+  const [y0, m0, d0] = dateKey(new Date()).split("-").map(Number);
+  return Math.round((Date.UTC(y1, m1 - 1, d1) - Date.UTC(y0, m0 - 1, d0)) / 86_400_000);
 }
 
 function whenKicker(s: BookClubSession) {
@@ -107,7 +108,7 @@ export default function HomeV3({
             질문하는 사람들 <small>Qsapiens</small>
           </Link>
           <nav className="qv3-nav" aria-label="주요 메뉴">
-            <a href="#calendar">달력</a>
+            <Link href="/bookclub?view=calendar">달력</Link>
             <a href="#now">지금 열리는</a>
             <a href="#open">함께 여는</a>
             <Link href="/archive">기록</Link>
@@ -126,18 +127,15 @@ export default function HomeV3({
           <span className="qv3-hero-eyebrow">서초구 선정 미래혁신형 북클럽</span>
           <h1 id="hero-title">질문 하나로<br />시작하는 북클럽</h1>
           <p>책을 다 읽지 않아도 괜찮아요.<br />질문 하나만 들고 오세요.</p>
-          <a href="#calendar" className="qv3-cta qv3-cta--hero">{PIN} 내 근처 북클럽 찾기</a>
-          <a href="#calendar" className="qv3-link-quiet">달력으로 보기</a>
+          <Link href="/bookclub?view=map" className="qv3-cta qv3-cta--hero">{PIN} 내 근처 북클럽 찾기</Link>
+          <Link href="/bookclub?view=calendar" className="qv3-link-quiet">달력으로 보기</Link>
         </section>
-
-        {/* 달력 · 내 근처 — 기존 허브 재사용(§3의 리스트·지도·달력 통합은 M3) */}
-        <HomeCalendarLocationHub sessions={sessions} />
 
         {upcoming.length > 0 && (
           <section className="qv3-wrap qv3-section" id="now" aria-labelledby="now-title">
             <div className="qv3-section-head">
               <h2 id="now-title">지금 열리는 북클럽</h2>
-              <Link href="/bookclub">전체 보기</Link>
+              <Link href="/bookclub">리스트 · 지도 · 달력</Link>
             </div>
             <div className="qv3-rail">
               {upcoming.map((s) => {
