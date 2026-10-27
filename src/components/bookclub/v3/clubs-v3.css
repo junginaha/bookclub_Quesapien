@@ -1,0 +1,55 @@
+/* 북클럽 찾기 v3 — 리스트 · 지도 · 달력 */
+
+.qv3-clubs { min-height: 100vh; display: flex; flex-direction: column; }
+.qv3-clubs-top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(250, 247, 242, 0.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--qv-line); }
+.qv3-clubs-top .qv3-icon-btn--ghost { border-color: transparent; background: transparent; flex: 0 0 auto; }
+.qv3-seg { flex: 1; display: flex; background: var(--qv-paper-2); border-radius: 12px; padding: 4px; gap: 4px; }
+.qv3-seg-btn { flex: 1; height: 40px; border: 0; border-radius: 9px; background: transparent; color: var(--qv-muted); font-size: 14px; font-weight: 500; }
+.qv3 .qv3-seg-btn[aria-selected="true"] { background: #fff; color: var(--qv-ink); font-weight: 700; box-shadow: 0 1px 2px rgba(31, 27, 22, 0.08); }
+.qv3-clubs .qv3-filters { padding: 12px 20px 4px; margin: 0; }
+.qv3-clubs-main { padding-top: 12px; padding-bottom: 48px; display: flex; flex-direction: column; gap: 16px; }
+.qv3-clubs-title { font-size: 18px; font-weight: 700; display: flex; align-items: baseline; gap: 8px; }
+.qv3-clubs-title span, .qv3-count { font-size: 13px; font-weight: 500; color: var(--qv-muted); }
+.qv3-clubs-past { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+.qv3-link-btn { background: transparent; border: 0; color: var(--qv-muted); font-size: 14px; min-height: 44px; text-decoration: underline; text-underline-offset: 4px; }
+.qv3-empty-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.qv3-empty-actions .qv3-btn, .qv3-empty-actions .qv3-cta { flex: 1 1 auto; }
+
+/* 지도 */
+.qv3-clubs-map { position: relative; flex: 1; min-height: calc(100dvh - 120px); background: var(--qv-paper-2); }
+.qv3-map { position: absolute; inset: 0; }
+.qv3-map .leaflet-container { font-family: inherit; }
+.qv3-map .qs-map-user-wrap, .qv3-map .qs-map-club-wrap { background: transparent; border: 0; }
+.qv3-map .qs-map-user { display: block; width: 26px; height: 26px; border-radius: 13px; background: rgba(181, 82, 42, 0.18); position: relative; }
+.qv3-map .qs-map-user i { position: absolute; left: 7px; top: 7px; width: 12px; height: 12px; border-radius: 6px; background: var(--qv-cta); border: 2px solid #fff; box-sizing: border-box; }
+.qv3-map .qs-map-club { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 17px; background: var(--qv-ink); color: #fff; font-weight: 700; font-size: 13px; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(31, 27, 22, 0.25); cursor: pointer; }
+.qv3-map .qs-map-tooltip { font-family: inherit; font-size: 12px; border-radius: 10px; border: 1px solid var(--qv-line); }
+.qv3-map-note { position: absolute; left: 20px; right: 20px; top: 12px; z-index: 500; background: #fff; border: 1px solid var(--qv-line); border-radius: 12px; padding: 8px 12px; font-size: 13px; color: var(--qv-muted); }
+.qv3-map-hint { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 500; background: var(--qv-ink); color: #fff; font-size: 13px; padding: 8px 14px; border-radius: 999px; white-space: nowrap; }
+.qv3-map-card { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 500; background: #fff; border: 1px solid var(--qv-line); border-radius: 20px; box-shadow: 0 8px 24px rgba(31, 27, 22, 0.12); }
+.qv3-map-card.qv3-empty { padding: 24px 20px; border-style: solid; }
+.qv3-map-card > .qv3-card { border: 0; }
+.qv3-map-card-close { position: absolute; right: 10px; top: 10px; z-index: 2; width: 36px; height: 36px; border-radius: 18px; border: 1px solid var(--qv-line); background: #fff; display: flex; align-items: center; justify-content: center; }
+
+/* 달력 */
+.qv3-cal { background: #fff; border: 1px solid var(--qv-line); border-radius: var(--qv-r); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.qv3-cal-head { display: flex; align-items: center; justify-content: space-between; }
+.qv3-cal-month { font-family: var(--qv-serif); font-weight: 600; font-size: 20px; }
+.qv3-cal-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.qv3-cal-table th { font-size: 12px; font-weight: 500; color: var(--qv-muted); padding: 6px 0; }
+.qv3-cal-table th:first-child { color: var(--qv-cta); }
+.qv3-cal-table td { padding: 2px; text-align: center; }
+.qv3-cal-day { width: 100%; aspect-ratio: 1; max-height: 48px; border: 0; border-radius: 12px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 15px; color: var(--qv-ink); position: relative; }
+.qv3-cal-day:disabled { color: var(--qv-line-2); cursor: default; }
+.qv3-cal-day i { width: 5px; height: 5px; border-radius: 3px; background: var(--qv-cta); }
+.qv3 .qv3-cal-day[aria-pressed="true"] { background: var(--qv-ink); color: #fff; }
+.qv3 .qv3-cal-day[aria-pressed="true"] i { background: #fff; }
+.qv3-cal-day[aria-current="date"] span { text-decoration: underline; text-underline-offset: 3px; }
+
+@media (min-width: 720px) {
+  .qv3-clubs-top { padding: 10px 20px; }
+  .qv3-seg { max-width: 420px; margin: 0 auto; }
+  .qv3-clubs .qv3-filters { padding-inline: 20px; }
+  .qv3-map-card { left: auto; right: 24px; bottom: 24px; width: 360px; }
+  .qv3-cal { max-width: 520px; }
+}

@@ -296,3 +296,27 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 - UI: 운영자가 보낸 문의 폼 형식(제목 '협업' 제외)으로 모달 신청서 `InterestDialog` — 제목은 『책 이름』, 이름·답변 받을 방법·답변 받을 전화번호·남기실 말(선택, 말로 입력=브라우저 음성인식 지원 시)·(필수) 동의·안내문. 추천 폼도 같은 필드(`InterestFields`). 카드 문구 "책친구들이 모이면 알려드려요"를 버튼 바로 위로. 관리자 표에 답변 방법·남기신 말 추가.
 - 로컬 dev 390px로 카드·모달·추천 폼 확인. 실제 저장은 워크플로 적용 결과와 운영 화면에서 확인 필요.
 - 2026-10-20: `ADMIN_EMAILS` 환경변수가 빈 문자열이면 기본 운영자 이메일로 대체, 대소문자 무시(관리자 페이지 진입 실패 방지).
+
+### 2026-10-27 — v3 전면개편 착수: 홈 교체 (feat/v3-home)
+- 운영자 결정: "대한민국 최고의 북클럽" 목표로 전면개편. 핵심 가치 '다정함', 예약 3탭, 거절 없는 화면, 질문이 먼저. 상세 스펙은 `MASTER_v3.md`(이 세션 신규) — v3 작업에서는 MASTER.md보다 우선한다("디자인은 리디자인이 아니다" 원칙은 v3에서 해제).
+- 홈(`/`)을 `src/components/home/v3/HomeV3.tsx` + `home-v3.css`로 교체. 토큰은 `.qv3` 스코프(종이 #FAF7F2 / 잉크 #1F1B16 / CTA 테라코타 #B5522A / 세이지 #6B8F71). 구 `LandingPage.tsx`는 삭제하지 않고 미사용으로 남김.
+- 구성: 히어로(CTA 1개 → #calendar) → 기존 `HomeCalendarLocationHub`(달력·내 근처, 그대로 재사용) → 지금 열리는 북클럽(질문 1개 큰 글씨, 날짜·장소·남은 자리, 예약하기 → /bookclub/[slug]) → 함께 여는 북클럽(지난 모임 앵콜 + UPCOMING_BOOKS, 실제 관심 인원 게이지 n/5, '나도 열래요' → 기존 `InterestDialog`, 6개 미리보기 + 더 보기, 장르 필터) → 읽고 싶은 책 요청(기존 `RecommendBookForm`, #recommend) → 처음 오시는 분께(/guide).
+- DB·API 변경 없음. 앵커 `#encore`·`#upcoming`·`#recommend`·`#calendar` 유지.
+- 검증: tsc 통과, 로컬 dev 390px 가로 넘침 없음(scrollWidth 390), 1280px 레이아웃 확인(헤드리스 Chromium). Google Fonts fetch는 샌드박스에서 실패 — Vercel 배포로 확인.
+- 다음: M2(상세 페이지·예약 바텀시트·완료 화면·/me 재설계), M3(/clubs 리스트·지도·달력 통합), M4(함께 여는 — 날짜 투표·트리거), M5(알림·빈 상태 전수), M6(마이그레이션·301). 모두 MASTER_v3.md §11.
+
+### 2026-10-27 — v3 M2: 상세 페이지·예약 시트·완료 화면 + 자리표시 표지 차단
+- 운영자 결정: **예약은 카카오 또는 구글 로그인 필수**(비회원 예약 없음).
+- `/bookclub/[slug]`를 `src/components/bookclub/v3/DetailV3.tsx`로 교체(Header/Footer·OpenBook·미니캘린더·타임라인 제거; 구 `DetailClient.tsx`는 미사용 보존). 구성: 질문 1개 히어로 → 책 → 일시·장소·정원 → 질문(1개 공개 + "나머지는 모임에서") → 진행 방식 → 지난 기록 → 다른 북클럽 → 하단 고정 CTA.
+- 예약 흐름(3탭): 미로그인 → `/login?next=/bookclub/[slug]?book=1` → 로그인 → 돌아오면 시트 자동 오픈. `src/lib/viewer.ts`(`getViewer`)가 쿠키 세션으로 프로필 이름·전화를 읽어 `BookingSheet`에 프리필. 저장은 기존 `applyToBookClub`(DB·RPC 변경 없음), 유료는 완료 화면에서 PayApp 결제 버튼. 완료 화면은 풀스크린 테라코타("○○님, 11월 8일 토요일에 뵙겠습니다") + .ics 캘린더 추가 + /guide 링크. 정원 마감은 기존 `NotifyForm` 대기 신청.
+- `LoginForm` OAuth `redirectTo`에 `?next=`를 실어 콜백·온보딩까지 복귀 경로 유지(기존엔 유실됐음).
+- **자리표시 표지 차단**: 운영 화면에서 교보문고 'no image'(연회색+로고)가 표지로 떴음(실기기 제보). `/api/book-cover`가 상위 후보 3개를 sharp로 64px 축소해 채널 표준편차 < 22면 자리표시로 보고 건너뜀(실측: 교보 자리표시 ≈9.5, 실제 표지 ≈41–54). 검사 실패 시엔 표지를 믿는다(과잉 차단 방지). 없으면 기존 타이포 표지.
+- 검증: tsc 통과, 로컬 dev 390px 상세·시트 렌더 확인(가로 넘침 없음). 실제 로그인 복귀·결제·완료 화면은 운영 배포 후 확인 필요.
+
+### 2026-10-27 — v3 M3·M5: 북클럽 찾기(리스트·지도·달력), 로그인 v3, 내 북클럽
+- `/bookclub` → `ClubsV3`(리스트·지도·달력 세그먼트, `?view=map|calendar`; 필터 전체/모집 중/주말/평일 저녁/온라인; 지난 북클럽 접기). 지도는 `ClubsMap`(Leaflet, 좌표 있는 모임만 핀, 위치 권한은 지도 탭에서만 요청·거절해도 동작). 빈 상태마다 다음 행동(함께 열기·전체 보기·다음 달). 구 `BookingCalendar`/`ReunionReads`는 이 페이지에서 제거(파일은 보존). 홈 히어로 CTA는 `/bookclub?view=map`·`?view=calendar`로, 홈의 `HomeCalendarLocationHub`는 제거(중복).
+- 날짜 뱃지("오늘/내일/이번 주") 버그 수정: 경과 시간이 아니라 KST 날짜 차이로 계산(`dateKey`).
+- `/login` → `LoginV3`(카카오·구글 두 버튼, "이름만 가져와요", `next`가 북클럽이면 '돌아갈 곳' 카드, 이메일 로그인은 접힘). 구 `LoginForm`은 접힌 패널 안에서 그대로 사용.
+- `/mypage` → `MyClubsV3`(내 북클럽: 다가오는 예약·대기, 함께 열기로 한 책, 함께 읽었던 책, 1탭 취소 "괜찮아요. 다음에 또 뵈어요", 프로필 수정·로그아웃). 데이터는 `src/lib/actions/my-bookclub.ts`: 예약은 `bookclub_applications.phone`(프로필 전화 기준) 조회, 취소는 status='canceled'(DB 변경 없음). 구 마이페이지는 `/mypage/legacy`(질문 DNA·후기·탈퇴)로 이동.
+- 미구현(다음 PR): M4 날짜 투표·5명 트리거(마이그레이션 필요 — `MASTER_v3.md §10`), M5 알림(D-3/D-1 알림톡·문자), `/bookclub/leaders`·`/bookclub/manage`·`/archive`·`/questions`의 v3 톤 적용, `/clubs`(M1 미사용 라우트) 정리.
+- 검증: tsc 통과, 로컬 dev 390px 리스트·지도·달력·로그인 렌더(가로 넘침 없음), `/mypage` 미로그인 → `/login?next=/mypage` 리다이렉트 확인. 저장소에 ESLint 설정이 없어 lint는 생략(이전 세션과 동일).

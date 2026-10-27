@@ -226,6 +226,26 @@ async function searchGoogle(title: string, author: string): Promise<Candidate[]>
   }
 }
 
+// ─── 자리표시 표지 걸러내기 ──────────────────────────────────────────
+// 교보문고 'no image'(연회색 바탕에 로고만) 같은 자리표시 이미지는 크기가 멀쩡해서
+// 클라이언트의 가로·세로 검사로는 못 잡는다. 서버에서 작게 줄여 픽셀 분산을 재고,
+// 거의 단색이면 표지가 아니라고 본다 — 실제 표지는 글자·그림 때문에 분산이 크다.
+const PLACEHOLDER_STDEV = 22;
+async function looksLikePlaceholder(url: string): Promise<boolean> {
+  try {
+    const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(4000) });
+    if (!res.ok) return true;
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (buf.length < 800) return true;
+    const sharp = (await import("sharp")).default;
+    const stats = await sharp(buf).resize(64, 64, { fit: "inside" }).removeAlpha().stats();
+    const stdev = stats.channels.reduce((m, c) => Math.max(m, c.stdev), 0);
+    return stdev < PLACEHOLDER_STDEV;
+  } catch {
+    return false; // 검사 자체가 실패하면 표지를 믿는다(과잉 차단 방지)
+  }
+}
+
 export async function GET(request: NextRequest) {
   const title = request.nextUrl.searchParams.get("title")?.trim() ?? "";
   const author = request.nextUrl.searchParams.get("author")?.trim() ?? "";
@@ -242,7 +262,11 @@ export async function GET(request: NextRequest) {
     .filter((item) => item.score >= 72)
     .sort((a, b) => b.score - a.score);
 
-  const best = ranked[0]?.candidate;
+  // 상위 후보부터 자리표시 여부를 확인해 첫 '진짜' 표지를 고른다(최대 3개).
+  let best: (typeof ranked)[number]["candidate"] | undefined;
+  for (const { candidate } of ranked.slice(0, 3)) {
+    if (!(await looksLikePlaceholder(candidate.coverUrl))) { best = candidate; break; }
+  }
   const response = NextResponse.json({
     coverUrl: best?.coverUrl ?? null,
     provider: best?.provider ?? null,

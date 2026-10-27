@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import Header from "@/components/common/Header";
-import Footer from "@/components/common/Footer";
 import { BOOKCLUB_SESSIONS, getSession } from "@/lib/bookclub/data";
-import { feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus } from "@/lib/bookclub/selectors";
+import { feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, sortByStart } from "@/lib/bookclub/selectors";
+import { getViewer } from "@/lib/viewer";
 import { getReservedCounts } from "@/lib/bookclub/server";
 import { buildMetadata } from "@/lib/metadata";
 import { absoluteCoverUrl, breadcrumbSchema, bookclubSessionEventSchema, discussionQuestionsSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
-import DetailClient from "./DetailClient";
+import DetailV3 from "@/components/bookclub/v3/DetailV3";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -68,10 +67,11 @@ export default async function BookClubDetailPage({ params }: Props) {
 
   // 한 번의 병렬 조회로 전부 처리 — Supabase 미연결 시 세션당 순차 DNS 실패 지연이
   // 누적되지 않게 한다.
-  const allCounts = await getReservedCounts(BOOKCLUB_SESSIONS.map((s) => s.slug));
+  const [allCounts, viewer] = await Promise.all([getReservedCounts(BOOKCLUB_SESSIONS.map((s) => s.slug)), getViewer()]);
   const allSessions = BOOKCLUB_SESSIONS.map((s) => ({ ...s, reserved: allCounts[s.slug] ?? 0 }));
   const resolved = allSessions.find((s) => s.slug === slug)!;
   const status = getStatus(resolved);
+  const nextSessions = allSessions.filter((s) => s.slug !== slug && getStatus(s) !== "past").sort(sortByStart).slice(0, 4);
 
   const crumbLd = breadcrumbSchema([
     { name: "홈", href: "/" },
@@ -87,13 +87,11 @@ export default async function BookClubDetailPage({ params }: Props) {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
+    <>
       <JsonLd data={questionsLd ? [crumbLd, eventLd, questionsLd] : [crumbLd, eventLd]} />
-      <Header />
-      <Suspense fallback={<div className="qc-skel" style={{ height: 480 }} />}>
-        <DetailClient session={resolved} status={status} allSessions={allSessions} />
+      <Suspense fallback={<div style={{ minHeight: "100vh", background: "#FAF7F2" }} />}>
+        <DetailV3 session={resolved} status={status} viewer={viewer} nextSessions={nextSessions} />
       </Suspense>
-      <Footer />
-    </div>
+    </>
   );
 }
