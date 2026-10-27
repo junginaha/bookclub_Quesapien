@@ -9,6 +9,7 @@ on:
       - "supabase/migrations/021_bookclub_applications.sql"
       - "supabase/migrations/023_bookclub_interest_v2.sql"
       - "supabase/migrations/024_reading_journey_interests.sql"
+      - "supabase/migrations/025_profiles_m0.sql"
       - ".github/workflows/migrate.yml"
 
 permissions:
@@ -35,9 +36,9 @@ jobs:
             exit 1
           fi
 
-      - name: Apply the idempotent migrations (020, 021, 023, 024)
+      - name: Apply the idempotent migrations (020, 021, 023, 024, 025)
         run: |
-          for f in 020_real_bookclub_reservations 021_bookclub_applications 023_bookclub_interest_v2 024_reading_journey_interests; do
+          for f in 020_real_bookclub_reservations 021_bookclub_applications 023_bookclub_interest_v2 024_reading_journey_interests 025_profiles_m0; do
             echo "Applying $f"
             jq -n --rawfile query "supabase/migrations/$f.sql" \
               '{query: $query, read_only: false}' > /tmp/supabase-migration.json
@@ -73,3 +74,19 @@ jobs:
             "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF/database/query")
 
           echo "$response" | jq -e '.[0].has_signups == true and .[0].has_reserve_rpc == true and .[0].has_waitlist == true and .[0].has_interest_rpc == true' > /dev/null
+
+      - name: Verify profiles M0 columns
+        run: |
+          jq -n '{
+            query: "select count(*) = 8 as ok from information_schema.columns where table_schema = '"'"'public'"'"' and table_name = '"'"'profiles'"'"' and column_name in ('"'"'nickname'"'"','"'"'phone'"'"','"'"'home_region'"'"','"'"'is_operator'"'"','"'"'privacy_consented_at'"'"','"'"'phone_consented_at'"'"','"'"'deactivated_at'"'"','"'"'onboarding_completed_at'"'"')",
+            read_only: true
+          }' > /tmp/supabase-verify-profiles.json
+
+          response=$(curl --silent --show-error --fail-with-body \
+            --request POST \
+            --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data-binary @/tmp/supabase-verify-profiles.json \
+            "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF/database/query")
+
+          echo "$response" | jq -e '.[0].ok == true' > /dev/null
