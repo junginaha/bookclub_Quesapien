@@ -7,6 +7,7 @@ import type { BookClubSession } from "@/lib/bookclub/types";
 import { seatsLeft } from "@/lib/bookclub/types";
 import { dateKey, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, sortByStart } from "@/lib/bookclub/selectors";
 import ClubsMap from "./ClubsMap";
+import BookCoverImage from "@/components/home/BookCoverImage";
 import "@/components/home/v3/home-v3.css";
 import "./clubs-v3.css";
 
@@ -68,10 +69,15 @@ function Card({ s }: { s: BookClubSession }) {
   const left = seatsLeft(s);
   const past = st === "past";
   return (
-    <Link href={`/bookclub/${s.slug}`} className="qv3-card">
-      <span className={`qv3-kicker${!past && daysUntil(s.startsAt) <= 7 ? " qv3-kicker--soon" : ""}`}>{past ? "지난 북클럽" : kicker(s)}</span>
-      <span className="qv3-q">{s.leadQuestion || s.title}</span>
-      <span className="qv3-book">{s.bookTitle} · {s.author}</span>
+    <Link href={`/bookclub/${s.slug}`} className="qv3-card qv3-card--book">
+      <span className="qv3-card-top">
+        <span className="qv3-cover"><BookCoverImage title={s.bookTitle} author={s.author} coverUrl={s.coverUrl} /></span>
+        <span className="qv3-card-body">
+          <span className={`qv3-kicker${!past && daysUntil(s.startsAt) <= 7 ? " qv3-kicker--soon" : ""}`}>{past ? "지난 북클럽" : kicker(s)}</span>
+          <span className="qv3-q">{s.leadQuestion || s.title}</span>
+          <span className="qv3-book">{s.bookTitle} · {s.author}</span>
+        </span>
+      </span>
       <span className="qv3-meta">
         <span>{formatMonthDay(s.startsAt)} {formatWeekdayFull(s.startsAt).replace("요일", "")} · {formatTimeOfDay(s.startsAt)}</span>
         <span className="m2">{s.venue.name} · {past ? "기록 보기" : st === "full" ? "자리가 다 찼어요 · 대기 받아요" : left <= 2 ? `${left}자리 남았어요` : `남은 ${left}자리`}</span>
