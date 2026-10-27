@@ -320,3 +320,7 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 - `/mypage` → `MyClubsV3`(내 북클럽: 다가오는 예약·대기, 함께 열기로 한 책, 함께 읽었던 책, 1탭 취소 "괜찮아요. 다음에 또 뵈어요", 프로필 수정·로그아웃). 데이터는 `src/lib/actions/my-bookclub.ts`: 예약은 `bookclub_applications.phone`(프로필 전화 기준) 조회, 취소는 status='canceled'(DB 변경 없음). 구 마이페이지는 `/mypage/legacy`(질문 DNA·후기·탈퇴)로 이동.
 - 미구현(다음 PR): M4 날짜 투표·5명 트리거(마이그레이션 필요 — `MASTER_v3.md §10`), M5 알림(D-3/D-1 알림톡·문자), `/bookclub/leaders`·`/bookclub/manage`·`/archive`·`/questions`의 v3 톤 적용, `/clubs`(M1 미사용 라우트) 정리.
 - 검증: tsc 통과, 로컬 dev 390px 리스트·지도·달력·로그인 렌더(가로 넘침 없음), `/mypage` 미로그인 → `/login?next=/mypage` 리다이렉트 확인. 저장소에 ESLint 설정이 없어 lint는 생략(이전 세션과 동일).
+
+### 2026-10-27 — 홈은 이전 버전으로 복귀(일단), v3 디자인 다듬기 (fix/v3-polish, PR #44)
+- 운영자 피드백: 첫 v3 홈 배포가 "오른쪽 잘림·디자인 부족·'나도 열래요' 싸구려". 가로 스크롤 카드 제거 → 세로 전폭 카드 + 책 표지, 히어로·섹션 타이포 강화, '함께 열기'로 교체.
+- 운영자 지시: **홈(`/`)은 당분간 이전 `LandingPage`로 복귀**. `HomeV3.tsx`는 보존(다시 쓸 때 `page.tsx` 한 줄). `/bookclub`·상세·예약·로그인·`/mypage`는 v3 유지.
