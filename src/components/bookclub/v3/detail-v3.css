@@ -1,0 +1,94 @@
+/* 북클럽 상세 v3 + 예약 시트 (home-v3.css의 .qv3 토큰 위에 얹는다) */
+
+.qv3-detail { display: flex; flex-direction: column; min-height: 100vh; }
+.qv3-detail-top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(250, 247, 242, 0.92); backdrop-filter: blur(10px); }
+.qv3-icon-btn--ghost { border-color: transparent; background: transparent; }
+.qv3-icon-btn--ghost:hover { background: #fff; border-color: var(--qv-line); }
+.qv3-toast { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); background: var(--qv-ink); color: #fff; font-size: 13px; padding: 8px 14px; border-radius: 999px; }
+
+.qv3-detail-main { padding-bottom: 120px; display: flex; flex-direction: column; gap: 28px; }
+.qv3-detail-hero { padding-top: 12px; display: flex; flex-direction: column; gap: 16px; }
+.qv3-detail-q { font-family: var(--qv-serif); font-weight: 600; font-size: clamp(26px, 7.2vw, 36px); line-height: 1.4; letter-spacing: -0.01em; }
+.qv3-detail-book { display: flex; gap: 14px; align-items: center; }
+.qv3-detail-cover { width: 56px; height: 80px; border-radius: 6px; overflow: hidden; background: var(--qv-paper-2); flex: 0 0 auto; }
+.qv3-detail-cover img, .qv3-detail-cover > * { width: 100%; height: 100%; object-fit: cover; }
+.qv3-detail-book-title { font-weight: 700; font-size: 16px; }
+.qv3-detail-book-author { font-size: 14px; color: var(--qv-muted); }
+
+.qv3-detail-facts { background: #fff; border: 1px solid var(--qv-line); border-radius: var(--qv-r); padding: 4px 20px; display: flex; flex-direction: column; }
+.qv3-fact { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--qv-line); color: var(--qv-ink); }
+.qv3-fact:last-child { border-bottom: 0; }
+.qv3-fact svg { flex: 0 0 auto; margin-top: 3px; color: var(--qv-muted); }
+.qv3-fact div { display: flex; flex-direction: column; }
+.qv3-fact b { font-weight: 500; }
+.qv3-fact span { font-size: 13px; color: var(--qv-muted); }
+
+.qv3-detail-section { display: flex; flex-direction: column; gap: 12px; }
+.qv3-detail-section h2 { font-size: 18px; font-weight: 700; }
+.qv3-qlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.qv3-qitem { display: flex; gap: 12px; padding: 16px 18px; background: #fff; border: 1px solid var(--qv-line); border-radius: 14px; font-family: var(--qv-serif); font-size: 16px; line-height: 1.5; }
+.qv3-qnum { font-family: var(--qv-serif); color: var(--qv-cta); font-weight: 600; flex: 0 0 auto; }
+.qv3-qitem--hidden { background: transparent; border-style: dashed; border-color: var(--qv-line-2); color: var(--qv-muted); font-family: var(--qv-sans); font-size: 14px; }
+.qv3-qitem--hidden .qv3-qnum { color: var(--qv-muted); }
+.qv3-how { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; color: var(--qv-ink-2); }
+.qv3-detail-summary { font-size: 14px; color: var(--qv-muted); }
+.qv3-record { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; color: var(--qv-cta); }
+.qv3-next-list { display: flex; flex-direction: column; gap: 10px; }
+.qv3-next-item { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; background: #fff; border: 1px solid var(--qv-line); border-radius: 14px; }
+.qv3-next-item:hover { border-color: var(--qv-ink); }
+.qv3-next-q { font-family: var(--qv-serif); font-size: 16px; line-height: 1.45; }
+.qv3-next-meta { font-size: 13px; color: var(--qv-muted); }
+
+/* 고정 CTA */
+.qv3-detail-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; padding: 12px 0 calc(16px + env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(250, 247, 242, 0) 0%, var(--qv-paper) 35%); }
+.qv3-cta--block { width: 100%; box-shadow: 0 6px 18px rgba(181, 82, 42, 0.25); }
+.qv3 .qv3-cta--ink { background: var(--qv-ink); box-shadow: none; }
+.qv3-cta-sub { font-weight: 500; opacity: 0.85; }
+.qv3-waitlist > summary { list-style: none; cursor: pointer; }
+.qv3-waitlist > summary::-webkit-details-marker { display: none; }
+.qv3-waitlist-body { margin-top: 10px; background: #fff; border: 1px solid var(--qv-line); border-radius: var(--qv-r); padding: 16px; }
+
+/* 예약 시트 */
+.qv3.qv3-sheet { min-height: 0; border: 0; padding: 0; margin: 0; max-width: 100vw; width: 100vw; max-height: 100dvh; background: transparent; color: var(--qv-ink); position: fixed; inset: auto 0 0 0; }
+.qv3-sheet::backdrop { background: rgba(31, 27, 22, 0.42); }
+.qv3-sheet.is-done { inset: 0; height: 100dvh; }
+.qv3-sheet-form { background: #fff; border-radius: 24px 24px 0 0; padding: 12px 24px calc(28px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 18px; box-shadow: 0 -12px 40px rgba(31, 27, 22, 0.18); max-width: 560px; margin: 0 auto; position: relative; }
+.qv3-sheet-handle { width: 40px; height: 4px; border-radius: 2px; background: var(--qv-line-2); align-self: center; }
+.qv3-sheet-head h2 { font-family: var(--qv-serif); font-weight: 600; font-size: 22px; line-height: 1.35; }
+.qv3-sheet-head p { font-size: 14px; color: var(--qv-muted); margin-top: 4px; }
+.qv3-field { display: flex; flex-direction: column; gap: 6px; }
+.qv3-field label { font-size: 13px; font-weight: 500; color: var(--qv-muted); }
+.qv3-field label small { font-weight: 400; margin-left: 4px; }
+.qv3-input-row { display: flex; align-items: center; gap: 8px; height: 52px; border-radius: 14px; border: 1px solid var(--qv-line); background: var(--qv-paper); padding: 0 16px; }
+.qv3-input-row:focus-within { border-color: var(--qv-ink); }
+.qv3-input-row input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 16px; color: var(--qv-ink); }
+.qv3-input-row .qv3-chip { background: #fff; border: 1px solid var(--qv-line); white-space: nowrap; }
+.qv3-consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--qv-ink-2); line-height: 1.5; cursor: pointer; }
+.qv3-consent input { width: 20px; height: 20px; margin-top: 1px; accent-color: var(--qv-cta); flex: 0 0 auto; }
+.qv3-consent a { text-decoration: underline; text-underline-offset: 3px; }
+.qv3 .qv3-cta:disabled { background: var(--qv-line-2); color: #fff; cursor: not-allowed; box-shadow: none; }
+.qv3-error { font-size: 13px; color: #9a2f1f; }
+.qv3-sheet-foot { text-align: center; font-size: 12px; color: var(--qv-muted); }
+.qv3-sheet-cancel { align-self: center; min-height: 44px; background: transparent; border: 0; color: var(--qv-muted); font-size: 14px; }
+
+/* 완료 화면 */
+.qv3-done { height: 100dvh; background: var(--qv-cta); color: #fff; display: flex; flex-direction: column; padding: 20px 28px calc(32px + env(safe-area-inset-bottom)); max-width: 100vw; }
+.qv3-done-close { align-self: flex-end; width: 44px; height: 44px; border-radius: 22px; border: 0; background: rgba(255, 255, 255, 0.14); color: #fff; display: flex; align-items: center; justify-content: center; }
+.qv3-done-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 24px; max-width: 480px; margin: 0 auto; width: 100%; }
+.qv3-done-body h2 { font-family: var(--qv-serif); font-weight: 600; font-size: clamp(26px, 7.5vw, 32px); line-height: 1.4; letter-spacing: -0.01em; }
+.qv3-done-body p { font-size: 17px; line-height: 1.7; color: rgba(255, 255, 255, 0.88); }
+.qv3-done-card { background: rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.qv3-done-card b { font-weight: 700; }
+.qv3-done-card span { color: rgba(255, 255, 255, 0.8); }
+.qv3-done-actions { display: flex; flex-direction: column; gap: 10px; max-width: 480px; margin: 0 auto; width: 100%; }
+.qv3-done-primary { height: 56px; border-radius: 16px; background: #fff; color: var(--qv-cta); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; border: 0; }
+.qv3-done-secondary { height: 52px; border-radius: 16px; border: 1.5px solid rgba(255, 255, 255, 0.6); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 500; background: transparent; }
+.qv3-done-note { text-align: center; font-size: 12px; color: rgba(255, 255, 255, 0.8); }
+
+@media (min-width: 720px) {
+  .qv3-detail-main { padding-top: 12px; }
+  .qv3-detail-cta .qv3-wrap { display: flex; justify-content: flex-end; }
+  .qv3-cta--block { width: auto; min-width: 320px; }
+  .qv3-waitlist { width: 100%; max-width: 420px; }
+  .qv3-sheet-form { border-radius: 24px; margin-bottom: 24px; }
+}

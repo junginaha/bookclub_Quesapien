@@ -55,7 +55,7 @@ export default function LoginForm() {
     const supabase = createClient();
     const { error: oauthErr } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next.startsWith("/") ? next : "/")}` },
     });
     if (oauthErr) {
       setError("Google 로그인을 사용할 수 없어요. Supabase 대시보드에서 Google 공급자를 활성화해주세요. 이메일로 로그인해주세요.");
@@ -69,7 +69,7 @@ export default function LoginForm() {
     const supabase = createClient();
     const { error: oauthErr } = await supabase.auth.signInWithOAuth({
       provider: "kakao",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next.startsWith("/") ? next : "/")}` },
     });
     if (oauthErr) {
       setError("카카오 로그인을 사용할 수 없어요. Supabase 대시보드에서 카카오 공급자를 활성화해주세요.");

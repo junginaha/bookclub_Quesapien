@@ -304,3 +304,11 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 - DB·API 변경 없음. 앵커 `#encore`·`#upcoming`·`#recommend`·`#calendar` 유지.
 - 검증: tsc 통과, 로컬 dev 390px 가로 넘침 없음(scrollWidth 390), 1280px 레이아웃 확인(헤드리스 Chromium). Google Fonts fetch는 샌드박스에서 실패 — Vercel 배포로 확인.
 - 다음: M2(상세 페이지·예약 바텀시트·완료 화면·/me 재설계), M3(/clubs 리스트·지도·달력 통합), M4(함께 여는 — 날짜 투표·트리거), M5(알림·빈 상태 전수), M6(마이그레이션·301). 모두 MASTER_v3.md §11.
+
+### 2026-10-27 — v3 M2: 상세 페이지·예약 시트·완료 화면 + 자리표시 표지 차단
+- 운영자 결정: **예약은 카카오 또는 구글 로그인 필수**(비회원 예약 없음).
+- `/bookclub/[slug]`를 `src/components/bookclub/v3/DetailV3.tsx`로 교체(Header/Footer·OpenBook·미니캘린더·타임라인 제거; 구 `DetailClient.tsx`는 미사용 보존). 구성: 질문 1개 히어로 → 책 → 일시·장소·정원 → 질문(1개 공개 + "나머지는 모임에서") → 진행 방식 → 지난 기록 → 다른 북클럽 → 하단 고정 CTA.
+- 예약 흐름(3탭): 미로그인 → `/login?next=/bookclub/[slug]?book=1` → 로그인 → 돌아오면 시트 자동 오픈. `src/lib/viewer.ts`(`getViewer`)가 쿠키 세션으로 프로필 이름·전화를 읽어 `BookingSheet`에 프리필. 저장은 기존 `applyToBookClub`(DB·RPC 변경 없음), 유료는 완료 화면에서 PayApp 결제 버튼. 완료 화면은 풀스크린 테라코타("○○님, 11월 8일 토요일에 뵙겠습니다") + .ics 캘린더 추가 + /guide 링크. 정원 마감은 기존 `NotifyForm` 대기 신청.
+- `LoginForm` OAuth `redirectTo`에 `?next=`를 실어 콜백·온보딩까지 복귀 경로 유지(기존엔 유실됐음).
+- **자리표시 표지 차단**: 운영 화면에서 교보문고 'no image'(연회색+로고)가 표지로 떴음(실기기 제보). `/api/book-cover`가 상위 후보 3개를 sharp로 64px 축소해 채널 표준편차 < 22면 자리표시로 보고 건너뜀(실측: 교보 자리표시 ≈9.5, 실제 표지 ≈41–54). 검사 실패 시엔 표지를 믿는다(과잉 차단 방지). 없으면 기존 타이포 표지.
+- 검증: tsc 통과, 로컬 dev 390px 상세·시트 렌더 확인(가로 넘침 없음). 실제 로그인 복귀·결제·완료 화면은 운영 배포 후 확인 필요.
