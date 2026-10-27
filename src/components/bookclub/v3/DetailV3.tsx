@@ -75,13 +75,13 @@ export default function DetailV3({
         <button type="button" onClick={share} aria-label="공유하기" className="qv3-icon-btn qv3-icon-btn--ghost">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 3v12" /><path d="M8 7l4-4 4 4" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" /></svg>
         </button>
-        {copied && <span className="qv3-toast" role="status">링크를 복사했어요</span>}
+        {copied && <span className="qv3-toast" role="status">링크를 복사했어요. 좋은 사람에게 보내주세요.</span>}
       </header>
 
       <main className="qv3-wrap qv3-detail-main">
         <section className="qv3-detail-hero">
           <span className={`qv3-kicker${past ? "" : " qv3-kicker--soon"}`}>
-            {past ? "지난 북클럽" : closed ? "정원·대기 모두 마감" : full ? "자리가 다 찼어요 · 대기 받아요" : left <= 2 ? `${left}자리 남았어요` : `남은 ${left}자리`}
+            {past ? "지난 북클럽" : closed ? "정원·대기 모두 마감" : full ? "자리는 다 찼지만, 대기는 받아요" : left <= 2 ? `딱 ${left}자리 남았어요` : `남은 ${left}자리`}
           </span>
           <h1 className="qv3-detail-q">{headline}</h1>
           <div className="qv3-detail-book">
@@ -115,14 +115,15 @@ export default function DetailV3({
 
         <section className="qv3-detail-section" aria-labelledby="dq-title">
           <h2 id="dq-title">이 모임의 질문</h2>
+          <p className="qv3-detail-lead">첫 질문만 미리 보여드려요. 나머지는 그날의 재미로 남겨둡니다.</p>
           <ol className="qv3-qlist">
             {firstDiffers ? (
               <li className="qv3-qitem"><span className="qv3-qnum">1</span><span>{questions[0]}</span></li>
             ) : (
-              <li className="qv3-qitem"><span className="qv3-qnum">1</span><span>위의 질문으로 시작해요.</span></li>
+              <li className="qv3-qitem"><span className="qv3-qnum">1</span><span>위의 질문으로 시작해요. 이미 반은 읽은 셈이에요.</span></li>
             )}
             {hiddenQ > 0 && (
-              <li className="qv3-qitem qv3-qitem--hidden"><span className="qv3-qnum">2–{hiddenQ + 1}</span><span>나머지 질문은 모임에서 함께 열어요.</span></li>
+              <li className="qv3-qitem qv3-qitem--hidden"><span className="qv3-qnum">2–{hiddenQ + 1}</span><span>나머지는 모임에서 함께 열어요. 스포일러 금지.</span></li>
             )}
           </ol>
         </section>
@@ -130,9 +131,9 @@ export default function DetailV3({
         <section className="qv3-detail-section" aria-labelledby="how-title">
           <h2 id="how-title">이렇게 진행해요</h2>
           <ol className="qv3-how">
-            <li>질문 하나로 가볍게 시작해요.</li>
-            <li>말하고 싶은 만큼만 말해요. 듣기만 해도 괜찮아요.</li>
-            <li>끝날 땐 각자 질문 하나씩 가져가요.</li>
+            <li>질문 하나로 가볍게 문을 열어요.</li>
+            <li>말하고 싶은 만큼만 말해요. 듣기만 해도 충분히 참여한 거예요.</li>
+            <li>끝날 땐 각자 질문 하나씩 주머니에 넣고 돌아가요.</li>
           </ol>
           {session.summary && <p className="qv3-detail-summary">{session.summary}</p>}
         </section>
@@ -166,9 +167,9 @@ export default function DetailV3({
       <div className="qv3-detail-cta">
         <div className="qv3-wrap">
           {past ? (
-            <Link href="/#open" className="qv3-cta qv3-cta--block">이 책으로 다시 열고 싶어요</Link>
+            <Link href="/#encore" className="qv3-cta qv3-cta--block">이 책, 다시 열고 싶어요</Link>
           ) : closed ? (
-            <Link href="/#now" className="qv3-cta qv3-cta--block qv3-cta--ink">다른 북클럽 보기</Link>
+            <Link href="/bookclub" className="qv3-cta qv3-cta--block qv3-cta--ink">다른 북클럽 보기</Link>
           ) : !viewer ? (
             <Link href={loginHref} className="qv3-cta qv3-cta--block">{full ? "대기 신청" : "예약하기"}<span className="qv3-cta-sub"> · {full ? "자리가 나면 알려드려요" : `남은 ${left}자리`}</span></Link>
           ) : full ? (

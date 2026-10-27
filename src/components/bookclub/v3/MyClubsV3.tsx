@@ -61,7 +61,7 @@ export default function MyClubsV3({
       <main className="qv3-wrap qv3-my-main">
         <section className="qv3-my-hello">
           <h2>{name}님, 안녕하세요.</h2>
-          <p>{upcoming.length > 0 ? `다가오는 북클럽이 ${upcoming.length}개 있어요.` : "아직 예약한 북클럽이 없어요. 가까운 곳부터 볼까요?"}</p>
+          <p>{upcoming.length > 0 ? `다가오는 북클럽이 ${upcoming.length}개. 책갈피 꽂아두셨죠?` : "아직 예약한 북클럽이 없어요. 가까운 곳부터 구경해볼까요?"}</p>
           {!phone && <p className="qv3-my-note">휴대전화를 등록하면 예약이 여기에 모여요. <Link href={`/onboarding/profile?next=${encodeURIComponent("/mypage")}`}>등록하기</Link></p>}
         </section>
 
@@ -83,7 +83,7 @@ export default function MyClubsV3({
                   {r.kind === "confirmed" && (
                     confirmSlug === s.slug ? (
                       <div className="qv3-my-confirm">
-                        <span>정말 취소할까요?</span>
+                        <span>정말 취소할까요? 자리는 다른 분께 갈 거예요.</span>
                         <div>
                           <button type="button" className="qv3-btn" disabled={pending} onClick={() => cancel(s.slug)}>{pending ? "처리 중…" : "네, 취소할게요"}</button>
                           <button type="button" className="qv3-link-btn" onClick={() => setConfirmSlug(null)}>아니요</button>
@@ -99,8 +99,8 @@ export default function MyClubsV3({
           </section>
         ) : (
           <div className="qv3-empty">
-            <strong>아직 예약한 북클럽이 없어요.</strong>
-            <p>질문 하나만 들고 오시면 돼요.</p>
+            <strong>책장이 아직 비어 있어요.</strong>
+            <p>첫 북클럽은 질문 하나면 충분해요. 가까운 곳부터 볼까요?</p>
             <div className="qv3-empty-actions">
               <Link href="/bookclub?view=map" className="qv3-cta">내 근처 찾기</Link>
               <Link href="/bookclub" className="qv3-btn">전체 보기</Link>
@@ -113,7 +113,7 @@ export default function MyClubsV3({
             <h2 id="my-wait">함께 열기로 한 북클럽</h2>
             <div className="qv3-my-list">
               {waiting.map(({ s }) => (
-                <Link key={s.slug} href="/#open" className="qv3-next-item">
+                <Link key={s.slug} href="/#encore" className="qv3-next-item">
                   <span className="qv3-next-q">{s.bookTitle}</span>
                   <span className="qv3-next-meta">5명이 모이면 날짜를 함께 정해요</span>
                 </Link>

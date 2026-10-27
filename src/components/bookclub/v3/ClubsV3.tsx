@@ -148,9 +148,11 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
         <Link href="/" aria-label="홈으로" className="qv3-icon-btn qv3-icon-btn--ghost">
           <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6" /></svg>
         </Link>
-        <div className="qv3-seg" role="tablist" aria-label="보기 방식">
-          {([["list", "리스트"], ["map", "지도"], ["calendar", "달력"]] as [View, string][]).map(([v, label]) => (
-            <button key={v} type="button" role="tab" aria-selected={view === v} className="qv3-seg-btn" onClick={() => setView(v)}>{label}</button>
+        <div className="qv3-coins" role="tablist" aria-label="보기 방식">
+          {([["list", "목록", "☰"], ["map", "근처", "◎"], ["calendar", "달력", "▦"]] as [View, string, string][]).map(([v, label, glyph]) => (
+            <button key={v} type="button" role="tab" aria-selected={view === v} className={`qv3-coin qv3-coin--tab${view === v ? "" : " qv3-coin--off"}`} onClick={() => setView(v)}>
+              <span className="qv3-coin-glyph" aria-hidden="true">{glyph}</span>{label}
+            </button>
           ))}
         </div>
         <Link href="/mypage" aria-label="내 북클럽" className="qv3-icon-btn qv3-icon-btn--ghost">
@@ -168,16 +170,16 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
 
       {view === "list" && (
         <main className="qv3-wrap qv3-clubs-main">
-          <h1 className="qv3-clubs-title">열리는 북클럽 <span>{filtered.length}</span></h1>
+          <div className="qv3-clubs-head"><span className="qv3-eyebrow">Now reading together</span><h1 className="qv3-clubs-title">지금 열리는 북클럽 <span>{filtered.length}</span></h1><p>마음에 드는 질문 하나 골라 오세요. 책은 덜 읽어도 됩니다.</p></div>
           {filtered.length > 0 ? (
             <div className="qv3-grid">{filtered.map((s) => <Card key={s.slug} s={s} />)}</div>
           ) : (
             <div className="qv3-empty">
-              <strong>{chip === "all" ? "지금 열리는 북클럽이 없어요." : "이 조건엔 아직 없어요."}</strong>
-              <p>{chip === "all" ? "5명이 모이면 새 북클럽이 열려요. 읽고 싶은 책을 골라주세요." : "조건을 바꾸거나, 읽고 싶은 책으로 함께 열어볼까요?"}</p>
+              <strong>{chip === "all" ? "오늘은 책장이 비었네요." : "이 조건엔 아직 없어요."}</strong>
+              <p>{chip === "all" ? "5명이 모이면 새 북클럽이 열려요. 읽고 싶은 책 한 권만 알려주세요." : "조건을 살짝 바꾸거나, 읽고 싶은 책으로 함께 열어볼까요?"}</p>
               <div className="qv3-empty-actions">
                 {chip !== "all" && <button type="button" className="qv3-btn" onClick={() => setChip("all")}>전체 보기</button>}
-                <Link href="/#open" className="qv3-btn qv3-btn--ink">함께 열기</Link>
+                <Link href="/#encore" className="qv3-btn qv3-btn--ink">함께 열기</Link>
               </div>
             </div>
           )}
@@ -198,7 +200,7 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
           <div className="qv3-map">
             <ClubsMap sessions={mapSessions} user={loc} onSelect={onPick} />
           </div>
-          {locState === "denied" && <p className="qv3-map-note" role="status">위치 권한 없이도 볼 수 있어요. 허용하면 가까운 순으로 보여드려요.</p>}
+          {locState === "denied" && <p className="qv3-map-note" role="status">위치를 몰라도 괜찮아요. 핀은 다 보여요.</p>}
           {picked ? (
             <div className="qv3-map-card">
               <button type="button" className="qv3-map-card-close" aria-label="닫기" onClick={() => setPicked(null)}>
@@ -208,15 +210,15 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
             </div>
           ) : mapSessions.length === 0 ? (
             <div className="qv3-map-card qv3-empty">
-              <strong>이 근처엔 아직 없어요.<br />첫 북클럽을 열어볼까요?</strong>
+              <strong>이 동네엔 아직 없네요.<br />첫 번째 북클럽, 열어볼까요?</strong>
               <p>5명이 모이면 열려요. 읽고 싶은 책을 고르면 함께 열어드릴게요.</p>
               <div className="qv3-empty-actions">
-                <Link href="/#open" className="qv3-cta">함께 열기</Link>
+                <Link href="/#encore" className="qv3-coin">함께 열기</Link>
                 {upcoming.some((s) => !hasCoords(s)) && <button type="button" className="qv3-link-btn" onClick={() => setView("list")}>장소 미정 북클럽 보기</button>}
               </div>
             </div>
           ) : (
-            <div className="qv3-map-hint">핀을 누르면 북클럽이 보여요 · {mapSessions.length}개</div>
+            <div className="qv3-map-hint">핀 {mapSessions.length}개 · 눌러보세요</div>
           )}
         </main>
       )}
@@ -224,9 +226,10 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
       {view === "calendar" && (
         <main className="qv3-wrap qv3-clubs-main">
           <div className="qv3-cal">
+            <div className="qv3-cal-mast"><span className="qv3-cal-script">Calendar</span><span className="qv3-cal-year">{y}</span></div>
             <div className="qv3-cal-head">
               <button type="button" className="qv3-icon-btn" aria-label="이전 달" onClick={() => moveMonth(-1)}>←</button>
-              <h1 className="qv3-cal-month" aria-live="polite">{y}년 {m}월</h1>
+              <h1 className="qv3-cal-month" aria-live="polite"><span aria-hidden="true">{pad(m)}</span><span className="qv3-sr">{y}년 {m}월</span></h1>
               <button type="button" className="qv3-icon-btn" aria-label="다음 달" onClick={() => moveMonth(1)}>→</button>
             </div>
             <table className="qv3-cal-table">
@@ -251,11 +254,11 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
             <div className="qv3-grid">{daySessions.map((s) => <Card key={s.slug} s={s} />)}</div>
           ) : (
             <div className="qv3-empty">
-              <strong>이번 달엔 아직 없어요.</strong>
+              <strong>이번 달 달력은 비어 있어요.</strong>
               <p>다음 달로 넘기거나, 읽고 싶은 책으로 함께 열어볼까요?</p>
               <div className="qv3-empty-actions">
                 <button type="button" className="qv3-btn" onClick={() => moveMonth(1)}>다음 달 보기</button>
-                <Link href="/#open" className="qv3-btn qv3-btn--ink">함께 열기</Link>
+                <Link href="/#encore" className="qv3-btn qv3-btn--ink">함께 열기</Link>
               </div>
             </div>
           )}

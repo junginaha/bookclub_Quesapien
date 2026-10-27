@@ -125,19 +125,19 @@ export default function BookingSheet({
             {done.kind === "confirmed" && (
               <>
                 <h2 id="qv3-sheet-title">{firstName}님,<br />{when}에<br />뵙겠습니다.</h2>
-                <p>책은 어디까지 읽어오셔도 괜찮아요.<br />질문 하나만 들고 오세요.</p>
+                <p>책은 어디까지 읽어오셔도 괜찮아요.<br />질문 하나와 편한 신발이면 충분합니다.</p>
               </>
             )}
             {done.kind === "just_filled_waitlisted" && (
               <>
                 <h2 id="qv3-sheet-title">{firstName}님,<br />방금 자리가 다 차서<br />대기로 모셨어요.</h2>
-                <p>자리가 나면 바로 알려드릴게요.</p>
+                <p>자리가 나면 제일 먼저 알려드릴게요. 약속.</p>
               </>
             )}
             {done.kind === "duplicate" && (
               <>
                 <h2 id="qv3-sheet-title">{firstName}님,<br />이미 예약돼 있어요.</h2>
-                <p>{when}에 뵙겠습니다. 그날 봬요.</p>
+                <p>{when}에 뵙겠습니다. 두 번 예약하신 마음, 잘 받았어요.</p>
               </>
             )}
             <div className="qv3-done-card">
@@ -173,20 +173,20 @@ export default function BookingSheet({
             <label htmlFor={nameId}>이름</label>
             <div className="qv3-input-row">
               <input id={nameId} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" required />
-              {viewer.name && name === viewer.name && <span className="qv3-chip">프로필에서 가져왔어요</span>}
+              {viewer.name && name === viewer.name && <span className="qv3-chip">이미 알고 있었어요</span>}
             </div>
           </div>
           <div className="qv3-field">
             <label htmlFor={phoneId}>휴대전화 <small>모임 안내용</small></label>
             <div className="qv3-input-row">
               <input id={phoneId} value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" inputMode="tel" placeholder="010-0000-0000" required />
-              {viewer.phone && phone === viewer.phone && <span className="qv3-chip">프로필에서 가져왔어요</span>}
+              {viewer.phone && phone === viewer.phone && <span className="qv3-chip">이미 알고 있었어요</span>}
             </div>
           </div>
           <label className="qv3-consent" htmlFor={consentId}>
             <input id={consentId} type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} required />
             <span>
-              <b>[필수]</b> 이름·휴대전화를 모임 안내{fee > 0 ? "와 결제·환불 확인" : ""}에만 쓰고, 끝나면 지워요.{" "}
+              <b>[필수]</b> 이름·휴대전화는 모임 안내{fee > 0 ? "와 결제·환불 확인" : ""}에만 쓰고, 끝나면 깨끗이 지워요.{" "}
               <a href="/privacy" target="_blank" rel="noreferrer">자세히</a>
               {fee > 0 ? <> · <a href="/terms#refund" target="_blank" rel="noreferrer">환불 규정</a></> : null}
             </span>
@@ -198,7 +198,7 @@ export default function BookingSheet({
           </button>
           {error && <p className="qv3-error" role="alert">{error}</p>}
           <p className="qv3-sheet-foot">{fee > 0 ? "예약 후 결제로 이어져요 · 환불은 3일 전 전액, 전날까지 50%" : "못 오시게 되면 미리 알려주세요. 다음에 또 뵈어요"}</p>
-          <button type="button" className="qv3-sheet-cancel" onClick={onClose}>다음에 할게요</button>
+          <button type="button" className="qv3-sheet-cancel" onClick={onClose}>조금 더 생각해볼게요</button>
         </form>
       )}
     </dialog>
