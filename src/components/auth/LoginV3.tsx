@@ -35,7 +35,7 @@ export default function LoginV3() {
       options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
     });
     if (e) {
-      setError("잠깐 문제가 있었어요. 한 번만 더 눌러주세요.");
+      setError("잠깐 딸꾹질을 했어요. 한 번만 더 눌러주세요.");
       setBusy(null);
     }
   }
@@ -52,7 +52,7 @@ export default function LoginV3() {
         <div className="qv3-login-head">
           <span className="qv3-login-brand">질문하는 사람들</span>
           <h1>{target ? <>예약하려면<br />이름만 있으면 돼요.</> : <>이름만 있으면<br />시작할 수 있어요.</>}</h1>
-          <p>카카오나 구글에서 이름만 가져와요.<br />다른 건 묻지 않아요.</p>
+          <p>카카오나 구글에서 이름만 살짝 가져와요.<br />생년월일, 혈액형, 그런 건 안 물어요.</p>
         </div>
 
         {target && (

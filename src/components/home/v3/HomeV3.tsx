@@ -8,6 +8,7 @@ import { UPCOMING_BOOKS, UPCOMING_GENRES, type UpcomingBook } from "@/lib/bookcl
 import { INTEREST_THRESHOLD } from "@/lib/bookclub/interest";
 import InterestDialog from "@/components/home/InterestDialog";
 import RecommendBookForm from "@/components/home/RecommendBookForm";
+import BookCoverImage from "@/components/home/BookCoverImage";
 import "./home-v3.css";
 
 /**
@@ -17,8 +18,8 @@ import "./home-v3.css";
  */
 
 type OpenItem =
-  | { kind: "past"; key: string; title: string; author: string; question: string; href: string; genre?: undefined }
-  | { kind: "next"; key: string; title: string; author: string; question: string; href?: undefined; genre: UpcomingBook["genre"] };
+  | { kind: "past"; key: string; title: string; author: string; question: string; href: string; coverUrl?: string; genre?: undefined }
+  | { kind: "next"; key: string; title: string; author: string; question: string; href?: undefined; coverUrl?: string; genre: UpcomingBook["genre"] };
 
 const PIN = (
   <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -86,7 +87,7 @@ export default function HomeV3({
         seen.add(k);
         return true;
       })
-      .map((s) => ({ kind: "past", key: s.slug, title: s.bookTitle, author: s.author, question: s.leadQuestion, href: `/bookclub/${s.slug}` }));
+      .map((s) => ({ kind: "past", key: s.slug, title: s.bookTitle, author: s.author, question: s.leadQuestion, href: `/bookclub/${s.slug}`, coverUrl: s.coverUrl }));
     const next: OpenItem[] = UPCOMING_BOOKS.map((b) => ({ kind: "next", key: b.slug, title: b.bookTitle, author: b.author, question: b.pitch, genre: b.genre }));
     const all = [...past, ...next];
     const count = (k: string) => liveCounts[k] ?? interestCounts[k] ?? 0;
@@ -137,15 +138,20 @@ export default function HomeV3({
               <h2 id="now-title">지금 열리는 북클럽</h2>
               <Link href="/bookclub">리스트 · 지도 · 달력</Link>
             </div>
-            <div className="qv3-rail">
+            <div className="qv3-grid">
               {upcoming.map((s) => {
                 const left = seatsLeft(s);
                 const full = getStatus(s) === "full";
                 return (
-                  <Link key={s.slug} href={`/bookclub/${s.slug}`} className="qv3-card">
-                    <span className={`qv3-kicker${daysUntil(s.startsAt) <= 7 ? " qv3-kicker--soon" : ""}`}>{whenKicker(s)}</span>
-                    <span className="qv3-q">{s.leadQuestion || s.title}</span>
-                    <span className="qv3-book">{s.bookTitle} · {s.author}</span>
+                  <Link key={s.slug} href={`/bookclub/${s.slug}`} className="qv3-card qv3-card--book">
+                    <span className="qv3-card-top">
+                      <span className="qv3-cover"><BookCoverImage title={s.bookTitle} author={s.author} coverUrl={s.coverUrl} /></span>
+                      <span className="qv3-card-body">
+                        <span className={`qv3-kicker${daysUntil(s.startsAt) <= 7 ? " qv3-kicker--soon" : ""}`}>{whenKicker(s)}</span>
+                        <span className="qv3-q">{s.leadQuestion || s.title}</span>
+                        <span className="qv3-book">{s.bookTitle} · {s.author}</span>
+                      </span>
+                    </span>
                     <span className="qv3-meta">
                       <span>{formatMonthDay(s.startsAt)} {formatWeekdayFull(s.startsAt).replace("요일", "")} · {formatTimeOfDay(s.startsAt)}</span>
                       <span className="m2">{s.venue.name} · {full ? "자리가 다 찼어요 · 대기 받아요" : seatCopy(left)}</span>
@@ -165,7 +171,7 @@ export default function HomeV3({
             <div className="qv3-section-head">
               <div>
                 <h2 id="open-title">함께 여는 북클럽</h2>
-                <p>{INTEREST_THRESHOLD}명이 모이면 열려요. 지금 함께 열어볼까요?</p>
+                <p>{INTEREST_THRESHOLD}명이 모이면 날짜를 정하고 함께 읽어요.</p>
               </div>
             </div>
             <div className="qv3-filters" role="group" aria-label="장르">
@@ -179,26 +185,29 @@ export default function HomeV3({
                 const pct = Math.min(100, Math.round((n / INTEREST_THRESHOLD) * 100));
                 const need = Math.max(0, INTEREST_THRESHOLD - n);
                 return (
-                  <article key={it.key} className="qv3-card">
-                    <span>
-                      <span className={`qv3-chip ${it.kind === "past" ? "qv3-chip--sage" : "qv3-chip--cta"}`}>{it.kind === "past" ? "다시 함께" : "새로"}</span>
+                  <article key={it.key} className="qv3-card qv3-card--book">
+                    <span className="qv3-card-top">
+                      <span className="qv3-cover"><BookCoverImage title={it.title} author={it.author} coverUrl={it.coverUrl} /></span>
+                      <span className="qv3-card-body">
+                        <span className={`qv3-chip ${it.kind === "past" ? "qv3-chip--sage" : "qv3-chip--cta"}`}>{it.kind === "past" ? "다시 함께" : "새로"}</span>
+                        <span className="qv3-q qv3-q--sm">{it.question || it.title}</span>
+                        <span className="qv3-book">{it.question ? `${it.title}${it.author ? ` · ${it.author}` : ""}` : it.author}</span>
+                      </span>
                     </span>
-                    <span className="qv3-q">{it.question || it.title}</span>
-                    <span className="qv3-book">{it.title}{it.author ? ` · ${it.author}` : ""}</span>
                     <span className="qv3-gauge" aria-label={`${n}명 모임, ${INTEREST_THRESHOLD}명이면 출발`}>
                       <span className="qv3-gauge-row">
-                        <b>{n > 0 ? `${n}/${INTEREST_THRESHOLD}명 모였어요` : `${INTEREST_THRESHOLD}명이 모이면 출발해요`}</b>
-                        <span>{n > 0 && need > 0 ? `${need}명만 더` : n >= INTEREST_THRESHOLD ? "일정 준비 중" : ""}</span>
+                        <b>{n > 0 ? `${n}/${INTEREST_THRESHOLD}명 모였어요` : "함께 읽을 분을 기다려요"}</b>
+                        <span>{n > 0 && need > 0 ? `${need}명만 더` : n >= INTEREST_THRESHOLD ? "일정 준비 중" : `${INTEREST_THRESHOLD}명이면 열려요`}</span>
                       </span>
                       <span className="qv3-gauge-bar"><span className="qv3-gauge-fill" style={{ width: `${pct}%` }} /></span>
                     </span>
-                    <button type="button" className="qv3-btn qv3-btn--ink" onClick={() => setOpenKey(it.key)}>나도 열래요</button>
+                    <button type="button" className="qv3-btn qv3-btn--ink" onClick={() => setOpenKey(it.key)}>함께 열기</button>
                   </article>
                 );
               })}
             </div>
             {hiddenCount > 0 && (
-              <button type="button" className="qv3-btn" onClick={() => setShowAll(true)}>기다리는 북클럽 {hiddenCount}개 더 보기</button>
+              <button type="button" className="qv3-btn" onClick={() => setShowAll(true)}>{hiddenCount}권 더 보기</button>
             )}
             {visibleOpen.length === 0 && (
               <div className="qv3-empty">

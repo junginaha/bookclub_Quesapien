@@ -3,18 +3,18 @@
 .qv3-login-top { display: flex; justify-content: flex-end; }
 .qv3-login-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 24px; padding: 24px 0; }
 .qv3-login-head { display: flex; flex-direction: column; gap: 14px; }
-.qv3-login-brand { font-family: var(--qv-serif); font-weight: 600; font-size: 17px; color: var(--qv-cta); }
+.qv3-login-brand { font-family: var(--qv-garamond); font-style: italic; font-size: 18px; letter-spacing: 0.04em; color: var(--qv-brass-deep); }
 .qv3-login-head h1 { font-family: var(--qv-serif); font-weight: 600; font-size: clamp(26px, 7.5vw, 32px); line-height: 1.4; letter-spacing: -0.01em; }
 .qv3-login-head p { font-size: 16px; color: var(--qv-muted); }
-.qv3-login-return { background: #fff; border: 1px solid var(--qv-line); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--qv-muted); }
+.qv3-login-return { background: var(--qv-card); border: 1px dashed var(--qv-line-2); border-radius: 3px; transform: rotate(-0.6deg); box-shadow: 0 10px 24px -16px rgba(72, 52, 34, 0.4); padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--qv-muted); }
 .qv3-login-return b { font-size: 14px; color: var(--qv-ink); font-weight: 700; }
 .qv3-login-return-label { font-size: 12px; }
 .qv3-login-actions { display: flex; flex-direction: column; gap: 12px; }
-.qv3-login-kakao, .qv3-login-google { height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; font-size: 16px; border: 0; }
+.qv3-login-kakao, .qv3-login-google { height: 56px; border-radius: 999px; box-shadow: 0 3px 0 rgba(72, 52, 34, 0.25), 0 8px 14px -8px rgba(72, 52, 34, 0.45); display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; font-size: 16px; border: 0; }
 .qv3 .qv3-login-kakao { background: #fee500; color: #1f1b16; }
-.qv3 .qv3-login-google { background: #fff; color: var(--qv-ink); border: 1.5px solid var(--qv-ink); }
+.qv3 .qv3-login-google { background: var(--qv-card); color: var(--qv-ink); border: 1px solid var(--qv-line-2); }
 .qv3-login-kakao:disabled, .qv3-login-google:disabled { opacity: 0.6; cursor: wait; }
 .qv3-login-terms { text-align: center; font-size: 12px; color: var(--qv-muted); line-height: 1.7; }
 .qv3-login-terms a { text-decoration: underline; text-underline-offset: 3px; color: var(--qv-muted); }
-.qv3-login-email-toggle { align-self: center; min-height: 44px; background: transparent; border: 0; color: var(--qv-muted); font-size: 13px; text-decoration: underline; text-underline-offset: 4px; }
-.qv3-login-email { background: #fff; border: 1px solid var(--qv-line); border-radius: 16px; padding: 20px; }
+.qv3-login-email-toggle { align-self: center; min-height: 44px; background: transparent; border: 0; color: var(--qv-muted); font-family: var(--qv-garamond); font-style: italic; font-size: 15px; text-decoration: underline; text-underline-offset: 4px; }
+.qv3-login-email { background: var(--qv-card); border: 1px solid #e1d5c2; border-radius: 3px; padding: 20px; }
