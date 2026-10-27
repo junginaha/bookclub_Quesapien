@@ -19,6 +19,7 @@ export default function LoginV3() {
   const rawNext = params.get("next") ?? "/";
   const next = rawNext.startsWith("/") ? rawNext : "/";
   const callbackError = params.get("error");
+  const reason = params.get("reason");
   const [busy, setBusy] = useState<"kakao" | "google" | null>(null);
   const [error, setError] = useState("");
   const [showEmail, setShowEmail] = useState(false);
@@ -30,12 +31,14 @@ export default function LoginV3() {
     setBusy(provider);
     setError("");
     const supabase = createClient();
+    // 돌아갈 곳은 쿠키로(10분). redirectTo는 허용 목록과 정확히 일치하는 /auth/callback 그대로.
+    document.cookie = `qs_next=${encodeURIComponent(next)}; path=/; max-age=600; samesite=lax${location.protocol === "https:" ? "; secure" : ""}`;
     const { error: e } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     if (e) {
-      setError("잠깐 딸꾹질을 했어요. 한 번만 더 눌러주세요.");
+      setError(`잠깐 딸꾹질을 했어요. 한 번만 더 눌러주세요. (${e.message})`);
       setBusy(null);
     }
   }
@@ -64,7 +67,7 @@ export default function LoginV3() {
         )}
 
         {(callbackError || error) && (
-          <p className="qv3-error" role="alert">{error || "로그인 링크가 만료됐어요. 다시 한 번 눌러주세요."}</p>
+          <p className="qv3-error" role="alert">{error || "로그인이 중간에 끊겼어요. 다시 한 번 눌러주세요."}{!error && reason ? <><br /><small>사유: {reason}</small></> : null}</p>
         )}
       </div>
 
