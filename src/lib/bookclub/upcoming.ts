@@ -12,6 +12,7 @@ export interface UpcomingBook {
   author: string; // 미확인이면 빈 문자열
   translator?: string;
   publisher?: string;
+  isbn?: string; // ISBN-13 — 표지 검색을 정확히 맞추기 위한 값(있으면 제목 검색보다 우선)
   genre: "소설" | "인문" | "사회" | "심리" | "에세이" | "역사";
   pitch: string; // 카드용 한 줄 소개(추천 사유를 바탕으로, 수치·후기 창작 금지)
 }
@@ -97,6 +98,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
     author: "마이클 이스터",
     translator: "김원진",
     publisher: "수오서재",
+    isbn: "9791193238691",
     genre: "인문",
     pitch: "알래스카 오지에서 33일을 보낸 저자가 묻는다. 너무 편해진 삶이 오히려 우리를 지치게 하는 건 아닐까.",
   },

@@ -20,7 +20,7 @@ export default function OpenBook({ session }: { session: BookClubSession }) {
           {spread === 0 ? (
             <>
               <div className={styles.cover}>
-                <BookCoverImage title={session.bookTitle} author={session.author} coverUrl={session.coverUrl} priority />
+                <BookCoverImage title={session.bookTitle} author={session.author} coverUrl={session.coverUrl} isbn={session.isbn} priority />
               </div>
               <h1 className={styles.title}>{session.bookTitle}</h1>
               <p className={styles.author}>{session.author}</p>

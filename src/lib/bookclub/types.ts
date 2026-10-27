@@ -19,6 +19,7 @@ export interface BookClubSession {
   bookTitle: string;
   author: string;
   coverUrl?: string;
+  isbn?: string; // ISBN-13 — 표지 검색 정확도용(선택)
   startsAt: string; // ISO8601 + KST offset
   endsAt: string;
   venue: BookClubVenue;

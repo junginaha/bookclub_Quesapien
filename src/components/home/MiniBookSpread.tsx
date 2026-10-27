@@ -45,6 +45,7 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
                     title={session.bookTitle}
                     author={session.author}
                     coverUrl={session.coverUrl}
+                    isbn={session.isbn}
                   />
                 </span>
                 <span className={styles.coverMeta}>

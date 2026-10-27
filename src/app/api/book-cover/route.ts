@@ -69,7 +69,8 @@ function authorsMatch(authors: string[], query: string) {
 
 // Verified Korean editions: book21.com/book/book_view.html?bookSID=6920
 // and yes24.com/product/goods/64620409. ISBN avoids subtitle/author-order ambiguity.
-function knownIsbn(title: string, author: string) {
+function knownIsbn(title: string, author: string, explicit?: string) {
+  if (explicit && /^97[89]\d{10}$/.test(explicit)) return explicit;
   if (["불통독단야망", "위험한리더는어떻게만들어지는가"].includes(norm(title)) &&
       norm(author).includes("스티브테일러")) return "9791173570650";
   if (norm(title) === "어떻게민주주의는무너지는가" &&
@@ -78,8 +79,8 @@ function knownIsbn(title: string, author: string) {
   return undefined;
 }
 
-function matchScore(candidate: Candidate, title: string, author: string) {
-  const isbn = knownIsbn(title, author);
+function matchScore(candidate: Candidate, title: string, author: string, explicitIsbn?: string) {
+  const isbn = knownIsbn(title, author, explicitIsbn);
   if (isbn && candidate.isbn?.split(/\s+/).includes(isbn)) return 200 + candidate.quality;
   const qt = norm(title);
   const qa = norm(author);
@@ -100,13 +101,14 @@ function matchScore(candidate: Candidate, title: string, author: string) {
   return score + candidate.quality;
 }
 
-async function searchNaver(title: string, author: string): Promise<Candidate[]> {
+async function searchNaver(title: string, author: string, explicitIsbn?: string): Promise<Candidate[]> {
   const id = process.env.NAVER_CLIENT_ID?.trim();
   const secret = process.env.NAVER_CLIENT_SECRET?.trim();
   if (!id || !secret) return [];
 
   const url = new URL("https://openapi.naver.com/v1/search/book.json");
-  url.searchParams.set("query", [title, author].filter(Boolean).join(" "));
+  const isbn = knownIsbn(title, author, explicitIsbn);
+  url.searchParams.set("query", isbn || [title, author].filter(Boolean).join(" "));
   url.searchParams.set("display", "10");
   url.searchParams.set("sort", "sim");
 
@@ -140,12 +142,12 @@ async function searchNaver(title: string, author: string): Promise<Candidate[]> 
   }
 }
 
-async function searchKakao(title: string, author: string): Promise<Candidate[]> {
+async function searchKakao(title: string, author: string, explicitIsbn?: string): Promise<Candidate[]> {
   const key = kakaoKey();
   if (!key) return [];
 
   const url = new URL("https://dapi.kakao.com/v3/search/book");
-  const isbn = knownIsbn(title, author);
+  const isbn = knownIsbn(title, author, explicitIsbn);
   url.searchParams.set("query", isbn || title);
   url.searchParams.set("target", isbn ? "isbn" : "title");
   url.searchParams.set("size", "20");
@@ -179,9 +181,10 @@ async function searchKakao(title: string, author: string): Promise<Candidate[]> 
   }
 }
 
-async function searchGoogle(title: string, author: string): Promise<Candidate[]> {
+async function searchGoogle(title: string, author: string, explicitIsbn?: string): Promise<Candidate[]> {
   const url = new URL("https://www.googleapis.com/books/v1/volumes");
-  url.searchParams.set("q", author ? `intitle:"${title}" inauthor:"${author}"` : `intitle:"${title}"`);
+  const isbn = knownIsbn(title, author, explicitIsbn);
+  url.searchParams.set("q", isbn ? `isbn:${isbn}` : author ? `intitle:"${title}" inauthor:"${author}"` : `intitle:"${title}"`);
   url.searchParams.set("maxResults", "10");
   url.searchParams.set("printType", "books");
   const key = process.env.GOOGLE_BOOKS_API_KEY;
@@ -234,7 +237,7 @@ const PLACEHOLDER_STDEV = 22;
 async function looksLikePlaceholder(url: string): Promise<boolean> {
   try {
     const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(4000) });
-    if (!res.ok) return true;
+    if (!res.ok) return false;
     const buf = Buffer.from(await res.arrayBuffer());
     if (buf.length < 800) return true;
     const sharp = (await import("sharp")).default;
@@ -249,16 +252,17 @@ async function looksLikePlaceholder(url: string): Promise<boolean> {
 export async function GET(request: NextRequest) {
   const title = request.nextUrl.searchParams.get("title")?.trim() ?? "";
   const author = request.nextUrl.searchParams.get("author")?.trim() ?? "";
+  const isbnParam = request.nextUrl.searchParams.get("isbn")?.replace(/\D/g, "") || undefined;
   if (!title) return NextResponse.json({ coverUrl: null }, { status: 400 });
 
   const [naver, kakao, google] = await Promise.all([
-    searchNaver(title, author),
-    searchKakao(title, author),
-    searchGoogle(title, author),
+    searchNaver(title, author, isbnParam),
+    searchKakao(title, author, isbnParam),
+    searchGoogle(title, author, isbnParam),
   ]);
 
   const ranked = [...naver, ...kakao, ...google]
-    .map((candidate) => ({ candidate, score: matchScore(candidate, title, author) }))
+    .map((candidate) => ({ candidate, score: matchScore(candidate, title, author, isbnParam) }))
     .filter((item) => item.score >= 72)
     .sort((a, b) => b.score - a.score);
 

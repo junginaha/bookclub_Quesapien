@@ -71,7 +71,7 @@ function Card({ s }: { s: BookClubSession }) {
   return (
     <Link href={`/bookclub/${s.slug}`} className="qv3-card qv3-card--book">
       <span className="qv3-card-top">
-        <span className="qv3-cover"><BookCoverImage title={s.bookTitle} author={s.author} coverUrl={s.coverUrl} /></span>
+        <span className="qv3-cover"><BookCoverImage title={s.bookTitle} author={s.author} coverUrl={s.coverUrl} isbn={s.isbn} /></span>
         <span className="qv3-card-body">
           <span className={`qv3-kicker${!past && daysUntil(s.startsAt) <= 7 ? " qv3-kicker--soon" : ""}`}>{past ? "지난 북클럽" : kicker(s)}</span>
           <span className="qv3-q">{s.leadQuestion || s.title}</span>

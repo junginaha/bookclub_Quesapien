@@ -34,7 +34,7 @@ export default function TimelineCard({
   const cardInner = (
     <>
       <div className="qc-card-cover">
-        <BookCoverImage title={session.bookTitle} author={session.author} coverUrl={session.coverUrl} />
+        <BookCoverImage title={session.bookTitle} author={session.author} coverUrl={session.coverUrl} isbn={session.isbn} />
       </div>
       <div className="qc-card-body">
         <span className="qc-card-title">{session.title}</span>

@@ -24,6 +24,7 @@ type BookCoverProps = {
   title: string;
   author: string;
   coverUrl?: string;
+  isbn?: string;
   fallbackClassName?: string;
   priority?: boolean;
 };
@@ -31,13 +32,14 @@ type BookCoverProps = {
 // All book surfaces share the same explicit-cover/API/fallback policy.
 // Remount on book changes so an old cover cannot flash for a different book.
 export default function BookCoverImage(props: BookCoverProps) {
-  return <ResolvedBookCover key={JSON.stringify([props.title, props.author, props.coverUrl])} {...props} />;
+  return <ResolvedBookCover key={JSON.stringify([props.title, props.author, props.coverUrl, props.isbn])} {...props} />;
 }
 
 function ResolvedBookCover({
   title,
   author,
   coverUrl,
+  isbn,
   fallbackClassName,
   priority = false,
 }: BookCoverProps) {
@@ -48,7 +50,8 @@ function ResolvedBookCover({
     if (!lookup) return;
     let active = true;
     const controller = new AbortController();
-    const params = new URLSearchParams({ title, author, v: "3" });
+    const params = new URLSearchParams({ title, author, v: "4" });
+    if (isbn) params.set("isbn", isbn);
     fetch("/api/book-cover?" + params.toString(), { signal: controller.signal })
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
@@ -56,7 +59,7 @@ function ResolvedBookCover({
       })
       .catch(() => {});
     return () => { active = false; controller.abort(); };
-  }, [title, author, lookup]);
+  }, [title, author, isbn, lookup]);
 
   if (!url) {
     const [bg, ink] = toneFor(title);
