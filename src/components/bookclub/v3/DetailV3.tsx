@@ -86,7 +86,7 @@ export default function DetailV3({
           <h1 className="qv3-detail-q">{headline}</h1>
           <div className="qv3-detail-book">
             <div className="qv3-detail-cover">
-              <BookCoverImage title={session.bookTitle} author={session.author} coverUrl={session.coverUrl} />
+              <BookCoverImage title={session.bookTitle} author={session.author} coverUrl={session.coverUrl} isbn={session.isbn} />
             </div>
             <div>
               <div className="qv3-detail-book-title">{session.bookTitle}</div>

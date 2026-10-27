@@ -18,8 +18,8 @@ import "./home-v3.css";
  */
 
 type OpenItem =
-  | { kind: "past"; key: string; title: string; author: string; question: string; href: string; coverUrl?: string; genre?: undefined }
-  | { kind: "next"; key: string; title: string; author: string; question: string; href?: undefined; coverUrl?: string; genre: UpcomingBook["genre"] };
+  | { kind: "past"; key: string; title: string; author: string; question: string; href: string; coverUrl?: string; isbn?: string; genre?: undefined }
+  | { kind: "next"; key: string; title: string; author: string; question: string; href?: undefined; coverUrl?: string; isbn?: string; genre: UpcomingBook["genre"] };
 
 const PIN = (
   <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -87,8 +87,8 @@ export default function HomeV3({
         seen.add(k);
         return true;
       })
-      .map((s) => ({ kind: "past", key: s.slug, title: s.bookTitle, author: s.author, question: s.leadQuestion, href: `/bookclub/${s.slug}`, coverUrl: s.coverUrl }));
-    const next: OpenItem[] = UPCOMING_BOOKS.map((b) => ({ kind: "next", key: b.slug, title: b.bookTitle, author: b.author, question: b.pitch, genre: b.genre }));
+      .map((s) => ({ kind: "past", key: s.slug, title: s.bookTitle, author: s.author, question: s.leadQuestion, href: `/bookclub/${s.slug}`, coverUrl: s.coverUrl, isbn: s.isbn }));
+    const next: OpenItem[] = UPCOMING_BOOKS.map((b) => ({ kind: "next", key: b.slug, title: b.bookTitle, author: b.author, question: b.pitch, genre: b.genre, isbn: b.isbn }));
     const all = [...past, ...next];
     const count = (k: string) => liveCounts[k] ?? interestCounts[k] ?? 0;
     // 게이지 높은 순 — 숫자 0은 뒤로
@@ -145,7 +145,7 @@ export default function HomeV3({
                 return (
                   <Link key={s.slug} href={`/bookclub/${s.slug}`} className="qv3-card qv3-card--book">
                     <span className="qv3-card-top">
-                      <span className="qv3-cover"><BookCoverImage title={s.bookTitle} author={s.author} coverUrl={s.coverUrl} /></span>
+                      <span className="qv3-cover"><BookCoverImage title={s.bookTitle} author={s.author} coverUrl={s.coverUrl} isbn={s.isbn} /></span>
                       <span className="qv3-card-body">
                         <span className={`qv3-kicker${daysUntil(s.startsAt) <= 7 ? " qv3-kicker--soon" : ""}`}>{whenKicker(s)}</span>
                         <span className="qv3-q">{s.leadQuestion || s.title}</span>
@@ -187,7 +187,7 @@ export default function HomeV3({
                 return (
                   <article key={it.key} className="qv3-card qv3-card--book">
                     <span className="qv3-card-top">
-                      <span className="qv3-cover"><BookCoverImage title={it.title} author={it.author} coverUrl={it.coverUrl} /></span>
+                      <span className="qv3-cover"><BookCoverImage title={it.title} author={it.author} coverUrl={it.coverUrl} isbn={it.isbn} /></span>
                       <span className="qv3-card-body">
                         <span className={`qv3-chip ${it.kind === "past" ? "qv3-chip--sage" : "qv3-chip--cta"}`}>{it.kind === "past" ? "다시 함께" : "새로"}</span>
                         <span className="qv3-q qv3-q--sm">{it.question || it.title}</span>

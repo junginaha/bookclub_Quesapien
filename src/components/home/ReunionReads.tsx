@@ -89,7 +89,7 @@ export default function ReunionReads({
           const cover = (
             <>
               <span className={styles.coverVisual}>
-                <BookCoverImage title={title} author={author} coverUrl={isPast ? item.session.coverUrl : undefined} />
+                <BookCoverImage title={title} author={author} coverUrl={isPast ? item.session.coverUrl : undefined} isbn={isPast ? item.session.isbn : item.book.isbn} />
               </span>
               <span className={styles.coverMeta}>
                 <strong>{title}</strong>
