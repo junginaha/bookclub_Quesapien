@@ -5,7 +5,12 @@ import { logEvent } from "@/lib/events";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  // 돌아갈 곳: 쿼리(next) 우선, 없으면 로그인 직전에 심어둔 쿠키(qs_next). redirectTo에 쿼리를
+  // 붙이면 Supabase 허용 목록과 어긋날 수 있어 쿠키 경로를 기본으로 쓴다(LoginV3).
+  const cookieNext = request.cookies.get("qs_next")?.value;
+  const rawNext = searchParams.get("next") ?? (cookieNext ? decodeURIComponent(cookieNext) : "/");
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
+  const providerError = searchParams.get("error_description") ?? searchParams.get("error");
   const type = searchParams.get("type"); // 'recovery' for password reset
   const consented = searchParams.get("consent") === "1"; // §D1.5① 가입 동의 체크박스, SignupForm에서 전달
 
@@ -78,10 +83,15 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      return NextResponse.redirect(`${origin}${next}`);
+      const done = NextResponse.redirect(`${origin}${next}`);
+      done.cookies.set("qs_next", "", { path: "/", maxAge: 0 });
+      return done;
     }
+    console.error("[auth/callback] exchange failed", error?.message);
+    return NextResponse.redirect(`${origin}/login?error=auth_callback_error&reason=${encodeURIComponent(error?.message ?? "exchange_failed")}&next=${encodeURIComponent(next)}`);
   }
 
-  // 코드가 없거나 교환 실패
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_error`);
+  // 코드가 없음 — 공급자가 에러를 돌려준 경우 그 사유를 그대로 보여준다
+  console.error("[auth/callback] no code", providerError);
+  return NextResponse.redirect(`${origin}/login?error=auth_callback_error&reason=${encodeURIComponent(providerError ?? "no_code")}&next=${encodeURIComponent(next)}`);
 }
