@@ -332,3 +332,16 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 - 오픈 예정 도서 17권 전부 ISBN-13 등록(예스24·알라딘·리디·교보 상품 페이지로 제목·저자·출판사 대조, 체크디지트 검증). 참고: 『결핍은…』은 현행 빌리버튼판, 『뱀의 뇌…』는 타임비즈 구판 ISBN(개정판 ISBN 미확인), 『웨이저』는 교보 펀딩 페이지 기준.
 - 같은 날 팩트체크 후속: 『바그다드 동물원 구하기』 ISBN을 리디 표기(9788958077398)에서 예스24 goods/70772365 확인값 **9788958077046**(개정판 2019-03)으로 정정 — 이게 타이포 표지로 남은 원인. 『결핍은…』 빌리버튼판 9791192999739(예스24 재확인), 『웨이저』 9791189336899(교보 펀딩 공식 페이지, 프시케의숲 접두 979-11-89336). 마지막 수단으로 ISBN 있는 책은 Open Library 표지(`covers.openlibrary.org/b/isbn/{isbn}-L.jpg?default=false`, 없으면 404)까지 시도.
 - 홈 '함께 읽고 싶은 책 추천하기': 폼을 접고 애니메이션 CTA(황동 코인 톤, 반짝임+펄스, 화살표) 뒤에 숨김 — 누르면 폼이 펼쳐지고 '접어두기'로 바뀜. `prefers-reduced-motion`이면 정지.
+
+### 2026-10-28 — 로그인 복구: Supabase URL 설정 + 구글 OAuth 신규 + 카카오 (진행 중)
+- 운영자 "로그인 에러나" 제보 → 원인은 코드가 아니라 **운영 설정 3가지**였다.
+  1. **Supabase Site URL이 `http://localhost:3000`** 이었다 → `https://www.qsapiens.com`으로 교체. 로그인에 성공해도 로컬로 리다이렉트되던 상태.
+  2. **리디렉션 URL 허용목록이 비어 있었다** → `https://www.qsapiens.com/**`, `https://qsapiens.com/**`, `http://localhost:3000/**` 3개 등록. (Vercel 프리뷰 와일드카드는 오픈 리다이렉트 위험이라 제외.)
+  3. **카카오·구글 provider가 둘 다 비활성** 이었다. 즉 어떤 방법으로도 로그인 불가.
+- 운영 Supabase 프로젝트 ref는 **`pgstyeddzbjoijmmnuuw`**(대시보드 "Qusapience")로 확정. 구 CLAUDE.md의 `smoehxmgnnaulrxjkqvm`은 폐기된 값.
+- **구글**: Google Cloud 프로젝트 `qsapiens` 신규 생성 → OAuth 동의 화면(앱 이름 "질문하는 사람들", 외부, 지원/개발자 메일 junginaha@gmail.com) → 웹 클라이언트 `qsapiens web` 생성, 리디렉션 URI `https://pgstyeddzbjoijmmnuuw.supabase.co/auth/v1/callback`. Supabase 구글 provider에 Client ID/Secret 입력 후 활성화. `/login`에서 구글 버튼 → accounts.google.com 계정 선택까지 정상 도달 확인(최종 콜백은 운영자 계정 선택 필요).
+- **카카오**: Supabase 카카오 provider 활성화(REST API 키 + Client Secret, "이메일 없는 계정 허용" ON). 카카오 콘솔에 리디렉션 URI 등록, 닉네임 **필수 동의**, 프로필 사진 **선택 동의** 설정.
+  **아직 KOE205로 실패한다.** Supabase GoTrue가 `account_email`을 항상 요청하고(커스텀 `scopes`는 기본값을 대체하지 않고 **추가**됨 — authorize URL로 직접 확인), 이 동의항목은 **비즈 앱 전용**(현재 "권한 없음")이다.
+  → 해소 조건: 카카오 **비즈 앱 전환** = 앱 아이콘 등록 + (사업자번호 없으면) **본인인증 + 카카오비즈니스 통합 서비스 약관 동의**. 앱 아이콘 PNG는 제작해 운영자에게 전달했고, 본인인증은 운영자만 가능.
+  대안으로 검토했다가 접은 것: 카카오 OIDC + Supabase Custom Provider(베타) — provider id가 바뀌어 앱 코드 수정·배포가 필요하고 불확실성이 커서 비즈 앱 경로를 택함.
+- 코드 변경 없음. 이 세션은 전부 외부 콘솔 설정이다.
