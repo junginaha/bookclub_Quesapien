@@ -271,6 +271,16 @@ export async function GET(request: NextRequest) {
   for (const { candidate } of ranked.slice(0, 3)) {
     if (!(await looksLikePlaceholder(candidate.coverUrl))) { best = candidate; break; }
   }
+  // 마지막 수단: ISBN이 있으면 Open Library 표지(키 불필요, 없으면 404 — default=false).
+  if (!best && isbnParam && /^97[89]\d{10}$/.test(isbnParam)) {
+    const ol = `https://covers.openlibrary.org/b/isbn/${isbnParam}-L.jpg?default=false`;
+    try {
+      const head = await fetch(ol, { method: "HEAD", cache: "no-store", signal: AbortSignal.timeout(4000) });
+      if (head.ok && !(await looksLikePlaceholder(ol))) {
+        best = { provider: "google", title, authors: author ? [author] : [], coverUrl: ol, quality: 20, isbn: isbnParam };
+      }
+    } catch { /* 없으면 타이포 표지 */ }
+  }
   const response = NextResponse.json({
     coverUrl: best?.coverUrl ?? null,
     provider: best?.provider ?? null,

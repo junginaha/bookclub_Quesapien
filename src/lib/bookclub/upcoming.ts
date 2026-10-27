@@ -176,7 +176,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
     author: "로렌스 앤서니·그레이엄 스펜스",
     translator: "고상숙",
     publisher: "뜨인돌",
-    isbn: "9788958077398",
+    isbn: "9788958077046", // 예스24 goods/70772365(개정판 2019-03, 뜨인돌) 확인 — 리디 표기 9788958077398은 오기
     genre: "에세이",
     pitch: "이라크 전쟁 한복판, 굶주린 동물들을 살리러 바그다드로 들어간 한 남자의 실화.",
   },

@@ -33,6 +33,7 @@ export default function ReunionReads({
   const [filter, setFilter] = useState<Filter>("전체");
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [liveCounts, setLiveCounts] = useState<Record<string, number>>({});
+  const [recOpen, setRecOpen] = useState(false);
 
   // 지난 모임 — 같은 책은 가장 최근 회차 하나만
   const seen = new Set<string>();
@@ -131,14 +132,27 @@ export default function ReunionReads({
         })}
       </ul>
 
-      <div className={styles.upcomingRecommend} id="recommend">
+      <div className={`${styles.upcomingRecommend}${recOpen ? ` ${styles.recommendOpen}` : ""}`} id="recommend">
         <div>
           <h3>함께 읽고 싶은 책 추천하기</h3>
           <p className={styles.sectionLead}>
             목록에 없는 책이 있나요? 읽고 싶은 책을 추천해 주세요. 같은 책을 고른 분이 5명 모이면 북토크를 열고 연락드려요.
           </p>
+          <button
+            type="button"
+            className={styles.recommendCta}
+            aria-expanded={recOpen}
+            aria-controls="recommend-form"
+            onClick={() => setRecOpen((v) => !v)}
+          >
+            <span className={styles.recommendCtaGlow} aria-hidden="true" />
+            <span className={styles.recommendCtaLabel}>{recOpen ? "접어두기" : "읽고 싶은 책 추천하기"}</span>
+            <span className={styles.recommendCtaArrow} aria-hidden="true">{recOpen ? "↑" : "→"}</span>
+          </button>
         </div>
-        <RecommendBookForm />
+        <div id="recommend-form" className={styles.recommendPanel} hidden={!recOpen}>
+          <RecommendBookForm />
+        </div>
       </div>
     </section>
   );
