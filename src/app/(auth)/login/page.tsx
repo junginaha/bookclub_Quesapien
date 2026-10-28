@@ -4,7 +4,7 @@ import LoginV3 from "@/components/auth/LoginV3";
 
 export const metadata: Metadata = {
   title: "로그인",
-  description: "카카오 또는 구글로 로그인하고 북클럽을 예약하세요. 이름만 가져와요.",
+  description: "카카오 또는 구글로 로그인하고 북클럽을 예약하세요. 이름을 받아오고, 프로필 사진과 이메일은 선택입니다.",
   robots: { index: false, follow: false },
 };
 
