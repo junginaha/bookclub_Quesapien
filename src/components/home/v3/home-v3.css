@@ -27,6 +27,9 @@
   --qv-sage-deep: #4f7256;
   --qv-sage-soft: #e6ece4;
   --qv-stamp: #a7483a;
+  /* 도장 글자용 — #a7483a는 마닐라 위에서 작은 글자가 안 읽힌다(4.25:1). */
+  --qv-stamp-deep: #8f3a2e;
+  --qv-hand: var(--font-nanum-pen), "Nanum Pen Script", cursive;
   --qv-serif: var(--font-noto-serif-kr), "Noto Serif KR", Georgia, serif;
   --qv-garamond: var(--font-eb-garamond), "EB Garamond", Georgia, serif;
   --qv-sans: "Pretendard", "Pretendard Variable", var(--font-noto-sans-kr), -apple-system, sans-serif;

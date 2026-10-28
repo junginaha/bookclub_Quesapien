@@ -5,7 +5,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { seatsLeft } from "@/lib/bookclub/types";
-import { feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, seatNotice } from "@/lib/bookclub/selectors";
+import { dateKey, feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, seatNotice } from "@/lib/bookclub/selectors";
 import { applyToBookClub } from "@/lib/actions/bookclub";
 import type { Viewer } from "@/lib/viewer";
 
@@ -112,6 +112,13 @@ export default function BookingSheet({
 
   const when = `${formatMonthDay(session.startsAt)} ${formatWeekdayFull(session.startsAt)}`;
   const firstName = name.trim() || viewer.name;
+  // 카드 번호·도장 날짜는 모임 날짜에서 그대로 끌어온다(임의 번호를 만들지 않는다).
+  const cardDate = dateKey(session.startsAt);
+  const cardNo = cardDate.replace(/-/g, "");
+  const stampDate = cardDate.replace(/-/g, ".");
+  const waitlisted = done?.kind === "just_filled_waitlisted";
+  const stampLabel = waitlisted ? "대기 접수" : "예약 완료";
+  const place = session.venue.nearestStation || session.venue.address || session.venue.detail || "자세한 위치는 모임 전에 안내드려요";
 
   return (
     <dialog ref={ref} className={`qv3 qv3-sheet${done ? " is-done" : ""}`} onClose={onClose} aria-labelledby="qv3-sheet-title">
@@ -121,16 +128,16 @@ export default function BookingSheet({
             <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
           </button>
           <div className="qv3-done-body">
-            <svg role="img" aria-label="예약 완료" width="56" height="56" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="30" stroke="currentColor" strokeOpacity="0.5" strokeWidth="2" /><path d="M20 33l8 8 16-17" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <span className="qv3-done-kicker">Card Issued</span>
             {done.kind === "confirmed" && (
               <>
-                <h2 id="qv3-sheet-title">{firstName}님,<br />{when}에<br />뵙겠습니다.</h2>
+                <h2 id="qv3-sheet-title">{firstName}님,<br />{when}에 뵙겠습니다.</h2>
                 <p>책은 어디까지 읽어오셔도 괜찮아요.<br />질문 하나와 편한 신발이면 충분합니다.</p>
               </>
             )}
             {done.kind === "just_filled_waitlisted" && (
               <>
-                <h2 id="qv3-sheet-title">{firstName}님,<br />방금 자리가 다 차서<br />대기로 모셨어요.</h2>
+                <h2 id="qv3-sheet-title">{firstName}님, 방금 자리가 다 차서<br />대기로 모셨어요.</h2>
                 <p>자리가 나면 제일 먼저 알려드릴게요. 약속.</p>
               </>
             )}
@@ -140,9 +147,22 @@ export default function BookingSheet({
                 <p>{when}에 뵙겠습니다. 두 번 예약하신 마음, 잘 받았어요.</p>
               </>
             )}
-            <div className="qv3-done-card">
-              <b>{formatTimeOfDay(session.startsAt)} · {session.venue.name}</b>
-              <span>{session.venue.nearestStation || session.venue.address || session.venue.detail || "자세한 위치는 모임 전에 안내드려요"}</span>
+            <div className="qv3-libcard">
+              <span className="qv3-libcard-punch" aria-hidden="true" />
+              <span className="qv3-libcard-no">NO. {cardNo}</span>
+              <b className="qv3-libcard-title">{session.bookTitle}</b>
+              <span className="qv3-libcard-sub">{session.author} · {when} {formatTimeOfDay(session.startsAt)}</span>
+              <div className="qv3-libcard-row">
+                <span className="qv3-libcard-label" aria-hidden="true">BORROWER</span>
+                <span className="qv3-libcard-name">{firstName}</span>
+              </div>
+              <div className="qv3-libcard-place">{session.venue.name} · {place}</div>
+              <div className="qv3-stamp" role="img" aria-label={`${stampLabel} ${stampDate}`}>
+                <span className="qv3-stamp-brand" aria-hidden="true">QSAPIENS</span>
+                <b aria-hidden="true">{stampLabel}</b>
+                <i aria-hidden="true" />
+                <span className="qv3-stamp-date" aria-hidden="true">{stampDate}</span>
+              </div>
             </div>
           </div>
           <div className="qv3-done-actions">
@@ -158,7 +178,7 @@ export default function BookingSheet({
             ) : (
               <a className="qv3-done-secondary" href={icsFor(session)} download={`${session.slug}.ics`}>캘린더에 추가</a>
             )}
-            <Link href="/guide" className="qv3-done-secondary">처음 오시나요? 안내 보기</Link>
+            <Link href="/guide" className="qv3-done-link">처음 오시나요? 안내 보기</Link>
           </div>
         </div>
       ) : (

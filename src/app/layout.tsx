@@ -14,6 +14,11 @@ const notoSerifKR = Noto_Serif_KR({ subsets: ["latin"], weight: ["300", "400", "
 const ebGaramond = EB_Garamond({ subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"], variable: "--font-eb-garamond", display: "swap" });
 // 배민 주아체 — 키캡 버튼(.btn-keycap) 전용. 예전 jsDelivr CSS 링크는 404였고 렌더를
 // 막고 있었다. 자체 호스팅 + preload 끔: 키캡이 있는 페이지에서만 내려받는다.
+// 나눔펜 — 대출카드에 이름이 "적히는" 자리 전용(예약 완료 화면). BMJUA와 같은 이유로
+// 자체 호스팅한다: Google Fonts의 CSS2 기본 응답에는 이 폰트의 한글 글리프가 없어서
+// next/font로 받으면 한글이 폴백 고딕으로 떨어진다(헤드리스 브라우저로 확인).
+// korean 서브셋 woff2만 두고, 이 화면에서만 내려받도록 preload는 끈다.
+const nanumPen = localFont({ src: "../../public/fonts/NanumPenScript-korean.woff2", variable: "--font-nanum-pen", display: "swap", preload: false });
 const bmjua = localFont({ src: "../../public/fonts/BMJUA.woff", variable: "--font-bmjua", display: "swap", preload: false });
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 
@@ -46,7 +51,7 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="ko" className={`${notoSansKR.variable} ${notoSerifKR.variable} ${ebGaramond.variable} ${bmjua.variable}`}>
+  return <html lang="ko" className={`${notoSansKR.variable} ${notoSerifKR.variable} ${ebGaramond.variable} ${nanumPen.variable} ${bmjua.variable}`}>
     <body className="min-h-screen antialiased">
       <JsonLd data={orgSchema()} />
       <JsonLd data={websiteSchema()} />

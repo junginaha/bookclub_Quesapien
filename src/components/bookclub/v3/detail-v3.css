@@ -73,18 +73,40 @@
 .qv3-sheet-cancel { align-self: center; min-height: 44px; background: transparent; border: 0; color: var(--qv-muted); font-family: var(--qv-garamond); font-style: italic; font-size: 16px; }
 
 /* 완료 화면 */
-.qv3-done { height: 100dvh; background: var(--qv-leather); background-image: radial-gradient(ellipse at 20% 10%, rgba(255, 230, 190, 0.22), transparent 50%), radial-gradient(ellipse at 90% 100%, rgba(0, 0, 0, 0.25), transparent 50%); color: #fff9ef; display: flex; flex-direction: column; padding: 20px 28px calc(32px + env(safe-area-inset-bottom)); max-width: 100vw; }
+.qv3-done { height: 100dvh; background: var(--qv-leather); background-image: radial-gradient(ellipse at 20% 10%, rgba(255, 230, 190, 0.22), transparent 50%), radial-gradient(ellipse at 90% 100%, rgba(0, 0, 0, 0.25), transparent 50%); color: #fff9ef; display: flex; flex-direction: column; padding: 12px 24px calc(22px + env(safe-area-inset-bottom)); max-width: 100vw; }
 .qv3-done-close { align-self: flex-end; width: 44px; height: 44px; border-radius: 22px; border: 0; background: rgba(255, 255, 255, 0.14); color: #fff; display: flex; align-items: center; justify-content: center; }
-.qv3-done-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 24px; max-width: 480px; margin: 0 auto; width: 100%; }
-.qv3-done-body h2 { font-family: var(--qv-serif); font-weight: 600; font-size: clamp(26px, 7.5vw, 32px); line-height: 1.4; letter-spacing: -0.01em; }
-.qv3-done-body p { font-size: 17px; line-height: 1.7; color: rgba(255, 249, 239, 0.85); }
-.qv3-done-card { background: rgba(255, 249, 239, 0.1); border: 1px dashed rgba(255, 249, 239, 0.35); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
-.qv3-done-card b { font-weight: 700; }
-.qv3-done-card span { color: rgba(255, 255, 255, 0.8); }
+.qv3-done-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; justify-content: center; gap: 14px; max-width: 480px; margin: 0 auto; width: 100%; padding-block: 8px; }
+.qv3-done-body h2 { font-family: var(--qv-serif); font-weight: 600; font-size: clamp(22px, 6vw, 27px); line-height: 1.45; letter-spacing: -0.01em; }
+.qv3-done-body p { font-size: 15px; line-height: 1.65; color: rgba(255, 249, 239, 0.85); }
+/* 발급된 대출카드 — 가죽 책상 위에 마닐라 카드 한 장 */
+.qv3-done-kicker { font-family: var(--qv-garamond); font-style: italic; font-size: 12.5px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255, 249, 239, 0.72); }
+.qv3-libcard { position: relative; transform: rotate(-1.1deg); color: #221f19; background-color: #e9dcbb; background-image: repeating-linear-gradient(0deg, transparent 0 26px, rgba(90, 70, 42, 0.13) 26px 27px); border: 1px solid #a2946f; border-radius: 3px; padding: 16px 16px 20px; min-height: 196px; box-shadow: 0 2px 0 #c9b893, 0 24px 36px -22px rgba(0, 0, 0, 0.8); }
+.qv3-libcard-punch { position: absolute; top: 12px; right: 14px; width: 11px; height: 11px; border-radius: 50%; background: var(--qv-leather-deep); box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.55); }
+.qv3-libcard-no { display: block; font-family: var(--qv-garamond); font-size: 11.5px; letter-spacing: 0.2em; color: #645c49; }
+.qv3-libcard-title { display: block; margin-top: 4px; font-family: var(--qv-serif); font-size: 19px; font-weight: 700; line-height: 1.35; letter-spacing: -0.01em; }
+.qv3-libcard-sub { display: block; margin-top: 3px; font-size: 12.5px; color: #555040; }
+.qv3-libcard-row { margin-top: 14px; display: flex; align-items: baseline; gap: 10px; border-bottom: 1.5px solid #a2946f; padding-bottom: 3px; }
+.qv3-libcard-label { flex: 0 0 auto; font-family: var(--qv-garamond); font-size: 11px; letter-spacing: 0.16em; color: #645c49; }
+.qv3-libcard-name { font-family: var(--qv-hand); font-size: 34px; line-height: 1; color: #26406b; transform: rotate(-1.2deg); overflow-wrap: anywhere; }
+.qv3-libcard-place { margin-top: 10px; font-size: 12.5px; line-height: 1.6; color: #555040; }
+.qv3-stamp { position: absolute; right: 12px; bottom: 10px; width: 104px; height: 104px; border: 3px solid var(--qv-stamp-deep); border-radius: 50%; box-shadow: inset 0 0 0 2.5px var(--qv-stamp-deep); color: var(--qv-stamp-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transform: rotate(-10deg); opacity: 0.9; mix-blend-mode: multiply; animation: qv3-stamp-in 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.25) both; }
+.qv3-stamp-brand { font-family: var(--qv-garamond); font-size: 10.5px; letter-spacing: 0.24em; }
+.qv3-stamp b { font-family: var(--qv-serif); font-size: 17px; font-weight: 700; letter-spacing: 0.06em; }
+.qv3-stamp i { width: 64px; height: 2px; background: currentColor; }
+.qv3-stamp-date { font-family: var(--qv-garamond); font-size: 13px; letter-spacing: 0.08em; }
+@keyframes qv3-stamp-in {
+  0% { transform: rotate(-10deg) scale(1.9); opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: rotate(-10deg) scale(1); opacity: 0.9; }
+}
+/* 장소가 길면 도장과 겹치지 않게 오른쪽을 비워둔다. */
+.qv3-libcard-place { padding-right: 104px; }
+@media (prefers-reduced-motion: reduce) { .qv3-stamp { animation: none; } }
 .qv3-done-actions { display: flex; flex-direction: column; gap: 10px; max-width: 480px; margin: 0 auto; width: 100%; }
 .qv3-done-primary { height: 56px; border-radius: 999px; background: linear-gradient(180deg, #e3c27a, #b08a4a); color: #2b1c0c; box-shadow: 0 3px 0 #6d5126, 0 8px 14px -6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,248,225,0.7); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; border: 0; }
 .qv3-done-secondary { height: 52px; border-radius: 999px; border: 1.5px solid rgba(255, 249, 239, 0.55); color: #fff9ef; display: flex; align-items: center; justify-content: center; font-weight: 500; background: transparent; }
 .qv3-done-note { text-align: center; font-size: 12px; color: rgba(255, 255, 255, 0.8); }
+.qv3-done-link { align-self: center; display: inline-flex; align-items: center; min-height: 44px; font-family: var(--qv-garamond); font-style: italic; font-size: 15px; color: #fff9ef; text-decoration: underline; text-underline-offset: 4px; }
 
 @media (min-width: 720px) {
   .qv3-detail-main { padding-top: 12px; }
