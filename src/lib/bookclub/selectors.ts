@@ -35,6 +35,13 @@ export function daysUntilStart(s: BookClubSession): number {
  * 그 전에는 "모집 중" — 방금 연 모임에까지 임박을 붙이면 사실이 아니다.
  * seatsLeft()는 예약 가능 여부 판단에만 쓰고, 사용자에게 보여주는 문구는 전부 이 함수를 거친다.
  */
+/** seatNotice()와 같은 분기 — 문장에 끼워 넣을 손그림 얼굴 종류. */
+export function seatKind(s: BookClubSession): "open" | "soon" | "full" | "past" {
+  if (isPast(s)) return "past";
+  if (getStatus(s) === "full") return "full";
+  return daysUntilStart(s) <= IMMINENT_DAYS ? "soon" : "open";
+}
+
 export function seatNotice(s: BookClubSession): string {
   if (isPast(s)) return "지난 북클럽";
   const status = getStatus(s);
