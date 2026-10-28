@@ -166,7 +166,7 @@ export default function BookingSheet({
           <span className="qv3-sheet-handle" aria-hidden="true" />
           <div className="qv3-sheet-head">
             <h2 id="qv3-sheet-title">{when} · {formatTimeOfDay(session.startsAt)}</h2>
-            <p>{session.venue.name} · {left > 0 ? `남은 ${left}자리` : "대기 접수"} · {feeText}</p>
+            <p>{session.venue.name} · {left > 0 ? "마감 임박" : "대기 접수"} · {feeText}</p>
           </div>
 
           <div className="qv3-field">

@@ -122,8 +122,9 @@ export function absoluteCoverUrl(url?: string): string | null {
 
 export function bookclubSessionEventSchema(session: SessionSchemaInput) {
   const url = `${SITE_URL}/bookclub/${session.slug}`;
-  // 신청을 닫은 모임은 좌석 수와 무관하게 남은 자리 0으로 표시(SoldOut과 모순되지 않게).
-  const remaining = session.registrationClosed ? 0 : Math.max(0, session.capacity - session.reserved);
+  // 잔여 좌석 "수"는 화면에서도 구조화 데이터에서도 공개하지 않는다(운영자 지시 2026-10-28).
+  // offers.availability(InStock/SoldOut)만 남긴다 — 예약 가능 여부는 어차피 버튼으로 드러난다.
+  const soldOut = session.registrationClosed || session.capacity - session.reserved <= 0;
   const name = session.title.includes(session.bookTitle)
     ? session.title
     : `${session.title} · 『${session.bookTitle}』`;
@@ -163,15 +164,13 @@ export function bookclubSessionEventSchema(session: SessionSchemaInput) {
       "@type": "Offer",
       url,
       ...(priceKnown ? { price: session.fee, priceCurrency: "KRW" } : {}),
-      availability:
-        remaining === 0
-          ? "https://schema.org/SoldOut"
-          : "https://schema.org/InStock",
+      availability: soldOut
+        ? "https://schema.org/SoldOut"
+        : "https://schema.org/InStock",
     },
     ...(priceKnown ? { isAccessibleForFree: session.fee === 0 } : {}),
     organizer: { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: ORG_NAME, url: SITE_URL },
     maximumAttendeeCapacity: session.capacity,
-    remainingAttendeeCapacity: remaining,
     inLanguage: "ko",
   };
 }

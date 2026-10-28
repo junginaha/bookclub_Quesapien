@@ -124,7 +124,7 @@ function SessionCard({ session }: { session: BookClubSession }) {
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between text-xs">
           <span className="text-warm-400">
-            {isFull ? "마감" : `${session.max_participants - session.current_participants}자리 남음`}
+            {isFull ? "마감" : "마감 임박"}
           </span>
           <span className="font-medium text-warm-700">{ratio}%</span>
         </div>

@@ -19,6 +19,18 @@ export function getStatus(s: BookClubSession): SessionStatus {
   return "open";
 }
 
+/**
+ * 남은 자리 수는 화면에 노출하지 않는다(운영자 지시 2026-10-28).
+ * 숫자 대신 상태만 알린다 — 모집 중이면 "마감 임박".
+ * seatsLeft()는 예약 가능 여부 판단에만 쓰고, 사용자에게 보여주는 문구는 전부 이 함수를 거친다.
+ */
+export function seatNotice(s: BookClubSession): string {
+  if (isPast(s)) return "지난 북클럽";
+  const status = getStatus(s);
+  if (status === "full") return isWaitlistFull(s) ? "마감" : "마감 · 대기 받아요";
+  return "마감 임박";
+}
+
 // ─── Asia/Seoul 날짜 포맷 — 타임존 무관하게 항상 KST 기준으로 고정 표시 ───
 const KOR_WEEKDAY: Record<string, string> = {
   Sun: "일", Mon: "월", Tue: "화", Wed: "수", Thu: "목", Fri: "금", Sat: "토",

@@ -126,7 +126,7 @@ export default function ClubDetailClient({
               )}
               {seats && seats.capacity !== null && (
                 <p style={{ fontSize: 13, color: seats.remaining === 0 ? "#EF4444" : "var(--muted)", marginBottom: 20 }}>
-                  {seats.remaining === 0 ? "정원 마감 — 대기 신청 가능" : `남은 자리 ${seats.remaining} / ${seats.capacity}`}
+                  {seats.remaining === 0 ? "정원 마감 — 대기 신청 가능" : "마감 임박"}
                 </p>
               )}
               <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import type { BookClubSession } from "@/lib/bookclub/types";
-import { seatsLeft } from "@/lib/bookclub/types";
+import { seatNotice } from "@/lib/bookclub/selectors";
 import { formatMonthDay, formatWeekdayFull, getStatus } from "@/lib/bookclub/selectors";
 import HoverReveal from "./HoverReveal";
 
@@ -49,10 +49,9 @@ function flatColorFor(slug: string): string {
 function BookCoverCard({ session }: { session: BookClubSession }) {
   const [imgFailed, setImgFailed] = useState(false);
   const status = getStatus(session);
-  const seats = seatsLeft(session);
   const showFallback = !session.coverUrl || imgFailed;
 
-  const seatLabel = status === "past" ? "지난 모임" : status === "full" ? "마감" : `${seats}자리 남음`;
+  const seatLabel = seatNotice(session);
   const summaryLine = session.summary.split("\n").find((l) => l.trim()) ?? "";
 
   return (
