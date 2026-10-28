@@ -134,11 +134,23 @@ export default function DetailV3({
         <section className="qv3-detail-section" aria-labelledby="how-title">
           <h2 id="how-title">이렇게 진행해요</h2>
           <DoodleRule />
-          <ol className="qv3-how">
-            <li>질문 하나로 가볍게 문을 열어요.</li>
-            <li>말하고 싶은 만큼만 말해요. 듣기만 해도 충분히 참여한 거예요.</li>
-            <li>끝날 땐 각자 질문 하나씩 주머니에 넣고 돌아가요.</li>
-          </ol>
+          {session.program?.length ? (
+            <ol className="qv3-program">
+              {session.program.map((part) => (
+                <li key={part.title}>
+                  <span className="qv3-program-time">{part.time}</span>
+                  <strong className="qv3-program-title">{part.title}</strong>
+                  {part.body && <span className="qv3-program-body">{part.body}</span>}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <ol className="qv3-how">
+              <li>질문 하나로 가볍게 문을 열어요.</li>
+              <li>말하고 싶은 만큼만 말해요. 듣기만 해도 충분히 참여한 거예요.</li>
+              <li>끝날 땐 각자 질문 하나씩 주머니에 넣고 돌아가요.</li>
+            </ol>
+          )}
           {session.summary && <p className="qv3-detail-summary">{session.summary}</p>}
         </section>
 

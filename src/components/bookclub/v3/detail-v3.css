@@ -117,3 +117,11 @@
   .qv3-waitlist { width: 100%; max-width: 420px; }
   .qv3-sheet-form { border-radius: 10px; margin-bottom: 24px; border: 1px solid #e1d5c2; }
 }
+
+/* 1부·2부처럼 순서가 정해진 모임의 진행 순서. 시각은 정보라 가라몬드,
+   설명은 "말"이 아니라 안내문이라 본문 서체 그대로 둔다. */
+.qv3-program { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+.qv3-program li { display: flex; flex-direction: column; gap: 4px; padding-left: 14px; border-left: 2px solid var(--qv-line-2); }
+.qv3-program-time { font-family: var(--qv-garamond); font-size: 14px; letter-spacing: .06em; color: var(--qv-gold-ink); }
+.qv3-program-title { font-size: 17px; font-weight: 600; color: var(--qv-navy); }
+.qv3-program-body { font-size: 14px; line-height: 1.8; color: var(--qv-ink-2); word-break: keep-all; }
