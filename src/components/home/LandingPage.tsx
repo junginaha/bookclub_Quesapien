@@ -157,7 +157,7 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
           <div className="lp-scroll-cue"><span className="sc-line" /></div>
           <div className="lp-hero-entry-cta">
             <button type="button" onClick={() => setHowToOpen(v => !v)} aria-expanded={howToOpen} aria-controls="how-it-works-panel" className="lp-hero-entry-btn">
-              <span className="lp-hero-entry-text">처음 온 당신에게</span>
+              <span className="lp-hero-entry-text lp-hand lp-hand--sm">처음 온 당신에게</span>
               <ChevronDown size={15} className={`lp-hero-entry-arrow${howToOpen ? " lp-hero-entry-arrow--open" : ""}`} />
             </button>
           </div>

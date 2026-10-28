@@ -5,6 +5,7 @@ import type { BookClubSession } from "@/lib/bookclub/types";
 import { formatMonthDay, getStatus } from "@/lib/bookclub/selectors";
 import BookCoverImage from "./BookCoverImage";
 import styles from "./home-tools.module.css";
+import { DoodleRule } from "@/components/common/Doodle";
 
 export default function MiniBookSpread({ sessions }: { sessions: BookClubSession[] }) {
   const unique = new Map<string, BookClubSession>();
@@ -24,7 +25,8 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
         <div>
           <span className={styles.eyebrow}>NEXT READS</span>
           <h2 id="books-title">함께 읽는 책</h2>
-          <p className={styles.sectionLead}>책을 선택하면 모임 상세 페이지로 이동합니다.</p>
+          <DoodleRule />
+          <p className={`${styles.sectionLead} lp-hand`}>책을 선택하면 모임 상세 페이지로 이동합니다.</p>
         </div>
       </div>
 

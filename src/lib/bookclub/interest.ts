@@ -45,3 +45,12 @@ export function interestCopy(count: number): string {
   if (count > 0) return `지금 ${count}명 · ${INTEREST_THRESHOLD}명 이상 모이면 시작!`;
   return `${INTEREST_THRESHOLD}명 이상 모이면 시작!`;
 }
+
+/**
+ * interestCopy()와 **같은 분기**에서 뽑는 손그림 얼굴 — 문구와 그림이 어긋날 수 없다.
+ * 아직 아무도 없으면 편안한 얼굴, 모이는 중이면 서두르는 얼굴.
+ * (자리 마감을 뜻하는 "full"은 여기 쓰지 않는다 — 5명은 마감이 아니라 시작이다.)
+ */
+export function interestFace(count: number): "open" | "soon" {
+  return count > 0 ? "soon" : "open";
+}
