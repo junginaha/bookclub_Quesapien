@@ -397,3 +397,8 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 - **종료 시각은 포스터에 없다**("2부 16:30부터"). 18:00으로 잡고 `TODO(unicorn)` 주석을 남겼다 — 실제 시각 확인 필요.
 - 강신범은 포스터 표기대로 "개발자"로 적었다(기존 제목은 "작가 직강").
 - tsc 통과, 헤드리스 390px 렌더 확인(가로 넘침 없음, 1부·2부 정상 노출, 표지 실제 이미지 로드).
+### 2026-10-28 (7) — 운영 DB 점검 라우트 + 한 번에 적용 SQL (#62)
+- 10/31 모임이 3일 앞인데 **예약 버튼이 운영에서 실제로 동작하는지 확인할 방법이 없었다.** `applyToBookClub`은 021의 `apply_to_bookclub` RPC에 의존하는데, 마이그레이션 워크플로는 2026-08-02 이후 **4회 전부 실패**(`SUPABASE_ACCESS_TOKEN` 빈 값)했고 025만 손으로 적용됐다. 이 샌드박스는 Supabase·qsapiens.com으로 나가는 네트워크가 막혀 있어 직접 조회도 불가능하다.
+- `GET /api/admin/db-health` 신규(운영자 전용, 읽기 전용). 데이터는 한 줄도 읽지 않고 **존재 여부만** 본다: 테이블 4개(bookclub_applications·bookclub_waitlist·reading_journey_interests·landing_book_club_signups), 함수 4개(apply_to_bookclub·join_bookclub_waitlist·join_bookclub_interest·reserve_book_club_spot), profiles의 025 컬럼. 함수 존재는 PostgREST 루트 OpenAPI의 `/rpc/*` 경로로 판단한다(함수를 **호출하지 않는다** — 호출하면 행이 생길 수 있다).
+- 게이트는 `isAdminEmail(user.email) || isOperator()` — `is_operator` 플래그가 안 들어가 있어도 운영자가 막히지 않게.
+- `supabase/manual/APPLY_PENDING.sql` 신규 — 021·023·024를 순서대로 묶은 재실행 안전 파일. 빠진 게 있으면 대시보드 SQL 에디터에 **한 번 붙여넣기**로 끝난다(025 때와 같은 방식). 020은 레거시라 묶지 않았다.
