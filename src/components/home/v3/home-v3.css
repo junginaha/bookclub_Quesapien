@@ -199,10 +199,21 @@ a.qv3-card:hover { transform: translateY(-2px) rotate(-0.15deg); box-shadow: 0 2
 .qv3-search input { flex: 1; border: 0; outline: 0; background: transparent; font: inherit; font-size: 15px; color: var(--qv-ink); min-width: 0; }
 
 /* 빈 상태 — 편지지 */
+/* ── 손그림 ───────────────────────────────────────────────
+   얼굴은 글자 사이에 끼워 넣는 것이라 em 단위로 글자 크기를 따라간다. */
+.qv3-doodle { width: 1.45em; height: 1.45em; vertical-align: -0.36em; margin-right: 0.04em; display: inline-block; flex: 0 0 auto; }
+.qv3-rule { display: block; width: 100%; height: 5px; color: var(--qv-line-2); }
+.qv3-doodle-art { width: 108px; height: 72px; color: var(--qv-line-2); align-self: center; margin-bottom: 2px; }
+
+/* 자로 그은 선 대신 손으로 그은 선 — 카드 아래 구분선 */
+.qv3-meta { border-top: 0 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'120\' height=\'5\' viewBox=\'0 0 120 5\'%3E%3Cpath d=\'M1 3C21 1.6 41 3.9 61 2.6 81 1.4 101 3.7 119 2.3\' fill=\'none\' stroke=\'%23c9bba3\' stroke-width=\'1.1\' stroke-linecap=\'round\'/%3E%3C/svg%3E"); background-repeat: repeat-x; background-position: left top; }
+
 .qv3-empty { border: 1px dashed var(--qv-line-2); border-radius: 3px; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: rgba(250, 246, 238, 0.6); }
+.qv3-empty { align-items: center; text-align: center; }
 .qv3-empty strong { font-family: var(--qv-serif); font-weight: 600; font-size: 18px; line-height: 1.4; }
+.qv3-empty p { font-family: var(--qv-hand); font-size: 22px; line-height: 1.45; color: #6b6253; }
 .qv3-empty p { font-size: 14px; color: var(--qv-muted); }
-.qv3-empty-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.qv3-empty-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; width: 100%; }
 .qv3-empty-actions .qv3-btn, .qv3-empty-actions .qv3-cta, .qv3-empty-actions .qv3-coin { flex: 1 1 auto; }
 
 /* 처음 오시는 분께 — 가죽 표지 */

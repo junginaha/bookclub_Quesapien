@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { seatNotice } from "@/lib/bookclub/selectors";
-import { dateKey, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, sortByStart } from "@/lib/bookclub/selectors";
+import { DoodleBook, DoodleFace } from "@/components/common/Doodle";
+import { dateKey, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, seatKind, sortByStart } from "@/lib/bookclub/selectors";
 import ClubsMap from "./ClubsMap";
 import BookCoverImage from "@/components/home/BookCoverImage";
 import "@/components/home/v3/home-v3.css";
@@ -80,7 +81,7 @@ function Card({ s }: { s: BookClubSession }) {
       </span>
       <span className="qv3-meta">
         <span>{formatMonthDay(s.startsAt)} {formatWeekdayFull(s.startsAt).replace("요일", "")} · {formatTimeOfDay(s.startsAt)}</span>
-        <span className="m2">{s.venue.name} · {past ? "기록 보기" : seatNotice(s)}</span>
+        <span className="m2">{s.venue.name} · <DoodleFace kind={seatKind(s)} />{past ? " 기록 보기" : ` ${seatNotice(s)}`}</span>
       </span>
       <span className="qv3-btn">{past ? "자세히" : st === "full" ? "대기 신청" : "예약하기"}</span>
     </Link>
@@ -175,6 +176,7 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
             <div className="qv3-grid">{filtered.map((s) => <Card key={s.slug} s={s} />)}</div>
           ) : (
             <div className="qv3-empty">
+              <DoodleBook />
               <strong>{chip === "all" ? "오늘은 책장이 비었네요." : "이 조건엔 아직 없어요."}</strong>
               <p>{chip === "all" ? "5명이 모이면 새 북클럽이 열려요. 읽고 싶은 책 한 권만 알려주세요." : "조건을 살짝 바꾸거나, 읽고 싶은 책으로 함께 열어볼까요?"}</p>
               <div className="qv3-empty-actions">
@@ -255,6 +257,7 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
             <div className="qv3-grid">{daySessions.map((s) => <Card key={s.slug} s={s} />)}</div>
           ) : (
             <div className="qv3-empty">
+              <DoodleBook />
               <strong>이번 달 달력은 비어 있어요.</strong>
               <p>다음 달로 넘기거나, 읽고 싶은 책으로 함께 열어볼까요?</p>
               <div className="qv3-empty-actions">

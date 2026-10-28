@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
 import { isWaitlistFull } from "@/lib/bookclub/types";
-import { feeLabel, formatMonthDay, formatTimeOfDay, formatTimeRange, formatWeekdayFull, seatNotice, daysUntilStart, IMMINENT_DAYS } from "@/lib/bookclub/selectors";
+import { feeLabel, formatMonthDay, formatTimeOfDay, formatTimeRange, formatWeekdayFull, seatNotice, seatKind, daysUntilStart, IMMINENT_DAYS } from "@/lib/bookclub/selectors";
 import type { Viewer } from "@/lib/viewer";
 import BookCoverImage from "@/components/home/BookCoverImage";
+import { DoodleFace } from "@/components/common/Doodle";
 import NotifyForm from "@/components/bookclub/NotifyForm";
 import BookingSheet from "./BookingSheet";
 import "@/components/home/v3/home-v3.css";
@@ -82,7 +83,7 @@ export default function DetailV3({
       <main className="qv3-wrap qv3-detail-main">
         <section className="qv3-detail-hero">
           <span className={`qv3-kicker${past ? "" : " qv3-kicker--soon"}`}>
-            {past ? "지난 북클럽" : closed ? "정원·대기 모두 마감" : full ? "자리는 다 찼지만, 대기는 받아요" : soon ? "마감 임박" : "모집 중"}
+            <DoodleFace kind={seatKind(session)} />{past ? " 지난 북클럽" : closed ? " 정원·대기 모두 마감" : full ? " 자리는 다 찼지만, 대기는 받아요" : soon ? " 마감 임박" : " 모집 중"}
           </span>
           <h1 className="qv3-detail-q">{headline}</h1>
           <div className="qv3-detail-book">
