@@ -34,6 +34,11 @@ export interface BookClubSession {
   bookSourceUrl?: string;
   bookSourceLabel?: string;
   agendaPreview: string[]; // 발제 미리보기. 없으면 빈 배열(화면에서 섹션 숨김)
+  /**
+   * 1부·2부처럼 순서가 정해진 모임의 진행 순서. 없으면 화면은 북클럽 기본 진행
+   * 문구를 쓴다 — 여기에 값이 있는 모임만 실제 순서를 보여준다.
+   */
+  program?: { time: string; title: string; body?: string }[];
   encoreCount?: number; // past 전용 — TODO(unicorn): 영문 slug 기준 앵콜 요청 집계 배선 필요
   archiveSlug?: string;
   // TODO(unicorn): 대기열 정원 데이터가 아직 없다(운영자 확인 필요). 생기면
