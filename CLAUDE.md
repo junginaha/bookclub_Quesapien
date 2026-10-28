@@ -402,3 +402,9 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 - `GET /api/admin/db-health` 신규(운영자 전용, 읽기 전용). 데이터는 한 줄도 읽지 않고 **존재 여부만** 본다: 테이블 4개(bookclub_applications·bookclub_waitlist·reading_journey_interests·landing_book_club_signups), 함수 4개(apply_to_bookclub·join_bookclub_waitlist·join_bookclub_interest·reserve_book_club_spot), profiles의 025 컬럼. 함수 존재는 PostgREST 루트 OpenAPI의 `/rpc/*` 경로로 판단한다(함수를 **호출하지 않는다** — 호출하면 행이 생길 수 있다).
 - 게이트는 `isAdminEmail(user.email) || isOperator()` — `is_operator` 플래그가 안 들어가 있어도 운영자가 막히지 않게.
 - `supabase/manual/APPLY_PENDING.sql` 신규 — 021·023·024를 순서대로 묶은 재실행 안전 파일. 빠진 게 있으면 대시보드 SQL 에디터에 **한 번 붙여넣기**로 끝난다(025 때와 같은 방식). 020은 레거시라 묶지 않았다.
+
+### 2026-10-28 (8) — 점검 결과: 운영 DB는 멀쩡했다 (#63)
+- `/api/admin/db-health`를 운영에서 실행한 결과(2026-10-28 12:50 UTC): **021·023·024·025가 모두 적용돼 있다.** `bookclub_applications`·`bookclub_waitlist`·`reading_journey_interests` 테이블, `apply_to_bookclub`·`join_bookclub_waitlist`·`join_bookclub_interest` 함수, profiles의 025 컬럼 전부 존재. 즉 **예약·읽고 싶어요는 DB 쪽에서 막혀 있지 않다.** 워크플로가 전부 실패했으니 DB도 비어 있을 것이라는 (7)의 추정은 틀렸다 — 누군가 손으로 적용해 둔 상태였다.
+- 유일하게 없는 것은 `reserve_book_club_spot()`(020)인데 **현재 코드 어디에서도 호출하지 않는다**(`grep` 확인). 그래서 점검이 이것을 "빠진것"으로 보고하면 양치기 소년이 된다 → 020 항목에 `legacy` 표시를 달고 `빠진것`에서 빼고 `레거시로_빠진것`에 따로 적는다.
+- 같은 호출에서 홈 손글씨·손그림 운영 반영도 확인(손그림 30개·손글씨 31개).
+- `supabase/manual/APPLY_PENDING.sql`은 지금 당장 실행할 필요가 없다 — 다음에 워크플로가 또 실패했을 때를 위해 남겨둔다.
