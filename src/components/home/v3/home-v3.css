@@ -163,7 +163,7 @@ a.qv3-card:hover { transform: translateY(-2px) rotate(-0.15deg); box-shadow: 0 2
 .qv3-cover .q-typecover { width: 100%; height: 100%; }
 .qv3-kicker { font-family: var(--qv-garamond); font-style: italic; font-size: 14px; letter-spacing: 0.02em; color: var(--qv-muted); }
 .qv3-kicker--soon { color: var(--qv-stamp); }
-.qv3-q { font-family: var(--qv-serif); font-weight: 600; font-size: 19px; line-height: 1.42; letter-spacing: -0.015em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.qv3-q { font-family: var(--qv-hand); font-weight: 400; font-size: 25px; line-height: 1.3; letter-spacing: 0; color: #2a2620; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .qv3-q--sm { font-size: 17px; }
 .qv3-book { font-size: 13px; color: var(--qv-muted); }
 .qv3-meta { display: flex; flex-direction: column; gap: 3px; font-size: 14px; border-top: 1px solid var(--qv-line); padding-top: 12px; }
