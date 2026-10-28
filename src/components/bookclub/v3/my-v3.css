@@ -7,7 +7,7 @@
 .qv3-my-hello p { font-family: var(--qv-hand); font-size: 22px; line-height: 1.45; color: #6b6253; }
 .qv3-my-note { font-size: 13px; }
 .qv3-my-note a { text-decoration: underline; text-underline-offset: 3px; color: var(--qv-cta); }
-.qv3-my-msg { background: var(--qv-sage-soft); color: var(--qv-sage-deep); border: 1px dashed #c7d3c6; border-radius: 3px; font-family: var(--qv-serif); padding: 10px 14px; font-size: 14px; }
+.qv3-my-msg { background: var(--qv-sage-soft); color: var(--qv-sage-deep); border: 1px dashed #c7d3c6; border-radius: 3px; font-family: var(--qv-hand); padding: 10px 14px; font-size: 21px; line-height: 1.4; }
 .qv3-my-list { display: flex; flex-direction: column; gap: 12px; }
 .qv3-my-cancel { align-self: flex-start; min-height: 40px; }
 .qv3-my-confirm { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }

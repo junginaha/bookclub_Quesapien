@@ -22,7 +22,7 @@
 .qv3-clubs-head { display: flex; flex-direction: column; gap: 4px; padding-bottom: 6px; }
 .qv3-clubs-title { font-family: var(--qv-serif); font-size: 26px; font-weight: 600; letter-spacing: -0.015em; display: flex; align-items: baseline; gap: 10px; }
 .qv3-clubs-title span, .qv3-count { font-family: var(--qv-garamond); font-style: italic; font-size: 18px; font-weight: 400; color: var(--qv-brass-deep); }
-.qv3-clubs-head p { font-size: 14px; color: var(--qv-muted); }
+.qv3-clubs-head p { font-family: var(--qv-hand); font-size: 22px; line-height: 1.45; color: #6b6253; }
 .qv3-clubs-past { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
 .qv3-link-btn { background: transparent; border: 0; color: var(--qv-leather); font-family: var(--qv-garamond); font-style: italic; font-size: 16px; min-height: 44px; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--qv-brass); }
 
@@ -36,8 +36,8 @@
 .qv3-map .qs-map-user i { position: absolute; left: 7px; top: 7px; width: 12px; height: 12px; border-radius: 6px; background: var(--qv-stamp); border: 2px solid #fff9ef; box-sizing: border-box; }
 .qv3-map .qs-map-club { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 17px; background: linear-gradient(180deg, #c99b55, #8a6a33); color: #fff9ef; font-family: var(--qv-garamond); font-weight: 600; font-size: 15px; border: 2px solid #fff4dc; box-shadow: 0 2px 0 #5c4420, 0 4px 8px rgba(48, 33, 20, 0.4); cursor: pointer; }
 .qv3-map .qs-map-tooltip { font-family: inherit; font-size: 12px; border-radius: 3px; border: 1px solid var(--qv-line-2); background: var(--qv-card); color: var(--qv-ink); }
-.qv3-map-note { position: absolute; left: 20px; right: 20px; top: 12px; z-index: 500; background: var(--qv-card); border: 1px dashed var(--qv-line-2); border-radius: 3px; padding: 8px 12px; font-size: 13px; color: var(--qv-muted); }
-.qv3-map-hint { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%) rotate(-1deg); z-index: 500; background: var(--qv-leather); color: #fff9ef; font-family: var(--qv-garamond); font-style: italic; font-size: 15px; padding: 8px 16px; border-radius: 2px; white-space: nowrap; box-shadow: 0 6px 14px -6px rgba(48, 33, 20, 0.6); }
+.qv3-map-note { position: absolute; left: 20px; right: 20px; top: 12px; z-index: 500; background: var(--qv-card); border: 1px dashed var(--qv-line-2); border-radius: 3px; padding: 8px 14px; font-family: var(--qv-hand); font-size: 21px; line-height: 1.35; color: #6b6253; transform: rotate(-0.6deg); }
+.qv3-map-hint { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%) rotate(-1deg); z-index: 500; background: var(--qv-navy); color: #fff9ef; font-family: var(--qv-hand); font-size: 21px; padding: 8px 16px; border-radius: 2px; white-space: nowrap; box-shadow: 0 6px 14px -6px rgba(48, 33, 20, 0.6); }
 .qv3-map-card { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 500; }
 .qv3-map-card.qv3-empty { background: var(--qv-card); border-style: solid; box-shadow: 0 18px 36px -20px rgba(48, 33, 20, 0.6); }
 .qv3-map-card-close { position: absolute; right: 8px; top: 8px; z-index: 2; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--qv-line-2); background: var(--qv-card); display: flex; align-items: center; justify-content: center; }
