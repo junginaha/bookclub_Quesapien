@@ -5,7 +5,8 @@ import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { cardBlurb, getStatus } from "@/lib/bookclub/selectors";
 import { UPCOMING_BOOKS, UPCOMING_GENRES, type UpcomingBook } from "@/lib/bookclub/upcoming";
-import { interestCopy } from "@/lib/bookclub/interest";
+import { interestCopy, interestFace } from "@/lib/bookclub/interest";
+import { DoodleFace, DoodleRule } from "@/components/common/Doodle";
 import InterestDialog from "./InterestDialog";
 import BookCoverImage from "./BookCoverImage";
 import RecommendBookForm from "./RecommendBookForm";
@@ -60,7 +61,8 @@ export default function ReunionReads({
         <div>
           <span className={styles.eyebrow}>ENCORE</span>
           <h2 id="encore-title">우리 다시 만나요</h2>
-          <p className={styles.sectionLead}>
+          <DoodleRule />
+          <p className={`${styles.sectionLead} lp-hand`}>
             지난 북클럽을 놓치셨나요? 다시 이야기를 나누고 싶다면 알려주세요. 취향이 같은 5분이 모이면 앵콜 북클럽을 열고 연결해드려요.
           </p>
         </div>
@@ -110,7 +112,14 @@ export default function ReunionReads({
               )}
               {blurb && <p className={styles.upcomingPitch}>{blurb}</p>}
               <div className={styles.cardFoot}>
-                <p className={styles.cardFootCopy}>{interestCopy(liveCounts[item.key] ?? counts[item.key] ?? 0)}</p>
+                {(() => {
+                  const n = liveCounts[item.key] ?? counts[item.key] ?? 0;
+                  return (
+                    <p className={`${styles.cardFootCopy} lp-hand lp-hand--sm`}>
+                      <DoodleFace kind={interestFace(n)} />{" "}{interestCopy(n)}
+                    </p>
+                  );
+                })()}
                 <button
                   type="button"
                   className={styles.cardAction}
@@ -135,7 +144,8 @@ export default function ReunionReads({
       <div className={`${styles.upcomingRecommend}${recOpen ? ` ${styles.recommendOpen}` : ""}`} id="recommend">
         <div>
           <h3>함께 읽고 싶은 책 추천하기</h3>
-          <p className={styles.sectionLead}>
+          <DoodleRule />
+          <p className={`${styles.sectionLead} lp-hand`}>
             목록에 없는 책이 있나요? 읽고 싶은 책을 추천해 주세요. 같은 책을 고른 분이 5명 모이면 북토크를 열고 연락드려요.
           </p>
           <button

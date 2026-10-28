@@ -1931,3 +1931,37 @@ html:not([data-intro="pending"]) .lp-intro {
 }
 .lp-nav-popup-link:hover,
 .lp-nav-popup-link:focus-visible { opacity: 1; }
+
+/* ── 손글씨·손그림 (홈) ──────────────────────────────────────────────
+   /bookclub 쪽 v3 화면에만 있던 손글씨·손그림을 홈에도 들인다.
+   기준은 v3와 같다: **정보가 아니라 "말"인 줄에만** 손글씨를 쓴다.
+   날짜·장소·가격·책 제목은 명조 그대로. 레이아웃은 건드리지 않는다. */
+.lp {
+  --lp-hand: var(--font-nanum-pen), "Nanum Pen Script", cursive;
+}
+
+/* 나눔펜은 x-height가 낮아 같은 px에서 훨씬 작아 보인다 — 1.45~1.5배로 잡아야
+   옆 본문과 같은 무게로 읽힌다. */
+.lp .lp-hand {
+  font-family: var(--lp-hand);
+  font-size: 20px;
+  line-height: 1.55;
+  letter-spacing: .01em;
+}
+.lp .lp-hand--sm { font-size: 17.5px; line-height: 1.45; }
+
+/* 문장 안에 끼워 넣는 손그림 얼굴 — 글자색·글자크기를 따라간다. */
+.lp .qv3-doodle {
+  display: inline-block;
+  width: 1.6em;
+  height: 1.6em;
+  vertical-align: -0.42em;
+}
+/* 제목 아래 손으로 그은 선 — 자로 그은 선 대신. */
+.lp .qv3-rule {
+  display: block;
+  width: 84px;
+  height: 5px;
+  margin: 12px 0 0;
+  color: var(--lp-gold);
+}
