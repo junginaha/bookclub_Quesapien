@@ -12,9 +12,27 @@
   --qv-paper-2: #ece5d7;
   --qv-paper-3: #e5dcc9;
   --qv-card: #faf6ee;
-  --qv-ink: #1c1f26;
-  --qv-ink-2: #2a2e37;
-  --qv-muted: #7b7268;
+  /* ── 색 ───────────────────────────────────────────────────
+     종이 바탕(#f4efe5) 위 대비를 재서 쓸 자리를 나눴다.
+       네이비 #1e2a4a        12.3:1  — 잉크. 본문·제목·질문
+       로얄블루 #2e4a7d       7.7:1  — 링크·강조·손그림 선
+       골드잉크 #7a5c28       5.4:1  — 작은 라벨(NO. 번호 등)
+       골드 #b08a4a          2.8:1  — 글자 불가. 코인·링·선 같은 '재질'로만
+       옐로우 #e8c45c        1.5:1  — 글자 불가. 형광펜 바탕으로만(그 위 네이비 8.4:1)
+     잉크를 순흑이 아니라 네이비로 둔 건 옛날 잉크가 청흑이기도 하고,
+     종이 위에서 순흑보다 덜 딱딱해서다. */
+  --qv-navy: #1e2a4a;
+  --qv-navy-deep: #141d35;
+  --qv-royal: #2e4a7d;
+  --qv-royal-light: #3a5c99;
+  --qv-royal-soft: #e5e9f1;
+  --qv-gold-ink: #7a5c28;
+  --qv-yellow: #e8c45c;
+  --qv-yellow-soft: #f3dd9c;
+  --qv-ink: #1e2a4a;
+  --qv-ink-2: #2e3a57;
+  /* 기존 #7b7268은 종이 위에서 4.12:1로 기준 미달이었다. */
+  --qv-muted: #6a6356;
   --qv-line: #d9cfbc;
   --qv-line-2: #c9bba3;
   --qv-leather: #5e4632;
@@ -36,8 +54,8 @@
   --qv-max: 1120px;
 
   /* 호환 별칭(이전 토큰명) */
-  --qv-cta: var(--qv-leather);
-  --qv-cta-deep: var(--qv-leather-deep);
+  --qv-cta: var(--qv-navy);
+  --qv-cta-deep: var(--qv-navy-deep);
   --qv-cta-soft: #e9dccb;
   --qv-r: 6px;
   --qv-r-sm: 4px;
@@ -76,10 +94,10 @@
 .qv3-wordmark { font-family: var(--qv-serif); font-weight: 600; font-size: 19px; letter-spacing: -0.012em; display: inline-flex; align-items: baseline; gap: 10px; }
 .qv3-wordmark small { font-family: var(--qv-garamond); font-style: italic; font-weight: 400; font-size: 14px; color: var(--qv-muted); letter-spacing: 0.06em; }
 .qv3-nav { display: none; gap: 24px; font-size: 14px; color: var(--qv-ink-2); }
-.qv3-nav a:hover { color: var(--qv-leather); }
+.qv3-nav a:hover { color: var(--qv-navy); }
 
 /* 아이콘 버튼 — 작은 황동 단추 */
-.qv3-icon-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid #bba58a; background: linear-gradient(180deg, #f8f2e6, #e9dfce); color: var(--qv-leather); display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px -2px rgba(60, 43, 27, 0.45), inset 0 1px rgba(255, 255, 255, 0.8); transition: transform 0.12s ease-out, box-shadow 0.12s ease-out; }
+.qv3-icon-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid #bba58a; background: linear-gradient(180deg, #f8f2e6, #e9dfce); color: var(--qv-navy); display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px -2px rgba(60, 43, 27, 0.45), inset 0 1px rgba(255, 255, 255, 0.8); transition: transform 0.12s ease-out, box-shadow 0.12s ease-out; }
 .qv3-icon-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 12px -8px rgba(60, 43, 27, 0.6), inset 0 1px rgba(255, 255, 255, 0.8); }
 .qv3-icon-btn:active { transform: translateY(1px); box-shadow: inset 0 2px 5px rgba(88, 63, 39, 0.2); }
 
@@ -118,20 +136,20 @@
 .qv3-cta--hero { margin-top: 8px; width: 100%; }
 .qv3-cta--block { width: 100%; }
 .qv3-cta-sub { font-weight: 500; opacity: 0.85; }
-.qv3-link-quiet { align-self: center; min-height: 44px; display: inline-flex; align-items: center; color: var(--qv-leather); font-family: var(--qv-garamond); font-style: italic; font-size: 16px; text-decoration: underline; text-underline-offset: 5px; text-decoration-color: var(--qv-brass); }
+.qv3-link-quiet { align-self: center; min-height: 44px; display: inline-flex; align-items: center; color: var(--qv-royal); font-family: var(--qv-garamond); font-style: italic; font-size: 16px; text-decoration: underline; text-underline-offset: 5px; text-decoration-color: var(--qv-brass); }
 
 /* 보조 버튼 — 잉크 선 */
-.qv3-btn { height: 48px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 15px; border: 1.5px solid var(--qv-leather); background: transparent; color: var(--qv-leather); padding: 0 20px; transition: background 0.15s ease-out, color 0.15s ease-out; }
-.qv3-btn:hover { background: var(--qv-leather); color: #fff9ef; }
-.qv3 .qv3-btn--ink { background: var(--qv-leather); color: #fff9ef; }
-.qv3 .qv3-btn--ink:hover { background: var(--qv-leather-deep); }
+.qv3-btn { height: 48px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 15px; border: 1.5px solid var(--qv-navy); background: transparent; color: var(--qv-navy); padding: 0 20px; transition: background 0.15s ease-out, color 0.15s ease-out; }
+.qv3-btn:hover { background: var(--qv-navy); color: #fff9ef; }
+.qv3 .qv3-btn--ink { background: var(--qv-navy); color: #fff9ef; }
+.qv3 .qv3-btn--ink:hover { background: var(--qv-navy-deep); }
 
 /* ── 섹션·타이포 ────────────────────────────────── */
 .qv3-section { padding-block: 28px 12px; display: flex; flex-direction: column; gap: 14px; }
 .qv3-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .qv3-section-head h2 { font-family: var(--qv-serif); font-size: 23px; font-weight: 600; letter-spacing: -0.012em; }
 .qv3-section-head p { font-size: 14px; color: var(--qv-muted); margin-top: 2px; }
-.qv3-section-head a { font-family: var(--qv-garamond); font-style: italic; font-size: 15px; color: var(--qv-leather); white-space: nowrap; min-height: 44px; display: inline-flex; align-items: center; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--qv-brass); }
+.qv3-section-head a { font-family: var(--qv-garamond); font-style: italic; font-size: 15px; color: var(--qv-royal); white-space: nowrap; min-height: 44px; display: inline-flex; align-items: center; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--qv-brass); }
 .qv3-eyebrow { font-family: var(--qv-garamond); font-style: italic; font-size: 15px; color: var(--qv-brass-deep); letter-spacing: 0.04em; }
 
 /* 히어로(홈 v3 보존용) */
@@ -152,7 +170,7 @@
 .qv3-card::before { content: ""; position: absolute; top: 9px; left: 12px; right: 12px; border-top: 1px dashed #d4c6b2; opacity: 0.7; pointer-events: none; }
 /* 철해져 있던 흔적 — 카드 오른쪽 위 천공 구멍 */
 .qv3-card::after { content: ""; position: absolute; top: 14px; right: 14px; width: 10px; height: 10px; border-radius: 50%; background: var(--qv-paper-2); box-shadow: inset 0 1px 2px rgba(72, 52, 34, 0.45); pointer-events: none; }
-.qv3-card-no { font-family: var(--qv-garamond); font-size: 12px; letter-spacing: 0.18em; color: var(--qv-brass-deep); font-variant-numeric: lining-nums; }
+.qv3-card-no { font-family: var(--qv-garamond); font-size: 12px; letter-spacing: 0.18em; color: var(--qv-gold-ink); font-variant-numeric: lining-nums; }
 a.qv3-card:hover { transform: translateY(-2px) rotate(-0.15deg); box-shadow: 0 2px 2px rgba(72, 52, 34, 0.08), 0 22px 36px -18px rgba(72, 52, 34, 0.4), inset 0 1px rgba(255, 255, 255, 0.8); }
 .qv3-card-top { display: flex; gap: 14px; align-items: flex-start; padding-top: 4px; }
 .qv3-card-body > .qv3-card-no + .qv3-kicker { margin-top: -2px; }
@@ -161,9 +179,13 @@ a.qv3-card:hover { transform: translateY(-2px) rotate(-0.15deg); box-shadow: 0 2
 .qv3-cover { flex: 0 0 72px; width: 72px; height: 104px; border-radius: 2px 4px 4px 2px; overflow: hidden; background: var(--qv-paper-2); box-shadow: 3px 4px 10px -4px rgba(48, 33, 20, 0.5), inset 2px 0 0 rgba(255, 255, 255, 0.25); display: block; transform: rotate(-1.2deg); }
 .qv3-cover img, .qv3-cover > * { width: 100%; height: 100%; object-fit: cover; display: block; }
 .qv3-cover .q-typecover { width: 100%; height: 100%; }
-.qv3-kicker { font-family: var(--qv-garamond); font-style: italic; font-size: 14px; letter-spacing: 0.02em; color: var(--qv-muted); }
-.qv3-kicker--soon { color: var(--qv-stamp); }
-.qv3-q { font-family: var(--qv-hand); font-weight: 400; font-size: 25px; line-height: 1.3; letter-spacing: 0; color: #2a2620; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.qv3-kicker { font-family: var(--qv-garamond); font-style: italic; font-size: 14px; letter-spacing: 0.02em; color: var(--qv-royal); display: inline-flex; align-items: center; align-self: flex-start; }
+/* 임박은 형광펜으로 그은 한 줄 — 색만 바꾸면 안 보이고, 칠하면 읽힌다(그 위 네이비 8.4:1). */
+.qv3-kicker--soon {
+  color: var(--qv-navy); padding: 0 0.3em 0.05em; border-radius: 2px;
+  background-image: linear-gradient(177deg, transparent 46%, var(--qv-yellow-soft) 46%, var(--qv-yellow) 88%, transparent 92%);
+}
+.qv3-q { font-family: var(--qv-hand); font-weight: 400; font-size: 25px; line-height: 1.3; letter-spacing: 0; color: var(--qv-navy); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .qv3-q--sm { font-size: 17px; }
 .qv3-book { font-size: 13px; color: var(--qv-muted); }
 .qv3-meta { display: flex; flex-direction: column; gap: 3px; font-size: 14px; border-top: 1px solid var(--qv-line); padding-top: 12px; }
@@ -191,18 +213,18 @@ a.qv3-card:hover { transform: translateY(-2px) rotate(-0.15deg); box-shadow: 0 2
 .qv3-filters { display: flex; gap: 8px; overflow-x: auto; padding: 2px 20px; margin: 0 -20px; scrollbar-width: none; }
 .qv3-filters::-webkit-scrollbar { display: none; }
 .qv3-filter { flex: 0 0 auto; height: 36px; padding: 0 14px; border-radius: 2px; border: 1px solid var(--qv-line-2); background: var(--qv-card); font-size: 13.5px; color: var(--qv-ink-2); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; }
-.qv3 .qv3-filter[aria-pressed="true"] { background: var(--qv-leather); border-color: var(--qv-leather); color: #fff9ef; font-weight: 600; }
+.qv3 .qv3-filter[aria-pressed="true"] { background: var(--qv-navy); border-color: var(--qv-navy); color: #fff9ef; font-weight: 600; }
 
 /* 검색·입력 */
 .qv3-search { display: flex; align-items: center; gap: 10px; height: 52px; border-radius: 3px; border: 1px solid var(--qv-line-2); background: var(--qv-card); padding: 0 16px; color: var(--qv-muted); box-shadow: inset 0 1px 2px rgba(72, 52, 34, 0.08); }
-.qv3-search:focus-within { border-color: var(--qv-leather); }
+.qv3-search:focus-within { border-color: var(--qv-royal); }
 .qv3-search input { flex: 1; border: 0; outline: 0; background: transparent; font: inherit; font-size: 15px; color: var(--qv-ink); min-width: 0; }
 
 /* 빈 상태 — 편지지 */
 /* ── 손그림 ───────────────────────────────────────────────
    얼굴은 글자 사이에 끼워 넣는 것이라 em 단위로 글자 크기를 따라간다. */
 .qv3-doodle { width: 1.45em; height: 1.45em; vertical-align: -0.36em; margin-right: 0.04em; display: inline-block; flex: 0 0 auto; }
-.qv3-rule { display: block; width: 100%; height: 5px; color: var(--qv-line-2); }
+.qv3-rule { display: block; width: 100%; height: 5px; color: var(--qv-royal); opacity: 0.4; }
 .qv3-doodle-art { width: 108px; height: 72px; color: var(--qv-line-2); align-self: center; margin-bottom: 2px; }
 /* 사람이 옆에서 거드는 줄은 손글씨로 — 정보가 아니라 말이다. */
 .qv3-hand { font-family: var(--qv-hand); font-size: 22px; line-height: 1.45; color: #6b6253; }
