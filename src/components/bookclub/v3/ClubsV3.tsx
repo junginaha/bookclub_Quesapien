@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BookClubSession } from "@/lib/bookclub/types";
-import { seatsLeft } from "@/lib/bookclub/types";
+import { seatNotice } from "@/lib/bookclub/selectors";
 import { dateKey, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, sortByStart } from "@/lib/bookclub/selectors";
 import ClubsMap from "./ClubsMap";
 import BookCoverImage from "@/components/home/BookCoverImage";
@@ -66,7 +66,6 @@ function monthGrid(year: number, month0: number) {
 
 function Card({ s }: { s: BookClubSession }) {
   const st = getStatus(s);
-  const left = seatsLeft(s);
   const past = st === "past";
   return (
     <Link href={`/bookclub/${s.slug}`} className="qv3-card qv3-card--book">
@@ -80,7 +79,7 @@ function Card({ s }: { s: BookClubSession }) {
       </span>
       <span className="qv3-meta">
         <span>{formatMonthDay(s.startsAt)} {formatWeekdayFull(s.startsAt).replace("요일", "")} · {formatTimeOfDay(s.startsAt)}</span>
-        <span className="m2">{s.venue.name} · {past ? "기록 보기" : st === "full" ? "자리가 다 찼어요 · 대기 받아요" : left <= 2 ? `${left}자리 남았어요` : `남은 ${left}자리`}</span>
+        <span className="m2">{s.venue.name} · {past ? "기록 보기" : seatNotice(s)}</span>
       </span>
       <span className="qv3-btn">{past ? "자세히" : st === "full" ? "대기 신청" : "예약하기"}</span>
     </Link>

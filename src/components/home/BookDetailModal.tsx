@@ -409,11 +409,6 @@ export default function BookDetailModal({ book, onClose }: Props) {
               {/* CTA */}
               <div className="bdm-footer">
                 {canEdit && <button className="bdm-btn-edit" onClick={startEdit}>편집</button>}
-                {detail?.maxParticipants && (
-                  <span className="bdm-spots">
-                    {Math.max(0, (detail.maxParticipants - (detail.currentParticipants ?? 0)))}자리 남음
-                  </span>
-                )}
                 {deadlinePast ? (
                   <span className="bdm-btn-join-pending">참석 마감됐습니다</span>
                 ) : (

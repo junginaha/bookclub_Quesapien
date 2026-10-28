@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
-import { dateKey, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, seatsLeft, sortByStart } from "@/lib/bookclub/selectors";
+import { dateKey, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, seatNotice, sortByStart } from "@/lib/bookclub/selectors";
 import { UPCOMING_BOOKS, UPCOMING_GENRES, type UpcomingBook } from "@/lib/bookclub/upcoming";
 import { INTEREST_THRESHOLD } from "@/lib/bookclub/interest";
 import InterestDialog from "@/components/home/InterestDialog";
@@ -27,12 +27,6 @@ const PIN = (
     <circle cx="12" cy="10" r="2.5" />
   </svg>
 );
-
-function seatCopy(left: number) {
-  if (left <= 0) return "자리가 다 찼어요";
-  if (left <= 2) return `${left}자리 남았어요`;
-  return `남은 ${left}자리`;
-}
 
 function daysUntil(iso: string) {
   // KST 날짜 기준(시각 무관): 오늘 19시 모임은 "오늘", 자정 넘기면 "내일".
@@ -140,7 +134,6 @@ export default function HomeV3({
             </div>
             <div className="qv3-grid">
               {upcoming.map((s) => {
-                const left = seatsLeft(s);
                 const full = getStatus(s) === "full";
                 return (
                   <Link key={s.slug} href={`/bookclub/${s.slug}`} className="qv3-card qv3-card--book">
@@ -154,7 +147,7 @@ export default function HomeV3({
                     </span>
                     <span className="qv3-meta">
                       <span>{formatMonthDay(s.startsAt)} {formatWeekdayFull(s.startsAt).replace("요일", "")} · {formatTimeOfDay(s.startsAt)}</span>
-                      <span className="m2">{s.venue.name} · {full ? "자리가 다 찼어요 · 대기 받아요" : seatCopy(left)}</span>
+                      <span className="m2">{s.venue.name} · {seatNotice(s)}</span>
                     </span>
                     <span className="qv3-btn">{full ? "대기 신청" : "예약하기"}</span>
                   </Link>

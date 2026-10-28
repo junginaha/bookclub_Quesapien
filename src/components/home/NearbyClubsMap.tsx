@@ -88,7 +88,6 @@ export default function NearbyClubsMap({
 
       clubs.forEach((c) => {
         const color = COLOR_MAP[c.color ?? ""] ?? "#5E4632";
-        const seatsLeft = (c.maxParticipants ?? 8) - (c.currentParticipants ?? 0);
 
         const icon = L.divIcon({
           className: "lnd-map-pin",
@@ -110,7 +109,7 @@ export default function NearbyClubsMap({
           `<div style="font-family:var(--lp-serif-ko,'Noto Serif KR',serif); min-width:150px;">
              <strong style="display:block; margin-bottom:3px; color:#1C1F26;">${escapeHtml(c.title)}</strong>
              ${c.location ? `<span style="font-size:12px; color:#7B7268;">${escapeHtml(c.location)}</span><br/>` : ""}
-             <span style="font-size:12px; color:#5E4632;">${c.distKm.toFixed(1)}km · ${seatsLeft}자리 남음</span>
+             <span style="font-size:12px; color:#5E4632;">${c.distKm.toFixed(1)}km · 마감 임박</span>
            </div>`
         );
         marker.on("click", () => onOpenRef.current(c.slug));

@@ -5,7 +5,8 @@ import OpenBook from "@/components/bookclub/OpenBook";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
-import { isWaitlistFull, seatsLeft } from "@/lib/bookclub/types";
+import { isWaitlistFull } from "@/lib/bookclub/types";
+import { seatNotice } from "@/lib/bookclub/selectors";
 import { Button } from "@/components/ui/button";
 import {
   dateKey,
@@ -130,7 +131,7 @@ export default function DetailClient({
           <div><dt>일시</dt><dd>{formatMonthDay(session.startsAt)} {weekday}<br />{formatTimeRange(session.startsAt, session.endsAt)}</dd></div>
           <div><dt>장소</dt><dd>{session.venue.name}</dd></div>
           <div><dt>참여비</dt><dd>{feeText}</dd></div>
-          <div><dt>자리</dt><dd>{status === "open" ? seatsLeft(session) + "자리 남음" : status === "full" ? "대기 신청" : "상세 확인"}</dd></div>
+          <div><dt>모집</dt><dd>{seatNotice(session)}</dd></div>
         </dl>
 
         {/* 책 소개(bookIntro)가 없으면 OpenBook 펼침면이 이미 summary를 보여주므로 중복 노출하지 않는다. */}
@@ -168,7 +169,7 @@ export default function DetailClient({
         ) : (
           <ApplyPanel
             triggerLabel={
-              isWaitlistFull(session) ? "마감되었습니다" : status === "full" ? "대기 신청" : `참여 신청 · ${seatsLeft(session)}자리 남음`
+              isWaitlistFull(session) ? "마감되었습니다" : status === "full" ? "대기 신청" : `참여 신청 · ${seatNotice(session)}`
             }
             variant={status === "full" ? "outline" : "primary"}
             disabled={isWaitlistFull(session)}
@@ -182,7 +183,7 @@ export default function DetailClient({
                   ? "다음 앵콜 일정이 열리면 가장 먼저 안내해 드릴게요."
                   : status === "full"
                   ? `${session.venue.name} · 대기자로 등록하면 자리가 나는 대로 안내해 드려요.`
-                  : `${formatMonthDay(session.startsAt)} ${weekday} · ${feeText} · ${seatsLeft(session)}자리 남음`}
+                  : `${formatMonthDay(session.startsAt)} ${weekday} · ${feeText} · ${seatNotice(session)}`}
               </p>
               {isWaitlistFull(session) ? (
                 <Button type="button" variant="outline" disabled>마감되었습니다</Button>
