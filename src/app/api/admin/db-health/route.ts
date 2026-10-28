@@ -17,18 +17,19 @@ import { isAdminEmail, isOperator } from "@/lib/admin";
 export const dynamic = "force-dynamic";
 
 // 화면이 실제로 의존하는 것들 — 하나라도 없으면 그 기능은 운영에서 죽어 있다.
-const TABLES: { name: string; why: string; migration: string }[] = [
+// legacy: 지금 화면에서 쓰지 않는 것 — 없어도 문제가 아니라 "빠진것"에 넣지 않는다.
+const TABLES: { name: string; why: string; migration: string; legacy?: boolean }[] = [
   { name: "bookclub_applications", why: "북클럽 예약 저장", migration: "021" },
   { name: "bookclub_waitlist", why: "대기 신청 · 읽고 싶어요 · 책 추천", migration: "021" },
   { name: "reading_journey_interests", why: "독서여행 관심 등록", migration: "024" },
-  { name: "landing_book_club_signups", why: "구 북클럽 신청(레거시)", migration: "020" },
+  { name: "landing_book_club_signups", why: "구 북클럽 신청 — 현재 코드에서 쓰지 않음", migration: "020", legacy: true },
 ];
 
-const FUNCTIONS: { name: string; why: string; migration: string }[] = [
+const FUNCTIONS: { name: string; why: string; migration: string; legacy?: boolean }[] = [
   { name: "apply_to_bookclub", why: "예약 — 정원·대기열을 원자적으로 처리", migration: "021" },
   { name: "join_bookclub_waitlist", why: "대기 신청(구버전)", migration: "021" },
   { name: "join_bookclub_interest", why: "읽고 싶어요 · 책 추천(현행)", migration: "023" },
-  { name: "reserve_book_club_spot", why: "구 북클럽 예약(레거시)", migration: "020" },
+  { name: "reserve_book_club_spot", why: "구 북클럽 예약 — 현재 코드에서 쓰지 않음", migration: "020", legacy: true },
 ];
 
 // 025가 profiles에 넣은 컬럼들 — 온보딩이 여기에 걸린 적이 있다.
@@ -79,7 +80,7 @@ export async function GET() {
   const tables = await Promise.all(
     TABLES.map(async (t) => {
       const { error } = await db.from(t.name).select("*", { count: "exact", head: true }).limit(1);
-      return { 이름: t.name, 쓰임: t.why, 마이그레이션: t.migration, 있음: !error, 오류: error?.message ?? null };
+      return { 이름: t.name, 쓰임: t.why, 마이그레이션: t.migration, 레거시: Boolean(t.legacy), 있음: !error, 오류: error?.message ?? null };
     })
   );
 
@@ -88,6 +89,7 @@ export async function GET() {
     이름: f.name,
     쓰임: f.why,
     마이그레이션: f.migration,
+    레거시: Boolean(f.legacy),
     있음: rpcNames ? rpcNames.has(f.name) : null,
   }));
 
@@ -96,9 +98,10 @@ export async function GET() {
     .select(PROFILE_COLUMNS.join(","), { count: "exact", head: true })
     .limit(1);
 
+  // 화면이 실제로 쓰는 것만 "빠진것"에 넣는다 — 레거시가 섞이면 점검이 양치기 소년이 된다.
   const missing = [
-    ...tables.filter((t) => !t.있음).map((t) => `${t.이름} (${t.마이그레이션})`),
-    ...functions.filter((f) => f.있음 === false).map((f) => `${f.이름}() (${f.마이그레이션})`),
+    ...tables.filter((t) => !t.있음 && !t.레거시).map((t) => `${t.이름} (${t.마이그레이션})`),
+    ...functions.filter((f) => f.있음 === false && !f.레거시).map((f) => `${f.이름}() (${f.마이그레이션})`),
     ...(profileError ? [`profiles 컬럼 (025) — ${profileError.message}`] : []),
   ];
 
@@ -113,6 +116,10 @@ export async function GET() {
     테이블: tables,
     함수: functions,
     프로필컬럼: { 확인한컬럼: PROFILE_COLUMNS, 있음: !profileError, 오류: profileError?.message ?? null },
+    레거시로_빠진것: [
+      ...tables.filter((t) => !t.있음 && t.레거시).map((t) => t.이름),
+      ...functions.filter((f) => f.있음 === false && f.레거시).map((f) => `${f.이름}()`),
+    ],
     비고: rpcNames ? null : "함수 목록을 읽지 못했습니다(PostgREST 루트 응답 실패) — 함수 '있음'은 판단 보류입니다.",
   });
 }
