@@ -142,14 +142,21 @@
 
 /* ── 카드: 종이 쪽지 ────────────────────────────── */
 .qv3-card {
-  position: relative; background: var(--qv-card); border: 1px solid #e1d5c2; border-radius: 3px 4px 5px 3px;
+  position: relative; background-color: var(--qv-card);
+  background-image: repeating-linear-gradient(0deg, transparent 0 27px, rgba(96, 74, 48, 0.055) 27px 28px);
+  border: 1px solid #e1d5c2; border-radius: 3px 4px 5px 3px;
   padding: 18px; display: flex; flex-direction: column; gap: 14px; color: var(--qv-ink);
   box-shadow: 0 2px 2px rgba(72, 52, 34, 0.08), 0 14px 28px -18px rgba(72, 52, 34, 0.28), inset 0 1px rgba(255, 255, 255, 0.8);
   transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
 }
 .qv3-card::before { content: ""; position: absolute; top: 9px; left: 12px; right: 12px; border-top: 1px dashed #d4c6b2; opacity: 0.7; pointer-events: none; }
+/* 철해져 있던 흔적 — 카드 오른쪽 위 천공 구멍 */
+.qv3-card::after { content: ""; position: absolute; top: 14px; right: 14px; width: 10px; height: 10px; border-radius: 50%; background: var(--qv-paper-2); box-shadow: inset 0 1px 2px rgba(72, 52, 34, 0.45); pointer-events: none; }
+.qv3-card-no { font-family: var(--qv-garamond); font-size: 12px; letter-spacing: 0.18em; color: var(--qv-brass-deep); font-variant-numeric: lining-nums; }
 a.qv3-card:hover { transform: translateY(-2px) rotate(-0.15deg); box-shadow: 0 2px 2px rgba(72, 52, 34, 0.08), 0 22px 36px -18px rgba(72, 52, 34, 0.4), inset 0 1px rgba(255, 255, 255, 0.8); }
 .qv3-card-top { display: flex; gap: 14px; align-items: flex-start; padding-top: 4px; }
+.qv3-card-body > .qv3-card-no + .qv3-kicker { margin-top: -2px; }
+.qv3-card-body > .qv3-card-no { padding-right: 14px; }
 .qv3-card-body { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
 .qv3-cover { flex: 0 0 72px; width: 72px; height: 104px; border-radius: 2px 4px 4px 2px; overflow: hidden; background: var(--qv-paper-2); box-shadow: 3px 4px 10px -4px rgba(48, 33, 20, 0.5), inset 2px 0 0 rgba(255, 255, 255, 0.25); display: block; transform: rotate(-1.2deg); }
 .qv3-cover img, .qv3-cover > * { width: 100%; height: 100%; object-fit: cover; display: block; }

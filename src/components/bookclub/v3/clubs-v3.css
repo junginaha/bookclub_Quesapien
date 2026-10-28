@@ -56,6 +56,8 @@
   display: flex; flex-direction: column; gap: 10px;
 }
 .qv3-cal::before { content: ""; position: absolute; top: 14px; left: 16px; right: 16px; border-top: 1px dashed #cabcaa; opacity: .8; pointer-events: none; }
+/* 기한표가 철해져 있던 천공 구멍 둘 */
+.qv3-cal::after { content: ""; position: absolute; top: 6px; left: 24%; right: 24%; height: 9px; pointer-events: none; background-image: radial-gradient(circle 4.5px at 0 50%, #e3dac6 99%, transparent 100%), radial-gradient(circle 4.5px at 100% 50%, #e3dac6 99%, transparent 100%); background-repeat: no-repeat; filter: drop-shadow(0 1px 1px rgba(72, 52, 34, .45)); }
 .qv3-cal-mast { display: flex; justify-content: space-between; align-items: baseline; }
 .qv3-cal-script { font-family: "Snell Roundhand", "Apple Chancery", "Segoe Script", var(--qv-garamond), Georgia, serif; font-style: italic; font-size: clamp(36px, 10vw, 48px); letter-spacing: -0.04em; line-height: 1.1; color: #302b26; }
 .qv3-cal-year { font-family: var(--qv-garamond); font-size: 17px; letter-spacing: 0.08em; color: var(--qv-muted); }
@@ -68,11 +70,13 @@
 .qv3-cal-table td { height: 50px; padding: 0; vertical-align: middle; }
 .qv3-cal-day { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 46px; height: 46px; margin: 0 auto; padding: 0 0 3px; border: 1px solid transparent; border-radius: 50%; background: transparent; color: #302b26; font: 600 23px/1.1 var(--qv-garamond), Georgia, serif; font-variant-numeric: lining-nums tabular-nums; }
 .qv3-cal-day:disabled { color: #a3978a; cursor: default; }
+.qv3-cal-day:not(:disabled) { box-shadow: inset 0 0 0 1.5px rgba(138, 106, 51, .7), inset 0 0 0 3.5px rgba(138, 106, 51, .16); }
 .qv3-cal-day:not(:disabled):hover { background: #e7dac5; }
 .qv3-cal-day i { position: absolute; bottom: 5px; width: 4px; height: 4px; border-radius: 50%; background: #756485; }
-.qv3 .qv3-cal-day[aria-pressed="true"] { background: linear-gradient(180deg, #655541, #4b3f31); color: #fff9ef; border-color: #4f4233; box-shadow: inset 0 2px 4px rgba(255,255,255,.10), inset 0 -3px 6px rgba(31,23,16,.22), 0 5px 10px -7px rgba(51,37,24,.75); }
+.qv3 .qv3-cal-day[aria-pressed="true"] { background: linear-gradient(180deg, #655541, #4b3f31); color: #fff9ef; border-color: #4f4233; box-shadow: inset 0 2px 5px rgba(31,23,16,.45), inset 0 -3px 6px rgba(31,23,16,.28), 0 2px 4px -3px rgba(51,37,24,.6); }
 .qv3 .qv3-cal-day[aria-pressed="true"] i { background: #edcda4; }
-.qv3-cal-day[aria-current="date"] { box-shadow: inset 0 0 0 1px #b49572; }
+.qv3-cal-day[aria-current="date"]:disabled { box-shadow: inset 0 0 0 1px #b49572; }
+.qv3-cal-note { margin-top: 2px; text-align: center; font-family: var(--qv-garamond); font-style: italic; font-size: 14px; color: var(--qv-muted); }
 
 @media (min-width: 720px) {
   .qv3-clubs-top { padding: 10px 20px; }

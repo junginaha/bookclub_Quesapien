@@ -72,6 +72,7 @@ function Card({ s }: { s: BookClubSession }) {
       <span className="qv3-card-top">
         <span className="qv3-cover"><BookCoverImage title={s.bookTitle} author={s.author} coverUrl={s.coverUrl} isbn={s.isbn} /></span>
         <span className="qv3-card-body">
+          <span className="qv3-card-no">NO. {dateKey(s.startsAt).replace(/-/g, "")}</span>
           <span className={`qv3-kicker${!past && daysUntil(s.startsAt) <= 7 ? " qv3-kicker--soon" : ""}`}>{past ? "지난 북클럽" : kicker(s)}</span>
           <span className="qv3-q">{s.leadQuestion || s.title}</span>
           <span className="qv3-book">{s.bookTitle} · {s.author}</span>
@@ -225,7 +226,7 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
       {view === "calendar" && (
         <main className="qv3-wrap qv3-clubs-main">
           <div className="qv3-cal">
-            <div className="qv3-cal-mast"><span className="qv3-cal-script">Calendar</span><span className="qv3-cal-year">{y}</span></div>
+            <div className="qv3-cal-mast"><span className="qv3-cal-script">Date Due</span><span className="qv3-cal-year">{y}</span></div>
             <div className="qv3-cal-head">
               <button type="button" className="qv3-icon-btn" aria-label="이전 달" onClick={() => moveMonth(-1)}>←</button>
               <h1 className="qv3-cal-month" aria-live="polite"><span aria-hidden="true">{pad(m)}</span><span className="qv3-sr">{y}년 {m}월</span></h1>
@@ -248,6 +249,7 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
                 ))}
               </tbody>
             </table>
+            <p className="qv3-cal-note">도장 자국이 있는 날에 모임이 열려요.</p>
           </div>
           {daySessions.length > 0 ? (
             <div className="qv3-grid">{daySessions.map((s) => <Card key={s.slug} s={s} />)}</div>
