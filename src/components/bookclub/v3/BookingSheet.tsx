@@ -5,9 +5,10 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { seatsLeft } from "@/lib/bookclub/types";
-import { dateKey, feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, seatNotice } from "@/lib/bookclub/selectors";
+import { dateKey, feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, seatNotice, seatKind } from "@/lib/bookclub/selectors";
 import { applyToBookClub } from "@/lib/actions/bookclub";
 import type { Viewer } from "@/lib/viewer";
+import { DoodleFace } from "@/components/common/Doodle";
 
 /**
  * 예약 바텀시트 (MASTER_v3.md §5) — 로그인 사용자 전용.
@@ -186,7 +187,7 @@ export default function BookingSheet({
           <span className="qv3-sheet-handle" aria-hidden="true" />
           <div className="qv3-sheet-head">
             <h2 id="qv3-sheet-title">{when} · {formatTimeOfDay(session.startsAt)}</h2>
-            <p>{session.venue.name} · {left > 0 ? seatNotice(session) : "대기 접수"} · {feeText}</p>
+            <p>{session.venue.name} · <DoodleFace kind={left > 0 ? seatKind(session) : "full"} />{left > 0 ? ` ${seatNotice(session)}` : " 대기 접수"} · {feeText}</p>
           </div>
 
           <div className="qv3-field">

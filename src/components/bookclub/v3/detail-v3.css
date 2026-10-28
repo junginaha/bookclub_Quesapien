@@ -9,7 +9,7 @@
 .qv3-detail-main { padding-bottom: 120px; display: flex; flex-direction: column; gap: 28px; }
 .qv3-detail-hero { padding-top: 12px; display: flex; flex-direction: column; gap: 16px; }
 .qv3-detail-q { font-family: var(--qv-serif); font-weight: 600; font-size: clamp(26px, 7.2vw, 38px); line-height: 1.38; letter-spacing: -0.015em; }
-.qv3-detail-lead { font-size: 14px; color: var(--qv-muted); margin-top: -6px; }
+.qv3-detail-lead { font-family: var(--qv-hand); font-size: 21px; line-height: 1.45; color: #6b6253; margin-top: -4px; }
 .qv3-detail-book { display: flex; gap: 14px; align-items: center; }
 .qv3-detail-cover { width: 84px; height: 120px; border-radius: 2px 4px 4px 2px; overflow: hidden; background: var(--qv-paper-2); flex: 0 0 auto; box-shadow: 4px 5px 12px -4px rgba(48, 33, 20, 0.55), inset 2px 0 0 rgba(255, 255, 255, 0.25); transform: rotate(-1.5deg); }
 .qv3-detail-cover img, .qv3-detail-cover > * { width: 100%; height: 100%; object-fit: cover; }
@@ -33,6 +33,8 @@
 .qv3-qitem--hidden .qv3-qnum { color: var(--qv-muted); }
 .qv3-how { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; color: var(--qv-ink-2); }
 .qv3-detail-summary { font-size: 14px; color: var(--qv-muted); }
+.qv3-detail-section .qv3-rule { margin: -4px 0 2px; color: var(--qv-line-2); }
+.qv3-qitem--hidden { font-family: var(--qv-hand) !important; font-size: 19px !important; }
 .qv3-record { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--qv-garamond); font-style: italic; font-size: 17px; color: var(--qv-leather); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--qv-brass); }
 .qv3-next-list { display: flex; flex-direction: column; gap: 10px; }
 .qv3-next-item { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; background: var(--qv-card); border: 1px solid #e1d5c2; border-radius: 3px; }

@@ -7,6 +7,7 @@ import type { BookClubSession } from "@/lib/bookclub/types";
 import { formatMonthDay, formatTimeOfDay, formatWeekdayFull, isPast } from "@/lib/bookclub/selectors";
 import { cancelMyReservation, type MyReservation } from "@/lib/actions/my-bookclub";
 import { logoutAction } from "@/lib/actions/auth";
+import { DoodleBook } from "@/components/common/Doodle";
 import "@/components/home/v3/home-v3.css";
 import "./clubs-v3.css";
 import "./my-v3.css";
@@ -99,6 +100,7 @@ export default function MyClubsV3({
           </section>
         ) : (
           <div className="qv3-empty">
+            <DoodleBook />
             <strong>책장이 아직 비어 있어요.</strong>
             <p>첫 북클럽은 질문 하나면 충분해요. 가까운 곳부터 볼까요?</p>
             <div className="qv3-empty-actions">

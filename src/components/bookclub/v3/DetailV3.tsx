@@ -8,7 +8,7 @@ import { isWaitlistFull } from "@/lib/bookclub/types";
 import { feeLabel, formatMonthDay, formatTimeOfDay, formatTimeRange, formatWeekdayFull, seatNotice, seatKind, daysUntilStart, IMMINENT_DAYS } from "@/lib/bookclub/selectors";
 import type { Viewer } from "@/lib/viewer";
 import BookCoverImage from "@/components/home/BookCoverImage";
-import { DoodleFace } from "@/components/common/Doodle";
+import { DoodleFace, DoodleRule } from "@/components/common/Doodle";
 import NotifyForm from "@/components/bookclub/NotifyForm";
 import BookingSheet from "./BookingSheet";
 import "@/components/home/v3/home-v3.css";
@@ -117,6 +117,7 @@ export default function DetailV3({
 
         <section className="qv3-detail-section" aria-labelledby="dq-title">
           <h2 id="dq-title">이 모임의 질문</h2>
+          <DoodleRule />
           <p className="qv3-detail-lead">첫 질문만 미리 보여드려요. 나머지는 그날의 재미로 남겨둡니다.</p>
           <ol className="qv3-qlist">
             {firstDiffers ? (
@@ -132,6 +133,7 @@ export default function DetailV3({
 
         <section className="qv3-detail-section" aria-labelledby="how-title">
           <h2 id="how-title">이렇게 진행해요</h2>
+          <DoodleRule />
           <ol className="qv3-how">
             <li>질문 하나로 가볍게 문을 열어요.</li>
             <li>말하고 싶은 만큼만 말해요. 듣기만 해도 충분히 참여한 거예요.</li>
