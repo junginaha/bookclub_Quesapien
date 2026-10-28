@@ -19,16 +19,27 @@ export function getStatus(s: BookClubSession): SessionStatus {
   return "open";
 }
 
+/** "마감 임박"을 붙이는 기준 — 모임 D-3부터. 그 전에는 사실대로 "모집 중". */
+export const IMMINENT_DAYS = 3;
+
+/** 오늘(KST)부터 모임 당일까지 남은 날 수. 오늘이면 0, 내일이면 1. */
+export function daysUntilStart(s: BookClubSession): number {
+  const [y1, m1, d1] = dateKey(s.startsAt).split("-").map(Number);
+  const [y0, m0, d0] = dateKey(new Date()).split("-").map(Number);
+  return Math.round((Date.UTC(y1, m1 - 1, d1) - Date.UTC(y0, m0 - 1, d0)) / 86_400_000);
+}
+
 /**
  * 남은 자리 수는 화면에 노출하지 않는다(운영자 지시 2026-10-28).
- * 숫자 대신 상태만 알린다 — 모집 중이면 "마감 임박".
+ * 숫자 대신 상태만 알린다. "마감 임박"은 실제로 임박했을 때(D-3 이내)만 쓰고,
+ * 그 전에는 "모집 중" — 방금 연 모임에까지 임박을 붙이면 사실이 아니다.
  * seatsLeft()는 예약 가능 여부 판단에만 쓰고, 사용자에게 보여주는 문구는 전부 이 함수를 거친다.
  */
 export function seatNotice(s: BookClubSession): string {
   if (isPast(s)) return "지난 북클럽";
   const status = getStatus(s);
   if (status === "full") return isWaitlistFull(s) ? "마감" : "마감 · 대기 받아요";
-  return "마감 임박";
+  return daysUntilStart(s) <= IMMINENT_DAYS ? "마감 임박" : "모집 중";
 }
 
 // ─── Asia/Seoul 날짜 포맷 — 타임존 무관하게 항상 KST 기준으로 고정 표시 ───

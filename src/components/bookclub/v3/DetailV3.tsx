@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
 import { isWaitlistFull } from "@/lib/bookclub/types";
-import { feeLabel, formatMonthDay, formatTimeOfDay, formatTimeRange, formatWeekdayFull, seatNotice } from "@/lib/bookclub/selectors";
+import { feeLabel, formatMonthDay, formatTimeOfDay, formatTimeRange, formatWeekdayFull, seatNotice, daysUntilStart, IMMINENT_DAYS } from "@/lib/bookclub/selectors";
 import type { Viewer } from "@/lib/viewer";
 import BookCoverImage from "@/components/home/BookCoverImage";
 import NotifyForm from "@/components/bookclub/NotifyForm";
@@ -38,6 +38,8 @@ export default function DetailV3({
   const full = status === "full";
   const closed = isWaitlistFull(session);
   const feeText = session.feeLabelOverride ?? feeLabel(session.fee);
+  // "마감 임박"은 실제로 임박했을 때만. 그 전에는 "모집 중".
+  const soon = !past && daysUntilStart(session) <= IMMINENT_DAYS;
   const bookPath = `/bookclub/${session.slug}`;
   const loginHref = `/login?next=${encodeURIComponent(`${bookPath}?book=1`)}`;
 
@@ -80,7 +82,7 @@ export default function DetailV3({
       <main className="qv3-wrap qv3-detail-main">
         <section className="qv3-detail-hero">
           <span className={`qv3-kicker${past ? "" : " qv3-kicker--soon"}`}>
-            {past ? "지난 북클럽" : closed ? "정원·대기 모두 마감" : full ? "자리는 다 찼지만, 대기는 받아요" : "마감 임박"}
+            {past ? "지난 북클럽" : closed ? "정원·대기 모두 마감" : full ? "자리는 다 찼지만, 대기는 받아요" : soon ? "마감 임박" : "모집 중"}
           </span>
           <h1 className="qv3-detail-q">{headline}</h1>
           <div className="qv3-detail-book">
@@ -108,7 +110,7 @@ export default function DetailV3({
           </div>
           <div className="qv3-fact">
             <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" /><circle cx="17" cy="9" r="2.5" /><path d="M16 14.5c3 0 5.5 2 5.5 5.5" /></svg>
-            <div><b>{past ? `정원 ${session.capacity}명` : full ? "정원 마감 · 대기 받아요" : "마감 임박"}</b><span>{feeText}</span></div>
+            <div><b>{past ? `정원 ${session.capacity}명` : seatNotice(session)}</b><span>{feeText}</span></div>
           </div>
         </section>
 
@@ -170,14 +172,14 @@ export default function DetailV3({
           ) : closed ? (
             <Link href="/bookclub" className="qv3-cta qv3-cta--block qv3-cta--ink">다른 북클럽 보기</Link>
           ) : !viewer ? (
-            <Link href={loginHref} className="qv3-cta qv3-cta--block">{full ? "대기 신청" : "예약하기"}<span className="qv3-cta-sub"> · {full ? "자리가 나면 알려드려요" : "마감 임박"}</span></Link>
+            <Link href={loginHref} className="qv3-cta qv3-cta--block">{full ? "대기 신청" : "예약하기"}<span className="qv3-cta-sub"> · {full ? "자리가 나면 알려드려요" : soon ? "마감 임박" : "모집 중"}</span></Link>
           ) : full ? (
             <details className="qv3-waitlist">
               <summary className="qv3-cta qv3-cta--block">대기 신청<span className="qv3-cta-sub"> · 자리가 나면 알려드려요</span></summary>
               <div className="qv3-waitlist-body"><NotifyForm clubSlug={session.slug} mode="waitlist" /></div>
             </details>
           ) : (
-            <button type="button" className="qv3-cta qv3-cta--block" onClick={() => setSheet(true)}>예약하기<span className="qv3-cta-sub"> · 마감 임박</span></button>
+            <button type="button" className="qv3-cta qv3-cta--block" onClick={() => setSheet(true)}>예약하기<span className="qv3-cta-sub"> · {soon ? "마감 임박" : "모집 중"}</span></button>
           )}
         </div>
       </div>

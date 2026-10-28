@@ -169,7 +169,7 @@ export default function DetailClient({
         ) : (
           <ApplyPanel
             triggerLabel={
-              isWaitlistFull(session) ? "마감되었습니다" : status === "full" ? "대기 신청" : "참여 신청 · 마감 임박"
+              isWaitlistFull(session) ? "마감되었습니다" : status === "full" ? "대기 신청" : `참여 신청 · ${seatNotice(session)}`
             }
             variant={status === "full" ? "outline" : "primary"}
             disabled={isWaitlistFull(session)}
@@ -183,7 +183,7 @@ export default function DetailClient({
                   ? "다음 앵콜 일정이 열리면 가장 먼저 안내해 드릴게요."
                   : status === "full"
                   ? `${session.venue.name} · 대기자로 등록하면 자리가 나는 대로 안내해 드려요.`
-                  : `${formatMonthDay(session.startsAt)} ${weekday} · ${feeText} · 마감 임박`}
+                  : `${formatMonthDay(session.startsAt)} ${weekday} · ${feeText} · ${seatNotice(session)}`}
               </p>
               {isWaitlistFull(session) ? (
                 <Button type="button" variant="outline" disabled>마감되었습니다</Button>

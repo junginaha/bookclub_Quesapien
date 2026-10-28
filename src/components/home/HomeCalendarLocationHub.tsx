@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
-import { dateKey, formatCompactSchedule, getStatus, isWaitlistFull } from "@/lib/bookclub/selectors";
+import { dateKey, formatCompactSchedule, getStatus, isWaitlistFull, seatNotice } from "@/lib/bookclub/selectors";
 import styles from "./linen-calendar.module.css";
 import NearbyBookclubMap from "./NearbyBookclubMap";
 
@@ -40,7 +40,7 @@ function formatKm(km: number): string {
 }
 
 function statusLine(session: BookClubSession, status: SessionStatus): string {
-  if (status === "open") return "마감 임박";
+  if (status === "open") return seatNotice(session);
   if (status === "full") return isWaitlistFull(session) ? "정원·대기 마감" : "정원 마감 · 대기 신청 가능";
   if (status === "closed") return "신청 마감";
   return "지난 모임";
