@@ -4,13 +4,14 @@
 .qv3-my-main { padding-top: 20px; padding-bottom: 56px; display: flex; flex-direction: column; gap: 28px; }
 .qv3-my-hello { display: flex; flex-direction: column; gap: 6px; }
 .qv3-my-hello h2 { font-family: var(--qv-serif); font-weight: 600; font-size: 26px; line-height: 1.35; }
-.qv3-my-hello p { font-size: 15px; color: var(--qv-muted); }
+.qv3-my-hello p { font-family: var(--qv-hand); font-size: 22px; line-height: 1.45; color: #6b6253; }
 .qv3-my-note { font-size: 13px; }
 .qv3-my-note a { text-decoration: underline; text-underline-offset: 3px; color: var(--qv-cta); }
 .qv3-my-msg { background: var(--qv-sage-soft); color: var(--qv-sage-deep); border: 1px dashed #c7d3c6; border-radius: 3px; font-family: var(--qv-serif); padding: 10px 14px; font-size: 14px; }
 .qv3-my-list { display: flex; flex-direction: column; gap: 12px; }
 .qv3-my-cancel { align-self: flex-start; min-height: 40px; }
 .qv3-my-confirm { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.qv3-my-confirm > div > span { font-family: var(--qv-hand); font-size: 20px; line-height: 1.4; }
 .qv3-my-confirm > div { display: flex; align-items: center; gap: 8px; }
 .qv3-my-account { background: var(--qv-card); border: 1px solid #e1d5c2; border-radius: 3px; display: flex; flex-direction: column; overflow: hidden; }
 .qv3-my-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 56px; padding: 0 20px; border-bottom: 1px solid var(--qv-line); font-size: 15px; font-weight: 500; width: 100%; background: transparent; border-left: 0; border-right: 0; border-top: 0; text-align: left; }
