@@ -11,7 +11,9 @@ import "@/components/home/v3/home-v3.css";
 import "./login-v3.css";
 
 /**
- * 로그인 v3 (MASTER_v3.md §7) — 카카오·구글 두 버튼. "이름만 가져와요."
+ * 로그인 v3 (MASTER_v3.md §7) — 카카오·구글 두 버튼.
+ * 안내 문구는 실제 동의 화면과 같아야 한다 — 카카오 동의 화면은 닉네임이 필수,
+ * 프로필 사진·이메일이 선택으로 뜬다(2026-10-29 비즈 앱 전환 후 확인).
  * next 경로가 북클럽이면 어디로 돌아가는지 보여준다. 이메일 로그인은 접어둔다(기존 회원용).
  */
 export default function LoginV3() {
@@ -55,7 +57,7 @@ export default function LoginV3() {
         <div className="qv3-login-head">
           <span className="qv3-login-brand">질문하는 사람들</span>
           <h1>{target ? <>예약하려면<br />이름만 있으면 돼요.</> : <>이름만 있으면<br />시작할 수 있어요.</>}</h1>
-          <p>카카오·구글 계정에서 이름만 받아옵니다.<br />그 밖의 정보는 가져오지 않습니다.</p>
+          <p>카카오·구글 계정에서 이름을 받아옵니다.<br />프로필 사진과 이메일은 선택이며, 동의하지 않아도 로그인됩니다.</p>
         </div>
 
         {target && (
