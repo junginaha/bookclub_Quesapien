@@ -139,7 +139,7 @@ export default function BookingSheet({
             {done.kind === "just_filled_waitlisted" && (
               <>
                 <h2 id="qv3-sheet-title">{firstName}님, 방금 자리가 다 차서<br />대기로 모셨어요.</h2>
-                <p>자리가 나면 제일 먼저 알려드릴게요. 약속.</p>
+                <p>자리가 나는 대로 가장 먼저 알려드릴게요.</p>
               </>
             )}
             {done.kind === "duplicate" && (
@@ -207,7 +207,7 @@ export default function BookingSheet({
           <label className="qv3-consent" htmlFor={consentId}>
             <input id={consentId} type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} required />
             <span>
-              <b>[필수]</b> 이름·휴대전화는 모임 안내{fee > 0 ? "와 결제·환불 확인" : ""}에만 쓰고, 끝나면 깨끗이 지워요.{" "}
+              <b>[필수]</b> 이름·휴대전화를 모임 안내{fee > 0 ? "와 결제·환불 확인" : ""} 목적으로 수집·이용합니다. 목적을 이루면 파기합니다.{" "}
               <a href="/privacy" target="_blank" rel="noreferrer">자세히</a>
               {fee > 0 ? <> · <a href="/terms#refund" target="_blank" rel="noreferrer">환불 규정</a></> : null}
             </span>

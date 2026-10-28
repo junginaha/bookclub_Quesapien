@@ -38,7 +38,7 @@ export default function LoginV3() {
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     if (e) {
-      setError(`잠깐 딸꾹질을 했어요. 한 번만 더 눌러주세요. (${e.message})`);
+      setError(`로그인에 실패했어요. 다시 시도해 주세요. (${e.message})`);
       setBusy(null);
     }
   }
@@ -55,7 +55,7 @@ export default function LoginV3() {
         <div className="qv3-login-head">
           <span className="qv3-login-brand">질문하는 사람들</span>
           <h1>{target ? <>예약하려면<br />이름만 있으면 돼요.</> : <>이름만 있으면<br />시작할 수 있어요.</>}</h1>
-          <p>카카오나 구글에서 이름만 살짝 가져와요.<br />생년월일, 혈액형, 그런 건 안 물어요.</p>
+          <p>카카오·구글 계정에서 이름만 받아옵니다.<br />그 밖의 정보는 가져오지 않습니다.</p>
         </div>
 
         {target && (
@@ -67,7 +67,7 @@ export default function LoginV3() {
         )}
 
         {(callbackError || error) && (
-          <p className="qv3-error" role="alert">{error || "로그인이 중간에 끊겼어요. 다시 한 번 눌러주세요."}{!error && reason ? <><br /><small>사유: {reason}</small></> : null}</p>
+          <p className="qv3-error" role="alert">{error || "로그인이 완료되지 않았어요. 다시 시도해 주세요."}{!error && reason ? <><br /><small>사유: {reason}</small></> : null}</p>
         )}
       </div>
 

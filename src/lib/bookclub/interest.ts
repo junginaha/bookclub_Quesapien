@@ -35,9 +35,13 @@ export function interestKey(slug: string): string | null {
   return rec ? `rec:${rec.key}` : null;
 }
 
-/** 카드·완료 문구. 실제 집계값만 쓴다(0이면 인원 숫자를 노출하지 않음). */
+/**
+ * 카드 바깥에 붙는 짧은 안내. 실제 집계값만 쓴다(0이면 인원 숫자를 노출하지 않음).
+ * 긴 설명("책친구들이 모이면 알려드려요")은 신청서 안에서 한 번만 한다 —
+ * 카드마다 같은 문장이 반복되면 안내가 아니라 잡음이 된다(운영자 지시 2026-10-28).
+ */
 export function interestCopy(count: number): string {
-  if (count >= INTEREST_THRESHOLD) return "책친구들이 모였어요. 북토크 일정을 준비해 연락드릴게요.";
-  if (count > 0) return `지금 ${count}명이 함께 읽고 싶어해요 · 책친구들이 모이면 알려드려요`;
-  return "책친구들이 모이면 알려드려요";
+  if (count >= INTEREST_THRESHOLD) return `${INTEREST_THRESHOLD}명이 모였어요. 일정을 잡아 연락드릴게요.`;
+  if (count > 0) return `지금 ${count}명 · ${INTEREST_THRESHOLD}명 이상 모이면 시작!`;
+  return `${INTEREST_THRESHOLD}명 이상 모이면 시작!`;
 }
