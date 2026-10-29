@@ -106,6 +106,7 @@ export default function ReunionReads({
               {isPast ? (
                 <Link href={"/bookclub/" + item.session.slug} className={styles.encoreCoverLink} aria-label={`${title} 북클럽 보기`}>
                   {cover}
+                  <span className={styles.tag} aria-hidden="true">기록</span>
                 </Link>
               ) : (
                 cover
@@ -124,7 +125,8 @@ export default function ReunionReads({
                         onClick={() => setOpenKey(item.key)}
                         aria-label={`${title} 같이 읽어요`}
                       >
-                        <DoodleFace kind={interestFace(n)} />{" "}{INTEREST_CTA}
+                        <DoodleFace kind={interestFace(n)} />
+                        <span className={styles.cardActionLabel}>{INTEREST_CTA}</span>
                       </button>
                     </>
                   );
