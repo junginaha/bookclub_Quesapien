@@ -7,6 +7,7 @@ import type { BookClubSession } from "@/lib/bookclub/types";
 import { seatsLeft } from "@/lib/bookclub/types";
 import { dateKey, feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, seatNotice, seatKind } from "@/lib/bookclub/selectors";
 import { applyToBookClub } from "@/lib/actions/bookclub";
+import { consentRecord } from "@/lib/bookclub/terms";
 import type { Viewer } from "@/lib/viewer";
 import { DoodleFace } from "@/components/common/Doodle";
 
@@ -60,6 +61,15 @@ export default function BookingSheet({
   const nameId = useId();
   const phoneId = useId();
   const consentId = useId();
+  const dueId = useId();
+  /**
+   * 대출카드의 '약속한 날' — 본인이 직접 적는 칸.
+   * 예약 카드에 날짜·시각을 **환자가 직접 적게** 하자 결석이 18% 줄었다
+   * (Martin·Bassi·Dunbar-Rees, J R Soc Med 2012). 같은 논문에서 의미 없는
+   * 네 자리 번호를 적게 한 쪽은 오히려 결석이 늘었으므로, 적는 것은 반드시
+   * 실제 약속 날짜여야 한다. 비워 둬도 예약에는 아무 지장이 없다.
+   */
+  const [due, setDue] = useState("");
   const [name, setName] = useState(viewer.name);
   const [phone, setPhone] = useState(viewer.phone);
   const [consent, setConsent] = useState(false);
@@ -86,7 +96,7 @@ export default function BookingSheet({
     setSubmitting(true);
     setError(null);
     try {
-      const res = await applyToBookClub({ clubSlug: session.slug, name, phone, email: viewer.email, note: "", website });
+      const res = await applyToBookClub({ clubSlug: session.slug, name, phone, email: viewer.email, note: consentRecord({ fee }), website });
       if (!res.ok) { setError(res.error); return; }
       setDone({ kind: res.kind });
       onBooked?.();
@@ -157,6 +167,19 @@ export default function BookingSheet({
                 <span className="qv3-libcard-label" aria-hidden="true">BORROWER</span>
                 <span className="qv3-libcard-name">{firstName}</span>
               </div>
+              <div className="qv3-libcard-row">
+                <label className="qv3-libcard-label" htmlFor={dueId}>DUE</label>
+                <input
+                  id={dueId}
+                  className="qv3-libcard-due"
+                  value={due}
+                  onChange={(e) => setDue(e.target.value)}
+                  placeholder={when}
+                  aria-label="약속한 날을 적어두세요"
+                  autoComplete="off"
+                  maxLength={40}
+                />
+              </div>
               <div className="qv3-libcard-place">{session.venue.name} · {place}</div>
               <div className="qv3-stamp" role="img" aria-label={`${stampLabel} ${stampDate}`}>
                 <span className="qv3-stamp-brand" aria-hidden="true">QSAPIENS</span>
@@ -180,6 +203,11 @@ export default function BookingSheet({
               <a className="qv3-done-secondary" href={icsFor(session)} download={`${session.slug}.ics`}>캘린더에 추가</a>
             )}
             <Link href="/guide" className="qv3-done-link">처음 오시나요? 안내 보기</Link>
+            {done.kind !== "just_filled_waitlisted" && (
+              <Link href="/mypage" className="qv3-done-link qv3-done-cancel lp-hand">
+                못 오시게 되면 여기서 알려주세요. 기다리는 분께 자리를 넘겨드려요.
+              </Link>
+            )}
           </div>
         </div>
       ) : (
