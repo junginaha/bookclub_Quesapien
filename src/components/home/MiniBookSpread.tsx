@@ -7,6 +7,12 @@ import BookCoverImage from "./BookCoverImage";
 import styles from "./home-tools.module.css";
 import { DoodleRule } from "@/components/common/Doodle";
 
+/** 꼬리표에 적는 두 글자 — getStatus()와 같은 분기에서 뽑는다. */
+function tagFor(s: BookClubSession): string {
+  const st = getStatus(s);
+  return st === "past" ? "기록" : st === "full" ? "대기" : "예약";
+}
+
 export default function MiniBookSpread({ sessions }: { sessions: BookClubSession[] }) {
   const unique = new Map<string, BookClubSession>();
   // 진행 중·예정 모임만 — 지난 모임은 다음 섹션(ReunionReads, 우리 다시 만나요)으로 간다
@@ -26,7 +32,6 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
           <span className={styles.eyebrow}>NEXT READS</span>
           <h2 id="books-title">함께 읽는 책</h2>
           <DoodleRule />
-          <p className={`${styles.sectionLead} lp-hand`}>책을 선택하면 모임 상세 페이지로 이동합니다.</p>
         </div>
       </div>
 
@@ -50,6 +55,7 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
                     isbn={session.isbn}
                   />
                 </span>
+                <span className={styles.tag} aria-hidden="true">{tagFor(session)}</span>
                 <span className={styles.coverMeta}>
                   <strong>{session.bookTitle}</strong>
                   <small>{session.author}</small>
