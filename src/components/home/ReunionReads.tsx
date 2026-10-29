@@ -6,7 +6,7 @@ import type { BookClubSession } from "@/lib/bookclub/types";
 import { cardBlurb, getStatus } from "@/lib/bookclub/selectors";
 import { UPCOMING_BOOKS, UPCOMING_GENRES, type UpcomingBook } from "@/lib/bookclub/upcoming";
 import { INTEREST_CTA_ACTION, INTEREST_CTA_HOOK, interestCount, interestFace } from "@/lib/bookclub/interest";
-import { DoodleFace, DoodleRule } from "@/components/common/Doodle";
+import { DoodleBookBloom, DoodleFace, DoodleRule } from "@/components/common/Doodle";
 import InterestDialog from "./InterestDialog";
 import BookCoverImage from "./BookCoverImage";
 import RecommendBookForm from "./RecommendBookForm";
@@ -173,6 +173,8 @@ export default function ReunionReads({
             <span className={styles.recommendCtaArrow} aria-hidden="true">{recOpen ? "↑" : "→"}</span>
           </button>
         </div>
+        {/* 격자 밖, 폼 옆 빈자리 — 레퍼런스가 손그림을 크게 두는 바로 그 자리 */}
+        <DoodleBookBloom className={styles.recommendBloom} />
         <div id="recommend-form" className={styles.recommendPanel} hidden={!recOpen}>
           <RecommendBookForm />
         </div>
