@@ -70,7 +70,7 @@ export default function InterestDialog({
           </>
         ) : (
           <>
-            <p className="qif-lead">이 책을 함께 읽고 싶으시면 남겨주세요. 책친구들이 모이면 알려드려요.</p>
+            <p className="qif-lead">같은 책을 고른 분이 5명 이상 모이면 북토크를 열어드려요.<br />책친구들이 모이면 알려드릴게요. 같이 읽어요.</p>
             <form className="qif-form" onSubmit={submit}>
               <InterestFields values={values} onChange={setValues} />
               <input
