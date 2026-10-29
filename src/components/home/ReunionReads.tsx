@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { cardBlurb, getStatus } from "@/lib/bookclub/selectors";
 import { UPCOMING_BOOKS, UPCOMING_GENRES, type UpcomingBook } from "@/lib/bookclub/upcoming";
-import { interestCopy, interestFace } from "@/lib/bookclub/interest";
+import { INTEREST_CTA, interestCount, interestFace } from "@/lib/bookclub/interest";
 import { DoodleFace, DoodleRule } from "@/components/common/Doodle";
 import InterestDialog from "./InterestDialog";
 import BookCoverImage from "./BookCoverImage";
@@ -114,20 +114,21 @@ export default function ReunionReads({
               <div className={styles.cardFoot}>
                 {(() => {
                   const n = liveCounts[item.key] ?? counts[item.key] ?? 0;
+                  const tally = interestCount(n);
                   return (
-                    <p className={`${styles.cardFootCopy} lp-hand lp-hand--sm`}>
-                      <DoodleFace kind={interestFace(n)} />{" "}{interestCopy(n)}
-                    </p>
+                    <>
+                      {tally && <p className={`${styles.cardFootCopy} lp-hand lp-hand--sm`}>{tally}</p>}
+                      <button
+                        type="button"
+                        className={`${styles.cardAction} lp-hand lp-hand--sm`}
+                        onClick={() => setOpenKey(item.key)}
+                        aria-label={`${title} 같이 읽어요`}
+                      >
+                        <DoodleFace kind={interestFace(n)} />{" "}{INTEREST_CTA}
+                      </button>
+                    </>
                   );
                 })()}
-                <button
-                  type="button"
-                  className={styles.cardAction}
-                  onClick={() => setOpenKey(item.key)}
-                  aria-label={`${title} 읽고 싶어요`}
-                >
-                  읽고 싶어요
-                </button>
               </div>
               <InterestDialog
                 clubSlug={item.key}

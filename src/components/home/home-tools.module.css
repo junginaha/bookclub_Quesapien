@@ -326,10 +326,17 @@ li.bookLink > button.cardAction:hover { background: #f7f2e9; border-color: #b9ab
 .cardFoot { margin-top: auto; display: grid; gap: 6px; padding-top: 4px; }
 .cardFootCopy { margin: 0; color: #8c6c50; font-size: 12px; line-height: 1.5; text-align: center; word-break: keep-all; }
 li.bookLink > .cardFoot > button.cardAction {
-  display: inline-flex; align-items: center; justify-content: center; width: 100%;
-  min-height: 44px; padding: 10px 16px; cursor: pointer;
+  /* flex로 두면 얼굴과 글이 따로 놀아 얼굴만 왼쪽에 떨어진다 — 한 줄의 글처럼 흐르게 둔다. */
+  display: block; width: 100%;
+  min-height: 44px; padding: 12px; cursor: pointer;
   background: #fff; border: 1px solid var(--tool-line); color: var(--tool-blue);
   font-size: 13px; font-weight: 600; font-family: inherit;
+  /* 안내와 행동을 한 버튼에 합쳤다 — 좁은 카드에서 두 줄로 접히되 단어는 안 쪼갠다. */
+  line-height: 1.3; text-align: center; word-break: keep-all; white-space: normal;
+}
+/* 손글씨는 x-height가 낮아 같은 px에서 작아 보인다 — 버튼 안에서는 한 단계 더 키운다. */
+li.bookLink > .cardFoot > button.cardAction:global(.lp-hand) {
+  font-family: var(--lp-hand); font-size: 19px; font-weight: 400; letter-spacing: 0.01em;
 }
 li.bookLink > .cardFoot > button.cardAction:hover { background: #f7f2e9; border-color: #b9ab98; }
 

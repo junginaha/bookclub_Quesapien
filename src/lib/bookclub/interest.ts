@@ -51,6 +51,19 @@ export function interestCopy(count: number): string {
  * 아직 아무도 없으면 편안한 얼굴, 모이는 중이면 서두르는 얼굴.
  * (자리 마감을 뜻하는 "full"은 여기 쓰지 않는다 — 5명은 마감이 아니라 시작이다.)
  */
+/** 카드 버튼 하나로 합친 문구 — 안내와 행동을 두 줄로 나누지 않는다(운영자 지시 2026-10-29). */
+export const INTEREST_CTA = "모이면 시작! 같이 읽어요";
+
+/**
+ * 버튼 위에 남기는 짧은 집계. 아직 아무도 없으면 **아무것도 쓰지 않는다** —
+ * 기준(5명)은 버튼이 이미 말하고 있다.
+ */
+export function interestCount(count: number): string {
+  if (count >= INTEREST_THRESHOLD) return `${INTEREST_THRESHOLD}명이 모였어요`;
+  if (count > 0) return `지금 ${count}명`;
+  return "";
+}
+
 export function interestFace(count: number): "open" | "soon" {
   return count > 0 ? "soon" : "open";
 }
