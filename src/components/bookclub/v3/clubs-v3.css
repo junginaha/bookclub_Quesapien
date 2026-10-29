@@ -91,3 +91,10 @@
   .qv3-map-card { left: auto; right: 24px; bottom: 24px; width: 380px; }
   .qv3-cal { max-width: 560px; padding: 36px 32px 26px; }
 }
+
+/* 제목에서 숫자를 빼냈다 — h1은 제목만, 개수는 바로 아래 한 줄.
+   (손글씨를 쓰는 .qv3-clubs-head p를 상속하면 안 되므로 따로 적는다) */
+.qv3-clubs-count {
+  font-family: var(--qv-garamond); font-style: italic; font-size: 17px;
+  color: var(--qv-brass-deep); margin: 0;
+}

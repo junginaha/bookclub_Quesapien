@@ -5,7 +5,7 @@ import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
   title: "개인정보처리방침",
-  description: "질문하는 사람들의 개인정보처리방침입니다.",
+  description: "질문하는 사람들이 수집하는 개인정보 항목과 이용 목적, 보유 기간, 처리 위탁 업체, 이용자의 권리와 보호책임자 연락처를 정리했습니다.",
   path: "/privacy",
   noIndex: true,
 });

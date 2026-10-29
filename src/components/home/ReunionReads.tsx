@@ -89,10 +89,13 @@ export default function ReunionReads({
           const title = isPast ? item.session.bookTitle : item.book.bookTitle;
           const author = isPast ? item.session.author : item.book.author;
           const blurb = isPast ? cardBlurb(item.session) : item.book.pitch;
+          // 칸의 두 번째 얼굴 — 지난 모임은 그날의 질문, 오픈 예정은 한 줄 소개
+          const face = isPast ? item.session.leadQuestion : item.book.pitch;
           const cover = (
             <>
               <span className={styles.coverVisual}>
                 <BookCoverImage title={title} author={author} coverUrl={isPast ? item.session.coverUrl : undefined} isbn={isPast ? item.session.isbn : item.book.isbn} />
+                {face ? <span className={styles.coverFace}>{face}</span> : null}
               </span>
               <span className={styles.coverMeta}>
                 {/* 작가 — 제목 한 줄. 같은 크기·같은 굵기로 이어 읽힌다. */}

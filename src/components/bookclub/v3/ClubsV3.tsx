@@ -171,7 +171,7 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
 
       {view === "list" && (
         <main className="qv3-wrap qv3-clubs-main">
-          <div className="qv3-clubs-head"><span className="qv3-eyebrow">Now reading together</span><h1 className="qv3-clubs-title">지금 열리는 북클럽 <span>{filtered.length}</span></h1><p>마음에 드는 질문 하나 골라 오세요. 책은 덜 읽어도 됩니다.</p></div>
+          <div className="qv3-clubs-head"><span className="qv3-eyebrow">Now reading together</span><h1 className="qv3-clubs-title">지금 열리는 북클럽</h1><p className="qv3-clubs-count" aria-live="polite">{filtered.length}곳</p><p>마음에 드는 질문 하나 골라 오세요. 책은 덜 읽어도 됩니다.</p></div>
           {filtered.length > 0 ? (
             <div className="qv3-grid">{filtered.map((s) => <Card key={s.slug} s={s} />)}</div>
           ) : (
