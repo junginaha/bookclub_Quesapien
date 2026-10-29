@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { cardBlurb, getStatus } from "@/lib/bookclub/selectors";
 import { UPCOMING_BOOKS, UPCOMING_GENRES, type UpcomingBook } from "@/lib/bookclub/upcoming";
-import { INTEREST_CTA, interestCount, interestFace } from "@/lib/bookclub/interest";
+import { INTEREST_CTA_ACTION, INTEREST_CTA_HOOK, interestCount, interestFace } from "@/lib/bookclub/interest";
 import { DoodleFace, DoodleRule } from "@/components/common/Doodle";
 import InterestDialog from "./InterestDialog";
 import BookCoverImage from "./BookCoverImage";
@@ -126,7 +126,10 @@ export default function ReunionReads({
                         aria-label={`${title} 같이 읽어요`}
                       >
                         <DoodleFace kind={interestFace(n)} />
-                        <span className={styles.cardActionLabel}>{INTEREST_CTA}</span>
+                        <span className={styles.cardActionLabel}>
+                          <span className={styles.ctaHook}>{INTEREST_CTA_HOOK}</span>
+                          <span className={styles.ctaAction}>{INTEREST_CTA_ACTION}</span>
+                        </span>
                       </button>
                     </>
                   );

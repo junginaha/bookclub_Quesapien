@@ -2,15 +2,21 @@
 
 import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
-import { formatMonthDay, getStatus } from "@/lib/bookclub/selectors";
+import { formatMonthDay, getStatus, seatKind, seatNotice } from "@/lib/bookclub/selectors";
 import BookCoverImage from "./BookCoverImage";
 import styles from "./home-tools.module.css";
-import { DoodleRule } from "@/components/common/Doodle";
+import { DoodleFace, DoodleRule } from "@/components/common/Doodle";
 
 /** 꼬리표에 적는 두 글자 — getStatus()와 같은 분기에서 뽑는다. */
 function tagFor(s: BookClubSession): string {
   const st = getStatus(s);
   return st === "past" ? "기록" : st === "full" ? "대기" : "예약";
+}
+
+/** CTA 둘째 줄 — 꼬리표와 같은 분기에서 뽑는다. */
+function ctaFor(s: BookClubSession): string {
+  const st = getStatus(s);
+  return st === "past" ? "기록 보기" : st === "full" ? "대기 신청" : "예약하기";
 }
 
 export default function MiniBookSpread({ sessions }: { sessions: BookClubSession[] }) {
@@ -62,6 +68,13 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
                   <small>
                     {formatMonthDay(session.startsAt)} · {session.venue.name}
                   </small>
+                </span>
+                <span className={`${styles.cardAction} ${styles.cardActionStatic} lp-hand lp-hand--sm`}>
+                  <DoodleFace kind={seatKind(session)} />
+                  <span className={styles.cardActionLabel}>
+                    <span className={styles.ctaHook}>{seatNotice(session)}</span>
+                    <span className={styles.ctaAction}>{ctaFor(session)}</span>
+                  </span>
                 </span>
               </Link>
             );
