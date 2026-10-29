@@ -438,3 +438,70 @@ a.bookLink > .cardActionStatic :global(.qv3-doodle) {
 a.bookLink > .cardActionStatic:global(.lp-hand) {
   font-family: var(--lp-hand); font-size: 19px; font-weight: 400; letter-spacing: 0.01em;
 }
+
+
+/* ── 레퍼런스(chosecommune.com)를 더 가져온다 ─────────────────
+   그 사이트가 쓰는 수는 넷뿐이다. 셀이 헤어라인으로 맞붙고,
+   표지가 넓은 칸 안에 작게 떠 있고(그림자는 표지 자신이 갖는다),
+   캡션은 "작가 - 제목" 한 줄이고, 섹션에 군더더기가 없다.
+   홈은 종이 톤이므로 선은 검정이 아니라 리넨 색으로 긋는다. */
+
+/* 1. 헤어라인 격자 — 간격을 지우고 셀이 자기 오른쪽·아래 선만 긋는다.
+      (격자에 테두리를 두르면 선이 겹쳐 두 겹으로 보인다) */
+/* 칸이 사방에 선을 긋고 1px씩 겹쳐 앉는다. 격자에 선을 두르면
+   줄이 덜 찬 행에서 아무것도 없는 칸 위로 선이 남는다. */
+.bookGrid { gap: 0; padding: 1px 0 0 1px; }
+.bookGrid > * {
+  border: 1px solid #ded2bd;
+  margin: -1px 0 0 -1px;
+  padding: 14px 14px 16px;
+  min-width: 0;
+}
+
+/* 2. 표지는 정사각 칸 안에 떠 있다 — 종이 쪽지 그림자 대신 표지 자신의 그림자.
+      세로 표지는 좌우에 여백이 남는데, 그 여백이 레퍼런스의 리듬이다. */
+.bookGrid .coverVisual {
+  display: block;
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  transform: none;
+}
+/* 표지를 흐름에서 빼야 칸이 정사각으로 고정된다 —
+   흐름에 두면 표지의 고유 비율이 칸 높이를 밀어 올려 칸마다 높이가 달라진다. */
+.bookGrid .coverVisual img,
+.bookGrid .coverVisual :global(.q-typecover) {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: auto; max-width: 100%; height: 100%;
+  /* 타이포 표지는 자기 배경색이 곧 표지다 — 투명하게 만들면 사라진다 */
+  filter: drop-shadow(3px 3px 3px rgba(122, 104, 80, 0.45));
+}
+.bookGrid .coverVisual img { object-fit: contain; background: transparent; }
+.bookGrid .coverVisual :global(.q-typecover) { aspect-ratio: 2 / 3; }
+.bookGrid a:hover .coverVisual img { transform: translateX(-50%) scale(1.02); }
+/* 들림·기울기는 격자에서 빼고, 표지만 아주 조금 커진다 */
+.bookGrid .bookLink:hover .coverVisual,
+.bookGrid .bookLink:focus-visible .coverVisual,
+.bookGrid .encoreCoverLink:hover .coverVisual { transform: none; }
+
+/* 3. 캡션은 한 줄 — 작가·구분표·제목이 같은 크기, 같은 굵기, 같은 색 */
+.coverLine {
+  display: block;
+  color: #2b2621;
+  font: 400 14px/1.9 var(--font-noto-serif-kr), serif;
+  letter-spacing: 0.01em;
+  word-break: keep-all;
+}
+.coverSep { margin: 0 0.35em; color: #9c8f7c; }
+.bookGrid .coverMeta { padding: 12px 0 0; gap: 1px; text-align: center; }
+.bookGrid .coverMeta small { color: #8c8175; font-size: 11.5px; line-height: 1.7; }
+.bookGrid .upcomingPitch { text-align: center; }
+.bookGrid .cardFoot { justify-items: center; }
+@media (min-width: 640px) { .coverLine { font-size: 15px; } }
+
+/* 꼬리표는 표지가 작아진 만큼 칸 모서리 기준으로 옮긴다 */
+.bookGrid .tag { top: 4px; right: 2px; }

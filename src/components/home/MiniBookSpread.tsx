@@ -63,8 +63,13 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
                 </span>
                 <span className={styles.tag} aria-hidden="true">{tagFor(session)}</span>
                 <span className={styles.coverMeta}>
-                  <strong>{session.bookTitle}</strong>
-                  <small>{session.author}</small>
+                  {/* 레퍼런스처럼 한 줄 — 작가와 제목이 같은 크기·같은 굵기로 이어진다.
+                      제목을 굵게 키우면 표지가 아니라 글자가 먼저 읽힌다. */}
+                  <span className={styles.coverLine}>
+                    <span className={styles.coverArtist}>{session.author}</span>
+                    <span className={styles.coverSep}>—</span>
+                    <span className={styles.coverTitle}>{session.bookTitle}</span>
+                  </span>
                   <small>
                     {formatMonthDay(session.startsAt)} · {session.venue.name}
                   </small>
