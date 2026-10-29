@@ -122,8 +122,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(16px, 2.5vw, 28px);
 }
-@media (min-width: 640px) { .bookGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (min-width: 1024px) { .bookGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+/* 레퍼런스는 813px에서도 2열이다 — 칸이 좁으면 표지가 작아지고 캡션이 접힌다.
+   3열은 900px, 4열은 1280px부터. */
+@media (min-width: 900px) { .bookGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .bookGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .book {
   max-width: 280px;
   perspective: 900px;
@@ -339,7 +341,7 @@ li.bookLink > .cardFoot > button.cardAction {
 }
 /* 손글씨는 x-height가 낮아 같은 px에서 작아 보인다 — 버튼 안에서는 한 단계 더 키운다. */
 li.bookLink > .cardFoot > button.cardAction:global(.lp-hand) {
-  font-family: var(--lp-hand); font-size: 19px; font-weight: 400; letter-spacing: 0.01em;
+  font-family: var(--lp-hand); font-size: 21px; font-weight: 400; letter-spacing: 0.01em;
 }
 li.bookLink > .cardFoot > button.cardAction:hover { background: #f7f2e9; border-color: #b9ab98; }
 
@@ -436,7 +438,7 @@ a.bookLink > .cardActionStatic :global(.qv3-doodle) {
   flex: 0 0 auto; width: 2.4em; height: 2.4em; margin-top: -0.18em;
 }
 a.bookLink > .cardActionStatic:global(.lp-hand) {
-  font-family: var(--lp-hand); font-size: 19px; font-weight: 400; letter-spacing: 0.01em;
+  font-family: var(--lp-hand); font-size: 21px; font-weight: 400; letter-spacing: 0.01em;
 }
 
 
@@ -492,7 +494,7 @@ a.bookLink > .cardActionStatic:global(.lp-hand) {
 .coverLine {
   display: block;
   color: #2b2621;
-  font: 400 14px/1.9 var(--font-noto-serif-kr), serif;
+  font: 400 15.5px/1.85 var(--font-noto-serif-kr), serif;
   letter-spacing: 0.01em;
   word-break: keep-all;
 }
@@ -501,7 +503,7 @@ a.bookLink > .cardActionStatic:global(.lp-hand) {
 .bookGrid .coverMeta small { color: #8c8175; font-size: 11.5px; line-height: 1.7; }
 .bookGrid .upcomingPitch { text-align: center; }
 .bookGrid .cardFoot { justify-items: center; }
-@media (min-width: 640px) { .coverLine { font-size: 15px; } }
+@media (min-width: 640px) { .coverLine { font-size: 16.5px; } }
 
 /* 꼬리표는 표지가 작아진 만큼 칸 모서리 기준으로 옮긴다 */
 .bookGrid .tag { top: 4px; right: 2px; }
@@ -529,5 +531,54 @@ a.bookLink > .cardActionStatic:global(.lp-hand) {
 /* 날짜·장소는 입장권 활자 — 가라몬드 숫자에 자간을 벌린다 */
 .bookGrid .coverMeta small {
   font-family: var(--font-eb-garamond), var(--font-noto-sans-kr), serif;
-  font-size: 12.5px; letter-spacing: 0.04em; font-variant-numeric: oldstyle-nums;
+  /* 올드스타일 숫자는 한글과 섞이면 들쭉날쭉해 읽기 나쁘다 — 라이닝으로 */
+  font-size: 13.5px; letter-spacing: 0.03em; font-variant-numeric: lining-nums;
+  color: #7d7265;
+}
+
+
+/* ── 칸의 두 번째 얼굴 ────────────────────────────────────────
+   레퍼런스를 호버해 보고서야 알았다. 셀마다 **2장짜리 페이드 스와이퍼**가 들어
+   있고(effect: fade, speed 200ms, autoplay 없음), 호버하면 표지가 사라지고
+   **다른 사진이 칸을 가득 채운다.** 헤어라인 격자도, 표지 둘레의 여백도 이걸
+   위해 있었다 — 채워질 자리를 비워둔 것이다.
+   우리에겐 속지 사진이 없다. 대신 그 자리에 **그날의 질문**을 넣는다. */
+.coverFace {
+  position: absolute;
+  /* 칸의 안쪽 여백까지 덮어야 "가득 찬다" — 표지 액자가 아니라 칸을 채운다 */
+  inset: -14px -14px 0;
+  z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px 18px;
+  background: #2f2721;
+  color: #f2e9d8;
+  font: 400 clamp(14px, 1.45vw, 17px)/1.65 var(--font-noto-serif-kr), serif;
+  text-align: center; word-break: keep-all; overflow: hidden;
+  opacity: 0; pointer-events: none;
+  transition: opacity 200ms ease;
+}
+/* 여는 따옴표는 손으로 그은 자국처럼 — 글이 아니라 표시다 */
+.coverFace::before {
+  content: "\201C";
+  position: absolute; left: 12px; top: 2px;
+  color: #b08a4a; font: italic 400 34px/1 var(--font-eb-garamond), serif;
+}
+/* 마우스가 있는 기기에서만. 손가락으로는 호버가 없고, 탭은 링크가 받는다. */
+@media (hover: hover) and (pointer: fine) {
+  .bookGrid > a.bookLink:hover .coverFace,
+  .bookGrid > a.bookLink:focus-visible .coverFace,
+  .bookGrid > li.bookLink:hover .coverFace { opacity: 1; }
+  /* 호버 중엔 표지가 조용히 물러난다(레퍼런스의 페이드와 같은 200ms) */
+  .bookGrid > a.bookLink:hover .coverVisual img,
+  .bookGrid > li.bookLink:hover .coverVisual img { opacity: 0; transition: opacity 200ms ease; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .coverFace, .bookGrid .coverVisual img { transition: none; }
+}
+
+/* '함께 읽는 책'은 보통 2~5권이다 — 4열이면 칸이 좁아 표지가 작아진다. 3열까지만. */
+/* CSS Modules는 로컬 모드에서 **id도 해시한다** — `#books`를 그대로 쓰면
+   실제 DOM의 id와 안 맞아 규칙이 죽는다(4열로 그대로 떴다). */
+@media (min-width: 1280px) {
+  :global(#books) .bookGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }

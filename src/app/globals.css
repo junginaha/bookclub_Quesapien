@@ -589,3 +589,18 @@
 .grid-responsive { grid-template-columns: 1fr 360px; }
 @media (max-width: 900px) { .grid-responsive { grid-template-columns: 1fr !important; } }
 @media (max-width: 900px) { .sidebar-hide { display: none !important; } }
+
+/* ── 손가락이 닿는 넓이 ───────────────────────────────────────
+   주 사용자가 40대 이상이다. 머리글·바닥글의 작은 링크는 글자 높이가 곧
+   누르는 넓이여서 15~30px밖에 안 됐다(실측). 글자 크기는 그대로 두고
+   **눌리는 영역만** 넓힌다. 마우스 기기에는 적용하지 않는다. */
+@media (pointer: coarse) {
+  header a, header button,
+  footer a, footer button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  /* 세로로 쌓인 링크 묶음은 간격을 줄여 늘어난 높이를 상쇄한다 */
+  footer [style*="flex-direction: column"] > a { margin-top: -6px; }
+}

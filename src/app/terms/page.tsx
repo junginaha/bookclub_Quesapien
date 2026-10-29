@@ -5,7 +5,7 @@ import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
   title: "이용약관 · 환불 규정",
-  description: "질문하는 사람들 북클럽 이용약관과 참여비 취소·환불 규정입니다.",
+  description: "질문하는 사람들 북클럽 참여 약관입니다. 신청과 예약 확정, 참여비 결제, 모임 3일 전·2일 전·당일 취소에 따른 환불 기준을 안내합니다.",
   path: "/terms",
   noIndex: true,
 });

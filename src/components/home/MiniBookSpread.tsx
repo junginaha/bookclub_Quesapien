@@ -60,6 +60,9 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
                     coverUrl={session.coverUrl}
                     isbn={session.isbn}
                   />
+                  {session.leadQuestion ? (
+                    <span className={styles.coverFace}>{session.leadQuestion}</span>
+                  ) : null}
                 </span>
                 <span className={styles.tag} aria-hidden="true">{tagFor(session)}</span>
                 <span className={styles.coverMeta}>
