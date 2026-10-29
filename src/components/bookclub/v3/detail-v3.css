@@ -125,3 +125,28 @@
 .qv3-program-time { font-family: var(--qv-garamond); font-size: 14px; letter-spacing: .06em; color: var(--qv-gold-ink); }
 .qv3-program-title { font-size: 17px; font-weight: 600; color: var(--qv-navy); }
 .qv3-program-body { font-size: 14px; line-height: 1.8; color: var(--qv-ink-2); word-break: keep-all; }
+
+/* ── 약속한 날은 본인이 적는다 ────────────────────────────────
+   대출카드는 원래 빌린 사람이 직접 적는 카드다. 예약 카드에 날짜·시각을
+   본인이 적게 하면 결석이 18% 줄었다(J R Soc Med 2012). 비워 둬도
+   예약에는 지장이 없다 — 강제하면 마찰만 남는다. */
+.qv3-libcard-due {
+  /* 도장이 오른쪽 12px에 104px로 앉는다 — 그 아래로 글자가 들어가면 안 읽힌다 */
+  flex: 0 1 auto; min-width: 0; max-width: calc(100% - 130px);
+  padding: 0 0 2px;
+  background: none;
+  border: 0; border-bottom: 1px dashed #b6a98c;
+  border-radius: 0;
+  font-family: var(--qv-hand); font-size: 23px; line-height: 1.15;
+  color: var(--qv-royal);
+  transform: rotate(-0.8deg);
+}
+.qv3-libcard-due::placeholder { color: #b3a894; font-size: 20px; }
+.qv3-libcard-due:focus { outline: none; border-bottom-style: solid; border-bottom-color: var(--qv-royal); }
+
+/* 못 오게 됐을 때 가는 길 — 노쇼를 취소로 바꾸면 자리가 대기자에게 간다 */
+.qv3-done-cancel {
+  max-width: 30ch; text-align: center; line-height: 1.45; word-break: keep-all;
+  font-family: var(--qv-hand); font-style: normal; font-size: 21px;
+  color: #f0e4cf; text-decoration-color: rgba(240, 228, 207, 0.5);
+}
