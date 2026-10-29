@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { cardBlurb, getStatus } from "@/lib/bookclub/selectors";
 import { UPCOMING_BOOKS, UPCOMING_GENRES, type UpcomingBook } from "@/lib/bookclub/upcoming";
-import { INTEREST_CTA, interestCount, interestFace } from "@/lib/bookclub/interest";
+import { INTEREST_CTA_ACTION, INTEREST_CTA_HOOK, interestCount, interestFace } from "@/lib/bookclub/interest";
 import { DoodleFace, DoodleRule } from "@/components/common/Doodle";
 import InterestDialog from "./InterestDialog";
 import BookCoverImage from "./BookCoverImage";
@@ -95,8 +95,12 @@ export default function ReunionReads({
                 <BookCoverImage title={title} author={author} coverUrl={isPast ? item.session.coverUrl : undefined} isbn={isPast ? item.session.isbn : item.book.isbn} />
               </span>
               <span className={styles.coverMeta}>
-                <strong>{title}</strong>
-                <small>{isPast ? author : credit(item.book)}</small>
+                {/* 작가 — 제목 한 줄. 같은 크기·같은 굵기로 이어 읽힌다. */}
+                <span className={styles.coverLine}>
+                  <span className={styles.coverArtist}>{isPast ? author : credit(item.book)}</span>
+                  <span className={styles.coverSep}>—</span>
+                  <span className={styles.coverTitle}>{title}</span>
+                </span>
                 {!isPast && <small>{item.book.genre}</small>}
               </span>
             </>
@@ -126,7 +130,10 @@ export default function ReunionReads({
                         aria-label={`${title} 같이 읽어요`}
                       >
                         <DoodleFace kind={interestFace(n)} />
-                        <span className={styles.cardActionLabel}>{INTEREST_CTA}</span>
+                        <span className={styles.cardActionLabel}>
+                          <span className={styles.ctaHook}>{INTEREST_CTA_HOOK}</span>
+                          <span className={styles.ctaAction}>{INTEREST_CTA_ACTION}</span>
+                        </span>
                       </button>
                     </>
                   );
