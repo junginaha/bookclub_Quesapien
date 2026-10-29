@@ -218,7 +218,7 @@ export default function BookingSheet({
             {submitting ? "확인 중…" : left > 0 ? "예약 완료" : "대기 신청"}
           </button>
           {error && <p className="qv3-error" role="alert">{error}</p>}
-          <p className="qv3-sheet-foot">{fee > 0 ? "예약 후 결제로 이어져요 · 환불은 3일 전 전액, 전날까지 50%" : "못 오시게 되면 미리 알려주세요. 다음에 또 뵈어요"}</p>
+          <p className="qv3-sheet-foot">{fee > 0 ? "예약 후 결제로 이어져요. 못 오시게 되면 미리 알려주세요" : "못 오시게 되면 미리 알려주세요. 다음에 또 뵈어요"}</p>
           <button type="button" className="qv3-sheet-cancel" onClick={onClose}>조금 더 생각해볼게요</button>
         </form>
       )}
