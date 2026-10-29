@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { businessLines } from "@/lib/business";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import { buildMetadata } from "@/lib/metadata";
@@ -63,7 +64,11 @@ export default function TermsPage() {
           </div>
           <div>
             <h2 style={h2}>6. 운영자 정보 및 문의</h2>
-            <p>운영: 질문하는 사람들 · 대표 김정인<br />문의: <a href="mailto:junginaha@qsapiens.com">junginaha@qsapiens.com</a></p>
+            <p>
+              {businessLines().map((r, i) => (
+                <span key={r.label}>{i > 0 ? " · " : ""}{r.label} {r.value}</span>
+              ))}
+            </p>
           </div>
         </section>
       </main>

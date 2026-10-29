@@ -1965,3 +1965,14 @@ html:not([data-intro="pending"]) .lp-intro {
   margin: 12px 0 0;
   color: var(--lp-gold);
 }
+
+/* 사업자 정보 — 전자상거래법 제10조(초기화면 표시). 선으로만 구분하고 조용히 둔다. */
+.lp-foot-biz {
+  display: flex; flex-wrap: wrap; gap: 2px 14px;
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--lp-line, rgba(92, 78, 60, 0.18));
+  font-size: 11.5px; line-height: 1.9; color: var(--lp-muted, #857a6b);
+  word-break: keep-all;
+}
+.lp-foot-biz i { font-style: normal; opacity: 0.7; }
+.lp-foot-biz a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
