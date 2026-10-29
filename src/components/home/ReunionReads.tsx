@@ -98,7 +98,7 @@ export default function ReunionReads({
                 {/* 작가 — 제목 한 줄. 같은 크기·같은 굵기로 이어 읽힌다. */}
                 <span className={styles.coverLine}>
                   <span className={styles.coverArtist}>{isPast ? author : credit(item.book)}</span>
-                  <span className={styles.coverSep}>—</span>
+                  <span className={styles.coverSep}>{"\u00a0—"}</span>{" "}
                   <span className={styles.coverTitle}>{title}</span>
                 </span>
                 {!isPast && <small>{item.book.genre}</small>}

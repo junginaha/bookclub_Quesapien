@@ -496,7 +496,7 @@ a.bookLink > .cardActionStatic:global(.lp-hand) {
   letter-spacing: 0.01em;
   word-break: keep-all;
 }
-.coverSep { margin: 0 0.35em; color: #9c8f7c; }
+.coverSep { color: #9c8f7c; }
 .bookGrid .coverMeta { padding: 12px 0 0; gap: 1px; text-align: center; }
 .bookGrid .coverMeta small { color: #8c8175; font-size: 11.5px; line-height: 1.7; }
 .bookGrid .upcomingPitch { text-align: center; }
@@ -505,3 +505,29 @@ a.bookLink > .cardActionStatic:global(.lp-hand) {
 
 /* 꼬리표는 표지가 작아진 만큼 칸 모서리 기준으로 옮긴다 */
 .bookGrid .tag { top: 4px; right: 2px; }
+
+
+/* ── 프레임을 고르게 ──────────────────────────────────────────
+   `.bookGrid`가 `align-items: start`라 칸이 늘어나지 않았다. 제목이 두 줄로
+   접히는 칸만 길어져 같은 행에서 아래 선이 어긋났다(운영 화면에서 확인).
+   격자에서는 칸 높이가 곧 선이므로 늘려서 맞추고, 안쪽은 바닥 정렬한다. */
+.bookGrid { align-items: stretch; }
+.bookGrid > a.bookLink,
+.bookGrid > li.bookLink { display: flex; flex-direction: column; height: auto; }
+/* 말(CTA)은 늘 칸 바닥에 — 제목이 한 줄이든 두 줄이든 같은 자리에서 만난다 */
+.bookGrid > a.bookLink > .cardActionStatic { margin-top: auto; }
+.bookGrid > li.bookLink > .cardFoot { margin-top: auto; }
+/* 한 단어만 둘째 줄에 떨어지지 않게 두 줄 길이를 고르게 나눈다 */
+.coverLine { text-wrap: balance; }
+
+/* ── 디테일만 키치 ────────────────────────────────────────────
+   틀은 조용하게 두고, 글자에서만 활자 인쇄물의 버릇을 낸다. */
+/* 구분표는 활자 사이에 끼운 장식처럼 — 황동색, 조금 작게 */
+/* 줄바꿈은 구분표 "뒤"에서만 일어난다 — 앞에서 끊기면 줄머리에 작대기가 선다.
+   (em 대시는 UAX#14상 앞뒤 모두 끊을 수 있어서 마크업에서 막는다) */
+.coverSep { color: #b08a4a; font-size: 0.86em; vertical-align: 0.06em; }
+/* 날짜·장소는 입장권 활자 — 가라몬드 숫자에 자간을 벌린다 */
+.bookGrid .coverMeta small {
+  font-family: var(--font-eb-garamond), var(--font-noto-sans-kr), serif;
+  font-size: 12.5px; letter-spacing: 0.04em; font-variant-numeric: oldstyle-nums;
+}

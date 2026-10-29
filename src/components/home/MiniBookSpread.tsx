@@ -67,7 +67,7 @@ export default function MiniBookSpread({ sessions }: { sessions: BookClubSession
                       제목을 굵게 키우면 표지가 아니라 글자가 먼저 읽힌다. */}
                   <span className={styles.coverLine}>
                     <span className={styles.coverArtist}>{session.author}</span>
-                    <span className={styles.coverSep}>—</span>
+                    <span className={styles.coverSep}>{"\u00a0—"}</span>{" "}
                     <span className={styles.coverTitle}>{session.bookTitle}</span>
                   </span>
                   <small>
