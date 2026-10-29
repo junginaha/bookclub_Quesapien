@@ -1,5 +1,7 @@
 .section {
-  --tool-blue: #173b75;
+  /* 색은 책 표지에만 준다(운영자 2026-10-29). 글·선·손그림은 먹색 —
+     파랑이 섞이면 표지와 경쟁해서 표지가 묻힌다. */
+  --tool-blue: #2b2620;
   --tool-violet: #6c63d9;
   --tool-line: #d9d5cd;
   --tool-muted: #756c62;
@@ -385,11 +387,10 @@ li.bookLink > .cardFoot > button.cardAction:hover { background: #f7f2e9; border-
   /* 표지 밖으로 내밀면 오른쪽 칸에서 화면에 잘린다 — 모서리 안쪽에 끼운다. */
   position: absolute; top: 10px; right: 6px; z-index: 2;
   padding: 3px 10px 3px 16px;
-  background: #f6efe1; border: 1px solid #c9bba3; border-right-width: 0;
-  font: 600 11px/1.6 var(--font-noto-sans-kr), sans-serif;
-  color: #5e4632; letter-spacing: 0.02em; white-space: nowrap;
+  background: none; border: 1px solid #b9ae9b; border-right-width: 0;
+  font: 500 11px/1.6 var(--font-noto-sans-kr), sans-serif;
+  color: #5a5248; letter-spacing: 0.02em; white-space: nowrap;
   transform: rotate(2deg); transform-origin: right center;
-  box-shadow: 0 2px 6px -3px rgba(72, 52, 34, 0.5);
   clip-path: polygon(9px 0, 100% 0, 100% 100%, 9px 100%, 0 50%);
   pointer-events: none;
 }
@@ -397,7 +398,7 @@ li.bookLink > .cardFoot > button.cardAction:hover { background: #f7f2e9; border-
 .tag::before {
   content: ""; position: absolute; left: 7px; top: 50%; transform: translateY(-50%);
   width: 4px; height: 4px; border-radius: 50%;
-  background: #fffdf7; box-shadow: inset 0 0 0 1px #bba98c;
+  background: none; box-shadow: inset 0 0 0 1px #b9ae9b;
 }
 a.bookLink { position: relative; }
 .encoreCoverLink { position: relative; }
@@ -527,7 +528,7 @@ a.bookLink > .cardActionStatic:global(.lp-hand) {
 /* 구분표는 활자 사이에 끼운 장식처럼 — 황동색, 조금 작게 */
 /* 줄바꿈은 구분표 "뒤"에서만 일어난다 — 앞에서 끊기면 줄머리에 작대기가 선다.
    (em 대시는 UAX#14상 앞뒤 모두 끊을 수 있어서 마크업에서 막는다) */
-.coverSep { color: #b08a4a; font-size: 0.86em; vertical-align: 0.06em; }
+.coverSep { color: #a2978a; font-size: 0.86em; vertical-align: 0.06em; }
 /* 날짜·장소는 입장권 활자 — 가라몬드 숫자에 자간을 벌린다 */
 .bookGrid .coverMeta small {
   font-family: var(--font-eb-garamond), var(--font-noto-sans-kr), serif;
@@ -550,8 +551,9 @@ a.bookLink > .cardActionStatic:global(.lp-hand) {
   z-index: 3;
   display: flex; align-items: center; justify-content: center;
   padding: 20px 18px;
-  background: #2f2721;
-  color: #f2e9d8;
+  /* 색면으로 칸을 덮으면 그게 제일 센 색이 된다 — 종이는 그대로 두고 글만 올린다 */
+  background: var(--tool-paper, #f4efe5);
+  color: #2b2620;
   font: 400 clamp(14px, 1.45vw, 17px)/1.65 var(--font-noto-serif-kr), serif;
   text-align: center; word-break: keep-all; overflow: hidden;
   opacity: 0; pointer-events: none;
@@ -561,7 +563,7 @@ a.bookLink > .cardActionStatic:global(.lp-hand) {
 .coverFace::before {
   content: "\201C";
   position: absolute; left: 12px; top: 2px;
-  color: #b08a4a; font: italic 400 34px/1 var(--font-eb-garamond), serif;
+  color: #a89b86; font: italic 400 34px/1 var(--font-eb-garamond), serif;
 }
 /* 마우스가 있는 기기에서만. 손가락으로는 호버가 없고, 탭은 링크가 받는다. */
 @media (hover: hover) and (pointer: fine) {
@@ -581,4 +583,33 @@ a.bookLink > .cardActionStatic:global(.lp-hand) {
    실제 DOM의 id와 안 맞아 규칙이 죽는다(4열로 그대로 떴다). */
 @media (min-width: 1280px) {
   :global(#books) .bookGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+
+/* ── 책에서 자란 얼굴들 ───────────────────────────────────────
+   레퍼런스가 구독 폼 옆에 손그림을 **크게** 둔다. 배지가 아니라 그 자리의
+   주인공이다. 우리도 같은 자리에 둔다 — 격자 밖, 폼 옆.
+   행렬은 흐트러지면 안 되므로 **칸을 명시**한다: 글은 1열, 그림과 폼은 2열. */
+.upcomingRecommend > div:first-child { grid-column: 1; grid-row: 1; }
+.recommendBloom { grid-column: 2; grid-row: 1; }
+.upcomingRecommend .recommendPanel { grid-column: 2; grid-row: 2; }
+
+.recommendBloom {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  justify-self: center;
+  color: #4a4338;
+  opacity: 0.92;
+}
+/* 폼이 펼쳐지면 그림은 자리를 조금 양보한다 — 사라지지는 않는다 */
+.recommendOpen .recommendBloom { max-width: 208px; }
+
+@media (max-width: 720px) {
+  /* 한 칸으로 접히면 칸 지정은 의미가 없다 — 순서대로 쌓이게 되돌린다 */
+  .upcomingRecommend > div:first-child,
+  .recommendBloom,
+  .upcomingRecommend .recommendPanel { grid-column: auto; grid-row: auto; }
+  .recommendBloom { max-width: 232px; margin: 4px auto 0; }
+  .recommendOpen .recommendBloom { max-width: 176px; }
 }
