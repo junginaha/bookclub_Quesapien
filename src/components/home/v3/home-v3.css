@@ -272,3 +272,79 @@ a.qv3-card:hover { transform: translateY(-2px) rotate(-0.15deg); box-shadow: 0 2
 @media (prefers-reduced-motion: reduce) {
   .qv3 * { transition: none !important; }
 }
+
+/* ── 코뮌 인터랙션 (chosecommune.com 이식) ─────────────────────────
+   레퍼런스를 열어 테마 CSS 271줄을 전부 읽었다. 이 사이트의 "인터랙티브"는
+   더해서 만든 것이 아니라 **덜어내서 남은 것**이었다. 스크롤 애니메이션도,
+   커서 효과도, 등장 효과도 하나도 없다. 실제로 움직이는 건 네 가지뿐이다.
+
+     1) 셀이 헤어라인으로 맞붙은 그리드 — 간격·그림자·둥근 모서리 없음
+     2) 호버 라벨이 0.5초 **기다렸다가** 뜬다(유일한 진짜 인터랙션)
+     3) 이미지는 opacity 100ms로만 들어온다
+     4) 리듬은 모션이 아니라 꽉 찬 셀과 여백 있는 셀의 교차에서 나온다
+
+   손글씨·손그림은 그대로 두고 장식만 덜어낸다 — "그럼에도 불구하고 미니멀". */
+
+/* 1) 헤어라인 그리드 — 카드가 떠 있지 않고 지면에 맞물린다. */
+.qv3-grid {
+  gap: 0;
+  border-top: 1px solid var(--qv-line);
+  border-left: 1px solid var(--qv-line);
+}
+.qv3-grid > .qv3-card {
+  border: 0;
+  border-right: 1px solid var(--qv-line);
+  border-bottom: 1px solid var(--qv-line);
+  border-radius: 0;
+  box-shadow: none;
+  background-image: none;
+  transition: background-color 0.1s;
+}
+/* 점선 자국과 천공 구멍은 여기서 걷는다 — 그리드 자체가 이미 선을 갖고 있다. */
+.qv3-grid > .qv3-card::before,
+.qv3-grid > .qv3-card::after { content: none; }
+/* 들리지도 기울지도 않는다. 종이색만 아주 조금 바뀐다. */
+a.qv3-card:hover { transform: none; box-shadow: none; }
+.qv3-grid > a.qv3-card:hover { background-color: var(--qv-paper-2); }
+.qv3-grid > .qv3-card .qv3-cover { transform: none; box-shadow: none; border-radius: 0; }
+
+/* 4) 네 칸에 한 번은 표지를 크게 세운다 — 리듬은 모션이 아니라 여기서 나온다.
+   레퍼런스는 사진이라 셀을 꽉 채웠지만, 책 표지는 세로라 가로로 자르면 제목이
+   잘린다. 그래서 '꽉 채우기' 대신 '크게 놓기'로 옮긴다 — 대비는 그대로다. */
+.qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-card-top {
+  flex-direction: column; align-items: center; gap: 16px; padding-top: 2px;
+}
+.qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-cover {
+  flex: none; width: 132px; height: 190px;
+}
+.qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-card-body { align-self: stretch; }
+
+/* 2) 0.5초 기다렸다 뜨는 라벨. 사라질 때는 기다리지 않는다(레퍼런스와 같다). */
+[data-title] { position: relative; }
+/* 표지는 overflow: hidden이라 그대로 두면 라벨이 잘린다(처음에 잘려서 안 보였다).
+   자식이 정확히 100%라 visible로 열어도 그림이 삐져나오지 않는다. */
+.qv3-cover[data-title] { overflow: visible; }
+[data-title]::after {
+  content: attr(data-title);
+  position: absolute; left: 0; bottom: -1.9em; z-index: 5;
+  padding: 2px 7px; white-space: nowrap;
+  font-family: var(--qv-garamond); font-size: 12px; letter-spacing: 0.06em;
+  color: var(--qv-paper); background: var(--qv-navy);
+  opacity: 0; visibility: hidden; pointer-events: none;
+}
+[data-title]:hover::after,
+[data-title]:focus-visible::after {
+  opacity: 1; visibility: visible;
+  transition: opacity 0.1s 0.5s, visibility 0s 0.5s;
+}
+
+/* 3) 표지는 뜨는 것도 커지는 것도 아니고, 그냥 100ms 동안 나타난다.
+   레퍼런스는 JS로 .loaded 클래스를 붙이지만 그 방식은 **캐시된 이미지에서
+   onLoad가 안 떠 표지가 영영 투명해진다**(실제로 겪었다). 애니메이션은
+   요소가 그려질 때 한 번 돌고 1에서 끝나므로 안 보이는 상태로 멈출 수 없다. */
+.qv3-cover img { animation: qv3-cover-in 100ms ease-out both; }
+@keyframes qv3-cover-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .qv3-cover img { animation: none; }
+  [data-title]:hover::after { transition: none; }
+}
