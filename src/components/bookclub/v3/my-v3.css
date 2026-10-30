@@ -22,3 +22,12 @@
 @media (min-width: 720px) {
   .qv3-my-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* 참여비 결제 — 예약 완료 화면을 닫은 사람이 여기서 결제를 마칠 수 있다.
+   돈이 오가는 자리라 키치를 쓰지 않는다(2026-10-28 결정: 결제 화면은 차분하게). */
+.qv3-my-pay { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+/* `.qv3 button { color: inherit }`(0,1,1)가 맨 클래스를 이긴다 — 글자색을 주려면
+   선택자를 한 칸 올려야 한다(2026-10-29에도 같은 곳에 걸렸다). */
+.qv3 .qv3-my-pay-btn { background: var(--qv-cta); border-color: var(--qv-cta); color: #fff9ef; min-height: 48px; }
+.qv3 .qv3-my-pay-btn:hover { background: var(--qv-cta-deep); border-color: var(--qv-cta-deep); color: #fff9ef; }
+.qv3-my-pay-note { font-size: 12.5px; line-height: 1.5; color: var(--qv-muted); margin: 0; }

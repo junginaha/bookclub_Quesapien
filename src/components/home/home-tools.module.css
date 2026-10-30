@@ -325,7 +325,7 @@ div.upcomingFilters > button.upcomingFilterActive, .upcomingFilterActive { backg
 .encoreCoverLink:hover .coverVisual { transform: translateY(-4px); }
 
 /* 카드형 목록(오픈 예정·앵콜) — 버튼을 카드 바닥에 맞춰 줄을 가지런히 */
-li.bookLink { display: flex; flex-direction: column; height: 100%; }
+li.bookLink { display: flex; flex-direction: column; height: 100%; position: relative; }
 li.bookLink > .cardAction { margin-top: auto; }
 /* 홈 .lp button 리셋(landing.css)보다 우선하도록 li.bookLink > button 으로 한정 */
 li.bookLink > button.cardAction, .cardAction {

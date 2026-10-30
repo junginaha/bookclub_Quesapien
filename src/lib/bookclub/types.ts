@@ -27,6 +27,8 @@ export interface BookClubSession {
   reserved: number; // 렌더 시점에 getJoinedCounts()로 덮어써진다 — 정적 값 아님
   fee: number; // 원 단위. 0이면 무료(단, feeLabelOverride가 있으면 해당 문구 우선)
   feeLabelOverride?: string; // 금액 미확정/별도 안내 등 운영 문구
+  /** 연속 기획(예: "talks-2026") 표시. 홈에서 단발 모임과 나눠 보여줄 때만 쓴다. */
+  series?: string;
   registrationClosed?: boolean; // 일정은 예정이지만 일반 참여 신청을 닫은 경우
   leadQuestion: string; // 히어로·카드에 노출할 대표 발제. 없으면 빈 문자열(화면에서 숨김)
   summary: string;

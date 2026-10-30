@@ -311,6 +311,12 @@
   font-family: var(--qz-serif-ko); font-size: 15.5px;
   line-height: 1.4; color: var(--qz-ink);
 }
+/* 지은이·상태 — 제목 아래 한 줄. 어떤 책인지, 지금 갈 수 있는 모임인지 알려준다. */
+.qzr-rec-sub {
+  display: block; margin-top: 3px;
+  font-size: 12.5px; line-height: 1.5; color: var(--qz-muted);
+  word-break: keep-all;
+}
 
 .qzr-ctas {
   display: flex; flex-direction: column; align-items: center;

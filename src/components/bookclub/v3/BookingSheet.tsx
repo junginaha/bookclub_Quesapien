@@ -8,6 +8,7 @@ import { seatsLeft } from "@/lib/bookclub/types";
 import { dateKey, feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, seatNotice, seatKind } from "@/lib/bookclub/selectors";
 import { applyToBookClub } from "@/lib/actions/bookclub";
 import { consentRecord } from "@/lib/bookclub/terms";
+import { PAYAPP_SCRIPT, startPayment } from "@/lib/bookclub/pay";
 import type { Viewer } from "@/lib/viewer";
 import { DoodleFace } from "@/components/common/Doodle";
 
@@ -16,16 +17,6 @@ import { DoodleFace } from "@/components/common/Doodle";
  * 이름·전화는 프로필에서 가져와 미리 채운다. 비어 있으면 그때만 묻는다.
  * 완료 화면은 풀스크린 테라코타 — "다정함"의 핵심 장면.
  */
-
-declare global {
-  interface Window {
-    PayApp?: {
-      setDefault: (key: string, value: string) => void;
-      setParam: (key: string, value: string) => void;
-      payrequest: () => void;
-    };
-  }
-}
 
 type Done = { kind: "confirmed" | "just_filled_waitlisted" | "duplicate" };
 
@@ -106,27 +97,7 @@ export default function BookingSheet({
   }
 
   function pay() {
-    if (!window.PayApp || fee <= 0) return;
-    window.PayApp.setDefault("userid", "onedaybooks");
-    window.PayApp.setDefault("shopname", "질문하는 사람들");
-    window.PayApp.setParam("goodname", session.title);
-    window.PayApp.setParam("price", String(fee));
-    window.PayApp.setParam("recvphone", phone.replace(/\D/g, ""));
-    window.PayApp.setParam("memo", "북클럽 참여비");
-    window.PayApp.setParam("var1", session.slug);
-    // var2 = 신청을 특정하는 값. bookclub_applications는 (club_slug, phone)으로 한 줄이
-    // 정해지므로 둘을 var1·var2로 보내면 통보가 어느 신청인지 알 수 있다.
-    // recvphone으로 이미 같은 번호가 PayApp에 가므로 새로 나가는 정보는 없다.
-    window.PayApp.setParam("var2", phone.replace(/\D/g, ""));
-    // 결제 결과 통보를 받을 주소 — 이게 없으면 결제 사실이 어디에도 기록되지 않는다.
-    window.PayApp.setParam("feedbackurl", `${window.location.origin}/api/payapp/feedback`);
-    // 통보가 실패하면 다시 보내달라(최대 10회).
-    window.PayApp.setParam("checkretry", "y");
-    window.PayApp.setParam("smsuse", "n");
-    window.PayApp.setParam("redirectpay", "1");
-    window.PayApp.setParam("skip_cstpage", "y");
-    window.PayApp.setParam("openpaytype", "card,kakaopay,naverpay,tosspay,applepay,rbank");
-    window.PayApp.payrequest();
+    startPayment(session, phone);
   }
 
   const when = `${formatMonthDay(session.startsAt)} ${formatWeekdayFull(session.startsAt)}`;
@@ -198,14 +169,14 @@ export default function BookingSheet({
             </div>
           </div>
           <div className="qv3-done-actions">
-            {fee > 0 && done.kind === "confirmed" && (
+            {fee > 0 && done.kind !== "just_filled_waitlisted" && (
               <>
-                <Script src="https://lite.payapp.kr/public/api/v2/payapp-lite.js" strategy="afterInteractive" />
+                <Script src={PAYAPP_SCRIPT} strategy="afterInteractive" />
                 <button type="button" className="qv3-done-primary" onClick={pay}>참여비 {fee.toLocaleString("ko-KR")}원 결제하기</button>
                 <small className="qv3-done-note">카드 · 카카오페이 · 네이버페이 · 토스페이 · 애플페이 · 계좌이체 · 결제 전까지 자리는 임시로 잡아둬요</small>
               </>
             )}
-            {fee <= 0 || done.kind !== "confirmed" ? (
+            {fee <= 0 || done.kind === "just_filled_waitlisted" ? (
               <a className="qv3-done-primary" href={icsFor(session)} download={`${session.slug}.ics`}>캘린더에 추가</a>
             ) : (
               <a className="qv3-done-secondary" href={icsFor(session)} download={`${session.slug}.ics`}>캘린더에 추가</a>

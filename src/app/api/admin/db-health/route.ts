@@ -32,6 +32,9 @@ const FUNCTIONS: { name: string; why: string; migration: string; legacy?: boolea
   { name: "reserve_book_club_spot", why: "구 북클럽 예약 — 현재 코드에서 쓰지 않음", migration: "020", legacy: true },
 ];
 
+// 026이 bookclub_applications에 넣은 결제 기록 칸.
+const PAYMENT_COLUMNS = ["paid_at", "payment_ref", "payment_state"];
+
 // 025가 profiles에 넣은 컬럼들 — 온보딩이 여기에 걸린 적이 있다.
 const PROFILE_COLUMNS = ["nickname", "phone", "home_region", "is_operator", "onboarding_completed_at"];
 
@@ -98,11 +101,24 @@ export async function GET() {
     .select(PROFILE_COLUMNS.join(","), { count: "exact", head: true })
     .limit(1);
 
+  // 026 — 결제 기록 칸. 이게 없으면 PayApp 통보가 와도 적을 자리가 없다.
+  const { error: payColError } = await db
+    .from("bookclub_applications")
+    .select(PAYMENT_COLUMNS.join(","), { count: "exact", head: true })
+    .limit(1);
+
+  // PayApp 연동 키 — **값은 절대 내보내지 않는다.** 설정됐는지 여부만 본다.
+  // 하나라도 비어 있으면 통보를 검증할 수 없어 결제가 기록되지 않는다.
+  const payEnv = ["PAYAPP_USERID", "PAYAPP_LINKKEY", "PAYAPP_LINKVAL", "PAYAPP_PAY_KEY"]
+    .map((k) => ({ 이름: k, 설정됨: Boolean(process.env[k]?.trim()) }));
+  const payEnvMissing = payEnv.filter((e) => !e.설정됨).map((e) => e.이름);
+
   // 화면이 실제로 쓰는 것만 "빠진것"에 넣는다 — 레거시가 섞이면 점검이 양치기 소년이 된다.
   const missing = [
     ...tables.filter((t) => !t.있음 && !t.레거시).map((t) => `${t.이름} (${t.마이그레이션})`),
     ...functions.filter((f) => f.있음 === false && !f.레거시).map((f) => `${f.이름}() (${f.마이그레이션})`),
     ...(profileError ? [`profiles 컬럼 (025) — ${profileError.message}`] : []),
+    ...(payColError ? [`bookclub_applications 결제 컬럼 (026) — ${payColError.message}`] : []),
   ];
 
   return NextResponse.json({
@@ -116,6 +132,17 @@ export async function GET() {
     테이블: tables,
     함수: functions,
     프로필컬럼: { 확인한컬럼: PROFILE_COLUMNS, 있음: !profileError, 오류: profileError?.message ?? null },
+    결제: {
+      기록칸_026: { 확인한컬럼: PAYMENT_COLUMNS, 있음: !payColError, 오류: payColError?.message ?? null },
+      // 값은 내보내지 않는다 — 설정 여부만.
+      연동키: payEnv,
+      결제기록_가능:
+        !payColError && payEnvMissing.length === 0
+          ? "예 — 결제 통보가 오면 기록됩니다."
+          : payColError
+            ? "아니오 — 026을 적용해야 기록할 칸이 생깁니다."
+            : `아니오 — 환경변수가 비어 있습니다: ${payEnvMissing.join(", ")}`,
+    },
     레거시로_빠진것: [
       ...tables.filter((t) => !t.있음 && t.레거시).map((t) => t.이름),
       ...functions.filter((f) => f.있음 === false && f.레거시).map((f) => `${f.이름}()`),

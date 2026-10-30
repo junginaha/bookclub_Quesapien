@@ -33,6 +33,9 @@ export const metadata: Metadata = {
   title: { default: "질문하는 사람들 — 미래혁신형 북클럽", template: "%s | 질문하는 사람들" },
   description: "질문하는 사람들은 질문을 중심으로 사람과 책을 연결하는 오프라인 북토크 커뮤니티입니다. 서초구 선정 미래혁신형 북클럽. 질문 → 책 → 대화 → 사람 → 성장.",
   authors: [{ name: "질문하는 사람들" }],
+  // iOS가 사업자등록번호(561-40-01548)를 전화번호로, 이메일을 주소로 자동 인식해
+  // 링크·밑줄을 입히고 있었다 — 법정 기재사항이 화면에서 제일 튀는 요소가 됐다.
+  formatDetection: { telephone: false, email: false, address: false },
   creator: "질문하는 사람들", publisher: "질문하는 사람들", category: "education",
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large", "max-video-preview": -1 } },
   openGraph: { title: "질문하는 사람들 — 미래혁신형 북클럽", description: "질문하는 사람들은 질문을 중심으로 사람과 책을 연결하는 오프라인 북토크 커뮤니티입니다.", type: "website", locale: "ko_KR", siteName: "질문하는 사람들", url: SITE_URL },

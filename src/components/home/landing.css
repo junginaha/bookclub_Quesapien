@@ -1979,6 +1979,8 @@ html:not([data-intro="pending"]) .lp-intro {
 }
 .lp-foot-biz i { font-style: normal; opacity: 0.7; }
 .lp-foot-biz a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+/* 사업자 정보는 링크 줄 아래에 한 단 더 조용히 — 선은 위 줄이 이미 그었다. */
+.lp-foot-biz-info { margin-top: 2px; color: var(--lp-muted, #857a6b); }
 
 /* ── 손가락이 닿는 넓이 (홈 히어로) ─────────────────────────────
    실측(390px, 터치 에뮬레이션): "북클럽 둘러보기" 25px, "처음 온 당신에게" 25px.

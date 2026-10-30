@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { cardBlurb, getStatus } from "@/lib/bookclub/selectors";
@@ -14,8 +14,9 @@ import styles from "./home-tools.module.css";
 import "@/components/bookclub/bookclub.css";
 
 /**
- * 우리 다시 만나요 — 지난 북클럽(앵콜) + 회원이 추천한 다음 책(오픈 예정)을 한 섹션으로.
- * 지난 모임은 날짜를 노출하지 않는다(운영자 지시). 어느 책이든 5명이 모이면 북클럽을 연다.
+ * 우리 다시 만나요 — 지난 북클럽(앵콜) + 아직 일정이 없는 후보 도서.
+ * 달이 정해진 2026~2027 북토크는 실제 모임이 되어 MiniBookSpread가 맡는다.
+ * 지난 모임은 날짜를 노출하지 않는다(운영자 지시).
  */
 type Item =
   | { kind: "past"; key: string; session: BookClubSession }
@@ -31,6 +32,7 @@ export default function ReunionReads({
   sessions: BookClubSession[];
   counts?: Record<string, number>;
 }) {
+  const sectionRef = useRef<HTMLElement>(null);
   const [filter, setFilter] = useState<Filter>("전체");
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [liveCounts, setLiveCounts] = useState<Record<string, number>>({});
@@ -42,7 +44,7 @@ export default function ReunionReads({
     const key = decodeURIComponent(window.location.hash.replace(/^#/, ""));
     if (!key) return;
     const el = document.getElementById(key);
-    if (!el) return;
+    if (!el || !sectionRef.current?.contains(el)) return;
     setFilter("전체"); // 장르 필터가 걸려 있으면 그 카드가 숨어 있다
     setSpot(key);
     // 위쪽 표지들이 늦게 로드되면 높이가 바뀌어 카드를 지나친다(실측 591px).
@@ -79,7 +81,7 @@ export default function ReunionReads({
     filter === "전체" ? [...past, ...next] : next.filter((i) => i.kind === "next" && i.book.genre === filter);
 
   return (
-    <section className={styles.section} id="encore" aria-labelledby="encore-title">
+    <section ref={sectionRef} className={styles.section} id="encore" aria-labelledby="encore-title">
       {/* 공지·llms.txt에 나간 #upcoming 링크를 살리기 위한 앵커 */}
       <span id="upcoming" aria-hidden="true" />
       <div className={styles.sectionHead}>
@@ -147,6 +149,7 @@ export default function ReunionReads({
               <div className={styles.cardFoot}>
                 {(() => {
                   const n = liveCounts[item.key] ?? counts[item.key] ?? 0;
+                  const cta = { hook: INTEREST_CTA_HOOK, action: INTEREST_CTA_ACTION };
                   const tally = interestCount(n);
                   return (
                     <>
@@ -155,12 +158,12 @@ export default function ReunionReads({
                         type="button"
                         className={`${styles.cardAction} lp-hand lp-hand--sm`}
                         onClick={() => setOpenKey(item.key)}
-                        aria-label={`${title} 같이 읽어요`}
+                        aria-label={`${title} ${cta.action}`}
                       >
                         <DoodleFace kind={interestFace(n)} />
                         <span className={styles.cardActionLabel}>
-                          <span className={styles.ctaHook}>{INTEREST_CTA_HOOK}</span>
-                          <span className={styles.ctaAction}>{INTEREST_CTA_ACTION}</span>
+                          <span className={styles.ctaHook}>{cta.hook}</span>
+                          <span className={styles.ctaAction}>{cta.action}</span>
                         </span>
                       </button>
                     </>
