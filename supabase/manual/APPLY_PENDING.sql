@@ -1,11 +1,11 @@
 -- 운영 DB에 빠진 것을 한 번에 적용하는 묶음 파일 (2026-10-28).
 --
 -- 마이그레이션 워크플로가 2026-08-02 이후 한 번도 성공하지 못해(저장소 시크릿
--- SUPABASE_ACCESS_TOKEN이 비어 있음) 021·023·024가 운영 DB에 적용되지 않았을 수 있다.
+-- SUPABASE_ACCESS_TOKEN이 비어 있음) 021·023·024·026이 운영 DB에 적용되지 않았을 수 있다.
 -- /api/admin/db-health 가 '빠진것'을 보고하면, 이 파일 전체를 Supabase 대시보드
 -- SQL 에디터에 붙여넣고 한 번 실행하면 된다.
 --
--- 세 파일 모두 재실행해도 안전하게(IF NOT EXISTS / CREATE OR REPLACE) 작성돼 있어,
+-- 네 파일 모두 재실행해도 안전하게(IF NOT EXISTS / CREATE OR REPLACE) 작성돼 있어,
 -- 이미 적용된 항목이 섞여 있어도 그대로 실행하면 된다.
 -- 원본은 supabase/migrations/ 아래 같은 번호의 파일이며, 이 파일은 그 복사본이다.
 
@@ -324,5 +324,30 @@ CREATE OR REPLACE VIEW public.reading_journey_interest_counts AS
   FROM public.reading_journey_interests
   WHERE status <> 'canceled'
   GROUP BY journey_slug, kind;
+
+notify pgrst, 'reload schema';
+
+-- ======================================================================
+-- 026_bookclub_payment.sql — 유료 모임 결제 확인 기록 (2026-10-30 추가)
+-- ======================================================================
+
+ALTER TABLE public.bookclub_applications
+  -- 결제 완료 시각. NULL이면 아직 확인되지 않은 것(무료 모임도 NULL).
+  ADD COLUMN IF NOT EXISTS paid_at      TIMESTAMPTZ,
+  -- PayApp 결제요청번호(mul_no) — 취소·대사(對査)에 쓴다. 중복 통보 방지용 키이기도 하다.
+  ADD COLUMN IF NOT EXISTS payment_ref  TEXT,
+  -- PayApp pay_state 원값(4 결제완료 / 9·64 승인취소 / 10 입금대기 등)을 그대로 남긴다.
+  -- 뜻을 해석해 저장하면 나중에 PayApp이 값을 늘렸을 때 사실이 뭉개진다.
+  ADD COLUMN IF NOT EXISTS payment_state TEXT;
+
+-- 같은 mul_no로 두 번 통보가 와도 한 줄만 갱신되도록(PayApp은 재시도한다).
+CREATE INDEX IF NOT EXISTS bookclub_applications_payment_ref_idx
+  ON public.bookclub_applications (payment_ref)
+  WHERE payment_ref IS NOT NULL;
+
+-- 결제 확인된 신청만 빠르게 세기 위한 보조 인덱스.
+CREATE INDEX IF NOT EXISTS bookclub_applications_paid_idx
+  ON public.bookclub_applications (club_slug, paid_at)
+  WHERE paid_at IS NOT NULL;
 
 notify pgrst, 'reload schema';

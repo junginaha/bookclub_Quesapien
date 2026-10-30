@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { cardBlurb, getStatus } from "@/lib/bookclub/selectors";
@@ -35,6 +35,31 @@ export default function ReunionReads({
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [liveCounts, setLiveCounts] = useState<Record<string, number>>({});
   const [recOpen, setRecOpen] = useState(false);
+  // 검색 결과에서 `/#next-xxx`로 들어오면 그 책 카드로 데려간다.
+  // 카드는 하이드레이션 뒤에 그려지므로 브라우저 기본 앵커 이동은 빈 화면을 잡는다.
+  const [spot, setSpot] = useState<string | null>(null);
+  useEffect(() => {
+    const key = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+    if (!key) return;
+    const el = document.getElementById(key);
+    if (!el) return;
+    setFilter("전체"); // 장르 필터가 걸려 있으면 그 카드가 숨어 있다
+    setSpot(key);
+    // 위쪽 표지들이 늦게 로드되면 높이가 바뀌어 카드를 지나친다(실측 591px).
+    // 자리가 잡힐 때까지 몇 번 더 맞춘다 — 이미 보이면 건너뛴다.
+    const timers = [0, 350, 900, 1600].map((d) =>
+      setTimeout(() => {
+        const node = document.getElementById(key);
+        if (!node) return;
+        const box = node.getBoundingClientRect();
+        const centered = box.top > 40 && box.bottom < window.innerHeight - 40;
+        if (!centered) node.scrollIntoView({ block: "center", behavior: d === 0 ? "auto" : "smooth" });
+      }, d)
+    );
+    // 잠깐만 표시하고 지운다 — 계속 켜두면 그게 영구 상태처럼 보인다
+    timers.push(setTimeout(() => setSpot(null), 3200));
+    return () => timers.forEach(clearTimeout);
+  }, []);
 
   // 지난 모임 — 같은 책은 가장 최근 회차 하나만
   const seen = new Set<string>();
@@ -109,7 +134,7 @@ export default function ReunionReads({
             </>
           );
           return (
-            <li key={item.key} className={styles.bookLink}>
+            <li key={item.key} id={item.key} className={`${styles.bookLink}${spot === item.key ? ` ${styles.spotlit}` : ""}`}>
               {isPast ? (
                 <Link href={"/bookclub/" + item.session.slug} className={styles.encoreCoverLink} aria-label={`${title} 북클럽 보기`}>
                   {cover}

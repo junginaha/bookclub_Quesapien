@@ -4,6 +4,8 @@
  * Structured data helps AI crawlers understand page context.
  */
 
+import { BUSINESS } from "@/lib/business";
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 const ORG_NAME = "질문하는 사람들";
 
@@ -40,7 +42,17 @@ export function orgSchema() {
     description:
       "질문하는 사람들은 질문을 중심으로 사람과 책을 연결하는 오프라인 북토크 커뮤니티입니다. 서초구 선정 미래혁신형 북클럽.",
     foundingDate: "2025",
-    areaServed: { "@type": "Country", name: "대한민국" },
+    // 사업자등록번호 — 검색·AI가 이 단체를 실재하는 사업자로 식별하는 근거.
+    // 값은 src/lib/business.ts 한 곳에서만 관리한다(전자상거래법 제10조 표기와 같은 출처).
+    ...(BUSINESS.registrationNo
+      ? { identifier: { "@type": "PropertyValue", name: "사업자등록번호", value: BUSINESS.registrationNo } }
+      : {}),
+    // 오프라인 모임이 실제로 열리는 지역. "대한민국"만 적으면 지역 검색에서 신호가 되지 않는다.
+    areaServed: [
+      { "@type": "AdministrativeArea", name: "서울특별시 서초구" },
+      { "@type": "AdministrativeArea", name: "서울특별시 강남구" },
+      { "@type": "City", name: "서울특별시" },
+    ],
     sameAs: SAME_AS,
     knowsAbout: [
       "독서모임",

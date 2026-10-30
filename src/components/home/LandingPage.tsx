@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import SearchPalette from "@/components/common/SearchPalette";
+import { DoodleMenu } from "@/components/common/Doodle";
 import { businessLines } from "@/lib/business";
 import { ChevronDown } from "lucide-react";
 import type { BookClubSession } from "@/lib/bookclub/types";
@@ -27,7 +29,18 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
   const [navBtnIdx, setNavBtnIdx] = useState(0);
   const [navBtnFading, setNavBtnFading] = useState(false);
   const [howToOpen, setHowToOpen] = useState(false);
+  // 모바일 메뉴 — .lp-nav-links는 760px 아래에서 숨는데(landing.css) 대체 수단이
+  // 아예 없었다. 즉 휴대폰으로 홈에 온 사람은 질문·북클럽·아카이빙으로 가는 길이
+  // 머리글에 하나도 없었다. 레퍼런스처럼 햄버거 하나로 받는다. 프레임은 그대로.
+  const [navOpen, setNavOpen] = useState(false);
   const guide = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    if (!navOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setNavOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [navOpen]);
 
   useEffect(() => {
     let transition: ReturnType<typeof setTimeout> | undefined;
@@ -100,6 +113,18 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
           <a href="/archive">아카이빙</a>
           {GIANTS_ENABLED && <a href="/giants">거인의 어깨</a>}
         </div>
+        {/* 검색 — .lp-nav-links 안에 두면 760px 아래에서 같이 숨는다(landing.css). 밖에 둔다. */}
+        <SearchPalette variant="icon" triggerClassName="lp-nav-search" size={21} />
+        <button
+          type="button"
+          className="lp-nav-menu"
+          aria-label={navOpen ? "메뉴 닫기" : "메뉴 열기"}
+          aria-expanded={navOpen}
+          aria-controls="lp-nav-panel"
+          onClick={() => setNavOpen((v) => !v)}
+        >
+          <span style={{ width: 22, height: 22, display: "inline-flex" }}><DoodleMenu open={navOpen} /></span>
+        </button>
         <div style={{ position: "relative", width: 100, height: 40, overflow: "visible" }}>
           {[
             { href: "/login", label: "로그인", filled: false },
@@ -123,6 +148,13 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
               <span>{btn.label}</span>
             </a>
           ))}
+        </div>
+        <div id="lp-nav-panel" className="lp-nav-panel" hidden={!navOpen}>
+          <a href="/bookclub" onClick={() => setNavOpen(false)}>북클럽</a>
+          <a href="/questions" onClick={() => setNavOpen(false)}>질문</a>
+          <a href="/archive" onClick={() => setNavOpen(false)}>아카이빙</a>
+          <a href="/guide" onClick={() => setNavOpen(false)}>처음 오시는 분께</a>
+          <a href="/mypage" onClick={() => setNavOpen(false)}>내 북클럽</a>
         </div>
       </nav>
       <main>
@@ -184,6 +216,7 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
           {businessLines().map((r) => (
             <span key={r.label}><i>{r.label}</i> {r.value}</span>
           ))}
+          <span><Link href="/guide">처음 오시는 분께</Link></span>
           <span><Link href="/terms">이용약관</Link></span>
           <span><Link href="/privacy">개인정보처리방침</Link></span>
         </div>
@@ -192,6 +225,7 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
         <h2 id="guide-title">처음 온 당신에게</h2>
         <p>캘린더에서 날짜를 고른 뒤, 책과 장소를 확인하고 참여를 신청하세요.</p>
         <p>혼자 오셔도, 처음이셔도 괜찮습니다.</p>
+        <p><Link href="/guide">자주 묻는 것들 보기 →</Link></p>
         <button type="button" onClick={() => setHowToOpen(false)}>닫기</button>
       </dialog>
     </div>

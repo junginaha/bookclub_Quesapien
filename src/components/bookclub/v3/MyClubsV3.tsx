@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import SearchPalette from "@/components/common/SearchPalette";
 import { useRouter } from "next/navigation";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { formatMonthDay, formatTimeOfDay, formatWeekdayFull, isPast } from "@/lib/bookclub/selectors";
@@ -56,7 +57,8 @@ export default function MyClubsV3({
           <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6" /></svg>
         </Link>
         <h1 className="qv3-my-title">내 북클럽</h1>
-        <span style={{ width: 44 }} aria-hidden="true" />
+        {/* 제목을 가운데 맞추려고 비워둔 자리 — 검색이 그 폭을 그대로 쓴다 */}
+        <SearchPalette variant="icon" triggerClassName="qv3-icon-btn qv3-icon-btn--ghost" />
       </header>
 
       <main className="qv3-wrap qv3-my-main">
@@ -64,6 +66,14 @@ export default function MyClubsV3({
           <h2>{name}님, 안녕하세요.</h2>
           <p>{upcoming.length > 0 ? `다가오는 북클럽이 ${upcoming.length}개. 책갈피 꽂아두셨죠?` : "아직 예약한 북클럽이 없어요. 가까운 곳부터 구경해볼까요?"}</p>
           {!phone && <p className="qv3-my-note">휴대전화를 등록하면 예약이 여기에 모여요. <Link href={`/onboarding/profile?next=${encodeURIComponent("/mypage")}`}>등록하기</Link></p>}
+          {/* 예약은 전화번호로 묶인다. 프로필 번호와 **다른 번호로** 예약하면 여기에
+              안 뜨는데, 그 사정을 모르면 예약이 사라진 것처럼 보인다. 번호가 있는데
+              아무것도 없을 때만 알려준다(없을 때는 윗줄이 이미 말한다). */}
+          {phone && upcoming.length === 0 && past.length === 0 && (
+            <p className="qv3-my-note">
+              다른 번호로 예약하셨다면 여기에 보이지 않아요. <Link href={`/onboarding/profile?next=${encodeURIComponent("/mypage")}`}>그 번호로 바꾸기</Link>
+            </p>
+          )}
         </section>
 
         {msg && <p className="qv3-my-msg" role="status">{msg}</p>}

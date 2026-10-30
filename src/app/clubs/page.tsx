@@ -11,6 +11,10 @@ export const metadata: Metadata = buildMetadata({
   path: "/clubs",
   type: "website",
   keywords: ["북클럽", "독서모임", "오프라인모임", "Qsapiens"],
+  // 이 라우트는 어디에서도 링크되지 않는 M1 잔존 화면이고, 목적이 /bookclub과 겹친다.
+  // 둘 다 색인되면 "북클럽" 검색에서 서로를 밀어낸다 → 색인에서만 뺀다(페이지는 그대로 열린다).
+  // /bookclub으로 정식 이관하거나 이 화면을 되살릴 때 이 한 줄만 지우면 된다.
+  noIndex: true,
 });
 
 export default async function ClubsPage() {

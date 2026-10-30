@@ -1,0 +1,188 @@
+/* ─────────────────────────────────────────────────────────────────────
+   참여 안내(/guide, /guide/[slug])
+   이 두 화면은 지금까지 인라인 style만 붙은 맨 문서였다 — 머리글·바닥글도,
+   사이트로 들어올 길도 없었다. 검색으로 들어온 사람이 가장 먼저 보는 글인데
+   다른 사이트처럼 읽혔다. 그래서 새로 만든 톤이 아니라 .qv3(종이·잉크·황동)를
+   그대로 입힌다. 토큰은 home-v3.css의 .qv3 블록에서 상속받는다.
+
+   손글씨는 "말"인 줄에만 쓴다 — 본문·날짜·질문 제목은 명조 그대로.
+   ───────────────────────────────────────────────────────────────────── */
+
+/* 바탕 — .qv3 래퍼가 배경을 갖지 않아 본문 아래로 흰 띠가 보였다.
+   화면 전체를 종이색으로 덮어 바닥글까지 이어지게 한다. */
+.qv3:has(.qv3-guide) {
+  min-height: 100vh;
+  background: var(--qv-paper);
+}
+
+.qv3-guide {
+  max-width: 740px;
+  margin: 0 auto;
+  /* 머리글이 position:fixed · height 64px라 그만큼 비워야 제목이 가려지지 않는다 */
+  padding: 100px 20px 72px;
+  color: var(--qv-ink);
+  word-break: keep-all;
+}
+
+/* ── 머리 ───────────────────────────────────────────────── */
+.qv3-guide-eyebrow {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--qv-gold-ink);
+  font: 700 11.5px/1.3 var(--font-noto-sans-kr), sans-serif;
+  letter-spacing: 0.15em;
+}
+.qv3-guide h1 {
+  margin: 0 0 18px;
+  font: 500 clamp(25px, 5.4vw, 34px)/1.35 var(--font-noto-serif-kr), serif;
+  color: var(--qv-ink);
+  text-wrap: balance;
+}
+/* 글머리 한 문단 — 검색 결과에서 그대로 인용되는 줄이라 본문보다 한 단 크게 */
+.qv3-guide-lead {
+  margin: 0 0 8px;
+  font: 400 clamp(16.5px, 2.1vw, 18.5px)/1.85 var(--font-noto-serif-kr), serif;
+  color: var(--qv-ink-2);
+}
+
+/* 거드는 한 줄 — 손글씨는 "말"인 줄에만. 나눔펜은 x-height가 낮아
+   같은 px에서 훨씬 작아 보인다: 본문 16px 자리에 22px로 잡아야 무게가 맞는다. */
+.qv3-guide-say {
+  margin: 0 0 4px;
+  font-family: var(--font-nanum-pen), "Nanum Pen Script", cursive;
+  font-size: 22px;
+  line-height: 1.5;
+  color: var(--qv-muted);
+}
+
+/* ── 본문 ───────────────────────────────────────────────── */
+.qv3-guide h2 {
+  margin: 44px 0 12px;
+  font: 500 clamp(19px, 2.6vw, 22px)/1.45 var(--font-noto-serif-kr), serif;
+  color: var(--qv-ink);
+}
+/* 제목 아래 짧은 황동 선 — 홈 섹션과 같은 리듬 */
+.qv3-guide h2::after {
+  content: "";
+  display: block;
+  width: 38px;
+  height: 1px;
+  margin-top: 10px;
+  background: var(--qv-brass);
+  opacity: 0.6;
+}
+.qv3-guide p {
+  margin: 0 0 14px;
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--qv-ink-2);
+}
+
+/* ── 자주 묻는 질문 ──────────────────────────────────────
+   AI 검색이 그대로 인용하는 자리다. 질문은 묻는 말이지만 '정보'에 가까워
+   명조로 둔다 — 손글씨로 쓰면 읽는 힘이 떨어진다. */
+.qv3-guide-faq {
+  margin-top: 16px;
+  border-top: 1px solid var(--qv-line);
+}
+.qv3-guide-faq > div {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--qv-line);
+}
+.qv3-guide-faq h3 {
+  margin: 0 0 6px;
+  font: 500 16.5px/1.6 var(--font-noto-serif-kr), serif;
+  color: var(--qv-ink);
+}
+.qv3-guide-faq p {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.85;
+  color: var(--qv-ink-2);
+}
+
+/* ── 안내 목록(허브) ─────────────────────────────────────
+   예전엔 맨 <ul><li><a>였고 링크 높이가 17px였다(실측). 줄 전체를 누르게 한다. */
+.qv3-guide-list {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--qv-line);
+}
+.qv3-guide-list li {
+  border-bottom: 1px solid var(--qv-line);
+}
+.qv3-guide-list a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 60px;
+  padding: 14px 4px;
+  color: var(--qv-ink);
+  font: 400 16.5px/1.6 var(--font-noto-serif-kr), serif;
+  text-decoration: none;
+  transition: background 0.12s ease;
+}
+.qv3-guide-list a:hover {
+  background: var(--qv-card);
+}
+.qv3-guide-list a::after {
+  content: "→";
+  margin-left: auto;
+  color: var(--qv-brass);
+  font-family: var(--font-eb-garamond), serif;
+  font-size: 17px;
+  flex: 0 0 auto;
+}
+
+/* ── 이어지는 곳 ────────────────────────────────────────── */
+.qv3-guide-next {
+  margin-top: 52px;
+  padding-top: 28px;
+  border-top: 1px solid var(--qv-line);
+}
+.qv3-guide-next h2 {
+  margin-top: 0;
+  font-size: 17px;
+}
+.qv3-guide-next h2::after {
+  display: none;
+}
+
+/* 황동 코인 — 사이트의 기본 버튼 모양 그대로 */
+.qv3-guide-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  margin: 8px 0 0;
+  padding: 14px 24px;
+  border: 1px solid var(--qv-brass-deep);
+  border-radius: 999px;
+  background: var(--qv-brass);
+  color: #2a1f0f;
+  font: 500 16px/1.2 var(--font-noto-sans-kr), sans-serif;
+  text-decoration: none;
+  box-shadow: 0 3px 0 var(--qv-brass-deep);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.qv3-guide-cta:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--qv-brass-deep);
+}
+
+/* 확인일 — 사실을 언제 맞춰봤는지 적는 줄. 작지만 12px 아래로 내리지 않는다. */
+.qv3-guide-verified {
+  margin-top: 36px;
+  color: var(--qv-muted);
+  font-family: var(--font-eb-garamond), serif;
+  font-size: 13.5px;
+  letter-spacing: 0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qv3-guide-cta,
+  .qv3-guide-list a {
+    transition: none;
+  }
+}

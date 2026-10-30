@@ -17,8 +17,12 @@ const STATIC_PATHS: { path: string; changeFrequency: MetadataRoute.Sitemap[numbe
   { path: "/questions", changeFrequency: "daily", priority: 0.9 },
   ...(GIANTS_ENABLED ? [{ path: "/giants", changeFrequency: "weekly" as const, priority: 0.8 }] : []),
   { path: "/archive", changeFrequency: "weekly", priority: 0.8 },
-  { path: "/clubs", changeFrequency: "weekly", priority: 0.7 },
   { path: "/quiz", changeFrequency: "monthly", priority: 0.5 },
+  // 법정 고지 — 신뢰 신호이므로 색인에 올린다(우선순위는 낮게).
+  { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
+  // /clubs는 뺐다 — 어디에서도 링크되지 않는 M1 잔존 화면이고 /bookclub과 목적이 겹쳐
+  // 둘 다 올리면 같은 검색어에서 서로를 밀어낸다(page.tsx에서 noIndex 처리).
 ];
 
 async function fetchDynamicEntries(): Promise<MetadataRoute.Sitemap> {
@@ -28,9 +32,8 @@ async function fetchDynamicEntries(): Promise<MetadataRoute.Sitemap> {
 
   try {
     const db = createClient(url, key, { auth: { persistSession: false } });
-    const [questions, clubs] = await Promise.all([
+    const [questions] = await Promise.all([
       db.from("questions").select("id, created_at").order("created_at", { ascending: false }).limit(5000),
-      db.from("clubs").select("slug, created_at"),
     ]);
 
     const entries: MetadataRoute.Sitemap = [];
@@ -38,15 +41,6 @@ async function fetchDynamicEntries(): Promise<MetadataRoute.Sitemap> {
       entries.push({
         url: `${SITE_URL}/questions/${q.id}`,
         ...(q.created_at ? { lastModified: new Date(q.created_at) } : {}),
-        changeFrequency: "weekly",
-        priority: 0.6,
-      });
-    }
-    for (const c of clubs.data ?? []) {
-      if (!c.slug) continue;
-      entries.push({
-        url: `${SITE_URL}/clubs/${encodeURIComponent(c.slug)}`,
-        ...(c.created_at ? { lastModified: new Date(c.created_at) } : {}),
         changeFrequency: "weekly",
         priority: 0.6,
       });

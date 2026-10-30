@@ -14,6 +14,9 @@ export interface ApplicationRow {
   note: string | null;
   status: string;
   created_at: string;
+  /** 026 적용 전에는 undefined로 온다 — 그 경우 화면에서 결제 열을 숨긴다. */
+  paid_at?: string | null;
+  payment_state?: string | null;
 }
 
 export interface WaitlistRow {
@@ -54,6 +57,19 @@ function downloadCsv(filename: string, csv: string) {
 }
 
 const METHOD_LABEL: Record<string, string> = { sms: "휴대폰 문자", kakao: "카카오톡", call: "전화" };
+
+/**
+ * 결제 확인 상태. PayApp 통보(026 + /api/payapp/feedback)로만 채워진다.
+ * **추정하지 않는다** — 통보가 오기 전에는 "확인 전"이지 "미납"이 아니다.
+ * 026이 아직 적용되지 않았으면 컬럼 자체가 없어 undefined로 온다.
+ */
+function payLabel(a: ApplicationRow): string {
+  if (a.paid_at === undefined) return "";            // 026 미적용
+  if (a.paid_at) return `완료 ${new Date(a.paid_at).toLocaleDateString("ko-KR")}`;
+  if (a.payment_state === "10") return "입금 대기";   // 가상계좌
+  if (a.payment_state && ["9", "64", "8", "32"].includes(a.payment_state)) return "취소";
+  return "확인 전";
+}
 const cellStyle: CSSProperties = { padding: "8px 10px", fontSize: 13, borderBottom: "1px solid var(--line)", color: "var(--ink)" };
 const headStyle: CSSProperties = { ...cellStyle, fontWeight: 700, color: "var(--muted)", fontSize: 11.5, textTransform: "uppercase" };
 
@@ -129,6 +145,7 @@ export default function BookClubAdminClient({
                       <th style={headStyle}>이름</th>
                       <th style={headStyle}>전화</th>
                       <th style={headStyle}>이메일</th>
+                      <th style={headStyle}>결제</th>
                       <th style={headStyle}>메모</th>
                       <th style={headStyle}>신청일</th>
                     </tr>
@@ -139,6 +156,7 @@ export default function BookClubAdminClient({
                         <td style={cellStyle}>{a.name}</td>
                         <td style={cellStyle}>{a.phone}</td>
                         <td style={cellStyle}>{a.email ?? ""}</td>
+                        <td style={cellStyle}>{payLabel(a)}</td>
                         <td style={cellStyle}>{a.note ?? ""}</td>
                         <td style={cellStyle}>{new Date(a.created_at).toLocaleString("ko-KR")}</td>
                       </tr>
@@ -156,8 +174,8 @@ export default function BookClubAdminClient({
                   downloadCsv(
                     `${club.slug}-신청자.csv`,
                     toCsv(
-                      ["이름", "전화", "이메일", "메모", "신청일"],
-                      apps.map((a) => [a.name, a.phone, a.email, a.note, new Date(a.created_at).toLocaleString("ko-KR")])
+                      ["이름", "전화", "이메일", "결제", "메모", "신청일"],
+                      apps.map((a) => [a.name, a.phone, a.email, payLabel(a), a.note, new Date(a.created_at).toLocaleString("ko-KR")])
                     )
                   )
                 }

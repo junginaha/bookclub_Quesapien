@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { activeGuides } from "@/content/ai-guides";
 import { CLUB } from "@/content/club-facts";
-import { guideJsonLd, orgJsonLd } from "@/lib/jsonld";
+import { guideJsonLd } from "@/lib/jsonld";
+import { breadcrumbSchema } from "@/lib/schema";
+import Header from "@/components/common/Header";
+import Footer from "@/components/common/Footer";
+import "@/components/home/v3/home-v3.css";
+import "../guide.css";
 
 export const dynamicParams = false;
 
@@ -16,10 +21,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!g) return {};
   const url = `${CLUB.siteUrl}/guide/${g.slug}`;
   return {
-    title: `${g.title} | ${CLUB.brand}`,
+    title: g.title,
     description: g.description,
-    alternates: { canonical: url },
-    openGraph: { title: g.title, description: g.description, url, locale: "ko_KR", type: "article" },
+    alternates: { canonical: url, types: { "text/plain": `${CLUB.siteUrl}/llms.txt` } },
+    openGraph: {
+      title: g.title, description: g.description, url, siteName: CLUB.brand, locale: "ko_KR", type: "article",
+      images: [{ url: `${CLUB.siteUrl}/og?title=${encodeURIComponent(g.title)}&sub=${encodeURIComponent(g.description.slice(0, 80))}`, width: 1200, height: 630, alt: g.title }],
+    },
+    twitter: { card: "summary_large_image", title: g.title, description: g.description },
     robots: { index: true, follow: true },
   };
 }
@@ -31,43 +40,71 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   const others = activeGuides().filter((x) => x.slug !== g.slug);
 
   return (
-    <main style={{ maxWidth: 720, margin: "0 auto", padding: "32px 20px 64px", lineHeight: 1.8, wordBreak: "keep-all" }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([orgJsonLd(), ...guideJsonLd(g)]) }} />
-      <article>
-        <h1 style={{ fontSize: 28, lineHeight: 1.35, marginBottom: 16 }}>{g.title}</h1>
-        <p style={{ fontSize: 18, fontWeight: 500 }}>{g.answer}</p>
-        {g.sections.map((s) => (
-          <section key={s.h}>
-            <h2 style={{ fontSize: 21, marginTop: 32 }}>{s.h}</h2>
-            <p>{s.p}</p>
-          </section>
-        ))}
-        <section>
-          <h2 style={{ fontSize: 21, marginTop: 32 }}>자주 묻는 질문</h2>
-          {g.faqs.map((f) => (
-            <div key={f.q} style={{ marginTop: 16 }}>
-              <h3 style={{ fontSize: 17, margin: 0 }}>{f.q}</h3>
-              <p style={{ margin: "4px 0 0" }}>{f.a}</p>
-            </div>
+    <div className="qv3">
+      <Header />
+      <main className="qv3-guide">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              breadcrumbSchema([
+                { name: "홈", href: "/" },
+                { name: "처음 오시는 분께", href: "/guide" },
+                { name: g.title, href: `/guide/${g.slug}` },
+              ]),
+              ...guideJsonLd(g),
+            ]),
+          }}
+        />
+        <article>
+          <span className="qv3-guide-eyebrow">GUIDE</span>
+          <h1>{g.title}</h1>
+          <p className="qv3-guide-lead">{g.answer}</p>
+
+          {g.sections.map((s) => (
+            <section key={s.h}>
+              <h2>{s.h}</h2>
+              <p>{s.p}</p>
+            </section>
           ))}
-        </section>
-        {CLUB.joinUrl && (
-          <p style={{ marginTop: 40 }}>
-            <a href={CLUB.joinUrl} style={{ display: "inline-block", padding: "14px 22px", borderRadius: 10, background: "#1E2A47", color: "#fff", textDecoration: "none", fontWeight: 700 }}>
-              {CLUB.brand} 참여 안내 보기
-            </a>
-          </p>
+
+          {g.faqs.length > 0 && (
+            <section>
+              <h2>자주 묻는 질문</h2>
+              <div className="qv3-guide-faq">
+                {g.faqs.map((f) => (
+                  <div key={f.q}>
+                    <h3>{f.q}</h3>
+                    <p>{f.a}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <div className="qv3-guide-next">
+            <h2>바로 보기</h2>
+            <p>일정과 장소를 확인하고 예약할 수 있습니다.</p>
+            <a className="qv3-guide-cta" href="/bookclub">열리는 북클럽 보기</a>
+          </div>
+
+          <p className="qv3-guide-verified">정보 확인일: {CLUB.lastVerified}</p>
+        </article>
+
+        {others.length > 0 && (
+          <nav aria-label="관련 안내" className="qv3-guide-next">
+            <h2>이런 것도 궁금하실 거예요</h2>
+            <ul className="qv3-guide-list">
+              {others.map((o) => (
+                <li key={o.slug}>
+                  <a href={`/guide/${o.slug}`}>{o.title}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         )}
-        <p style={{ marginTop: 24, fontSize: 14, color: "#666" }}>정보 확인일: {CLUB.lastVerified}</p>
-      </article>
-      <nav aria-label="관련 안내" style={{ marginTop: 48 }}>
-        <h2 style={{ fontSize: 18 }}>관련 안내</h2>
-        <ul>
-          {others.map((o) => (
-            <li key={o.slug}><a href={`/guide/${o.slug}`}>{o.title}</a></li>
-          ))}
-        </ul>
-      </nav>
-    </main>
+      </main>
+      <Footer />
+    </div>
   );
 }

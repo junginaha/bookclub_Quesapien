@@ -173,9 +173,11 @@ export default function ArchiveClient({ initialReviews }: { initialReviews: Revi
           </p>
 
           <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
+            {/* `${n}+`로 쓰면 0일 때 "0+"가 된다 — 0개 이상이라는 뜻이 되어
+                없는 것을 있는 것처럼 보이게 한다. 센 숫자를 그대로 적는다. */}
             {[
-              { value: `${initialReviews.length}+`, label: "후기" },
-              { value: `${STATIC_QUESTIONS.length}+`, label: "아카이브 질문" },
+              { value: String(initialReviews.length), label: "후기" },
+              { value: String(STATIC_QUESTIONS.length), label: "아카이브 질문" },
               { value: String(totalLikes), label: "공감 수" },
             ].map((s) => (
               <div key={s.label}>

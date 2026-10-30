@@ -288,7 +288,7 @@ export default function QuestionsClient({
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--accent)", animation: "pulse 2s ease-in-out infinite" }} />
-                    <div style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--muted)" }}>
+                    <div style={{ fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--muted)" }}>
                       Today&apos;s Question — 오늘의 질문
                     </div>
                   </div>
@@ -341,7 +341,7 @@ export default function QuestionsClient({
             {/* 인기 질문 */}
             {!search && (
               <section>
-                <div style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 20 }}>
+                <div style={{ fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 20 }}>
                   Popular — 인기 질문
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -392,7 +392,7 @@ export default function QuestionsClient({
             {/* 최근 질문 / 검색 결과 */}
             <section>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-                <div style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--muted)" }}>
+                <div style={{ fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--muted)" }}>
                   {search ? `"${search}" 검색 결과` : "Recent — 최근 질문"}
                 </div>
                 {search && filtered.length > 0 && (

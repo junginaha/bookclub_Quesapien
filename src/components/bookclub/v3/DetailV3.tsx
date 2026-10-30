@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import SearchPalette from "@/components/common/SearchPalette";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BookClubSession, SessionStatus } from "@/lib/bookclub/types";
 import { isWaitlistFull } from "@/lib/bookclub/types";
@@ -74,6 +75,7 @@ export default function DetailV3({
         <Link href="/" aria-label="홈으로" className="qv3-icon-btn qv3-icon-btn--ghost">
           <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6" /></svg>
         </Link>
+        <SearchPalette variant="icon" triggerClassName="qv3-icon-btn qv3-icon-btn--ghost" />
         <button type="button" onClick={share} aria-label="공유하기" className="qv3-icon-btn qv3-icon-btn--ghost">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 3v12" /><path d="M8 7l4-4 4 4" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" /></svg>
         </button>

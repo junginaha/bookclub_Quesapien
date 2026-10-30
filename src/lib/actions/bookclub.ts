@@ -11,6 +11,7 @@ import { getSession } from "@/lib/bookclub/data";
 import { getUpcomingBook } from "@/lib/bookclub/upcoming";
 import { isPast } from "@/lib/bookclub/selectors";
 import { buildRecSlug, titleKey } from "@/lib/bookclub/interest";
+import { getViewer } from "@/lib/viewer";
 
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT = 8;
@@ -44,6 +45,31 @@ function databaseConfigured(): boolean {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() && process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
   );
+}
+
+/**
+ * 예약에 쓴 번호를 프로필에 채운다 — **비어 있을 때만.**
+ *
+ * `/mypage`는 `bookclub_applications.phone`을 **프로필 전화번호**로 조회한다
+ * (`bookclub_applications`에 user_id 컬럼이 없어 번호가 유일한 연결고리다).
+ * 그런데 카카오·구글 로그인은 전화번호를 주지 않으므로, 온보딩에서 번호를 넣지
+ * 않은 사람은 예약 시트에 번호를 직접 입력하고도 **자기 예약을 내 북클럽에서
+ * 영영 못 봤다** — 취소도 거기서만 되니 취소할 방법도 없었다.
+ *
+ * 이미 번호가 있는데 다른 번호로 예약한 경우는 **덮어쓰지 않는다** — 사용자가
+ * 저장해 둔 연락처를 말없이 바꾸지 않기 위해서다(그 경우 안내는 /mypage 빈 화면에서).
+ * 수집·이용 동의는 예약 시 이미 받았고, 쓰임(모임 안내 연락)도 같다.
+ */
+async function backfillProfilePhone(phone: string): Promise<void> {
+  try {
+    const viewer = await getViewer();
+    if (!viewer || viewer.phone.replace(/\D/g, "")) return; // 미로그인이거나 이미 번호가 있다
+    const db = createServiceClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (db as any).from("profiles").update({ phone }).eq("id", viewer.id);
+  } catch {
+    // 예약 자체는 이미 성공했다 — 여기서 실패해도 신청을 되돌리지 않는다.
+  }
 }
 
 export type ApplyResult =
@@ -98,6 +124,10 @@ export async function applyToBookClub(input: {
     revalidatePath("/bookclub");
     revalidatePath(`/bookclub/${club.slug}`);
 
+    if (kind === "confirmed" || kind === "just_filled_waitlisted" || kind === "duplicate") {
+      await backfillProfilePhone(phone);
+      revalidatePath("/mypage");
+    }
     if (kind === "confirmed") return { ok: true, kind: "confirmed" };
     if (kind === "just_filled_waitlisted") return { ok: true, kind: "just_filled_waitlisted" };
     if (kind === "duplicate") return { ok: true, kind: "duplicate" };
@@ -149,6 +179,11 @@ export async function joinBookClubWaitlist(input: {
     const kind = (data as { kind?: string } | null)?.kind;
     if (input.clubSlug) revalidatePath(`/bookclub/${input.clubSlug}`);
     revalidatePath("/bookclub");
+    // 대기도 /mypage가 번호로 찾는다 — 예약과 같은 이유로 프로필 번호를 채운다.
+    if (kind === "joined" || kind === "duplicate") {
+      await backfillProfilePhone(phone);
+      revalidatePath("/mypage");
+    }
 
     const pastSession = input.clubSlug ? getSession(input.clubSlug) : undefined;
     const count =

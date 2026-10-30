@@ -133,8 +133,10 @@ export default function Header() {
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-  // /questions 페이지는 자체 검색창이 있으므로 헤더 SearchPalette 숨김
-  const hideSearch = pathname === "/questions";
+  // 예전에는 /questions에서 헤더 검색을 숨겼다 — "자체 검색창이 있으니까".
+  // 그런데 그 검색은 **질문만** 찾는다. 그래서 질문 페이지에서는 북클럽·책·안내를
+  // 찾을 방법이 아예 없었다(사이트 전체 검색에 닿을 길이 없음).
+  // 둘은 하는 일이 다르므로 같이 둔다 — 하나는 이 페이지 거르기, 하나는 사이트 찾기.
 
   // Transparent on landing unless scrolled > 30px or hovered
   const showOpaque = scrolled || hovered || !isLanding;
@@ -157,7 +159,7 @@ export default function Header() {
         borderBottom: headerBorder,
       }}
     >
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
+      <div className="q-hdr-inner" style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
         <div style={{ display: "flex", height: 64, alignItems: "center", justifyContent: "space-between" }}>
 
           {/* Logo — ?! 질문하는 사람들 */}
@@ -179,6 +181,7 @@ export default function Header() {
               }}>!</span>
             </div>
             <span
+              className="q-hdr-wordmark"
               style={{
                 whiteSpace: "nowrap",
                 fontFamily: "var(--font-noto-serif-kr), Georgia, serif",
@@ -277,7 +280,7 @@ export default function Header() {
 
           {/* Right */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {!hideSearch && <SearchPalette />}
+            <SearchPalette />
             {currentUser ? (
               /* 로그인 상태 — 프로필 드롭다운 */
               <div ref={profileRef} style={{ position: "relative" }} className="hidden md:block">

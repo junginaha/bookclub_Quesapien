@@ -20,16 +20,32 @@ export default async function BookClubAdminPage() {
 
   try {
     const db = createServiceClient();
-    const [{ data: appData, error: appErr }, { data: waitData, error: waitErr }] = await Promise.all([
-      db
+    const BASE = "id, club_slug, name, phone, email, note, status, created_at";
+    // 026(결제 기록 칸)이 아직 적용되지 않은 DB에서는 paid_at·payment_state가 없어
+    // 조회가 통째로 실패한다 — 그러면 관리자 화면이 빈 화면이 된다.
+    // 결제 열 없이 한 번 더 시도해서, 적어도 신청 목록은 늘 보이게 한다.
+    let appData: unknown[] | null = null;
+    let appErr: unknown = null;
+    {
+      const withPay = await db
         .from("bookclub_applications")
-        .select("id, club_slug, name, phone, email, note, status, created_at")
-        .order("created_at", { ascending: false }),
-      db
-        .from("bookclub_waitlist")
-        .select("*")
-        .order("created_at", { ascending: false }),
-    ]);
+        .select(`${BASE}, paid_at, payment_state`)
+        .order("created_at", { ascending: false });
+      if (withPay.error) {
+        const plain = await db
+          .from("bookclub_applications")
+          .select(BASE)
+          .order("created_at", { ascending: false });
+        appData = plain.data;
+        appErr = plain.error;
+      } else {
+        appData = withPay.data;
+      }
+    }
+    const { data: waitData, error: waitErr } = await db
+      .from("bookclub_waitlist")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (appErr || waitErr) throw appErr ?? waitErr;
     applications = (appData ?? []) as ApplicationRow[];
     waitlist = (waitData ?? []) as WaitlistRow[];
