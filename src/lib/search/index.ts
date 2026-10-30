@@ -9,7 +9,7 @@
  * DB도 API도 거치지 않으므로 즉시 뜨고 운영비가 0이다.
  */
 import { BOOKCLUB_SESSIONS } from "@/lib/bookclub/data";
-import { UPCOMING_BOOKS } from "@/lib/bookclub/upcoming";
+import { UPCOMING_BOOKS, formatScheduledMonth } from "@/lib/bookclub/upcoming";
 import { activeGuides } from "@/content/ai-guides";
 import { getStatus } from "@/lib/bookclub/selectors";
 
@@ -78,7 +78,9 @@ function bookDocs(): SearchDoc[] {
   return UPCOMING_BOOKS.map((b) => ({
     kind: "book" as const,
     title: `『${b.bookTitle}』`,
-    sub: [b.author || "저자 확인 중", b.publisher, b.genre].filter(Boolean).join(" · "),
+    sub: [formatScheduledMonth(b.scheduledMonth) && `${formatScheduledMonth(b.scheduledMonth)} 북토크`, b.author || "저자 확인 중", b.publisher, b.genre]
+      .filter(Boolean)
+      .join(" · "),
     // 오픈 예정 도서는 자기 페이지가 없다. 섹션으로만 보내면 27개 카드 중에서
     // 그 책을 눈으로 다시 찾아야 하므로, 카드 자체에 앵커를 달아 바로 보낸다.
     href: `/#${b.slug}`,

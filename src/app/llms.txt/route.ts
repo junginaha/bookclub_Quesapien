@@ -13,7 +13,7 @@ import {
 } from "@/lib/bookclub/selectors";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { activeGuides } from "@/content/ai-guides";
-import { UPCOMING_BOOKS } from "@/lib/bookclub/upcoming";
+import { UPCOMING_BOOKS, formatScheduledMonth } from "@/lib/bookclub/upcoming";
 import { GIANTS_ENABLED } from "@/lib/features";
 import { businessLines } from "@/lib/business";
 
@@ -67,11 +67,22 @@ ${activeGuides().map((g) => `- [${g.title}](${SITE_URL}/guide/${g.slug}): ${g.de
 
 ${upcoming.length ? upcoming.map(sessionLines).join("\n") : "- 현재 공개된 예정 모임이 없습니다."}
 
+## 2026~2027 북토크 — 달이 정해진 여덟 권
+
+여덟 달, 여덟 권. ${SITE_URL}/#talks 에서 볼 수 있습니다. **도서별 날짜와 장소는 아직 정해지지 않았고**, 정해지는 대로 공지합니다. 카드의 "알려주세요"로 등록하면 가장 먼저 안내받습니다.
+
+${UPCOMING_BOOKS.filter((b) => b.scheduledMonth)
+  .sort((a, b) => (a.scheduledMonth ?? "").localeCompare(b.scheduledMonth ?? ""))
+  .map((b) => `- ${formatScheduledMonth(b.scheduledMonth)} — 『${b.bookTitle}』${b.author ? ` (${b.author})` : ""} — ${b.pitch}`)
+  .join("\n")}
+
 ## 우리 다시 만나요 — 열리기를 기다리는 책 (일정 미정)
 
 회원 추천으로 고른 다음 책 후보입니다. ${SITE_URL}/#encore 의 "모이면 시작! 같이 읽어요"로 등록하면, 같은 책을 고른 분이 5명 이상 모일 때 북토크를 열고 안내합니다.
 
-${UPCOMING_BOOKS.map((b) => `- 『${b.bookTitle}』${b.author ? ` (${b.author})` : ""} — ${b.pitch}`).join("\n")}
+${UPCOMING_BOOKS.filter((b) => !b.scheduledMonth)
+  .map((b) => `- 『${b.bookTitle}』${b.author ? ` (${b.author})` : ""} — ${b.pitch}`)
+  .join("\n")}
 
 ## 참여·취소·환불
 

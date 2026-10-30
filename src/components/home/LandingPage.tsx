@@ -198,6 +198,8 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
         </section>
         <HomeCalendarLocationHub sessions={bookclubSessions} />
         <MiniBookSpread sessions={bookclubSessions} />
+        {/* 2026~2027 북토크(달 확정) — 앵콜과 섞으면 안내문이 어긋난다(운영자 결정 2026-10-30) */}
+        <ReunionReads sessions={bookclubSessions} counts={interestCounts} variant="talks" />
         <ReunionReads sessions={bookclubSessions} counts={interestCounts} />
         <HomeArchive />
         {GIANTS_ENABLED && (

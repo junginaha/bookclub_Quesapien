@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { cardBlurb, getStatus } from "@/lib/bookclub/selectors";
@@ -14,8 +14,14 @@ import styles from "./home-tools.module.css";
 import "@/components/bookclub/bookclub.css";
 
 /**
- * 우리 다시 만나요 — 지난 북클럽(앵콜) + 회원이 추천한 다음 책(오픈 예정)을 한 섹션으로.
- * 지난 모임은 날짜를 노출하지 않는다(운영자 지시). 어느 책이든 5명이 모이면 북클럽을 연다.
+ * 책 격자 두 곳을 한 컴포넌트로 그린다 — 카드 한 장의 생김새가 갈라지지 않게.
+ *
+ *  variant="talks"   2026~2027 북토크 — **달이 정해진 책**(포스터). 날짜·장소는 아직 없다.
+ *  variant="reunion" 우리 다시 만나요 — 지난 북클럽(앵콜) + 아직 달이 없는 후보 도서.
+ *
+ * 둘을 한 섹션에 두면 안내문이 어긋난다("5분이 모이면 앵콜을 열어드려요"가 이미 열리기로
+ * 정해진 책 위에 붙는다) — 그래서 섹션을 나눈다(운영자 결정 2026-10-30).
+ * 지난 모임은 날짜를 노출하지 않는다(운영자 지시).
  */
 type Item =
   | { kind: "past"; key: string; session: BookClubSession }
@@ -27,10 +33,14 @@ type Filter = (typeof FILTERS)[number];
 export default function ReunionReads({
   sessions,
   counts = {},
+  variant = "reunion",
 }: {
   sessions: BookClubSession[];
   counts?: Record<string, number>;
+  variant?: "reunion" | "talks";
 }) {
+  const talks = variant === "talks";
+  const sectionRef = useRef<HTMLElement>(null);
   const [filter, setFilter] = useState<Filter>("전체");
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [liveCounts, setLiveCounts] = useState<Record<string, number>>({});
@@ -42,7 +52,7 @@ export default function ReunionReads({
     const key = decodeURIComponent(window.location.hash.replace(/^#/, ""));
     if (!key) return;
     const el = document.getElementById(key);
-    if (!el) return;
+    if (!el || !sectionRef.current?.contains(el)) return;
     setFilter("전체"); // 장르 필터가 걸려 있으면 그 카드가 숨어 있다
     setSpot(key);
     // 위쪽 표지들이 늦게 로드되면 높이가 바뀌어 카드를 지나친다(실측 591px).
@@ -83,30 +93,38 @@ export default function ReunionReads({
     })
     .map((b) => ({ kind: "next", key: b.slug, book: b }));
 
-  // 달이 정해진 북토크가 먼저 온다 — 지난 북클럽 뒤에 묻히면 확정된 일정이 보이지 않는다.
-  // 그 다음 지난 북클럽, 마지막이 아직 달이 없는 후보 도서.
   const scheduled = next.filter((i) => i.kind === "next" && i.book.scheduledMonth);
   const openCandidates = next.filter((i) => i.kind === "next" && !i.book.scheduledMonth);
-  const items =
-    filter === "전체"
-      ? [...scheduled, ...past, ...openCandidates]
-      : next.filter((i) => i.kind === "next" && i.book.genre === filter);
+  // 북토크 섹션은 달 순서 그대로, 거르지 않는다 — 여덟 권이 곧 포스터다.
+  const items = talks
+    ? scheduled
+    : filter === "전체"
+      ? [...past, ...openCandidates]
+      : openCandidates.filter((i) => i.kind === "next" && i.book.genre === filter);
 
   return (
-    <section className={styles.section} id="encore" aria-labelledby="encore-title">
+    <section
+      ref={sectionRef}
+      className={styles.section}
+      id={talks ? "talks" : "encore"}
+      aria-labelledby={talks ? "talks-title" : "encore-title"}
+    >
       {/* 공지·llms.txt에 나간 #upcoming 링크를 살리기 위한 앵커 */}
-      <span id="upcoming" aria-hidden="true" />
+      {!talks && <span id="upcoming" aria-hidden="true" />}
       <div className={styles.sectionHead}>
         <div>
-          <span className={styles.eyebrow}>ENCORE</span>
-          <h2 id="encore-title">우리 다시 만나요</h2>
+          <span className={styles.eyebrow}>{talks ? "2026 – 2027" : "ENCORE"}</span>
+          <h2 id={talks ? "talks-title" : "encore-title"}>{talks ? "2026~2027 북토크" : "우리 다시 만나요"}</h2>
           <DoodleRule />
           <p className={`${styles.sectionLead} lp-hand`}>
-            지난 북클럽을 놓치셨나요? 다시 이야기를 나누고 싶다면 알려주세요. 취향이 같은 5분이 모이면 앵콜 북클럽을 열고 연결해드려요.
+            {talks
+              ? "여덟 달, 여덟 권의 책. 우리의 이야기는 계속됩니다. 도서별 북토크 날짜와 장소는 정해지는 대로 알려드려요."
+              : "지난 북클럽을 놓치셨나요? 다시 이야기를 나누고 싶다면 알려주세요. 취향이 같은 5분이 모이면 앵콜 북클럽을 열고 연결해드려요."}
           </p>
         </div>
       </div>
 
+      {!talks && (
       <div className={styles.upcomingFilters} role="tablist" aria-label="분류">
         {FILTERS.map((f) => (
           <button
@@ -121,6 +139,7 @@ export default function ReunionReads({
           </button>
         ))}
       </div>
+      )}
 
       <ul className={styles.bookGrid} style={{ listStyle: "none", padding: 0, margin: 0 }}>
         {items.map((item) => {
@@ -208,6 +227,7 @@ export default function ReunionReads({
         })}
       </ul>
 
+      {!talks && (
       <div className={`${styles.upcomingRecommend}${recOpen ? ` ${styles.recommendOpen}` : ""}`} id="recommend">
         <div>
           <h3>함께 읽고 싶은 책 추천하기</h3>
@@ -233,6 +253,7 @@ export default function ReunionReads({
           <RecommendBookForm />
         </div>
       </div>
+      )}
     </section>
   );
 }
