@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import SearchPalette from "@/components/common/SearchPalette";
 import { DoodleMenu } from "@/components/common/Doodle";
-import { businessLines } from "@/lib/business";
+import BusinessInfo from "@/components/common/BusinessInfo";
 import { ChevronDown } from "lucide-react";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
@@ -211,15 +211,13 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
         <div className="lp-foot-inner"><span className="lp-foot-mark">질문하는 사람들</span><span className="lp-foot-copy">© 2026 Qsapiens.</span></div>
         <a className="lp-foot-sign" href="https://toroom19.com" target="_blank" rel="noopener">첫 질문을 던진 사람 · <b>출판 전문가 김정인</b> <span aria-hidden="true">↗</span></a>
         {/* 전자상거래법 제10조는 **초기화면**에 표시하라고 한다 — 홈은 공통 Footer를
-            쓰지 않으므로 여기에 둔다. 값이 없는 항목은 businessLines()가 뺀다. */}
+            쓰지 않으므로 여기에 둔다. 다만 펼쳐 둘 필요는 없다(BusinessInfo). */}
         <div className="lp-foot-biz">
-          {businessLines().map((r) => (
-            <span key={r.label}><i>{r.label}</i> {r.value}</span>
-          ))}
           <span><Link href="/guide">처음 오시는 분께</Link></span>
           <span><Link href="/terms">이용약관</Link></span>
           <span><Link href="/privacy">개인정보처리방침</Link></span>
         </div>
+        <BusinessInfo className="lp-foot-biz-info" />
       </footer>
       <dialog ref={guide} id="how-it-works-panel" className={styles.dialog} onClose={() => setHowToOpen(false)} aria-labelledby="guide-title">
         <h2 id="guide-title">처음 온 당신에게</h2>

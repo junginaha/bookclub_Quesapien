@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { GIANTS_ENABLED } from "@/lib/features";
-import { businessLines } from "@/lib/business";
+import BusinessInfo from "@/components/common/BusinessInfo";
 
 const SECTIONS = [
   {
@@ -126,14 +126,10 @@ export default function Footer() {
               junginaha@qsapiens.com
             </a>
           </div>
-          {/* 전자상거래법 제10조 — 사이버몰 초기화면에 표시해야 하는 사업자 정보.
-              값이 없는 항목은 businessLines()가 빼므로 빈 라벨이 뜨지 않는다. */}
-          <div style={{ fontSize: 11.5, lineHeight: 1.9, color: "rgba(163,154,140,0.45)", display: "flex", flexWrap: "wrap", gap: "0 10px" }}>
-            {businessLines().map((r) => (
-              <span key={r.label}>
-                <span style={{ opacity: 0.75 }}>{r.label}</span> {r.value}
-              </span>
-            ))}
+          {/* 전자상거래법 제10조 — 사이버몰에 표시해야 하는 사업자 정보.
+              펼쳐 늘어놓지 않고 접어 둔다(BusinessInfo 주석 참조). */}
+          <div style={{ color: "rgba(163,154,140,0.72)" }}>
+            <BusinessInfo />
           </div>
           <div style={{
             display: "flex",
