@@ -9,7 +9,9 @@ const SECTIONS = [
     title: "탐색",
     links: [
       { href: "/questions", label: "질문" },
-      { href: "/clubs", label: "내 근처 북클럽" },
+      // 구 /clubs(M1 잔존 화면) 대신 유지 중인 v3 지도로 보낸다 — 두 화면이
+      // 같은 검색어를 두고 겹쳐 있었다. /clubs를 다시 쓰려면 이 href만 돌리면 된다.
+      { href: "/bookclub?view=map", label: "내 근처 북클럽" },
       { href: "/bookclub", label: "북클럽" },
       { href: "/archive", label: "아카이빙" },
       ...(GIANTS_ENABLED ? [{ href: "/giants", label: "거인의 어깨" }] : []),
@@ -20,6 +22,9 @@ const SECTIONS = [
     links: [
       { href: "/questions/create", label: "질문 작성" },
       { href: "/bookclub", label: "북토크 신청" },
+      // 참여 안내(/guide) — 롱테일 검색으로 들어오는 글들인데 사이트 어디에서도
+      // 링크되지 않아 크롤러가 닿기 어려웠다. 바닥글은 전 페이지에 있다.
+      { href: "/guide", label: "처음 오시는 분께" },
       { href: "/onboarding", label: "프로필 만들기" },
       { href: "/mypage", label: "마이페이지" },
     ],

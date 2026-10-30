@@ -8,7 +8,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { getSessionsWithReserved } from "@/lib/bookclub/server";
 
 export const metadata: Metadata = buildMetadata({
-  title: "북클럽 찾기 — 리스트·지도·달력 | 질문하는 사람들",
+  title: "북클럽 찾기 — 리스트·지도·달력",
   description: "서초·강남에서 열리는 북클럽을 리스트, 지도, 달력으로 찾고 바로 예약하세요. 질문 하나로 시작하는 북클럽, 질문하는 사람들.",
   path: "/bookclub",
   type: "website",

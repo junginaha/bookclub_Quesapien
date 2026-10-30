@@ -120,6 +120,10 @@
   transition: color .25s ease;
 }
 .qz-btn-skip:hover { color: var(--qz-accent); }
+/* 단독 링크라 글자 높이가 곧 누르는 넓이였다(실측 20px). 여백만 넓힌다. */
+@media (pointer: coarse) {
+  .qz-btn-skip { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; }
+}
 
 /* ── Quiz ── */
 .qz-quiz-wrap {

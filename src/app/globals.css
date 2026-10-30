@@ -603,4 +603,11 @@
   }
   /* 세로로 쌓인 링크 묶음은 간격을 줄여 늘어난 높이를 상쇄한다 */
   footer [style*="flex-direction: column"] > a { margin-top: -6px; }
+
+  /* 머리글·바닥글 밖의 버튼도 같은 기준으로. 실측에서 본문 버튼이 23~36px였다
+     (질문 태그 칩 23px, 장르·분류 필터 36px). 글자 크기는 건드리지 않는다.
+     본문 문장 속 링크(a)는 제외한다 — 높이를 늘리면 글줄이 끊긴다. */
+  main button, main [role="tab"] {
+    min-height: 44px;
+  }
 }

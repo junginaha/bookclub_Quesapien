@@ -1976,3 +1976,15 @@ html:not([data-intro="pending"]) .lp-intro {
 }
 .lp-foot-biz i { font-style: normal; opacity: 0.7; }
 .lp-foot-biz a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ── 손가락이 닿는 넓이 (홈 히어로) ─────────────────────────────
+   실측(390px, 터치 에뮬레이션): "북클럽 둘러보기" 25px, "처음 온 당신에게" 25px.
+   주 행동 버튼이 권장치의 절반이었다. 다만 둘러보기 버튼은 헤드라인 **문장 안에**
+   박힌 알약이라 44px로 키우면 글줄 간격이 깨진다 — 글자 크기는 그대로 두고
+   누르는 여백만 넓힌다. 마우스 기기에는 적용하지 않는다(데스크톱 디자인 불변). */
+@media (pointer: coarse) {
+  .lp-hero-bookclub-btn { padding-top: 11px; padding-bottom: 11px; }
+  .lp-hero-entry-btn { padding: 11px 6px; }
+  /* 위 padding이 만든 높이를 헤드라인에서 상쇄 — 줄간격이 벌어지지 않게 */
+  .lp-hero-headline .lp-hero-bookclub-btn { margin-bottom: -6px; }
+}

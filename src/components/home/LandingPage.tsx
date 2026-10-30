@@ -183,6 +183,7 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
           {businessLines().map((r) => (
             <span key={r.label}><i>{r.label}</i> {r.value}</span>
           ))}
+          <span><Link href="/guide">처음 오시는 분께</Link></span>
           <span><Link href="/terms">이용약관</Link></span>
           <span><Link href="/privacy">개인정보처리방침</Link></span>
         </div>
@@ -191,6 +192,7 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
         <h2 id="guide-title">처음 온 당신에게</h2>
         <p>캘린더에서 날짜를 고른 뒤, 책과 장소를 확인하고 참여를 신청하세요.</p>
         <p>혼자 오셔도, 처음이셔도 괜찮습니다.</p>
+        <p><Link href="/guide">자주 묻는 것들 보기 →</Link></p>
         <button type="button" onClick={() => setHowToOpen(false)}>닫기</button>
       </dialog>
     </div>

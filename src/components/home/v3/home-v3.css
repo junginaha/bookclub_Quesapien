@@ -213,6 +213,8 @@ a.qv3-card:hover { transform: translateY(-2px) rotate(-0.15deg); box-shadow: 0 2
 .qv3-filters { display: flex; gap: 8px; overflow-x: auto; padding: 2px 20px; margin: 0 -20px; scrollbar-width: none; }
 .qv3-filters::-webkit-scrollbar { display: none; }
 .qv3-filter { flex: 0 0 auto; height: 36px; padding: 0 14px; border-radius: 2px; border: 1px solid var(--qv-line-2); background: var(--qv-card); font-size: 13.5px; color: var(--qv-ink-2); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; }
+/* 이 칩들은 상단 바에 있어 <main> 밖이다 — globals.css의 `main button` 규칙이 닿지 않는다. */
+@media (pointer: coarse) { .qv3-filter { height: 44px; } }
 .qv3 .qv3-filter[aria-pressed="true"] { background: var(--qv-navy); border-color: var(--qv-navy); color: #fff9ef; font-weight: 600; }
 
 /* 검색·입력 */
