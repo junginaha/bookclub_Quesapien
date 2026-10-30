@@ -11,6 +11,7 @@ import DiscussionGenerator from "@/components/discussion/DiscussionGenerator";
 import HomeCalendarLocationHub from "./HomeCalendarLocationHub";
 import MiniBookSpread from "./MiniBookSpread";
 import ReunionReads from "./ReunionReads";
+import { TALKS_2026 } from "@/lib/bookclub/data";
 import { GIANTS_ENABLED } from "@/lib/features";
 import HomeArchive from "./HomeArchive";
 import "./landing.css";
@@ -198,8 +199,15 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
         </section>
         <HomeCalendarLocationHub sessions={bookclubSessions} />
         <MiniBookSpread sessions={bookclubSessions} />
-        {/* 2026~2027 북토크(달 확정) — 앵콜과 섞으면 안내문이 어긋난다(운영자 결정 2026-10-30) */}
-        <ReunionReads sessions={bookclubSessions} counts={interestCounts} variant="talks" />
+        {/* 2026~2027 북토크 — 여덟 달 연속 기획. 단발 모임과 섞지 않는다. */}
+        <MiniBookSpread
+          sessions={bookclubSessions}
+          series={TALKS_2026}
+          id="talks"
+          eyebrow="2026 – 2027"
+          heading="2026~2027 북토크"
+          lead="여덟 달, 여덟 권의 책. 매월 셋째 토요일 오전 열 시, 강남에서 만나요."
+        />
         <ReunionReads sessions={bookclubSessions} counts={interestCounts} />
         <HomeArchive />
         {GIANTS_ENABLED && (

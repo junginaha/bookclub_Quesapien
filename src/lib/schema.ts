@@ -182,7 +182,8 @@ export function bookclubSessionEventSchema(session: SessionSchemaInput) {
     },
     ...(priceKnown ? { isAccessibleForFree: session.fee === 0 } : {}),
     organizer: { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: ORG_NAME, url: SITE_URL },
-    maximumAttendeeCapacity: session.capacity,
+    // 정원은 내보내지 않는다. 화면에서 자리 수를 가려 놓고 구조화 데이터로
+    // 숫자를 흘리면 가린 의미가 없다(운영자 지시 2026-10-28·10-30).
     inLanguage: "ko",
   };
 }

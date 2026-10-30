@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { registerInterest } from "@/lib/actions/bookclub";
-import { interestCopy, interestLead } from "@/lib/bookclub/interest";
+import { interestCopy, INTEREST_THRESHOLD } from "@/lib/bookclub/interest";
 import InterestFields, { EMPTY_INTEREST, interestValid, type InterestValues } from "./InterestFields";
 import "./interest-form.css";
 
@@ -10,15 +10,12 @@ import "./interest-form.css";
 export default function InterestDialog({
   clubSlug,
   bookTitle,
-  scheduledMonth,
   open,
   onClose,
   onDone,
 }: {
   clubSlug: string;
   bookTitle: string;
-  /** "2026년 11월" — 북토크 달이 정해진 책이면 안내 문구가 달라진다. */
-  scheduledMonth?: string;
   open: boolean;
   onClose: () => void;
   onDone?: (count?: number) => void;
@@ -73,7 +70,7 @@ export default function InterestDialog({
           </>
         ) : (
           <>
-            <p className="qif-lead">{interestLead(scheduledMonth)}</p>
+            <p className="qif-lead">같은 책을 고른 분이 {INTEREST_THRESHOLD}명 이상 모이면 북토크를 열어드려요.<br />책친구들이 모이면 알려드릴게요. 같이 읽어요.</p>
             <form className="qif-form" onSubmit={submit}>
               <InterestFields values={values} onChange={setValues} />
               <input

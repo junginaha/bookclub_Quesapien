@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { cardBlurb, getStatus } from "@/lib/bookclub/selectors";
-import { UPCOMING_BOOKS, UPCOMING_GENRES, formatScheduledMonth, type UpcomingBook } from "@/lib/bookclub/upcoming";
-import { INTEREST_CTA_ACTION, INTEREST_CTA_HOOK, interestCount, interestFace, scheduledCta } from "@/lib/bookclub/interest";
+import { UPCOMING_BOOKS, UPCOMING_GENRES, type UpcomingBook } from "@/lib/bookclub/upcoming";
+import { INTEREST_CTA_ACTION, INTEREST_CTA_HOOK, interestCount, interestFace } from "@/lib/bookclub/interest";
 import { DoodleBookBloom, DoodleFace, DoodleRule } from "@/components/common/Doodle";
 import InterestDialog from "./InterestDialog";
 import BookCoverImage from "./BookCoverImage";
@@ -14,13 +14,8 @@ import styles from "./home-tools.module.css";
 import "@/components/bookclub/bookclub.css";
 
 /**
- * 책 격자 두 곳을 한 컴포넌트로 그린다 — 카드 한 장의 생김새가 갈라지지 않게.
- *
- *  variant="talks"   2026~2027 북토크 — **달이 정해진 책**(포스터). 날짜·장소는 아직 없다.
- *  variant="reunion" 우리 다시 만나요 — 지난 북클럽(앵콜) + 아직 달이 없는 후보 도서.
- *
- * 둘을 한 섹션에 두면 안내문이 어긋난다("5분이 모이면 앵콜을 열어드려요"가 이미 열리기로
- * 정해진 책 위에 붙는다) — 그래서 섹션을 나눈다(운영자 결정 2026-10-30).
+ * 우리 다시 만나요 — 지난 북클럽(앵콜) + 아직 일정이 없는 후보 도서.
+ * 달이 정해진 2026~2027 북토크는 실제 모임이 되어 MiniBookSpread가 맡는다.
  * 지난 모임은 날짜를 노출하지 않는다(운영자 지시).
  */
 type Item =
@@ -33,13 +28,10 @@ type Filter = (typeof FILTERS)[number];
 export default function ReunionReads({
   sessions,
   counts = {},
-  variant = "reunion",
 }: {
   sessions: BookClubSession[];
   counts?: Record<string, number>;
-  variant?: "reunion" | "talks";
 }) {
-  const talks = variant === "talks";
   const sectionRef = useRef<HTMLElement>(null);
   const [filter, setFilter] = useState<Filter>("전체");
   const [openKey, setOpenKey] = useState<string | null>(null);
@@ -83,48 +75,26 @@ export default function ReunionReads({
       return true;
     })
     .map((s) => ({ kind: "past", key: s.slug, session: s }));
-  // 북토크 달이 정해진 책(2026~2027 포스터)을 앞으로, 달 순서대로. 나머지는 원래 순서.
-  const next: Item[] = [...UPCOMING_BOOKS]
-    .sort((a, b) => {
-      const am = a.scheduledMonth ?? "";
-      const bm = b.scheduledMonth ?? "";
-      if (am && bm) return am.localeCompare(bm);
-      return am ? -1 : bm ? 1 : 0;
-    })
-    .map((b) => ({ kind: "next", key: b.slug, book: b }));
+  const next: Item[] = UPCOMING_BOOKS.map((b) => ({ kind: "next", key: b.slug, book: b }));
 
-  const scheduled = next.filter((i) => i.kind === "next" && i.book.scheduledMonth);
-  const openCandidates = next.filter((i) => i.kind === "next" && !i.book.scheduledMonth);
-  // 북토크 섹션은 달 순서 그대로, 거르지 않는다 — 여덟 권이 곧 포스터다.
-  const items = talks
-    ? scheduled
-    : filter === "전체"
-      ? [...past, ...openCandidates]
-      : openCandidates.filter((i) => i.kind === "next" && i.book.genre === filter);
+  const items =
+    filter === "전체" ? [...past, ...next] : next.filter((i) => i.kind === "next" && i.book.genre === filter);
 
   return (
-    <section
-      ref={sectionRef}
-      className={styles.section}
-      id={talks ? "talks" : "encore"}
-      aria-labelledby={talks ? "talks-title" : "encore-title"}
-    >
+    <section ref={sectionRef} className={styles.section} id="encore" aria-labelledby="encore-title">
       {/* 공지·llms.txt에 나간 #upcoming 링크를 살리기 위한 앵커 */}
-      {!talks && <span id="upcoming" aria-hidden="true" />}
+      <span id="upcoming" aria-hidden="true" />
       <div className={styles.sectionHead}>
         <div>
-          <span className={styles.eyebrow}>{talks ? "2026 – 2027" : "ENCORE"}</span>
-          <h2 id={talks ? "talks-title" : "encore-title"}>{talks ? "2026~2027 북토크" : "우리 다시 만나요"}</h2>
+          <span className={styles.eyebrow}>ENCORE</span>
+          <h2 id="encore-title">우리 다시 만나요</h2>
           <DoodleRule />
           <p className={`${styles.sectionLead} lp-hand`}>
-            {talks
-              ? "여덟 달, 여덟 권의 책. 우리의 이야기는 계속됩니다. 도서별 북토크 날짜와 장소는 정해지는 대로 알려드려요."
-              : "지난 북클럽을 놓치셨나요? 다시 이야기를 나누고 싶다면 알려주세요. 취향이 같은 5분이 모이면 앵콜 북클럽을 열고 연결해드려요."}
+            지난 북클럽을 놓치셨나요? 다시 이야기를 나누고 싶다면 알려주세요. 취향이 같은 5분이 모이면 앵콜 북클럽을 열고 연결해드려요.
           </p>
         </div>
       </div>
 
-      {!talks && (
       <div className={styles.upcomingFilters} role="tablist" aria-label="분류">
         {FILTERS.map((f) => (
           <button
@@ -139,7 +109,6 @@ export default function ReunionReads({
           </button>
         ))}
       </div>
-      )}
 
       <ul className={styles.bookGrid} style={{ listStyle: "none", padding: 0, margin: 0 }}>
         {items.map((item) => {
@@ -174,27 +143,14 @@ export default function ReunionReads({
                   <span className={styles.tag} aria-hidden="true">기록</span>
                 </Link>
               ) : (
-                <>
-                  {cover}
-                  {/* 꼬리표는 칸(li) 기준으로 붙인다 — 표지 안에 두면 어두운 표지 위에서
-                      칠하지 않은 글자가 묻힌다(실제로 "11월"이 잘려 보였다). */}
-                  {formatScheduledMonth(item.book.scheduledMonth) ? (
-                    <span className={styles.tag} aria-hidden="true">
-                      {formatScheduledMonth(item.book.scheduledMonth).replace(/^\d{4}년 /, "")}
-                    </span>
-                  ) : null}
-                </>
+                cover
               )}
               {blurb && <p className={styles.upcomingPitch}>{blurb}</p>}
               <div className={styles.cardFoot}>
                 {(() => {
                   const n = liveCounts[item.key] ?? counts[item.key] ?? 0;
-                  const monthLabel = isPast ? "" : formatScheduledMonth(item.book.scheduledMonth);
-                  const cta = monthLabel
-                    ? scheduledCta(monthLabel.replace(/^\d{4}년 /, ""))
-                    : { hook: INTEREST_CTA_HOOK, action: INTEREST_CTA_ACTION };
-                  // 달이 정해진 책에는 인원 집계를 쓰지 않는다 — 모으는 일이 이미 끝났다.
-                  const tally = monthLabel ? "" : interestCount(n);
+                  const cta = { hook: INTEREST_CTA_HOOK, action: INTEREST_CTA_ACTION };
+                  const tally = interestCount(n);
                   return (
                     <>
                       {tally && <p className={`${styles.cardFootCopy} lp-hand lp-hand--sm`}>{tally}</p>}
@@ -202,9 +158,9 @@ export default function ReunionReads({
                         type="button"
                         className={`${styles.cardAction} lp-hand lp-hand--sm`}
                         onClick={() => setOpenKey(item.key)}
-                        aria-label={`${title}${monthLabel ? ` ${monthLabel} 북토크` : ""} ${cta.action}`}
+                        aria-label={`${title} ${cta.action}`}
                       >
-                        <DoodleFace kind={monthLabel ? "soon" : interestFace(n)} />
+                        <DoodleFace kind={interestFace(n)} />
                         <span className={styles.cardActionLabel}>
                           <span className={styles.ctaHook}>{cta.hook}</span>
                           <span className={styles.ctaAction}>{cta.action}</span>
@@ -217,7 +173,6 @@ export default function ReunionReads({
               <InterestDialog
                 clubSlug={item.key}
                 bookTitle={title}
-                scheduledMonth={isPast ? undefined : formatScheduledMonth(item.book.scheduledMonth) || undefined}
                 open={openKey === item.key}
                 onClose={() => setOpenKey(null)}
                 onDone={(c) => c != null && setLiveCounts((m) => ({ ...m, [item.key]: c }))}
@@ -227,7 +182,6 @@ export default function ReunionReads({
         })}
       </ul>
 
-      {!talks && (
       <div className={`${styles.upcomingRecommend}${recOpen ? ` ${styles.recommendOpen}` : ""}`} id="recommend">
         <div>
           <h3>함께 읽고 싶은 책 추천하기</h3>
@@ -253,7 +207,6 @@ export default function ReunionReads({
           <RecommendBookForm />
         </div>
       </div>
-      )}
     </section>
   );
 }
