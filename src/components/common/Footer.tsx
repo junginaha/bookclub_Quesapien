@@ -151,7 +151,7 @@ export default function Footer() {
                 style={{ color: "rgba(163,154,140,0.5)", textDecoration: "none", fontStyle: "normal", fontFamily: "inherit", transition: "color 0.2s" }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.85)"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(163,154,140,0.5)"; }}>
-                첫 질문을 던진 사람 · <span style={{ color: "rgba(176,138,74,0.8)" }}>Founder, To Room 19 Press</span> ↗
+                북클럽을 연 사람 · <span style={{ color: "rgba(176,138,74,0.8)" }}>Founder, To Room 19 Press</span> ↗
               </a>
             </p>
           </div>
