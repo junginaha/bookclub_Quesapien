@@ -15,11 +15,25 @@ export interface UpcomingBook {
   isbn?: string; // ISBN-13 — 표지 검색을 정확히 맞추기 위한 값(있으면 제목 검색보다 우선)
   genre: "소설" | "인문" | "사회" | "심리" | "에세이" | "역사";
   pitch: string; // 카드용 한 줄 소개(추천 사유를 바탕으로, 수치·후기 창작 금지)
+  /**
+   * 북토크가 열리는 달 — "YYYY-MM". 2026~2027 북토크 포스터(운영자 제공 2026-10-30)로
+   * **달까지만** 확정된 책에 붙인다. 포스터 자체가 "도서별 북토크 일정과 장소는 추후
+   * 안내합니다"라고 적고 있으므로, 날짜·장소·정원은 여기에 없다 — 그것이 정해지면
+   * BOOKCLUB_SESSIONS로 옮기고 이 책을 목록에서 지운다.
+   */
+  scheduledMonth?: string;
+}
+
+/** "2026-11" → "2026년 11월". 형식이 어긋나면 빈 문자열(화면에 아무것도 쓰지 않는다). */
+export function formatScheduledMonth(month?: string): string {
+  const m = /^(\d{4})-(\d{2})$/.exec(month ?? "");
+  return m ? `${m[1]}년 ${Number(m[2])}월` : "";
 }
 
 export const UPCOMING_BOOKS: UpcomingBook[] = [
   {
     slug: "next-small-things-like-these",
+    scheduledMonth: "2026-11",
     bookTitle: "이처럼 사소한 것들",
     author: "클레어 키건",
     isbn: "9791130646381",
@@ -28,6 +42,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
   },
   {
     slug: "next-east-of-eden",
+    scheduledMonth: "2027-06",
     bookTitle: "에덴의 동쪽",
     author: "존 스타인벡",
     isbn: "9788937461811",
@@ -45,6 +60,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
   },
   {
     slug: "next-homo-deus",
+    scheduledMonth: "2027-05",
     bookTitle: "호모 데우스",
     author: "유발 하라리",
     translator: "김명주",
@@ -65,6 +81,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
   },
   {
     slug: "next-scarcity",
+    scheduledMonth: "2027-03",
     bookTitle: "결핍은 우리를 어떻게 변화시키는가",
     author: "센딜 멀레이너선·엘다 샤퍼",
     translator: "이경식",
@@ -74,6 +91,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
   },
   {
     slug: "next-youth-reading",
+    scheduledMonth: "2026-12",
     bookTitle: "청춘의 독서",
     author: "유시민",
     publisher: "웅진지식하우스",
@@ -93,6 +111,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
   },
   {
     slug: "next-snake-brain",
+    scheduledMonth: "2027-04",
     bookTitle: "뱀의 뇌에게 말을 걸지 마라",
     author: "마크 고울스톤",
     translator: "황혜숙",
@@ -103,6 +122,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
   },
   {
     slug: "next-comfort-crisis",
+    scheduledMonth: "2027-01",
     bookTitle: "편안함의 습격",
     author: "마이클 이스터",
     translator: "김원진",
@@ -123,6 +143,7 @@ export const UPCOMING_BOOKS: UpcomingBook[] = [
   },
   {
     slug: "next-cutoff-society",
+    scheduledMonth: "2027-02",
     bookTitle: "손절사회",
     author: "이승연",
     publisher: "어크로스",

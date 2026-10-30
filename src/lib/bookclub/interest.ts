@@ -71,3 +71,24 @@ export function interestCount(count: number): string {
 export function interestFace(count: number): "open" | "soon" {
   return count > 0 ? "soon" : "open";
 }
+
+/**
+ * 북토크 달이 이미 정해진 책(2026~2027 북토크 포스터)의 CTA.
+ *
+ * 이 책들에는 "5명 이상 모이면 시작"이 맞지 않는다 — 이미 열리기로 정해졌다.
+ * 포스터도 "도서별 북토크 일정과 장소는 추후 안내합니다"라고 적고 있으므로,
+ * 사람이 할 일은 모으는 것이 아니라 **날짜가 정해지면 듣는 것**이다.
+ * 신청은 기존 관심 등록(bookclub_waitlist)을 그대로 쓴다.
+ */
+export function scheduledCta(monthLabel: string): { hook: string; action: string } {
+  // 좁은 카드(390px 2열)에서 네 줄로 접히면 읽히지 않는다 — 연도는 꼬리표 순서와
+  // 신청서가 말하므로 버튼에서는 달만 쓴다("2026년 11월 북토크 / 미리 알려주세요" → 4줄).
+  return { hook: `${monthLabel} 북토크`, action: "알려주세요" };
+}
+
+/** 신청서 안에서 한 번만 하는 설명 — 달이 정해진 책과 아닌 책이 다르다. */
+export function interestLead(monthLabel?: string): string {
+  return monthLabel
+    ? `${monthLabel}에 여는 북토크예요. 날짜와 장소가 정해지면 가장 먼저 알려드릴게요.`
+    : `같은 책을 고른 분이 ${INTEREST_THRESHOLD}명 이상 모이면 북토크를 열어드려요. 책친구들이 모이면 알려드릴게요. 같이 읽어요.`;
+}
