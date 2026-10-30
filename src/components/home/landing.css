@@ -687,6 +687,9 @@ a.lp-btn-cream, .lp-btn-cream a { color: var(--lp-bg-ink); }
 .lp-foot-mark em { font-family: var(--lp-serif); font-style: normal; color: #DDBE85; margin-right: 8px; }
 .lp-foot-links { display: flex; gap: 28px; font-size: 13px; letter-spacing: 0.02em; }
 .lp-foot-links a:hover { color: var(--lp-cream); }
+.lp-foot-sign { display: block; max-width: var(--lp-max); margin: 14px auto 0; font-size: 12.5px; letter-spacing: 0.02em; color: rgba(236,227,207,0.45); text-decoration: none; transition: color .2s; }
+.lp-foot-sign b { font-weight: 500; color: #DDBE85; }
+.lp-foot-sign:hover { color: var(--lp-cream); }
 .lp-foot-copy { font-family: var(--lp-serif); font-style: normal; font-size: 12.5px; letter-spacing: 0.04em; color: rgba(236,227,207,0.4); }
 
 /* ── SCROLL REVEAL ── */

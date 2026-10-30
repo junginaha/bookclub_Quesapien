@@ -146,6 +146,12 @@ export default function Footer() {
             </div>
             <p style={{ fontSize: 12, color: "rgba(163,154,140,0.3)", fontFamily: '"EB Garamond", Georgia, serif', fontStyle: "italic" }}>
               <span aria-hidden="true" style={{ position: "absolute", opacity: 0, pointerEvents: "none", fontSize: 0 }}>질문 → 책 → 대화 → 사람 → 성장</span>
+              <a href="https://toroom19.com" target="_blank" rel="noopener"
+                style={{ color: "rgba(163,154,140,0.5)", textDecoration: "none", fontStyle: "normal", fontFamily: "inherit", transition: "color 0.2s" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.85)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(163,154,140,0.5)"; }}>
+                첫 질문을 던진 사람 · <span style={{ color: "rgba(176,138,74,0.8)" }}>출판 전문가 김정인</span> ↗
+              </a>
             </p>
           </div>
         </div>

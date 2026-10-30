@@ -177,6 +177,7 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
       </main>
       <footer className="lp-footer">
         <div className="lp-foot-inner"><span className="lp-foot-mark">질문하는 사람들</span><span className="lp-foot-copy">© 2026 Qsapiens.</span></div>
+        <a className="lp-foot-sign" href="https://toroom19.com" target="_blank" rel="noopener">첫 질문을 던진 사람 · <b>출판 전문가 김정인</b> <span aria-hidden="true">↗</span></a>
         {/* 전자상거래법 제10조는 **초기화면**에 표시하라고 한다 — 홈은 공통 Footer를
             쓰지 않으므로 여기에 둔다. 값이 없는 항목은 businessLines()가 뺀다. */}
         <div className="lp-foot-biz">
