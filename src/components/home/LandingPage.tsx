@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import SearchPalette from "@/components/common/SearchPalette";
 import { businessLines } from "@/lib/business";
 import { ChevronDown } from "lucide-react";
 import type { BookClubSession } from "@/lib/bookclub/types";
@@ -100,6 +101,8 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
           <a href="/archive">아카이빙</a>
           {GIANTS_ENABLED && <a href="/giants">거인의 어깨</a>}
         </div>
+        {/* 검색 — .lp-nav-links 안에 두면 760px 아래에서 같이 숨는다(landing.css). 밖에 둔다. */}
+        <SearchPalette variant="icon" triggerClassName="lp-nav-search" size={21} />
         <div style={{ position: "relative", width: 100, height: 40, overflow: "visible" }}>
           {[
             { href: "/login", label: "로그인", filled: false },

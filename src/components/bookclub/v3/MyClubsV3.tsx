@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import SearchPalette from "@/components/common/SearchPalette";
 import { useRouter } from "next/navigation";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { formatMonthDay, formatTimeOfDay, formatWeekdayFull, isPast } from "@/lib/bookclub/selectors";
@@ -56,7 +57,8 @@ export default function MyClubsV3({
           <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6" /></svg>
         </Link>
         <h1 className="qv3-my-title">내 북클럽</h1>
-        <span style={{ width: 44 }} aria-hidden="true" />
+        {/* 제목을 가운데 맞추려고 비워둔 자리 — 검색이 그 폭을 그대로 쓴다 */}
+        <SearchPalette variant="icon" triggerClassName="qv3-icon-btn qv3-icon-btn--ghost" />
       </header>
 
       <main className="qv3-wrap qv3-my-main">

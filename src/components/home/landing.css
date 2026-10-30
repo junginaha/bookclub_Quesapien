@@ -1988,3 +1988,15 @@ html:not([data-intro="pending"]) .lp-intro {
   /* 위 padding이 만든 높이를 헤드라인에서 상쇄 — 줄간격이 벌어지지 않게 */
   .lp-hero-headline .lp-hero-bookclub-btn { margin-bottom: -6px; }
 }
+
+/* 머리글 검색 — 메뉴(.lp-nav-links)는 760px 아래에서 숨지만 검색은 남는다.
+   종이 위 잉크색을 그대로 따르고, 모양은 두지 않는다(상자 없는 손그림 하나). */
+.lp-nav-search {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; margin-right: 4px;
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: var(--lp-ink-soft); opacity: 0.78;
+  transition: opacity .25s ease, color .25s ease;
+}
+.lp-nav-search:hover { opacity: 1; color: var(--lp-ink); }
+@media (pointer: coarse) { .lp-nav-search { width: 44px; height: 44px; } }

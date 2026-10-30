@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import SearchPalette from "@/components/common/SearchPalette";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { seatNotice } from "@/lib/bookclub/selectors";
@@ -156,6 +157,7 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
             </button>
           ))}
         </div>
+        <SearchPalette variant="icon" triggerClassName="qv3-icon-btn qv3-icon-btn--ghost" />
         <Link href="/mypage" aria-label="내 북클럽" className="qv3-icon-btn qv3-icon-btn--ghost">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" /></svg>
         </Link>

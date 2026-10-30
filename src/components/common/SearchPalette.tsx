@@ -34,7 +34,21 @@ const STARTERS: SearchHit[] = [
   { kind: "page", title: "내 북클럽", sub: "예약 · 대기 · 함께 읽은 책", href: "/mypage", strong: "", body: "", score: 0 },
 ];
 
-export default function SearchPalette() {
+/**
+ * `variant`
+ *  - "header": 공통 머리글의 기본 모양(테두리 있는 단추 + ⌘K 뱃지, 모바일은 아이콘)
+ *  - "icon":   돋보기 하나만. 홈·v3 머리글처럼 각자 모양이 다른 곳에서 쓴다.
+ *              색은 `currentColor`를 따르므로 그 화면의 머리글 색을 그대로 입는다.
+ */
+export default function SearchPalette({
+  variant = "header",
+  triggerClassName,
+  size = 20,
+}: {
+  variant?: "header" | "icon";
+  triggerClassName?: string;
+  size?: number;
+} = {}) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -68,9 +82,9 @@ export default function SearchPalette() {
   useEffect(() => { if (open) setTimeout(() => inputRef.current?.focus(), 50); }, [open]);
   useEffect(() => { setSelectedIdx(0); }, [query]);
 
-  return (
+  const triggers = (
     <>
-      {/* 머리글의 검색 단추 (데스크톱) */}
+      {/* 공통 머리글의 검색 단추 (데스크톱) */}
       <button
         onClick={openPalette}
         aria-label="검색 (Cmd+K)"
@@ -99,6 +113,25 @@ export default function SearchPalette() {
       >
         <span style={{ width: 20, height: 20, display: "inline-flex" }}><DoodleSearch /></span>
       </button>
+    </>
+  );
+
+  return (
+    <>
+      {variant === "icon" ? (
+        /* 홈·v3 머리글 — 그 화면의 단추 모양(triggerClassName)을 그대로 입는다 */
+        <button
+          type="button"
+          onClick={openPalette}
+          aria-label="검색"
+          className={triggerClassName}
+          style={triggerClassName ? undefined : { background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 4, display: "inline-flex", alignItems: "center" }}
+        >
+          <span style={{ width: size, height: size, display: "inline-flex" }}><DoodleSearch /></span>
+        </button>
+      ) : (
+        triggers
+      )}
 
       {open && (
         <div
