@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import SearchPalette from "@/components/common/SearchPalette";
+import { DoodleMenu } from "@/components/common/Doodle";
 import { businessLines } from "@/lib/business";
 import { ChevronDown } from "lucide-react";
 import type { BookClubSession } from "@/lib/bookclub/types";
@@ -28,7 +29,18 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
   const [navBtnIdx, setNavBtnIdx] = useState(0);
   const [navBtnFading, setNavBtnFading] = useState(false);
   const [howToOpen, setHowToOpen] = useState(false);
+  // 모바일 메뉴 — .lp-nav-links는 760px 아래에서 숨는데(landing.css) 대체 수단이
+  // 아예 없었다. 즉 휴대폰으로 홈에 온 사람은 질문·북클럽·아카이빙으로 가는 길이
+  // 머리글에 하나도 없었다. 레퍼런스처럼 햄버거 하나로 받는다. 프레임은 그대로.
+  const [navOpen, setNavOpen] = useState(false);
   const guide = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    if (!navOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setNavOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [navOpen]);
 
   useEffect(() => {
     let transition: ReturnType<typeof setTimeout> | undefined;
@@ -103,6 +115,16 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
         </div>
         {/* 검색 — .lp-nav-links 안에 두면 760px 아래에서 같이 숨는다(landing.css). 밖에 둔다. */}
         <SearchPalette variant="icon" triggerClassName="lp-nav-search" size={21} />
+        <button
+          type="button"
+          className="lp-nav-menu"
+          aria-label={navOpen ? "메뉴 닫기" : "메뉴 열기"}
+          aria-expanded={navOpen}
+          aria-controls="lp-nav-panel"
+          onClick={() => setNavOpen((v) => !v)}
+        >
+          <span style={{ width: 22, height: 22, display: "inline-flex" }}><DoodleMenu open={navOpen} /></span>
+        </button>
         <div style={{ position: "relative", width: 100, height: 40, overflow: "visible" }}>
           {[
             { href: "/login", label: "로그인", filled: false },
@@ -126,6 +148,13 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
               <span>{btn.label}</span>
             </a>
           ))}
+        </div>
+        <div id="lp-nav-panel" className="lp-nav-panel" hidden={!navOpen}>
+          <a href="/bookclub" onClick={() => setNavOpen(false)}>북클럽</a>
+          <a href="/questions" onClick={() => setNavOpen(false)}>질문</a>
+          <a href="/archive" onClick={() => setNavOpen(false)}>아카이빙</a>
+          <a href="/guide" onClick={() => setNavOpen(false)}>처음 오시는 분께</a>
+          <a href="/mypage" onClick={() => setNavOpen(false)}>내 북클럽</a>
         </div>
       </nav>
       <main>

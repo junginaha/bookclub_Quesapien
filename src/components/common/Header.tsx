@@ -157,7 +157,7 @@ export default function Header() {
         borderBottom: headerBorder,
       }}
     >
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
+      <div className="q-hdr-inner" style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px, 4vw, 48px)" }}>
         <div style={{ display: "flex", height: 64, alignItems: "center", justifyContent: "space-between" }}>
 
           {/* Logo — ?! 질문하는 사람들 */}
@@ -179,6 +179,7 @@ export default function Header() {
               }}>!</span>
             </div>
             <span
+              className="q-hdr-wordmark"
               style={{
                 whiteSpace: "nowrap",
                 fontFamily: "var(--font-noto-serif-kr), Georgia, serif",

@@ -98,3 +98,20 @@
   font-family: var(--qv-garamond); font-style: italic; font-size: 17px;
   color: var(--qv-brass-deep); margin: 0;
 }
+
+/* ── 좁은 폭에서 머리글이 넘치던 것 ──────────────────────────
+   뒤로(44) + 코인 3개(230) + 검색(44) + 내 북클럽(44) + 여백 = 410px가 필요했다.
+   390px에서 20px 넘쳤다(실측). `.qv3-coins`는 flex:1이지만 코인이
+   `white-space: nowrap`이라 글자 폭 아래로는 줄지 못한다.
+   배치는 그대로 두고 **여백과 글자만** 좁힌다 — 라벨은 끝까지 남긴다
+   (글리프만 남기면 ☰ ◎ ▦의 뜻이 통하지 않는다). */
+@media (max-width: 430px) {
+  .qv3-clubs-top { gap: 4px; padding-inline: 8px; }
+  .qv3-coins { gap: 4px; }
+  .qv3 .qv3-coin--tab { padding: 0 8px; font-size: 12.5px; gap: 4px; }
+  .qv3-coin-glyph { font-size: 13px; }
+}
+@media (max-width: 345px) {
+  .qv3 .qv3-coin--tab { padding: 0 5px; font-size: 11.5px; gap: 3px; }
+  .qv3-coin-glyph { font-size: 12px; }
+}

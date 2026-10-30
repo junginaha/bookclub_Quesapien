@@ -2000,3 +2000,37 @@ html:not([data-intro="pending"]) .lp-intro {
 }
 .lp-nav-search:hover { opacity: 1; color: var(--lp-ink); }
 @media (pointer: coarse) { .lp-nav-search { width: 44px; height: 44px; } }
+
+/* 모바일 메뉴 — 760px 아래에서만. 데스크톱은 .lp-nav-links가 그대로 있으므로 숨긴다.
+   프레임은 건드리지 않는다: 머리글 높이·배치 그대로, 패널만 아래로 펼쳐진다. */
+.lp-nav-menu {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 44px; height: 44px; margin-left: 2px;
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: var(--lp-ink-soft); opacity: 0.82;
+  transition: opacity .25s ease, color .25s ease;
+}
+.lp-nav-menu:hover { opacity: 1; color: var(--lp-ink); }
+
+.lp-nav-panel {
+  display: none;
+  position: absolute; left: 0; right: 0; top: 100%;
+  padding: 6px var(--lp-gutter) 14px;
+  background: rgba(244,239,229,0.97);
+  backdrop-filter: blur(14px) saturate(1.05);
+  -webkit-backdrop-filter: blur(14px) saturate(1.05);
+  border-bottom: 1px solid var(--lp-line-soft);
+}
+.lp-nav-panel a {
+  display: flex; align-items: center; min-height: 48px;
+  font-family: var(--lp-serif-ko);
+  font-size: 17px; color: var(--lp-ink);
+  border-bottom: 1px solid var(--lp-line-soft);
+}
+.lp-nav-panel a:last-child { border-bottom: none; }
+
+@media (max-width: 760px) {
+  .lp-nav-menu { display: inline-flex; }
+  .lp-nav-panel:not([hidden]) { display: block; }
+}

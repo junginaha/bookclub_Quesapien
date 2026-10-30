@@ -226,3 +226,31 @@ export function DoodleClose({ className }: { className?: string }) {
     </svg>
   );
 }
+
+/** 손으로 그은 메뉴 세 줄 — 길이가 제각각이고 끝이 안 맞는다. */
+export function DoodleMenu({ open }: { open?: boolean }) {
+  return (
+    <svg
+      className="qv3-doodle"
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+    >
+      {open ? (
+        <>
+          <path d="M6.4 6.1C10 9.9 13.7 13.6 17.8 17.6" />
+          <path d="M17.6 6.3C13.9 10.1 10.1 13.8 6.2 17.5" />
+        </>
+      ) : (
+        <>
+          <path d="M4.2 7.4C9 7 14 7.2 19.6 7.1" />
+          <path d="M4.5 12.1C8.6 11.8 13.2 12 18.2 11.9" />
+          <path d="M4.1 16.8C9.4 16.4 14.6 16.7 19.8 16.5" />
+        </>
+      )}
+    </svg>
+  );
+}

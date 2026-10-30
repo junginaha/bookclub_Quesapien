@@ -611,3 +611,15 @@
     min-height: 44px;
   }
 }
+
+/* ── 아주 좁은 화면에서 머리글이 넘치던 것 ───────────────────
+   실측(320px): 로고 128 + 오른쪽 묶음 185 + 좌우 여백 40 = 353px가 필요했다.
+   머리글이 position:fixed라 문서 가로 스크롤로는 안 잡히지만 오른쪽 버튼이
+   화면 밖으로 밀려난다. 배치는 그대로 두고 여백과 글자만 좁힌다. */
+@media (max-width: 400px) {
+  .q-hdr-inner { padding-left: 12px !important; padding-right: 12px !important; }
+}
+@media (max-width: 345px) {
+  /* 브랜드명은 바로 아래 제목에 다시 나오므로, 여기서는 ?! 마크만 남긴다 */
+  .q-hdr-wordmark { display: none; }
+}
