@@ -2,41 +2,37 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, ArrowRight, BookOpen, MessageSquare } from "lucide-react";
-import { GIANTS_ENABLED } from "@/lib/features";
+import { ArrowRight } from "lucide-react";
+import { DoodleSearch, DoodleClose, DoodleBook } from "@/components/common/Doodle";
+import { search, type SearchHit, type SearchKind } from "@/lib/search";
 
-interface SearchResult {
-  type: "question" | "booktalk" | "giant" | "archive" | "page";
-  label: string;
-  sub?: string;
-  href: string;
-  icon: React.ReactNode;
-}
+/**
+ * 헤더 검색.
+ *
+ * 여기 있던 검색은 **고정 링크 5개**만 들고 있었다 — "체호프"도 "카너먼"도
+ * "민주주의"도 하나도 찾지 못했다. ⌘K 팔레트라 기술적으로 보였을 뿐
+ * 뒤에 아무것도 없었다. 이제 `lib/search`가 실제 북클럽·책·안내를 뒤진다.
+ *
+ * 표면은 반대로 간다 — 돋보기도 닫기도 손으로 그린 선이고, 묻는 말도
+ * 기계가 아니라 사람의 말투다. 레퍼런스(chosecommune.com)가 가장 기능적인
+ * 컨트롤 위에만 떨리는 손을 올려둔 것과 같은 자리다.
+ */
 
-const ALL_STATIC_RESULTS: SearchResult[] = [
-  { type: "page", label: "질문 탐색", sub: "오늘의 질문 · 인기 질문", href: "/questions", icon: <MessageSquare size={14} /> },
-  { type: "page", label: "북클럽 일정", sub: "진행 중인 북토크", href: "/bookclub", icon: <BookOpen size={14} /> },
-  { type: "giant", label: "거인의 어깨", sub: "책이나 문장으로 발제 10개 생성하기", href: "/giants", icon: <Search size={14} /> },
-  { type: "page", label: "아카이빙", sub: "후기 · 질문 · 발제문 기록", href: "/archive", icon: <BookOpen size={14} /> },
-  { type: "page", label: "질문 작성", sub: "당신의 질문을 남겨보세요", href: "/questions/create", icon: <MessageSquare size={14} /> },
-];
-const STATIC_RESULTS = ALL_STATIC_RESULTS.filter((r) => GIANTS_ENABLED || r.href !== "/giants");
-
-const TYPE_COLORS: Record<string, string> = {
-  question: "var(--accent)",
-  booktalk: "#2C5364",
-  giant: "#553C2A",
-  archive: "#5C6B3A",
-  page: "var(--muted)",
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  question: "질문",
-  booktalk: "북클럽",
-  giant: "거인",
-  archive: "아카이브",
+/** 분류 꼬리표 — 결과가 무엇인지 한눈에. 색은 쓰지 않는다(먹색 하나). */
+const KIND_LABELS: Record<SearchKind, string> = {
+  club: "북클럽",
+  book: "읽고 싶은 책",
+  guide: "안내",
   page: "페이지",
 };
+
+/** 아무것도 치지 않았을 때 보여주는 길 — 가장 자주 가는 곳. */
+const STARTERS: SearchHit[] = [
+  { kind: "page", title: "북클럽 찾기", sub: "목록 · 지도 · 달력", href: "/bookclub", strong: "", body: "", score: 0 },
+  { kind: "page", title: "우리 다시 만나요", sub: "5명이 모이면 다시 여는 책", href: "/#encore", strong: "", body: "", score: 0 },
+  { kind: "page", title: "처음 오시는 분께", sub: "참여 안내", href: "/guide", strong: "", body: "", score: 0 },
+  { kind: "page", title: "내 북클럽", sub: "예약 · 대기 · 함께 읽은 책", href: "/mypage", strong: "", body: "", score: 0 },
+];
 
 export default function SearchPalette() {
   const [open, setOpen] = useState(false);
@@ -45,12 +41,8 @@ export default function SearchPalette() {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  const results = query.trim().length < 1
-    ? STATIC_RESULTS.slice(0, 8)
-    : STATIC_RESULTS.filter((r) =>
-        r.label.toLowerCase().includes(query.toLowerCase()) ||
-        r.sub?.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 10);
+  const typed = query.trim().length > 0;
+  const results: SearchHit[] = typed ? search(query, 8) : STARTERS;
 
   const openPalette = useCallback(() => { setOpen(true); setQuery(""); setSelectedIdx(0); }, []);
   const closePalette = useCallback(() => { setOpen(false); setQuery(""); }, []);
@@ -78,7 +70,7 @@ export default function SearchPalette() {
 
   return (
     <>
-      {/* Trigger button — shown in header */}
+      {/* 머리글의 검색 단추 (데스크톱) */}
       <button
         onClick={openPalette}
         aria-label="검색 (Cmd+K)"
@@ -93,54 +85,63 @@ export default function SearchPalette() {
         onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(255,255,255,0.4)"; el.style.borderColor = "var(--line)"; }}
         className="hidden md:flex"
       >
-        <Search size={13} />
+        <span style={{ width: 15, height: 15, display: "inline-flex", flexShrink: 0 }}><DoodleSearch /></span>
         <span>검색</span>
         <kbd style={{ fontSize: 10, padding: "1px 5px", borderRadius: 4, background: "var(--bg-warm)", border: "1px solid var(--line)", color: "var(--muted-2)" }}>⌘K</kbd>
       </button>
 
-      {/* Mobile search icon */}
+      {/* 손가락 기기 */}
       <button
         onClick={openPalette}
         aria-label="검색"
         className="flex md:hidden"
         style={{ background: "none", border: "none", cursor: "pointer", color: "var(--ink)", padding: 4, display: "flex", alignItems: "center" }}
       >
-        <Search size={18} />
+        <span style={{ width: 20, height: 20, display: "inline-flex" }}><DoodleSearch /></span>
       </button>
 
-      {/* Palette overlay */}
       {open && (
         <div
-          style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(28,31,38,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "10vh", padding: "10vh 16px 0" }}
+          style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(28,31,38,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "10vh 16px 0" }}
           onClick={closePalette}
         >
           <div
             style={{ width: "100%", maxWidth: 560, background: "var(--bg)", borderRadius: 16, overflow: "hidden", boxShadow: "0 40px 80px -20px rgba(28,31,38,0.4)", border: "1px solid var(--line-soft)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Search input */}
             <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", borderBottom: "1px solid var(--line-soft)" }}>
-              <Search size={16} style={{ color: "var(--muted)", flexShrink: 0 }} />
+              <span style={{ width: 18, height: 18, display: "inline-flex", flexShrink: 0, color: "var(--muted)" }}><DoodleSearch /></span>
               <input
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="질문, 북클럽, 거인 검색…"
-                style={{ flex: 1, background: "none", border: "none", outline: "none", fontSize: 15, color: "var(--ink)", fontFamily: "var(--font-noto-sans-kr),sans-serif" }}
+                /* 기계의 말("검색어를 입력하세요")이 아니라 사람의 말 */
+                placeholder="어떤 책을 찾으세요?"
+                style={{ flex: 1, background: "none", border: "none", outline: "none", fontSize: 15, color: "var(--ink)", fontFamily: "var(--font-noto-sans-kr),sans-serif", minWidth: 0 }}
               />
               {query && (
-                <button onClick={() => setQuery("")} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: 2 }}>
-                  <X size={14} />
+                <button onClick={() => setQuery("")} aria-label="지우기" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: 2, width: 20, height: 20, display: "inline-flex", flexShrink: 0 }}>
+                  <DoodleClose />
                 </button>
               )}
-              <kbd style={{ fontSize: 10.5, padding: "2px 6px", borderRadius: 4, background: "var(--bg-warm)", border: "1px solid var(--line)", color: "var(--muted-2)", flexShrink: 0 }}>ESC</kbd>
+              <kbd className="hidden md:inline" style={{ fontSize: 10.5, padding: "2px 6px", borderRadius: 4, background: "var(--bg-warm)", border: "1px solid var(--line)", color: "var(--muted-2)", flexShrink: 0 }}>ESC</kbd>
             </div>
 
-            {/* Results */}
             <div style={{ maxHeight: 400, overflowY: "auto" }}>
+              {!typed && (
+                <div style={{ padding: "12px 20px 4px", fontSize: 11.5, letterSpacing: "0.14em", color: "var(--muted-2)" }}>자주 가는 곳</div>
+              )}
               {results.length === 0 ? (
-                <div style={{ padding: "32px 20px", textAlign: "center", color: "var(--muted)", fontSize: 14 }}>
-                  검색 결과가 없습니다.
+                /* 빈 화면도 사람이 말하듯 — 그리고 다음 수를 같이 준다 */
+                <div style={{ padding: "28px 20px 32px", textAlign: "center", color: "var(--muted)" }}>
+                  <span style={{ display: "inline-flex", width: 76, color: "var(--line-2, #c9bba3)" }}><DoodleBook /></span>
+                  <p style={{ margin: "10px 0 4px", fontSize: 14, color: "var(--ink)" }}>그 이름으로는 아직 못 찾았어요.</p>
+                  <p style={{ margin: 0, fontSize: 13 }}>
+                    책 제목이나 지은이로도 찾을 수 있어요.{" "}
+                    <button onClick={() => navigate("/#recommend")} style={{ background: "none", border: "none", padding: 0, color: "var(--ink)", textDecoration: "underline", textUnderlineOffset: 3, cursor: "pointer", font: "inherit" }}>
+                      읽고 싶은 책 추천하기
+                    </button>
+                  </p>
                 </div>
               ) : (
                 results.map((r, i) => (
@@ -155,22 +156,12 @@ export default function SearchPalette() {
                       textAlign: "left", transition: "background 0.1s",
                     }}
                   >
-                    <div style={{
-                      width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                      background: `${TYPE_COLORS[r.type]}18`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      color: TYPE_COLORS[r.type],
-                    }}>
-                      {r.icon}
-                    </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 500, color: "var(--ink)", marginBottom: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.label}</div>
-                      {r.sub && <div style={{ fontSize: 12, color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.sub}</div>}
+                      <div style={{ fontSize: 14.5, fontWeight: 500, color: "var(--ink)", marginBottom: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.title}</div>
+                      {r.sub && <div style={{ fontSize: 12.5, color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.sub}</div>}
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 10.5, padding: "2px 8px", borderRadius: 9999, background: `${TYPE_COLORS[r.type]}15`, color: TYPE_COLORS[r.type] }}>
-                        {TYPE_LABELS[r.type]}
-                      </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                      <span style={{ fontSize: 11, color: "var(--muted-2)" }}>{KIND_LABELS[r.kind]}</span>
                       {i === selectedIdx && <ArrowRight size={13} style={{ color: "var(--muted)" }} />}
                     </div>
                   </button>
@@ -178,10 +169,11 @@ export default function SearchPalette() {
               )}
             </div>
 
-            <div style={{ padding: "10px 20px", borderTop: "1px solid var(--line-soft)", display: "flex", gap: 16, fontSize: 11.5, color: "var(--muted-2)" }}>
-              <span>↑↓ 이동</span>
-              <span>↵ 이동</span>
+            <div className="hidden md:flex" style={{ padding: "10px 20px", borderTop: "1px solid var(--line-soft)", gap: 16, fontSize: 11.5, color: "var(--muted-2)" }}>
+              <span>↑↓ 고르기</span>
+              <span>↵ 열기</span>
               <span>ESC 닫기</span>
+              <span style={{ marginLeft: "auto" }}>초성으로도 찾혀요 — ㅊㅎㅍ</span>
             </div>
           </div>
         </div>

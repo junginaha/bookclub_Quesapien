@@ -174,3 +174,55 @@ export function DoodleBookBloom({ className }: { className?: string }) {
     </svg>
   );
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   기능 컨트롤에 붙는 손그림.
+
+   레퍼런스(chosecommune.com)에서 마지막에야 본 것: 그 사이트의 손그림은
+   장식 자리가 아니라 **가장 기능적인 컨트롤 위에** 있다. 계정·장바구니·
+   닫기·검색이 전부 손으로 그린 잉크를 PNG로 올린 것이고, 그중 찜 아이콘은
+   아예 **자고 있는 하트**(눈을 감고 Zz)다. 서체는 Futura로 끝까지 단정한데
+   손은 버튼 위에서만 떨린다 — 그 비율이 "서툴러 보이지만 뒤가 단단한" 인상을
+   만든다.
+
+   우리는 그 PNG를 가져오지 않는다(그쪽 그림이다). 가져오는 건 **자리**다.
+   ───────────────────────────────────────────────────────────────────── */
+
+/** 손으로 그린 돋보기. 원을 닫지 않고, 손잡이는 살짝 어긋나게 붙는다. */
+export function DoodleSearch({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className ? `qv3-doodle ${className}` : "qv3-doodle"}
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {/* 한 번에 그은 원 — 시작점으로 정확히 돌아오지 않는다 */}
+      <path d="M14.6 6.1C12.3 3.9 8.6 4.1 6.5 6.5C4.3 8.9 4.6 12.7 7.1 14.7C9.5 16.7 13.2 16.3 15.2 13.8C16.8 11.8 16.7 8.9 15.1 6.9" />
+      {/* 손잡이 — 원에 닿기 전에 시작한다 */}
+      <path d="M14.9 14.4C16.6 16.3 18.2 18.1 19.8 19.9" />
+    </svg>
+  );
+}
+
+/** 손으로 그은 가위표. 두 획이 교차점을 지나 조금씩 넘어간다. */
+export function DoodleClose({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className ? `qv3-doodle ${className}` : "qv3-doodle"}
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+    >
+      <path d="M6.4 6.1C10 9.9 13.7 13.6 17.8 17.6" />
+      <path d="M17.6 6.3C13.9 10.1 10.1 13.8 6.2 17.5" />
+    </svg>
+  );
+}
