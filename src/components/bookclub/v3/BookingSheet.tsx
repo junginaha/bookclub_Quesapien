@@ -114,6 +114,14 @@ export default function BookingSheet({
     window.PayApp.setParam("recvphone", phone.replace(/\D/g, ""));
     window.PayApp.setParam("memo", "북클럽 참여비");
     window.PayApp.setParam("var1", session.slug);
+    // var2 = 신청을 특정하는 값. bookclub_applications는 (club_slug, phone)으로 한 줄이
+    // 정해지므로 둘을 var1·var2로 보내면 통보가 어느 신청인지 알 수 있다.
+    // recvphone으로 이미 같은 번호가 PayApp에 가므로 새로 나가는 정보는 없다.
+    window.PayApp.setParam("var2", phone.replace(/\D/g, ""));
+    // 결제 결과 통보를 받을 주소 — 이게 없으면 결제 사실이 어디에도 기록되지 않는다.
+    window.PayApp.setParam("feedbackurl", `${window.location.origin}/api/payapp/feedback`);
+    // 통보가 실패하면 다시 보내달라(최대 10회).
+    window.PayApp.setParam("checkretry", "y");
     window.PayApp.setParam("smsuse", "n");
     window.PayApp.setParam("redirectpay", "1");
     window.PayApp.setParam("skip_cstpage", "y");
