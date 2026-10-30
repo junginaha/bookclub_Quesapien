@@ -3,14 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { BookMBTI } from "@/lib/supabase/types";
-import { BOOKCLUB_SESSIONS } from "@/lib/bookclub/data";
-import { getStatus } from "@/lib/bookclub/selectors";
+import { picksFor } from "@/lib/quiz/recommend";
 
-/** 결과 화면에 거는 실제 모임 — 지난 모임은 빼고 가까운 순으로 최대 4개. */
-const openClubs = BOOKCLUB_SESSIONS
-  .filter((s) => getStatus(s) !== "past")
-  .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt))
-  .slice(0, 4);
 import "./quiz.css";
 
 interface Question {
@@ -278,6 +272,9 @@ export default function QuizClient() {
 
   if (!result) return null;
 
+  // 유형별 추천 — 목록에서 사라진 책은 resolve가 알아서 뺀다.
+  const picks = picksFor(result.type);
+
   return (
     <div className="qz qz-result-page">
       <div className="qz-grain" aria-hidden />
@@ -300,18 +297,19 @@ export default function QuizClient() {
 
         <blockquote className="qzr-quote">{result.quote}</blockquote>
 
-        {/* 예전에는 여기 "추천 북클럽"으로 **존재하지 않는 책 제목 12개**가 떴고
-            전부 /#books로만 갔다(우리 데이터에 하나도 없는 책들이었다).
-            지어낸 제목을 지우고 실제로 열리는 모임을 건다 — 유형별 맞춤 추천은
-            어떤 유형에 어떤 책인지 운영자가 정해야 할 내용이라 비워 둔다. */}
-        {openClubs.length > 0 && (
+        {/* 유형별 추천 — 전부 우리가 실제로 가진 책이고, 각 책의 장르·소개글을
+            근거로 골랐다(src/lib/quiz/recommend.ts에 근거를 적어 뒀다).
+            예전에는 여기에 **존재하지 않는 책 12권**이 떠 있었고 링크는 전부
+            홈으로 갔다. 이제 모임이 잡힌 책은 상세로, 아직 후보인 책은 그 카드로 간다. */}
+        {picks.length > 0 && (
           <div className="qzr-rec-section">
-            <div className="qzr-rec-label">— 지금 열리는 북클럽</div>
+            <div className="qzr-rec-label">— {result.title}에게 맞는 책</div>
             <div className="qzr-rec-list">
-              {openClubs.map((s, i) => (
-                <Link key={s.slug} href={`/bookclub/${s.slug}`} className="qzr-rec-item">
+              {picks.map((p, i) => (
+                <Link key={p.href} href={p.href} className="qzr-rec-item">
                   <span className={`qzr-rec-spine qzr-spine-${i % 4}`} />
-                  <span className="qzr-rec-title">{s.bookTitle}</span>
+                  <span className="qzr-rec-title">{p.title}</span>
+                  <span className="qzr-rec-sub">{p.sub}</span>
                 </Link>
               ))}
             </div>
