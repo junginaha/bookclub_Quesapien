@@ -79,8 +79,9 @@ function bookDocs(): SearchDoc[] {
     kind: "book" as const,
     title: `『${b.bookTitle}』`,
     sub: [b.author || "저자 확인 중", b.publisher, b.genre].filter(Boolean).join(" · "),
-    // 오픈 예정 도서는 자기 페이지가 없다 — 카드가 있는 섹션으로 보낸다.
-    href: "/#encore",
+    // 오픈 예정 도서는 자기 페이지가 없다. 섹션으로만 보내면 27개 카드 중에서
+    // 그 책을 눈으로 다시 찾아야 하므로, 카드 자체에 앵커를 달아 바로 보낸다.
+    href: `/#${b.slug}`,
     strong: [b.bookTitle, b.author, b.translator, b.publisher, b.genre].filter(Boolean).join(" "),
     body: b.pitch ?? "",
   }));

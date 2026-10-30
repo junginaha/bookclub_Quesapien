@@ -3,6 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { BookMBTI } from "@/lib/supabase/types";
+import { BOOKCLUB_SESSIONS } from "@/lib/bookclub/data";
+import { getStatus } from "@/lib/bookclub/selectors";
+
+/** 결과 화면에 거는 실제 모임 — 지난 모임은 빼고 가까운 순으로 최대 4개. */
+const openClubs = BOOKCLUB_SESSIONS
+  .filter((s) => getStatus(s) !== "past")
+  .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt))
+  .slice(0, 4);
 import "./quiz.css";
 
 interface Question {
@@ -72,8 +80,6 @@ interface MBTIProfile {
   description: string;
   traits: string[];
   color: string;
-  recommendedSlugs: string[];
-  recommendedTitles: string[];
   quote: string;
 }
 
@@ -86,8 +92,6 @@ const PROFILES: Record<BookMBTI, MBTIProfile> = {
     description: "당신은 책에서 논리보다 감정을 먼저 만납니다. 문장 하나에 오래 머무르고, 밑줄 친 구절이 삶을 바꾸기도 합니다. 당신의 독서는 내면을 향한 긴 여행입니다.",
     traits: ["감성 충만한 문장에 반응", "시와 에세이를 사랑함", "읽은 것을 오래 품음", "혼자 읽는 시간이 충전됨"],
     color: "dusk",
-    recommendedSlugs: ["다정함의-발명", "오늘-저녁-당신께", "밤에만-편지를-씁니다", "어머니의-문장들"],
-    recommendedTitles: ["다정함의 발명", "오늘 저녁, 당신께", "밤에만 편지를 씁니다", "어머니의 문장들"],
     quote: "\"한 페이지에서 일주일을 머문 적이 있어요.\"",
   },
   SAGE: {
@@ -98,8 +102,6 @@ const PROFILES: Record<BookMBTI, MBTIProfile> = {
     description: "당신은 책을 통해 세상의 구조를 이해하고 싶습니다. 쉬운 답보다 더 나은 질문을 찾고, 사유의 깊이가 삶의 깊이라고 믿습니다.",
     traits: ["철학·인문학 애독자", "핵심 논점 정리가 자연스러움", "깊은 대화를 선호", "혼자만의 사색 시간이 필요함"],
     color: "rust",
-    recommendedSlugs: ["혼자라는-감각", "인간이라는-풍경", "철학이-필요한-저녁", "흐린-날의-사유"],
-    recommendedTitles: ["혼자라는 감각", "인간이라는 풍경", "철학이 필요한 저녁", "흐린 날의 사유"],
     quote: "\"고독을 결핍이 아니라 깊이로 다루는 책.\"",
   },
   SEEKER: {
@@ -110,8 +112,6 @@ const PROFILES: Record<BookMBTI, MBTIProfile> = {
     description: "당신에게 장르는 제약이 아닙니다. 오늘은 요리책, 내일은 과학서. 끌리는 것을 따라가다 보면 예상치 못한 연결이 생깁니다. 독서가 세계 탐험입니다.",
     traits: ["장르 불문 독서", "새로운 관점에 열려있음", "대화를 예상치 못한 곳으로 이끔", "독서 목록이 끝이 없음"],
     color: "olive",
-    recommendedSlugs: ["최신간-북토크", "아무것도-하지-않는-연습", "외국어로-읽는-한국-소설", "도시의-올랜-해"],
-    recommendedTitles: ["최신간 북토크", "아무것도 하지 않는 연습", "외국어로 읽는 한국 소설", "도시의 올랜 해"],
     quote: "\"새벽 세 시에 깨어 있는 사람만 아는 문장.\"",
   },
   BRIDGE: {
@@ -122,8 +122,6 @@ const PROFILES: Record<BookMBTI, MBTIProfile> = {
     description: "당신은 책에서 언제나 사람을 찾습니다. 읽은 것을 나누고 싶고, 같은 문장에 다른 반응을 보이는 사람들이 신기합니다. 북클럽은 당신을 위한 공간입니다.",
     traits: ["읽은 책을 꼭 누군가에게 이야기함", "관계·회고·사람 이야기 선호", "북클럽에서 빛남", "대화가 책만큼 중요함"],
     color: "sage",
-    recommendedSlugs: ["아무도-보지-않는-오후", "제자리로-돌아오는-밤에", "헤어진-이들의-재회", "이름-없는-감정들에게"],
-    recommendedTitles: ["아무도 보지 않는 오후", "제자리로 돌아오는 밤에", "헤어진 이들의 재회", "이름 없는 감정들에게"],
     quote: "\"'사람은 아직 믿을 만하다'는 감각을 4년 만에 느꼈습니다.\"",
   },
 };
@@ -214,7 +212,7 @@ export default function QuizClient() {
               시작하기
               <span className="qz-arrow" />
             </button>
-            <Link href="/#books" className="qz-btn-skip">
+            <Link href="/bookclub" className="qz-btn-skip">
               건너뛰고 북클럽 보기
             </Link>
           </div>
@@ -236,7 +234,7 @@ export default function QuizClient() {
           <div className="qz-num">{current + 1} / {QUESTIONS.length}</div>
 
           {/* Skip */}
-          <Link href="/#books" className="qz-skip-link">언제든 SKIP →</Link>
+          <Link href="/bookclub" className="qz-skip-link">언제든 SKIP →</Link>
 
           <div className="qz-question-card">
             <p className="qz-q-text">{q.text}</p>
@@ -258,7 +256,7 @@ export default function QuizClient() {
             </div>
           </div>
 
-          <Link href="/#books" className="qz-btn-skip qz-skip-bottom">
+          <Link href="/bookclub" className="qz-btn-skip qz-skip-bottom">
             결과 건너뛰고 북클럽 바로 보기
           </Link>
         </div>
@@ -302,24 +300,26 @@ export default function QuizClient() {
 
         <blockquote className="qzr-quote">{result.quote}</blockquote>
 
-        <div className="qzr-rec-section">
-          <div className="qzr-rec-label">— 추천 북클럽</div>
-          <div className="qzr-rec-list">
-            {result.recommendedTitles.map((title, i) => (
-              <Link
-                key={title}
-                href={`/#books`}
-                className="qzr-rec-item"
-              >
-                <span className={`qzr-rec-spine qzr-spine-${i % 4}`} />
-                <span className="qzr-rec-title">{title}</span>
-              </Link>
-            ))}
+        {/* 예전에는 여기 "추천 북클럽"으로 **존재하지 않는 책 제목 12개**가 떴고
+            전부 /#books로만 갔다(우리 데이터에 하나도 없는 책들이었다).
+            지어낸 제목을 지우고 실제로 열리는 모임을 건다 — 유형별 맞춤 추천은
+            어떤 유형에 어떤 책인지 운영자가 정해야 할 내용이라 비워 둔다. */}
+        {openClubs.length > 0 && (
+          <div className="qzr-rec-section">
+            <div className="qzr-rec-label">— 지금 열리는 북클럽</div>
+            <div className="qzr-rec-list">
+              {openClubs.map((s, i) => (
+                <Link key={s.slug} href={`/bookclub/${s.slug}`} className="qzr-rec-item">
+                  <span className={`qzr-rec-spine qzr-spine-${i % 4}`} />
+                  <span className="qzr-rec-title">{s.bookTitle}</span>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="qzr-ctas">
-          <Link href="/#books" className="qz-btn-start">
+          <Link href="/bookclub" className="qz-btn-start">
             북클럽 참여하기
             <span className="qz-arrow" />
           </Link>

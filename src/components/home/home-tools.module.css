@@ -621,3 +621,17 @@ a.bookLink > .cardActionStatic:global(.lp-hand) {
   .recommendBloom { max-width: 232px; margin: 4px auto 0; }
   .recommendOpen .recommendBloom { max-width: 176px; }
 }
+
+/* 검색 결과에서 그 책으로 들어왔을 때 — 어느 칸인지 잠깐만 알려준다.
+   고정 머리글에 가리지 않도록 스크롤 여백도 함께. */
+.bookGrid > li.bookLink { scroll-margin-top: 96px; }
+.spotlit {
+  animation: qv-spotlit 2.4s ease forwards;
+}
+@keyframes qv-spotlit {
+  0%, 62% { background: rgba(176, 138, 74, 0.14); }
+  100% { background: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spotlit { animation: none; background: rgba(176, 138, 74, 0.12); }
+}
