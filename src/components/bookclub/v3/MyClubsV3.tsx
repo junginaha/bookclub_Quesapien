@@ -2,12 +2,14 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import Script from "next/script";
 import SearchPalette from "@/components/common/SearchPalette";
 import { useRouter } from "next/navigation";
 import type { BookClubSession } from "@/lib/bookclub/types";
 import { formatMonthDay, formatTimeOfDay, formatWeekdayFull, isPast } from "@/lib/bookclub/selectors";
 import { cancelMyReservation, type MyReservation } from "@/lib/actions/my-bookclub";
 import { logoutAction } from "@/lib/actions/auth";
+import { PAYAPP_SCRIPT, startPayment } from "@/lib/bookclub/pay";
 import { DoodleBook } from "@/components/common/Doodle";
 import "@/components/home/v3/home-v3.css";
 import "./clubs-v3.css";
@@ -40,6 +42,12 @@ export default function MyClubsV3({
   const upcoming = rows.filter(({ r, s }) => !isPast(s) && r.kind !== "interest").sort((a, b) => Date.parse(a.s.startsAt) - Date.parse(b.s.startsAt));
   const waiting = rows.filter(({ r }) => r.kind === "interest");
   const past = rows.filter(({ r, s }) => isPast(s) && r.kind === "confirmed").sort((a, b) => Date.parse(b.s.startsAt) - Date.parse(a.s.startsAt));
+
+  // 참여비가 남은 예약 — 유료 모임인데 결제 기록이 없는 경우.
+  // paid === undefined는 "모른다"(026 미적용)이므로 결제할 수 있게 두되 문구로 밝힌다.
+  const unpaid = ({ r, s }: { r: MyReservation; s: BookClubSession }) =>
+    r.kind === "confirmed" && (s.fee ?? 0) > 0 && r.paid !== true;
+  const needsPayScript = upcoming.some(unpaid);
 
   function cancel(slug: string) {
     start(async () => {
@@ -78,6 +86,8 @@ export default function MyClubsV3({
 
         {msg && <p className="qv3-my-msg" role="status">{msg}</p>}
 
+        {needsPayScript && <Script src={PAYAPP_SCRIPT} strategy="afterInteractive" />}
+
         {upcoming.length > 0 ? (
           <section className="qv3-detail-section" aria-labelledby="my-up">
             <h2 id="my-up">다가오는 북클럽</h2>
@@ -91,6 +101,24 @@ export default function MyClubsV3({
                     <span>{formatMonthDay(s.startsAt)} {formatWeekdayFull(s.startsAt)} · {formatTimeOfDay(s.startsAt)}</span>
                     <span className="m2">{s.venue.name}{s.venue.nearestStation ? ` · ${s.venue.nearestStation}` : ""}</span>
                   </span>
+                  {unpaid({ r, s }) && (
+                    r.paymentState === "10" ? (
+                      <p className="qv3-my-pay-note">입금을 기다리고 있어요. 계좌로 보내주시면 자리가 확정돼요.</p>
+                    ) : (
+                      <div className="qv3-my-pay">
+                        <button type="button" className="qv3-btn qv3-my-pay-btn" onClick={() => startPayment(s, phone)}>
+                          참여비 {(s.fee ?? 0).toLocaleString("ko-KR")}원 결제하기
+                        </button>
+                        <small className="qv3-my-pay-note">
+                          카드 · 카카오페이 · 네이버페이 · 토스페이 · 애플페이 · 계좌이체
+                          {r.paid === undefined ? " · 이미 결제하셨다면 누르지 않아도 돼요" : ""}
+                        </small>
+                      </div>
+                    )
+                  )}
+                  {r.kind === "confirmed" && (s.fee ?? 0) > 0 && r.paid === true && (
+                    <p className="qv3-my-pay-note">참여비 결제가 확인됐어요.</p>
+                  )}
                   {r.kind === "confirmed" && (
                     confirmSlug === s.slug ? (
                       <div className="qv3-my-confirm">
