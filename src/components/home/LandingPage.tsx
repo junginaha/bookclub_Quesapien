@@ -199,14 +199,14 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
         </section>
         <HomeCalendarLocationHub sessions={bookclubSessions} />
         <MiniBookSpread sessions={bookclubSessions} />
-        {/* 2026~2027 북토크 — 여덟 달 연속 기획. 단발 모임과 섞지 않는다. */}
+        {/* 2026~2027 북토크 — 연속 기획. 단발 모임과 섞지 않는다. 회차가 늘어도 문구는 그대로다. */}
         <MiniBookSpread
           sessions={bookclubSessions}
           series={TALKS_2026}
           id="talks"
           eyebrow="2026 – 2027"
           heading="2026~2027 북토크"
-          lead="여덟 달, 여덟 권의 책. 매월 셋째 토요일 오전 열 시, 강남에서 만나요."
+          lead="매월 셋째 토요일 오전 10시, 강남에서 만납니다. 달마다 읽는 책이 바뀝니다."
         />
         <ReunionReads sessions={bookclubSessions} counts={interestCounts} />
         <HomeArchive />

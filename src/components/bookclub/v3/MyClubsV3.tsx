@@ -122,7 +122,7 @@ export default function MyClubsV3({
                   {r.kind === "confirmed" && (
                     confirmSlug === s.slug ? (
                       <div className="qv3-my-confirm">
-                        <span>정말 취소할까요? 자리는 다른 분께 갈 거예요.</span>
+                        <span>예약을 취소할까요? 자리는 기다리는 분께 넘어갑니다.</span>
                         <div>
                           <button type="button" className="qv3-btn" disabled={pending} onClick={() => cancel(s.slug)}>{pending ? "처리 중…" : "네, 취소할게요"}</button>
                           <button type="button" className="qv3-link-btn" onClick={() => setConfirmSlug(null)}>아니요</button>
@@ -139,8 +139,8 @@ export default function MyClubsV3({
         ) : (
           <div className="qv3-empty">
             <DoodleBook />
-            <strong>책장이 아직 비어 있어요.</strong>
-            <p>첫 북클럽은 질문 하나면 충분해요. 가까운 곳부터 볼까요?</p>
+            <strong>아직 예약한 북클럽이 없습니다.</strong>
+            <p>질문 하나만 있으면 시작할 수 있어요. 가까운 모임부터 보시겠어요?</p>
             <div className="qv3-empty-actions">
               <Link href="/bookclub?view=map" className="qv3-cta">내 근처 찾기</Link>
               <Link href="/bookclub" className="qv3-btn">전체 보기</Link>
@@ -155,7 +155,7 @@ export default function MyClubsV3({
               {waiting.map(({ s }) => (
                 <Link key={s.slug} href="/#encore" className="qv3-next-item">
                   <span className="qv3-next-q">{s.bookTitle}</span>
-                  <span className="qv3-next-meta">5명이 모이면 날짜를 함께 정해요</span>
+                  <span className="qv3-next-meta">다섯 명이 모이면 날짜를 정해 알려드려요</span>
                 </Link>
               ))}
             </div>

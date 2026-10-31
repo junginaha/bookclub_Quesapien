@@ -56,13 +56,13 @@ export default function LoginV3() {
       <div className="qv3-login-body">
         <div className="qv3-login-head">
           <span className="qv3-login-brand">질문하는 사람들</span>
-          <h1>{target ? <>예약하려면<br />이름만 있으면 돼요.</> : <>이름만 있으면<br />시작할 수 있어요.</>}</h1>
+          <h1>{target ? <>예약하려면<br />로그인이 필요합니다.</> : <>로그인하고<br />북클럽을 예약하세요.</>}</h1>
           <p>카카오·구글 계정에서 이름을 받아옵니다.<br />프로필 사진과 이메일은 선택이며, 동의하지 않아도 로그인됩니다.</p>
         </div>
 
         {target && (
           <div className="qv3-login-return">
-            <span className="qv3-login-return-label">로그인하면 돌아갈 곳</span>
+            <span className="qv3-login-return-label">로그인 후 돌아갈 곳</span>
             <b>{formatMonthDay(target.startsAt)} {formatWeekdayFull(target.startsAt)} · {target.bookTitle}</b>
             <span>{target.leadQuestion || target.title}</span>
           </div>
