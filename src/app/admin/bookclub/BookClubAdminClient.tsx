@@ -1,7 +1,8 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useState, useTransition, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
+import { markAttendance, type AttendanceMark } from "@/lib/actions/attendance";
 import { INTEREST_THRESHOLD, interestKey, parseRecSlug } from "@/lib/bookclub/interest";
 import { getUpcomingBook } from "@/lib/bookclub/upcoming";
 
@@ -17,6 +18,9 @@ export interface ApplicationRow {
   /** 026 적용 전에는 undefined로 온다 — 그 경우 화면에서 결제 열을 숨긴다. */
   paid_at?: string | null;
   payment_state?: string | null;
+  /** 027 적용 전에는 undefined. 둘 다 null이면 "아직 확인 안 함"(노쇼와 다르다). */
+  attended_at?: string | null;
+  no_show_at?: string | null;
 }
 
 export interface WaitlistRow {
@@ -34,6 +38,8 @@ interface ClubInfo {
   slug: string;
   title: string;
   capacity: number;
+  /** 지난 회차만 참석률에 넣기 위해 쓴다. */
+  startsAt: string;
 }
 
 function toCsv(headers: string[], rows: (string | number | null)[][]): string {
@@ -70,6 +76,18 @@ function payLabel(a: ApplicationRow): string {
   if (a.payment_state && ["9", "64", "8", "32"].includes(a.payment_state)) return "취소";
   return "확인 전";
 }
+/**
+ * 출석 상태. 027이 적용되지 않았으면 컬럼 자체가 없어 undefined로 온다 —
+ * 그때는 "아직 확인 안 함"이 아니라 **기록할 칸이 없는 것**이라 버튼을 숨긴다.
+ */
+function attendanceOf(a: ApplicationRow): "unavailable" | "attended" | "no_show" | "none" {
+  if (a.attended_at === undefined && a.no_show_at === undefined) return "unavailable";
+  if (a.attended_at) return "attended";
+  if (a.no_show_at) return "no_show";
+  return "none";
+}
+const ATT_LABEL: Record<string, string> = { attended: "참석", no_show: "노쇼", none: "미확인", unavailable: "" };
+
 const cellStyle: CSSProperties = { padding: "8px 10px", fontSize: 13, borderBottom: "1px solid var(--line)", color: "var(--ink)" };
 const headStyle: CSSProperties = { ...cellStyle, fontWeight: 700, color: "var(--muted)", fontSize: 11.5, textTransform: "uppercase" };
 
@@ -118,9 +136,52 @@ export default function BookClubAdminClient({
     .map(([key, g]) => ({ key, label: g.label, rows: g.rows, people: new Set(g.rows.map((r) => r.phone)).size }))
     .sort((a, b) => b.people - a.people);
 
+  // 지난 회차 집계. 027이 없으면(=기록할 칸이 없으면) 아예 보여주지 않는다.
+  const pastSlugs = new Set(clubs.filter((c) => Date.parse(c.startsAt) < Date.now()).map((c) => c.slug));
+  const summary = (() => {
+    const rows = applications.filter((a) => a.status === "confirmed" && pastSlugs.has(a.club_slug));
+    if (!rows.length || rows.every((a) => attendanceOf(a) === "unavailable")) return null;
+    const attendedRows = rows.filter((a) => attendanceOf(a) === "attended");
+    const byPhone = new Map<string, number>();
+    for (const a of attendedRows) byPhone.set(a.phone, (byPhone.get(a.phone) ?? 0) + 1);
+    return {
+      attended: attendedRows.length,
+      noShow: rows.filter((a) => attendanceOf(a) === "no_show").length,
+      unchecked: rows.filter((a) => attendanceOf(a) === "none").length,
+      people: byPhone.size,
+      repeat: [...byPhone.values()].filter((n) => n >= 2).length,
+    };
+  })();
+
+  // 출석 기록 — 누르면 서버에 적고 화면을 새로 고친다.
+  const [attPending, startAtt] = useTransition();
+  const [attMsg, setAttMsg] = useState<string | null>(null);
+  function mark(id: string, next: AttendanceMark) {
+    startAtt(async () => {
+      const res = await markAttendance(id, next);
+      setAttMsg(res.ok ? null : res.error);
+      if (res.ok) router.refresh();
+    });
+  }
+
   return (
     <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px var(--gutter) 96px" }}>
       <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--ink)", marginBottom: 24 }}>북클럽 신청·대기자 관리</h1>
+      {summary && (
+        <section style={{ border: "1px solid var(--line)", borderRadius: 14, padding: "16px 20px", background: "#fff", marginBottom: 24 }}>
+          <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", marginBottom: 8 }}>지난 모임 집계</h2>
+          <p style={{ fontSize: 14, color: "var(--ink)", lineHeight: 1.8 }}>
+            참석 <b>{summary.attended}명</b> · 노쇼 <b>{summary.noShow}명</b> · 아직 확인 안 한 신청 <b>{summary.unchecked}건</b>
+            <br />
+            두 번 이상 오신 분 <b>{summary.repeat}명</b> / 한 번이라도 오신 분 <b>{summary.people}명</b>
+            {summary.people > 0 ? ` · 재참여율 ${Math.round((summary.repeat / summary.people) * 100)}%` : ""}
+          </p>
+          <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>
+            지난 회차만 셉니다. 출석을 확인하지 않은 신청은 어느 쪽에도 넣지 않습니다.
+          </p>
+        </section>
+      )}
+      {attMsg && <p role="status" style={{ fontSize: 13, color: "var(--ink)", background: "#fff6e6", border: "1px solid #e8d9b8", borderRadius: 8, padding: "8px 12px", marginBottom: 16 }}>{attMsg}</p>}
 
       {clubs.map((club) => {
         const apps = applications.filter((a) => a.club_slug === club.slug && a.status === "confirmed");
@@ -129,7 +190,16 @@ export default function BookClubAdminClient({
           <section key={club.slug} style={{ marginBottom: 40, border: "1px solid var(--line)", borderRadius: 14, padding: 20, background: "#fff" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)" }}>
-                {club.title} <span style={{ color: "var(--muted)", fontWeight: 400, fontSize: 13 }}>· {apps.length}/{club.capacity}명 · 대기 {waits.length}명</span>
+                {club.title}{" "}
+                <span style={{ color: "var(--muted)", fontWeight: 400, fontSize: 13 }}>
+                  · {apps.length}/{club.capacity}명 · 대기 {waits.length}명
+                  {(() => {
+                    const att = apps.filter((a) => attendanceOf(a) === "attended").length;
+                    const checked = apps.filter((a) => attendanceOf(a) !== "none" && attendanceOf(a) !== "unavailable").length;
+                    // 확인한 사람이 하나도 없으면 비율을 적지 않는다 — 0%는 "안 왔다"가 아니다.
+                    return checked > 0 ? ` · 참석 ${att}명 (확인 ${checked}명 중)` : "";
+                  })()}
+                </span>
               </h2>
               <a href={`/bookclub/${club.slug}`} className="qc-inline-btn">모임 페이지 보기</a>
             </div>
@@ -146,6 +216,7 @@ export default function BookClubAdminClient({
                       <th style={headStyle}>전화</th>
                       <th style={headStyle}>이메일</th>
                       <th style={headStyle}>결제</th>
+                      <th style={headStyle}>출석</th>
                       <th style={headStyle}>메모</th>
                       <th style={headStyle}>신청일</th>
                     </tr>
@@ -156,7 +227,35 @@ export default function BookClubAdminClient({
                         <td style={cellStyle}>{a.name}</td>
                         <td style={cellStyle}>{a.phone}</td>
                         <td style={cellStyle}>{a.email ?? ""}</td>
-                        <td style={cellStyle}>{payLabel(a)}</td>
+                        <td style={cellStyle}>
+                          {attendanceOf(a) === "unavailable" ? (
+                            ""
+                          ) : (
+                            <span style={{ display: "inline-flex", gap: 4, alignItems: "center", whiteSpace: "nowrap" }}>
+                              {(["attended", "no_show"] as const).map((k) => {
+                                const on = attendanceOf(a) === k;
+                                return (
+                                  <button
+                                    key={k}
+                                    type="button"
+                                    disabled={attPending}
+                                    onClick={() => mark(a.id, on ? "clear" : k)}
+                                    aria-pressed={on}
+                                    title={on ? "다시 누르면 미확인으로" : ATT_LABEL[k]}
+                                    style={{
+                                      padding: "3px 9px", fontSize: 12, borderRadius: 999, cursor: "pointer",
+                                      border: `1px solid ${on ? (k === "attended" ? "#3f6b4a" : "#9a5a4a") : "var(--line)"}`,
+                                      background: on ? (k === "attended" ? "#3f6b4a" : "#9a5a4a") : "#fff",
+                                      color: on ? "#fff" : "var(--muted)",
+                                    }}
+                                  >
+                                    {ATT_LABEL[k]}
+                                  </button>
+                                );
+                              })}
+                            </span>
+                          )}
+                        </td>
                         <td style={cellStyle}>{a.note ?? ""}</td>
                         <td style={cellStyle}>{new Date(a.created_at).toLocaleString("ko-KR")}</td>
                       </tr>
@@ -174,8 +273,8 @@ export default function BookClubAdminClient({
                   downloadCsv(
                     `${club.slug}-신청자.csv`,
                     toCsv(
-                      ["이름", "전화", "이메일", "결제", "메모", "신청일"],
-                      apps.map((a) => [a.name, a.phone, a.email, payLabel(a), a.note, new Date(a.created_at).toLocaleString("ko-KR")])
+                      ["이름", "전화", "이메일", "결제", "출석", "메모", "신청일"],
+                      apps.map((a) => [a.name, a.phone, a.email, payLabel(a), ATT_LABEL[attendanceOf(a)], a.note, new Date(a.created_at).toLocaleString("ko-KR")])
                     )
                   )
                 }

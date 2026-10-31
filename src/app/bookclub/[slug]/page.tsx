@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { BOOKCLUB_SESSIONS, getSession } from "@/lib/bookclub/data";
 import { feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, sortByStart } from "@/lib/bookclub/selectors";
 import { getViewer } from "@/lib/viewer";
-import { getReservedCounts } from "@/lib/bookclub/server";
+import { getAttendedCount, getReservedCounts } from "@/lib/bookclub/server";
 import { buildMetadata } from "@/lib/metadata";
 import { absoluteCoverUrl, breadcrumbSchema, bookclubSessionEventSchema, discussionQuestionsSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -67,7 +67,16 @@ export default async function BookClubDetailPage({ params }: Props) {
 
   // 한 번의 병렬 조회로 전부 처리 — Supabase 미연결 시 세션당 순차 DNS 실패 지연이
   // 누적되지 않게 한다.
-  const [allCounts, viewer] = await Promise.all([getReservedCounts(BOOKCLUB_SESSIONS.map((s) => s.slug)), getViewer()]);
+  // 지난 회차에 실제로 온 사람 수 — 같은 기획이면 그 기획의 지난 회차만,
+  // 아니면 지난 북클럽 전체. 0이면 화면에 아무 문구도 쓰지 않는다.
+  const pastSlugs = BOOKCLUB_SESSIONS.filter(
+    (s) => getStatus(s) === "past" && (session.series ? s.series === session.series : true)
+  ).map((s) => s.slug);
+  const [allCounts, viewer, attendedBefore] = await Promise.all([
+    getReservedCounts(BOOKCLUB_SESSIONS.map((s) => s.slug)),
+    getViewer(),
+    getAttendedCount(pastSlugs),
+  ]);
   const allSessions = BOOKCLUB_SESSIONS.map((s) => ({ ...s, reserved: allCounts[s.slug] ?? 0 }));
   const resolved = allSessions.find((s) => s.slug === slug)!;
   const status = getStatus(resolved);
@@ -90,7 +99,7 @@ export default async function BookClubDetailPage({ params }: Props) {
     <>
       <JsonLd data={questionsLd ? [crumbLd, eventLd, questionsLd] : [crumbLd, eventLd]} />
       <Suspense fallback={<div style={{ minHeight: "100vh", background: "#FAF7F2" }} />}>
-        <DetailV3 session={resolved} status={status} viewer={viewer} nextSessions={nextSessions} />
+        <DetailV3 session={resolved} status={status} viewer={viewer} nextSessions={nextSessions} attendedBefore={attendedBefore} />
       </Suspense>
     </>
   );

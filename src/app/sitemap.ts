@@ -13,6 +13,8 @@ export const revalidate = 3600;
 const STATIC_PATHS: { path: string; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number }[] = [
   { path: "", changeFrequency: "daily", priority: 1.0 },
   { path: "/bookclub", changeFrequency: "daily", priority: 0.95 },
+  // 지역 페이지 — 실제로 매달 강남에서 여는 회차를 모아 보여준다.
+  { path: "/gangnam-bookclub", changeFrequency: "weekly", priority: 0.9 },
   { path: "/reading-journey/2026-2027-hitchhiker", changeFrequency: "weekly", priority: 0.85 },
   { path: "/questions", changeFrequency: "daily", priority: 0.9 },
   ...(GIANTS_ENABLED ? [{ path: "/giants", changeFrequency: "weekly" as const, priority: 0.8 }] : []),

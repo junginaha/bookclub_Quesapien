@@ -38,12 +38,15 @@ function icsFor(s: BookClubSession) {
 export default function BookingSheet({
   session,
   viewer,
+  attendedBefore = 0,
   open,
   onClose,
   onBooked,
 }: {
   session: BookClubSession;
   viewer: Viewer;
+  /** 지난 회차에 실제로 온 사람 수. 0이면 아무 문구도 쓰지 않는다. */
+  attendedBefore?: number;
   open: boolean;
   onClose: () => void;
   onBooked?: () => void;
@@ -221,6 +224,11 @@ export default function BookingSheet({
           </label>
           <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: "absolute", left: -9999, width: 1, height: 1, opacity: 0 }} />
 
+          {attendedBefore > 0 && (
+            /* 빠진 사람이 아니라 **온 사람** 수를 적는다 — 결석을 줄이는 쪽은 이쪽이다
+               (Martin 외, J R Soc Med 2012). 0이면 아무 말도 하지 않는다. */
+            <p className="qv3-sheet-norm lp-hand">지난 북클럽에는 {attendedBefore}분이 오셨어요.</p>
+          )}
           <button type="submit" className="qv3-cta" disabled={!valid || submitting}>
             {submitting ? "확인 중…" : left > 0 ? "예약 완료" : "대기 신청"}
           </button>

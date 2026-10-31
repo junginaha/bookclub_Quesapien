@@ -25,6 +25,7 @@ const SECTIONS = [
       // 참여 안내(/guide) — 롱테일 검색으로 들어오는 글들인데 사이트 어디에서도
       // 링크되지 않아 크롤러가 닿기 어려웠다. 바닥글은 전 페이지에 있다.
       { href: "/guide", label: "처음 오시는 분께" },
+      { href: "/gangnam-bookclub", label: "강남 북클럽" },
       { href: "/onboarding", label: "프로필 만들기" },
       { href: "/mypage", label: "마이페이지" },
     ],

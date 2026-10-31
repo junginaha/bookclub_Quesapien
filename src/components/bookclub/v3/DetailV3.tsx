@@ -25,11 +25,14 @@ export default function DetailV3({
   status,
   viewer,
   nextSessions,
+  attendedBefore = 0,
 }: {
   session: BookClubSession;
   status: SessionStatus;
   viewer: Viewer | null;
   nextSessions: BookClubSession[];
+  /** 지난 회차에 실제로 온 사람 수. 0이면 아무 문구도 쓰지 않는다. */
+  attendedBefore?: number;
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -202,7 +205,7 @@ export default function DetailV3({
       </div>
 
       {viewer && !past && !closed && (
-        <BookingSheet session={session} viewer={viewer} open={sheet} onClose={() => setSheet(false)} onBooked={() => router.refresh()} />
+        <BookingSheet session={session} viewer={viewer} attendedBefore={attendedBefore} open={sheet} onClose={() => setSheet(false)} onBooked={() => router.refresh()} />
       )}
     </div>
   );
