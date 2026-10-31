@@ -36,14 +36,22 @@ type Win = {
 /** 키보드 마이크 안내 — 어느 기기든 이 길은 열려 있다. */
 const KEYBOARD_TIP = "글상자를 누르고 키보드의 마이크를 눌러 말씀하시면 그대로 적힙니다.";
 
+/**
+ * 인앱 브라우저에서만 덧붙이는 한 줄.
+ * 마이크를 막는 것은 **사이트가 아니라 지금 쓰는 브라우저**다 — 그 사실을 알려주지
+ * 않으면 "이 사이트가 고장났다"로 읽힌다. 기본 브라우저로 옮기면 바로 된다.
+ */
+const INAPP_TIP = "지금은 앱 안에서 열린 화면이라 마이크가 막혀 있어요. 아래 ⤴(공유)를 눌러 Safari·크롬으로 열면 음성 입력이 됩니다.";
+
 /** 카카오톡·네이버·인스타그램 등 앱 안에서 열린 브라우저. 마이크가 막혀 있다. */
 function isInAppBrowser(ua: string): boolean {
   return /KAKAOTALK|NAVER\(inapp|DaumApps|Instagram|FBAN|FBAV|Line\/|KAKAOSTORY|everytimeApp|whale\/.*inapp/i.test(ua);
 }
 
 function reasonFor(code: string | undefined, inApp: boolean): string {
-  if (inApp || code === "not-allowed" || code === "service-not-allowed") {
-    return `이 브라우저에서는 마이크를 쓸 수 없어요. ${KEYBOARD_TIP}`;
+  if (inApp) return `${INAPP_TIP} 그대로 쓰시려면, ${KEYBOARD_TIP}`;
+  if (code === "not-allowed" || code === "service-not-allowed") {
+    return `마이크 사용이 허용되지 않았어요. 브라우저 설정에서 마이크를 허용하거나, ${KEYBOARD_TIP}`;
   }
   if (code === "no-speech") return "소리가 들리지 않았어요. 한 번 더 눌러주세요.";
   if (code === "audio-capture") return `마이크를 찾지 못했어요. ${KEYBOARD_TIP}`;
