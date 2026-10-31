@@ -312,14 +312,20 @@ a.qv3-card:hover { transform: none; box-shadow: none; }
 
 /* 4) 네 칸에 한 번은 표지를 크게 세운다 — 리듬은 모션이 아니라 여기서 나온다.
    레퍼런스는 사진이라 셀을 꽉 채웠지만, 책 표지는 세로라 가로로 자르면 제목이
-   잘린다. 그래서 '꽉 채우기' 대신 '크게 놓기'로 옮긴다 — 대비는 그대로다. */
-.qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-card-top {
-  flex-direction: column; align-items: center; gap: 16px; padding-top: 2px;
+   잘린다. 그래서 '꽉 채우기' 대신 '크게 놓기'로 옮긴다 — 대비는 그대로다.
+
+   **한 줄로 쌓이는 폭에서는 쓰지 않는다.** 격자가 1열이면 '네 칸에 한 번'이
+   리듬이 아니라 그냥 들쭉날쭉으로 읽힌다 — 표지가 작게 왼쪽에 붙었다가 크게
+   가운데로 갔다가 한다(운영자 제보 2026-10-31). 칸이 둘 이상일 때만 켠다. */
+@media (min-width: 720px) {
+  .qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-card-top {
+    flex-direction: column; align-items: center; gap: 16px; padding-top: 2px;
+  }
+  .qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-cover {
+    flex: none; width: 132px; height: 190px;
+  }
+  .qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-card-body { align-self: stretch; }
 }
-.qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-cover {
-  flex: none; width: 132px; height: 190px;
-}
-.qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-card-body { align-self: stretch; }
 
 /* 2) 0.5초 기다렸다 뜨는 라벨. 사라질 때는 기다리지 않는다(레퍼런스와 같다). */
 [data-title] { position: relative; }
