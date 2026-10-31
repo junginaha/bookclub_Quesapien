@@ -31,3 +31,14 @@
 .qv3 .qv3-my-pay-btn { background: var(--qv-cta); border-color: var(--qv-cta); color: #fff9ef; min-height: 48px; }
 .qv3 .qv3-my-pay-btn:hover { background: var(--qv-cta-deep); border-color: var(--qv-cta-deep); color: #fff9ef; }
 .qv3-my-pay-note { font-size: 12.5px; line-height: 1.5; color: var(--qv-muted); margin: 0; }
+
+/* 후기 — 지난 회차 아래 접혀 있다가 펼쳐진다. 돈·개인정보 화면과 같은 차분한 톤. */
+.qv3-my-past-item { display: flex; flex-direction: column; gap: 6px; }
+.qv3-my-review-open { align-self: flex-start; min-height: 40px; }
+.qv3-my-review { display: flex; flex-direction: column; gap: 6px; padding: 12px; border: 1px solid var(--qv-line); border-radius: 4px; background: var(--qv-card); }
+.qv3-my-review label { font-size: 12.5px; color: var(--qv-muted); }
+.qv3-my-review textarea,
+.qv3-my-review input { width: 100%; font: inherit; font-size: 15px; padding: 9px 11px; border: 1px solid #ddd0ba; border-radius: 3px; background: #fff; color: var(--qv-ink); box-sizing: border-box; }
+.qv3-my-review textarea { resize: vertical; min-height: 92px; line-height: 1.65; }
+.qv3-my-review-note { margin: 2px 0 0; font-size: 12px; line-height: 1.55; color: var(--qv-muted); }
+.qv3-my-review-actions { display: flex; align-items: center; gap: 10px; margin-top: 4px; }

@@ -150,3 +150,9 @@
   font-family: var(--qv-hand); font-style: normal; font-size: 21px;
   color: #f0e4cf; text-decoration-color: rgba(240, 228, 207, 0.5);
 }
+
+/* 모임 후기 — 참여하신 분이 직접 남긴 글. 없으면 아예 그리지 않는다. */
+.qv3-reviews { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.qv3-reviews li { border-left: 2px solid var(--qv-brass, #b08a4a); padding: 2px 0 2px 14px; }
+.qv3-reviews p { margin: 0; font-size: 15.5px; line-height: 1.8; color: var(--qv-ink); white-space: pre-wrap; }
+.qv3-reviews span { display: block; margin-top: 6px; font-size: 13px; color: var(--qv-muted); }

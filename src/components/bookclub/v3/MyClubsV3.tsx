@@ -9,6 +9,8 @@ import type { BookClubSession } from "@/lib/bookclub/types";
 import { formatMonthDay, formatTimeOfDay, formatWeekdayFull, isPast } from "@/lib/bookclub/selectors";
 import { cancelMyReservation, type MyReservation } from "@/lib/actions/my-bookclub";
 import { logoutAction } from "@/lib/actions/auth";
+import { submitReview } from "@/lib/actions/reviews";
+import VoiceDictation from "@/components/common/VoiceDictation";
 import { PAYAPP_SCRIPT, startPayment } from "@/lib/bookclub/pay";
 import { DoodleBook } from "@/components/common/Doodle";
 import "@/components/home/v3/home-v3.css";
@@ -24,11 +26,14 @@ export default function MyClubsV3({
   phone,
   reservations,
   sessions,
+  myReviews = {},
 }: {
   name: string;
   phone: string;
   reservations: MyReservation[];
   sessions: BookClubSession[];
+  /** 내가 이미 남긴 후기(회차 slug → 내용·공개 여부). */
+  myReviews?: Record<string, { content: string; published: boolean }>;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -48,6 +53,26 @@ export default function MyClubsV3({
   const unpaid = ({ r, s }: { r: MyReservation; s: BookClubSession }) =>
     r.kind === "confirmed" && (s.fee ?? 0) > 0 && r.paid !== true;
   const needsPayScript = upcoming.some(unpaid);
+
+  // 후기 — 지난 회차에만. 올리면 운영자 확인 뒤 모임 페이지에 보인다.
+  const [reviewSlug, setReviewSlug] = useState<string | null>(null);
+  const [reviewText, setReviewText] = useState("");
+  const [reviewName, setReviewName] = useState(name);
+  const [reviewMsg, setReviewMsg] = useState<string | null>(null);
+  const [reviewPending, startReview] = useTransition();
+  function openReview(slug: string) {
+    setReviewSlug(slug);
+    setReviewText(myReviews[slug]?.content ?? "");
+    setReviewName(name);
+    setReviewMsg(null);
+  }
+  function sendReview(slug: string) {
+    startReview(async () => {
+      const res = await submitReview(slug, reviewName, reviewText);
+      if (res.ok) { setReviewMsg("고맙습니다. 확인한 뒤 모임 페이지에 올려드릴게요."); setReviewSlug(null); router.refresh(); }
+      else setReviewMsg(res.error);
+    });
+  }
 
   function cancel(slug: string) {
     start(async () => {
@@ -85,6 +110,7 @@ export default function MyClubsV3({
         </section>
 
         {msg && <p className="qv3-my-msg" role="status">{msg}</p>}
+        {reviewMsg && <p className="qv3-my-msg" role="status">{reviewMsg}</p>}
 
         {needsPayScript && <Script src={PAYAPP_SCRIPT} strategy="afterInteractive" />}
 
@@ -166,12 +192,43 @@ export default function MyClubsV3({
           <section className="qv3-detail-section" aria-labelledby="my-past">
             <h2 id="my-past">함께 읽었던 책</h2>
             <div className="qv3-my-list">
-              {past.map(({ s }) => (
-                <Link key={s.slug} href={`/bookclub/${s.slug}`} className="qv3-next-item">
-                  <span className="qv3-next-q">{s.bookTitle}</span>
-                  <span className="qv3-next-meta">{formatMonthDay(s.startsAt)} · {s.venue.name}</span>
-                </Link>
-              ))}
+              {past.map(({ s }) => {
+                const mine = myReviews[s.slug];
+                return (
+                  <div key={s.slug} className="qv3-my-past-item">
+                    <Link href={`/bookclub/${s.slug}`} className="qv3-next-item">
+                      <span className="qv3-next-q">{s.bookTitle}</span>
+                      <span className="qv3-next-meta">{formatMonthDay(s.startsAt)} · {s.venue.name}</span>
+                    </Link>
+                    {reviewSlug === s.slug ? (
+                      <div className="qv3-my-review">
+                        <label htmlFor={`rv-${s.slug}`}>후기</label>
+                        <textarea
+                          id={`rv-${s.slug}`}
+                          value={reviewText}
+                          onChange={(e) => setReviewText(e.target.value.slice(0, 2000))}
+                          placeholder="그날 어떤 이야기가 기억에 남으셨나요?"
+                          rows={4}
+                        />
+                        <VoiceDictation onText={(t) => setReviewText((p) => (p ? `${p} ${t}` : t).slice(0, 2000))} />
+                        <label htmlFor={`rvn-${s.slug}`}>보일 이름</label>
+                        <input id={`rvn-${s.slug}`} value={reviewName} onChange={(e) => setReviewName(e.target.value)} maxLength={40} placeholder="익명" />
+                        <p className="qv3-my-review-note">확인한 뒤 모임 페이지에 올려드립니다. 휴대전화 번호는 공개되지 않습니다.</p>
+                        <div className="qv3-my-review-actions">
+                          <button type="button" className="qv3-btn" disabled={reviewPending || reviewText.trim().length < 2} onClick={() => sendReview(s.slug)}>
+                            {reviewPending ? "보내는 중…" : "보내기"}
+                          </button>
+                          <button type="button" className="qv3-link-btn" onClick={() => setReviewSlug(null)}>닫기</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button type="button" className="qv3-link-btn qv3-my-review-open" onClick={() => openReview(s.slug)}>
+                        {mine ? (mine.published ? "후기 고치기 · 올라가 있어요" : "후기 고치기 · 확인 중") : "후기 남기기"}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}

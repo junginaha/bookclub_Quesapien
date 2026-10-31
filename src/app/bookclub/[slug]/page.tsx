@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { BOOKCLUB_SESSIONS, getSession } from "@/lib/bookclub/data";
 import { feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, sortByStart } from "@/lib/bookclub/selectors";
 import { getViewer } from "@/lib/viewer";
-import { getAttendedCount, getReservedCounts } from "@/lib/bookclub/server";
+import { getAttendedCount, getPublishedReviews, getReservedCounts } from "@/lib/bookclub/server";
 import { buildMetadata } from "@/lib/metadata";
 import { absoluteCoverUrl, breadcrumbSchema, bookclubSessionEventSchema, discussionQuestionsSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -72,10 +72,11 @@ export default async function BookClubDetailPage({ params }: Props) {
   const pastSlugs = BOOKCLUB_SESSIONS.filter(
     (s) => getStatus(s) === "past" && (session.series ? s.series === session.series : true)
   ).map((s) => s.slug);
-  const [allCounts, viewer, attendedBefore] = await Promise.all([
+  const [allCounts, viewer, attendedBefore, reviews] = await Promise.all([
     getReservedCounts(BOOKCLUB_SESSIONS.map((s) => s.slug)),
     getViewer(),
     getAttendedCount(pastSlugs),
+    getPublishedReviews([slug]),
   ]);
   const allSessions = BOOKCLUB_SESSIONS.map((s) => ({ ...s, reserved: allCounts[s.slug] ?? 0 }));
   const resolved = allSessions.find((s) => s.slug === slug)!;
@@ -99,7 +100,7 @@ export default async function BookClubDetailPage({ params }: Props) {
     <>
       <JsonLd data={questionsLd ? [crumbLd, eventLd, questionsLd] : [crumbLd, eventLd]} />
       <Suspense fallback={<div style={{ minHeight: "100vh", background: "#FAF7F2" }} />}>
-        <DetailV3 session={resolved} status={status} viewer={viewer} nextSessions={nextSessions} attendedBefore={attendedBefore} />
+        <DetailV3 session={resolved} status={status} viewer={viewer} nextSessions={nextSessions} attendedBefore={attendedBefore} reviews={reviews} />
       </Suspense>
     </>
   );

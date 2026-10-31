@@ -95,3 +95,53 @@ export async function getAttendedCount(slugs: string[]): Promise<number> {
     return 0;
   }
 }
+
+export interface PublishedReview { id: string; clubSlug: string; authorName: string; content: string; publishedAt: string | null }
+
+/**
+ * 공개된 모임 후기. **전화번호는 조회하지 않는다**(화면에 나갈 일이 없다).
+ * 028 미적용이거나 아직 아무 글도 공개되지 않았으면 빈 배열 — 화면은 섹션을 숨긴다.
+ * 후기는 지어내지 않으므로, 비어 있으면 비어 있는 채로 보여준다.
+ */
+export async function getPublishedReviews(slugs: string[]): Promise<PublishedReview[]> {
+  if (!slugs.length) return [];
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = createServiceClient() as any;
+    const { data, error } = await db
+      .from("bookclub_reviews")
+      .select("id, club_slug, author_name, content, published_at")
+      .in("club_slug", slugs)
+      .eq("is_published", true)
+      .order("published_at", { ascending: false })
+      .limit(50);
+    if (error) return [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (data ?? []).map((r: any) => ({
+      id: r.id, clubSlug: r.club_slug, authorName: r.author_name, content: r.content, publishedAt: r.published_at,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/** 내가 이미 남긴 후기(회차별). 내 북클럽에서 "고치기"로 보여준다. */
+export async function getMyReviews(phone: string): Promise<Record<string, { content: string; published: boolean }>> {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 9) return {};
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = createServiceClient() as any;
+    const { data, error } = await db
+      .from("bookclub_reviews")
+      .select("club_slug, content, is_published")
+      .eq("phone", digits);
+    if (error) return {};
+    const out: Record<string, { content: string; published: boolean }> = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    for (const r of data ?? []) out[r.club_slug] = { content: r.content, published: r.is_published };
+    return out;
+  } catch {
+    return {};
+  }
+}
