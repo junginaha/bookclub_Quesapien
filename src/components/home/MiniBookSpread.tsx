@@ -62,7 +62,7 @@ export default function MiniBookSpread({
       </div>
 
       {!unique.size ? (
-        <p className={styles.muted}>다음 책을 고르고 있습니다.</p>
+        <p className={styles.muted}>다음에 읽을 책을 고르고 있습니다.</p>
       ) : (
         <div className={styles.bookGrid}>
           {[...unique.values()].map((session) => {

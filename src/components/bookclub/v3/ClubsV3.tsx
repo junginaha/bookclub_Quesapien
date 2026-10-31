@@ -173,7 +173,7 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
 
       {view === "list" && (
         <main className="qv3-wrap qv3-clubs-main">
-          <div className="qv3-clubs-head"><span className="qv3-eyebrow">Now reading together</span><h1 className="qv3-clubs-title">지금 열리는 북클럽</h1><p className="qv3-clubs-count" aria-live="polite">{filtered.length}곳</p><p>마음에 드는 질문 하나 골라 오세요. 책은 덜 읽어도 됩니다.</p></div>
+          <div className="qv3-clubs-head"><span className="qv3-eyebrow">Now reading together</span><h1 className="qv3-clubs-title">지금 열리는 북클럽</h1><p>마음에 드는 질문을 고르세요. 책을 다 읽지 않아도 괜찮습니다.</p><p><Link href="/gangnam-bookclub" className="qv3-link-quiet">강남에서 열리는 회차만 모아 보기 →</Link></p></div>
           {filtered.length > 0 ? (
             <div className="qv3-grid">{filtered.map((s) => <Card key={s.slug} s={s} />)}</div>
           ) : (
@@ -190,7 +190,7 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
           {past.length > 0 && (
             <section className="qv3-clubs-past" aria-labelledby="past-title">
               <div className="qv3-section-head">
-                <h2 id="past-title">지난 북클럽 <span className="qv3-count">{past.length}</span></h2>
+                <h2 id="past-title">지난 북클럽</h2>
                 {!showPast && <button type="button" className="qv3-link-btn" onClick={() => setShowPast(true)}>펼치기</button>}
               </div>
               {showPast && <div className="qv3-grid">{past.map((s) => <Card key={s.slug} s={s} />)}</div>}
@@ -204,7 +204,7 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
           <div className="qv3-map">
             <ClubsMap sessions={mapSessions} user={loc} onSelect={onPick} />
           </div>
-          {locState === "denied" && <p className="qv3-map-note" role="status">위치를 몰라도 괜찮아요. 핀은 다 보여요.</p>}
+          {locState === "denied" && <p className="qv3-map-note" role="status">위치를 허용하지 않아도 모든 모임이 지도에 보입니다.</p>}
           {picked ? (
             <div className="qv3-map-card">
               <button type="button" className="qv3-map-card-close" aria-label="닫기" onClick={() => setPicked(null)}>
@@ -214,8 +214,8 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
             </div>
           ) : mapSessions.length === 0 ? (
             <div className="qv3-map-card qv3-empty">
-              <strong>이 동네엔 아직 없네요.<br />첫 번째 북클럽, 열어볼까요?</strong>
-              <p>5명이 모이면 열려요. 읽고 싶은 책을 고르면 함께 열어드릴게요.</p>
+              <strong>이 근처에는 아직 모임이 없습니다.<br />읽고 싶은 책 알려주기</strong>
+              <p>같은 책을 고른 분이 다섯 명 모이면 새 모임을 엽니다. 읽고 싶은 책을 알려주세요.</p>
               <div className="qv3-empty-actions">
                 <Link href="/#encore" className="qv3-coin">함께 열기</Link>
                 {upcoming.some((s) => !hasCoords(s)) && <button type="button" className="qv3-link-btn" onClick={() => setView("list")}>장소 미정 북클럽 보기</button>}
@@ -253,15 +253,15 @@ export default function ClubsV3({ sessions }: { sessions: BookClubSession[] }) {
                 ))}
               </tbody>
             </table>
-            <p className="qv3-cal-note">도장 자국이 있는 날에 모임이 열려요.</p>
+            <p className="qv3-cal-note">표시된 날에 모임이 열립니다. 날짜를 누르면 그날 모임을 볼 수 있어요.</p>
           </div>
           {daySessions.length > 0 ? (
             <div className="qv3-grid">{daySessions.map((s) => <Card key={s.slug} s={s} />)}</div>
           ) : (
             <div className="qv3-empty">
               <DoodleBook />
-              <strong>이번 달 달력은 비어 있어요.</strong>
-              <p>다음 달로 넘기거나, 읽고 싶은 책으로 함께 열어볼까요?</p>
+              <strong>이번 달에는 예정된 모임이 없습니다.</strong>
+              <p>다음 달을 보시거나, 읽고 싶은 책을 알려주세요.</p>
               <div className="qv3-empty-actions">
                 <button type="button" className="qv3-btn" onClick={() => moveMonth(1)}>다음 달 보기</button>
                 <Link href="/#encore" className="qv3-btn qv3-btn--ink">함께 열기</Link>

@@ -38,12 +38,15 @@ function icsFor(s: BookClubSession) {
 export default function BookingSheet({
   session,
   viewer,
+  attendedBefore = 0,
   open,
   onClose,
   onBooked,
 }: {
   session: BookClubSession;
   viewer: Viewer;
+  /** 지난 회차에 실제로 온 사람 수. 0이면 아무 문구도 쓰지 않는다. */
+  attendedBefore?: number;
   open: boolean;
   onClose: () => void;
   onBooked?: () => void;
@@ -122,7 +125,7 @@ export default function BookingSheet({
             {done.kind === "confirmed" && (
               <>
                 <h2 id="qv3-sheet-title">{firstName}님,<br />{when}에 뵙겠습니다.</h2>
-                <p>책은 어디까지 읽어오셔도 괜찮아요.<br />질문 하나와 편한 신발이면 충분합니다.</p>
+                <p>책을 다 읽지 않으셔도 됩니다.<br />질문 하나만 가지고 오세요.</p>
               </>
             )}
             {done.kind === "just_filled_waitlisted" && (
@@ -154,7 +157,7 @@ export default function BookingSheet({
                   value={due}
                   onChange={(e) => setDue(e.target.value)}
                   placeholder={when}
-                  aria-label="약속한 날을 적어두세요"
+                  aria-label="모임 날짜 적어두기"
                   autoComplete="off"
                   maxLength={40}
                 />
@@ -201,14 +204,14 @@ export default function BookingSheet({
             <label htmlFor={nameId}>이름</label>
             <div className="qv3-input-row">
               <input id={nameId} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" required />
-              {viewer.name && name === viewer.name && <span className="qv3-chip">이미 알고 있었어요</span>}
+              {viewer.name && name === viewer.name && <span className="qv3-chip">저장된 정보</span>}
             </div>
           </div>
           <div className="qv3-field">
             <label htmlFor={phoneId}>휴대전화 <small>모임 안내용</small></label>
             <div className="qv3-input-row">
               <input id={phoneId} value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" inputMode="tel" placeholder="010-0000-0000" required />
-              {viewer.phone && phone === viewer.phone && <span className="qv3-chip">이미 알고 있었어요</span>}
+              {viewer.phone && phone === viewer.phone && <span className="qv3-chip">저장된 정보</span>}
             </div>
           </div>
           <label className="qv3-consent" htmlFor={consentId}>
@@ -221,6 +224,11 @@ export default function BookingSheet({
           </label>
           <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: "absolute", left: -9999, width: 1, height: 1, opacity: 0 }} />
 
+          {attendedBefore > 0 && (
+            /* 빠진 사람이 아니라 **온 사람** 수를 적는다 — 결석을 줄이는 쪽은 이쪽이다
+               (Martin 외, J R Soc Med 2012). 0이면 아무 말도 하지 않는다. */
+            <p className="qv3-sheet-norm lp-hand">지난 북클럽에는 {attendedBefore}분이 오셨어요.</p>
+          )}
           <button type="submit" className="qv3-cta" disabled={!valid || submitting}>
             {submitting ? "확인 중…" : left > 0 ? "예약 완료" : "대기 신청"}
           </button>

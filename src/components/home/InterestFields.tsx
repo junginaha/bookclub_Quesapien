@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useId } from "react";
+import VoiceDictation from "@/components/common/VoiceDictation";
 
 export const METHOD_OPTIONS = [
   { value: "sms", label: "휴대폰 문자" },
@@ -18,16 +19,6 @@ export function interestValid(v: InterestValues) {
   return v.name.trim().length > 0 && v.phone.replace(/\D/g, "").length >= 9 && v.consent && v.memo.length <= MEMO_MAX;
 }
 
-type SpeechRecognitionLike = {
-  lang: string;
-  interimResults: boolean;
-  continuous: boolean;
-  onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
-  onend: (() => void) | null;
-  onerror: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-};
 
 /** 이름 · 답변 받을 방법 · 답변 받을 전화번호 · 남기실 말(말로 입력) · [필수] 동의 */
 export default function InterestFields({
@@ -39,41 +30,6 @@ export default function InterestFields({
 }) {
   const ids = { name: useId(), method: useId(), phone: useId(), memo: useId(), consent: useId() };
   const set = (patch: Partial<InterestValues>) => onChange({ ...values, ...patch });
-
-  // 말로 입력 — 브라우저가 지원할 때만 버튼을 보여준다
-  const [canSpeak, setCanSpeak] = useState(false);
-  const [listening, setListening] = useState(false);
-  const recRef = useRef<SpeechRecognitionLike | null>(null);
-  const memoRef = useRef(values.memo);
-  memoRef.current = values.memo;
-  useEffect(() => {
-    const w = window as unknown as { SpeechRecognition?: new () => SpeechRecognitionLike; webkitSpeechRecognition?: new () => SpeechRecognitionLike };
-    setCanSpeak(Boolean(w.SpeechRecognition || w.webkitSpeechRecognition));
-    return () => recRef.current?.stop();
-  }, []);
-  function toggleVoice() {
-    if (listening) {
-      recRef.current?.stop();
-      return;
-    }
-    const w = window as unknown as { SpeechRecognition?: new () => SpeechRecognitionLike; webkitSpeechRecognition?: new () => SpeechRecognitionLike };
-    const Ctor = w.SpeechRecognition || w.webkitSpeechRecognition;
-    if (!Ctor) return;
-    const rec = new Ctor();
-    rec.lang = "ko-KR";
-    rec.interimResults = false;
-    rec.continuous = false;
-    const base = memoRef.current;
-    rec.onresult = (e) => {
-      const text = Array.from(e.results).map((r) => r[0]?.transcript ?? "").join(" ").trim();
-      if (text) onChange({ ...values, memo: (base ? base + " " : "") + text });
-    };
-    rec.onend = () => setListening(false);
-    rec.onerror = () => setListening(false);
-    recRef.current = rec;
-    setListening(true);
-    rec.start();
-  }
 
   return (
     <>
@@ -114,15 +70,8 @@ export default function InterestFields({
         />
       </div>
       <div className="qif-meta">
-        {canSpeak && (
-          <button type="button" className="qif-voice" onClick={toggleVoice} aria-pressed={listening}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <rect x="9" y="2" width="6" height="12" rx="3" />
-              <path d="M5 10a7 7 0 0 0 14 0M12 17v5" />
-            </svg>
-            {listening ? "듣는 중… 누르면 멈춰요" : "말로 입력"}
-          </button>
-        )}
+        {/* 알아들은 말은 기존 글 뒤에 붙인다 — 적어둔 것을 지우지 않는다. */}
+        <VoiceDictation onText={(text) => set({ memo: (values.memo ? `${values.memo} ${text}` : text).slice(0, MEMO_MAX) })} />
         <span className="qif-count">{values.memo.length.toLocaleString("ko-KR")} / {MEMO_MAX.toLocaleString("ko-KR")}자</span>
       </div>
       <label className="qif-consent" htmlFor={ids.consent}>

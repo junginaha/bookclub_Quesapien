@@ -25,11 +25,14 @@ export default function DetailV3({
   status,
   viewer,
   nextSessions,
+  attendedBefore = 0,
 }: {
   session: BookClubSession;
   status: SessionStatus;
   viewer: Viewer | null;
   nextSessions: BookClubSession[];
+  /** 지난 회차에 실제로 온 사람 수. 0이면 아무 문구도 쓰지 않는다. */
+  attendedBefore?: number;
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -79,7 +82,7 @@ export default function DetailV3({
         <button type="button" onClick={share} aria-label="공유하기" className="qv3-icon-btn qv3-icon-btn--ghost">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 3v12" /><path d="M8 7l4-4 4 4" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" /></svg>
         </button>
-        {copied && <span className="qv3-toast" role="status">링크를 복사했어요. 좋은 사람에게 보내주세요.</span>}
+        {copied && <span className="qv3-toast" role="status">링크를 복사했습니다.</span>}
       </header>
 
       <main className="qv3-wrap qv3-detail-main">
@@ -120,15 +123,15 @@ export default function DetailV3({
         <section className="qv3-detail-section" aria-labelledby="dq-title">
           <h2 id="dq-title">이 모임의 질문</h2>
           <DoodleRule />
-          <p className="qv3-detail-lead">첫 질문만 미리 보여드려요. 나머지는 그날의 재미로 남겨둡니다.</p>
+          <p className="qv3-detail-lead">질문 하나만 미리 보여드립니다. 나머지는 모임에서 함께 엽니다.</p>
           <ol className="qv3-qlist">
             {firstDiffers ? (
               <li className="qv3-qitem"><span className="qv3-qnum">1</span><span>{questions[0]}</span></li>
             ) : (
-              <li className="qv3-qitem"><span className="qv3-qnum">1</span><span>위의 질문으로 시작해요. 이미 반은 읽은 셈이에요.</span></li>
+              <li className="qv3-qitem"><span className="qv3-qnum">1</span><span>위 질문으로 이야기를 시작합니다.</span></li>
             )}
             {hiddenQ > 0 && (
-              <li className="qv3-qitem qv3-qitem--hidden"><span className="qv3-qnum">2–{hiddenQ + 1}</span><span>나머지는 모임에서 함께 열어요. 스포일러 금지.</span></li>
+              <li className="qv3-qitem qv3-qitem--hidden"><span className="qv3-qnum">2–{hiddenQ + 1}</span><span>나머지 질문은 모임에서 함께 엽니다.</span></li>
             )}
           </ol>
         </section>
@@ -148,9 +151,9 @@ export default function DetailV3({
             </ol>
           ) : (
             <ol className="qv3-how">
-              <li>질문 하나로 가볍게 문을 열어요.</li>
-              <li>말하고 싶은 만큼만 말해요. 듣기만 해도 충분히 참여한 거예요.</li>
-              <li>끝날 땐 각자 질문 하나씩 주머니에 넣고 돌아가요.</li>
+              <li>먼저 각자 질문 하나를 꺼냅니다.</li>
+              <li>말하고 싶은 만큼만 말합니다. 듣기만 하셔도 됩니다.</li>
+              <li>끝날 때는 각자 새로운 질문 하나를 가지고 돌아갑니다.</li>
             </ol>
           )}
           {session.summary && <p className="qv3-detail-summary">{session.summary}</p>}
@@ -162,7 +165,7 @@ export default function DetailV3({
             {session.archiveSlug ? (
               <Link href={`/archive/${session.archiveSlug}`} className="qv3-record">그날의 기록 보기 →</Link>
             ) : (
-              <p className="qv3-detail-summary">공개할 기록을 정리하고 있어요.</p>
+              <p className="qv3-detail-summary">기록을 정리하고 있습니다. 곧 올려드릴게요.</p>
             )}
           </section>
         )}
@@ -202,7 +205,7 @@ export default function DetailV3({
       </div>
 
       {viewer && !past && !closed && (
-        <BookingSheet session={session} viewer={viewer} open={sheet} onClose={() => setSheet(false)} onBooked={() => router.refresh()} />
+        <BookingSheet session={session} viewer={viewer} attendedBefore={attendedBefore} open={sheet} onClose={() => setSheet(false)} onBooked={() => router.refresh()} />
       )}
     </div>
   );

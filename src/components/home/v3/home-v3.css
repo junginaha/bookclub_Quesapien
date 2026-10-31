@@ -310,16 +310,18 @@ a.qv3-card:hover { transform: none; box-shadow: none; }
 .qv3-grid > a.qv3-card:hover { background-color: var(--qv-paper-2); }
 .qv3-grid > .qv3-card .qv3-cover { transform: none; box-shadow: none; border-radius: 0; }
 
-/* 4) 네 칸에 한 번은 표지를 크게 세운다 — 리듬은 모션이 아니라 여기서 나온다.
-   레퍼런스는 사진이라 셀을 꽉 채웠지만, 책 표지는 세로라 가로로 자르면 제목이
-   잘린다. 그래서 '꽉 채우기' 대신 '크게 놓기'로 옮긴다 — 대비는 그대로다. */
-.qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-card-top {
-  flex-direction: column; align-items: center; gap: 16px; padding-top: 2px;
-}
-.qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-cover {
-  flex: none; width: 132px; height: 190px;
-}
-.qv3-grid > .qv3-card--book:nth-child(4n + 1) .qv3-card-body { align-self: stretch; }
+/* 4) **모든 칸이 같은 모양이다.**
+   레퍼런스를 따라 "네 칸에 한 번 표지를 크게"를 넣었더니, 그 칸만 훌쩍 길어져
+   같은 줄의 다른 칸 아래에 빈 공간이 크게 남았다. 리듬이 아니라 어수선함으로
+   읽힌다(운영자 제보 2026-10-31, 두 번째). 그래서 걷어냈다.
+   격자에서 질서는 '칸마다 다르게'가 아니라 '칸마다 같게'에서 나온다.
+
+   대신 칸을 세로로 늘려 **버튼이 모두 바닥에서 만나게** 한다 — 제목이 한 줄이든
+   세 줄이든 줄의 아래 선이 어긋나지 않는다. */
+.qv3-grid { align-items: stretch; }
+.qv3-grid > .qv3-card { height: 100%; }
+/* 날짜·장소 줄과 버튼을 아래로 밀어 바닥에 붙인다. */
+.qv3-grid > .qv3-card > .qv3-meta { margin-top: auto; }
 
 /* 2) 0.5초 기다렸다 뜨는 라벨. 사라질 때는 기다리지 않는다(레퍼런스와 같다). */
 [data-title] { position: relative; }

@@ -67,7 +67,7 @@ ${activeGuides().map((g) => `- [${g.title}](${SITE_URL}/guide/${g.slug}): ${g.de
 
 ${upcoming.length ? upcoming.map(sessionLines).join("\n") : "- 현재 공개된 예정 모임이 없습니다."}
 
-## 2026~2027 북토크 — 여덟 달 연속 기획
+## 2026~2027 북토크 — 매월 연속 기획
 
 매월 셋째 토요일 오전 10시–12시, 에피소드 강남 262(서울 서초구 강남대로 299), 참여비 20,000원. ${SITE_URL}/#talks 에서 회차별로 예약합니다. 각 회차는 위 "예정 모임"에 날짜와 함께 올라 있습니다.
 

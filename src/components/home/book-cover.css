@@ -49,8 +49,13 @@
 }
 .q-typecover__mark {
   display: block;
-  font-size: clamp(8px, 4.6cqi, 10px);
-  letter-spacing: .22em;
+  /* 작은 표지(72px)에서 "QSAPIENS"가 두 줄로 갈라져 S 한 자가 떨어졌다
+     (운영자 제보 2026-10-31). 자간은 em이라 글자와 함께 줄지만, 마지막 글자 뒤에도
+     한 칸이 붙어 폭을 넘긴다 — 줄바꿈을 막고 그 한 칸을 되돌린다. */
+  white-space: nowrap;
+  font-size: clamp(7px, 4.6cqi, 10px);
+  letter-spacing: clamp(.08em, 1.1cqi, .22em);
+  margin-right: calc(-1 * clamp(.08em, 1.1cqi, .22em));
   font-style: normal;
   opacity: .55;
 }

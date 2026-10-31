@@ -186,3 +186,30 @@
     transition: none;
   }
 }
+
+/* ── 지역 페이지의 회차 목록 ─────────────────────────────────
+   기본 목록은 한 줄짜리 안내글 제목용이라 가로로 붙인다. 회차는 날짜와 책이
+   둘 다 길어서, 좁은 화면에서 날짜가 "11월 21일 / 토요일 오전 / 10시 – 오후 / 12시"
+   처럼 네 줄로 쪼개졌다. 세로로 쌓고, 날짜를 윗줄에 통째로 둔다. */
+.qv3-guide-list--rows a,
+.qv3-guide-list--rows li > span:first-child {
+  display: block;
+  padding: 14px 4px;
+}
+.qv3-guide-list--rows strong {
+  display: block;
+  font: 600 15px/1.6 var(--font-noto-sans-kr), sans-serif;
+  letter-spacing: 0.01em;
+  word-break: keep-all;
+}
+.qv3-guide-list--rows span {
+  display: block;
+  margin-top: 2px;
+  color: var(--qv-muted);
+  font-size: 14.5px;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+/* 화살표는 블록으로 바뀌면 제 줄로 떨어진다 — 첫 줄 오른쪽에 고정한다. */
+.qv3-guide-list--rows a { position: relative; padding-right: 26px; }
+.qv3-guide-list--rows a::after { position: absolute; right: 2px; top: 13px; margin-left: 0; }

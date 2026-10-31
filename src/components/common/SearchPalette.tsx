@@ -168,7 +168,7 @@ export default function SearchPalette({
                 /* 빈 화면도 사람이 말하듯 — 그리고 다음 수를 같이 준다 */
                 <div style={{ padding: "28px 20px 32px", textAlign: "center", color: "var(--muted)" }}>
                   <span style={{ display: "inline-flex", width: 76, color: "var(--line-2, #c9bba3)" }}><DoodleBook /></span>
-                  <p style={{ margin: "10px 0 4px", fontSize: 14, color: "var(--ink)" }}>그 이름으로는 아직 못 찾았어요.</p>
+                  <p style={{ margin: "10px 0 4px", fontSize: 14, color: "var(--ink)" }}>찾는 내용이 없습니다.</p>
                   <p style={{ margin: 0, fontSize: 13 }}>
                     책 제목이나 지은이로도 찾을 수 있어요.{" "}
                     <button onClick={() => navigate("/#recommend")} style={{ background: "none", border: "none", padding: 0, color: "var(--ink)", textDecoration: "underline", textUnderlineOffset: 3, cursor: "pointer", font: "inherit" }}>
@@ -206,7 +206,7 @@ export default function SearchPalette({
               <span>↑↓ 고르기</span>
               <span>↵ 열기</span>
               <span>ESC 닫기</span>
-              <span style={{ marginLeft: "auto" }}>초성으로도 찾혀요 — ㅊㅎㅍ</span>
+              <span style={{ marginLeft: "auto" }}>초성으로도 찾을 수 있어요. 예: ㅊㅎㅍ</span>
             </div>
           </div>
         </div>

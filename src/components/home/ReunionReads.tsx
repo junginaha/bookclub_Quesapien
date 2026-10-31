@@ -90,7 +90,7 @@ export default function ReunionReads({
           <h2 id="encore-title">우리 다시 만나요</h2>
           <DoodleRule />
           <p className={`${styles.sectionLead} lp-hand`}>
-            지난 북클럽을 놓치셨나요? 다시 이야기를 나누고 싶다면 알려주세요. 취향이 같은 5분이 모이면 앵콜 북클럽을 열고 연결해드려요.
+            지난 북클럽을 놓치셨나요? 같은 책을 고른 분이 다섯 명 모이면 다시 엽니다.
           </p>
         </div>
       </div>
@@ -187,7 +187,7 @@ export default function ReunionReads({
           <h3>함께 읽고 싶은 책 추천하기</h3>
           <DoodleRule />
           <p className={`${styles.sectionLead} lp-hand`}>
-            목록에 없는 책이 있나요? 읽고 싶은 책을 추천해 주세요. 같은 책을 고른 분이 5명 모이면 북토크를 열고 연락드려요.
+            목록에 없는 책이 있나요? 알려주시면 같은 책을 고른 분이 다섯 명 모였을 때 모임을 열고 연락드립니다.
           </p>
           <button
             type="button"

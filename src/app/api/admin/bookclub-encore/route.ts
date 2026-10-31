@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 
-const ADMIN_KEY = process.env.ADMIN_KEY ?? "qsapiens2024";
+// 기본값을 두지 않는다. 이 저장소는 **공개**라 소스에 적힌 키는 키가 아니다 —
+// ADMIN_KEY가 비어 있으면 아무도 통과시키지 않는다(열려 있는 것보다 잠겨 있는 편이 낫다).
+const ADMIN_KEY = process.env.ADMIN_KEY?.trim() ?? "";
 
 function checkKey(req: NextRequest) {
-  return req.headers.get("x-admin-key") === ADMIN_KEY;
+  return ADMIN_KEY.length > 0 && req.headers.get("x-admin-key") === ADMIN_KEY;
 }
 
 interface EncoreRow {
