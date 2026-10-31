@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import MyClubsV3 from "@/components/bookclub/v3/MyClubsV3";
 import { getViewer } from "@/lib/viewer";
 import { getMyReservations } from "@/lib/actions/my-bookclub";
-import { getSessionsWithReserved } from "@/lib/bookclub/server";
+import { getMyReviews, getSessionsWithReserved } from "@/lib/bookclub/server";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
@@ -17,6 +17,18 @@ export const dynamic = "force-dynamic";
 export default async function MyPage() {
   const viewer = await getViewer();
   if (!viewer) redirect(`/login?next=${encodeURIComponent("/mypage")}`);
-  const [reservations, sessions] = await Promise.all([getMyReservations(), getSessionsWithReserved()]);
-  return <MyClubsV3 name={viewer.name} phone={viewer.phone} reservations={reservations} sessions={sessions} />;
+  const [reservations, sessions, myReviews] = await Promise.all([
+    getMyReservations(),
+    getSessionsWithReserved(),
+    getMyReviews(viewer.phone),
+  ]);
+  return (
+    <MyClubsV3
+      name={viewer.name}
+      phone={viewer.phone}
+      reservations={reservations}
+      sessions={sessions}
+      myReviews={myReviews}
+    />
+  );
 }

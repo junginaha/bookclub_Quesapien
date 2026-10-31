@@ -26,6 +26,7 @@ export default function DetailV3({
   viewer,
   nextSessions,
   attendedBefore = 0,
+  reviews = [],
 }: {
   session: BookClubSession;
   status: SessionStatus;
@@ -33,6 +34,8 @@ export default function DetailV3({
   nextSessions: BookClubSession[];
   /** 지난 회차에 실제로 온 사람 수. 0이면 아무 문구도 쓰지 않는다. */
   attendedBefore?: number;
+  /** 이 회차의 공개된 후기. 비어 있으면 섹션을 그리지 않는다 — 후기는 지어내지 않는다. */
+  reviews?: { id: string; authorName: string; content: string }[];
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -164,8 +167,19 @@ export default function DetailV3({
             <h2 id="rec-title">지난 기록</h2>
             {session.archiveSlug ? (
               <Link href={`/archive/${session.archiveSlug}`} className="qv3-record">그날의 기록 보기 →</Link>
-            ) : (
+            ) : reviews.length === 0 ? (
               <p className="qv3-detail-summary">기록을 정리하고 있습니다. 곧 올려드릴게요.</p>
+            ) : null}
+            {/* 참여하신 분이 직접 남긴 글만 싣는다. 하나도 없으면 아무것도 그리지 않는다. */}
+            {reviews.length > 0 && (
+              <ul className="qv3-reviews">
+                {reviews.map((r) => (
+                  <li key={r.id}>
+                    <p>{r.content}</p>
+                    <span>{r.authorName}</span>
+                  </li>
+                ))}
+              </ul>
             )}
           </section>
         )}

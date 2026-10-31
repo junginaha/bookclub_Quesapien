@@ -3,6 +3,7 @@
 import { useState, useTransition, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { markAttendance, type AttendanceMark } from "@/lib/actions/attendance";
+import { setReviewPublished } from "@/lib/actions/reviews";
 import { INTEREST_THRESHOLD, interestKey, parseRecSlug } from "@/lib/bookclub/interest";
 import { getUpcomingBook } from "@/lib/bookclub/upcoming";
 
@@ -32,6 +33,15 @@ export interface WaitlistRow {
   notified_at: string | null;
   contact_method?: string | null;
   memo?: string | null;
+}
+
+export interface ReviewRow {
+  id: string;
+  club_slug: string;
+  author_name: string;
+  content: string;
+  is_published: boolean;
+  created_at: string;
 }
 
 interface ClubInfo {
@@ -95,11 +105,13 @@ export default function BookClubAdminClient({
   clubs,
   applications,
   waitlist,
+  reviews = [],
   loadError,
 }: {
   clubs: ClubInfo[];
   applications: ApplicationRow[];
   waitlist: WaitlistRow[];
+  reviews?: ReviewRow[];
   loadError: string | null;
 }) {
   const router = useRouter();
@@ -152,6 +164,16 @@ export default function BookClubAdminClient({
       repeat: [...byPhone.values()].filter((n) => n >= 2).length,
     };
   })();
+
+  // 후기 검수 — 확인한 것만 모임 페이지에 올라간다.
+  const [rvPending, startRv] = useTransition();
+  function publish(id: string, next: boolean) {
+    startRv(async () => {
+      const res = await setReviewPublished(id, next);
+      setAttMsg(res.ok ? null : res.error);
+      if (res.ok) router.refresh();
+    });
+  }
 
   // 출석 기록 — 누르면 서버에 적고 화면을 새로 고친다.
   const [attPending, startAtt] = useTransition();
@@ -330,6 +352,44 @@ export default function BookClubAdminClient({
           </section>
         );
       })}
+
+      {reviews.length > 0 && (
+        <section style={{ marginBottom: 40, border: "1px solid var(--line)", borderRadius: 14, padding: 20, background: "#fff" }}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>모임 후기</h2>
+          <p style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 12 }}>
+            확인한 글만 모임 페이지에 올라갑니다. 올린 뒤에도 다시 내릴 수 있어요.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {reviews.map((r) => {
+              const club = clubs.find((c) => c.slug === r.club_slug);
+              return (
+                <article key={r.id} style={{ border: "1px solid var(--line)", borderRadius: 10, padding: 14 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
+                    <b style={{ fontSize: 13 }}>{club?.title ?? r.club_slug}</b>
+                    <span style={{ fontSize: 12, color: "var(--muted)" }}>
+                      {r.author_name} · {new Date(r.created_at).toLocaleDateString("ko-KR")}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 14, lineHeight: 1.75, color: "var(--ink)", whiteSpace: "pre-wrap", margin: "0 0 10px" }}>{r.content}</p>
+                  <button
+                    type="button"
+                    disabled={rvPending}
+                    onClick={() => publish(r.id, !r.is_published)}
+                    style={{
+                      padding: "5px 12px", fontSize: 12.5, borderRadius: 999, cursor: "pointer",
+                      border: `1px solid ${r.is_published ? "#3f6b4a" : "var(--line)"}`,
+                      background: r.is_published ? "#3f6b4a" : "#fff",
+                      color: r.is_published ? "#fff" : "var(--muted)",
+                    }}
+                  >
+                    {r.is_published ? "올라가 있음 · 내리기" : "확인했어요 · 올리기"}
+                  </button>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section style={{ marginBottom: 40, border: "1px solid var(--line)", borderRadius: 14, padding: 20, background: "#fff" }}>
         <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>
