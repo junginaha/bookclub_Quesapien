@@ -12,6 +12,7 @@ import {
   toggleTodayLandingQuestion,
 } from "@/lib/actions/landing-questions";
 import { toast } from "sonner";
+import VoiceDictation from "@/components/common/VoiceDictation";
 
 // ── 고정 UUID (DB 시드와 동일) ────────────────────────────────────────────
 const IDS = {
@@ -603,6 +604,7 @@ export default function QuestionsClient({
                     onFocus={(e) => { e.target.style.borderColor = "var(--accent)"; }}
                     onBlur={(e) => { e.target.style.borderColor = "var(--line)"; }}
                   />
+                  <VoiceDictation onText={(text) => setAskContent((prev) => (prev ? `${prev} ${text}` : text))} />
                   <input
                     value={askAuthor}
                     onChange={(e) => setAskAuthor(e.target.value)}

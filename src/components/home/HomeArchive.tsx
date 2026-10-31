@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import styles from "./home-tools.module.css";
+import VoiceDictation from "@/components/common/VoiceDictation";
 
 type MediaKind = "text" | "photo" | "video";
 const PHOTO_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"];
@@ -82,6 +83,7 @@ export default function HomeArchive() {
           </div>
           <label>이름<input value={name} onChange={event => setName(event.target.value)} maxLength={50} placeholder="미입력 시 익명" autoComplete="nickname" /></label>
           <label>내용<textarea value={content} onChange={event => setContent(event.target.value)} required maxLength={4000} rows={4} /></label>
+          <VoiceDictation onText={text => setContent(prev => (prev ? `${prev} ${text}` : text).slice(0, 4000))} />
           {kind !== "text" && <label>파일 · {kind === "photo" ? "사진 10MB" : "영상 50MB"} 이하<input key={kind} ref={inputRef} type="file" accept={(kind === "photo" ? PHOTO_TYPES : VIDEO_TYPES).join(",")} onChange={event => { setFile(event.target.files?.[0] ?? null); uploaded.current = null; }} /></label>}
           {kind === "video" && !file && <label>또는 YouTube·Vimeo 링크<input type="url" value={videoLink} onChange={event => setVideoLink(event.target.value)} placeholder="https://" /></label>}
           {kind !== "text" && <p className={styles.hint}>첨부 파일은 공개 링크로 저장됩니다.</p>}
