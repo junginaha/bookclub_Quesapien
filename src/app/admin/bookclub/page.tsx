@@ -24,22 +24,20 @@ export default async function BookClubAdminPage() {
     // 026(결제 기록 칸)이 아직 적용되지 않은 DB에서는 paid_at·payment_state가 없어
     // 조회가 통째로 실패한다 — 그러면 관리자 화면이 빈 화면이 된다.
     // 결제 열 없이 한 번 더 시도해서, 적어도 신청 목록은 늘 보이게 한다.
+    // 027(출석 기록)까지 있는 DB가 가장 넓고, 없으면 한 단계씩 좁혀 간다.
+    // 중요한 건 **어느 경우에도 신청 목록 자체는 보인다**는 것이다.
     let appData: unknown[] | null = null;
     let appErr: unknown = null;
     {
-      const withPay = await db
-        .from("bookclub_applications")
-        .select(`${BASE}, paid_at, payment_state`)
-        .order("created_at", { ascending: false });
-      if (withPay.error) {
-        const plain = await db
-          .from("bookclub_applications")
-          .select(BASE)
-          .order("created_at", { ascending: false });
-        appData = plain.data;
-        appErr = plain.error;
-      } else {
-        appData = withPay.data;
+      const SELECTS = [
+        `${BASE}, paid_at, payment_state, attended_at, no_show_at`,
+        `${BASE}, paid_at, payment_state`,
+        BASE,
+      ];
+      for (const sel of SELECTS) {
+        const r = await db.from("bookclub_applications").select(sel).order("created_at", { ascending: false });
+        if (!r.error) { appData = r.data; appErr = null; break; }
+        appErr = r.error;
       }
     }
     const { data: waitData, error: waitErr } = await db
@@ -57,7 +55,7 @@ export default async function BookClubAdminPage() {
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <Header />
       <BookClubAdminClient
-        clubs={BOOKCLUB_SESSIONS.map((c) => ({ slug: c.slug, title: c.title, capacity: c.capacity }))}
+        clubs={BOOKCLUB_SESSIONS.map((c) => ({ slug: c.slug, title: c.title, capacity: c.capacity, startsAt: c.startsAt }))}
         applications={applications}
         waitlist={waitlist}
         loadError={loadError}

@@ -68,3 +68,30 @@ export async function getInterestCounts(sessionSlugs: string[] = []): Promise<Re
     return {};
   }
 }
+
+/**
+ * 지난 회차에 **실제로 온** 사람 수 — 노쇼를 줄이는 규범 신호에 쓴다.
+ *
+ * 근거: Martin·Bassi·Dunbar-Rees, *Commitments, norms and custard creams*
+ * (J R Soc Med 2012) — 빠진 사람 수가 아니라 **온 사람 수**를 게시하자 결석이 줄었다.
+ *
+ * 027(출석 기록)이 없거나 아직 아무도 출석 처리하지 않았으면 **0을 돌려준다** —
+ * 화면은 0이면 아무 문구도 쓰지 않는다. 예약 수로 대신 세지 않는다(그건 참석이 아니고,
+ * 정원에서 역산되면 '자리 수 비공개' 결정과도 어긋난다).
+ */
+export async function getAttendedCount(slugs: string[]): Promise<number> {
+  if (!slugs.length) return 0;
+  try {
+    const db = createServiceClient();
+    const { count, error } = await db
+      .from("bookclub_applications")
+      .select("id", { count: "exact", head: true })
+      .in("club_slug", slugs)
+      .eq("status", "confirmed")
+      .not("attended_at", "is", null);
+    if (error) return 0; // 027 미적용 등 — 조용히 0, 화면은 아무 말도 하지 않는다
+    return count ?? 0;
+  } catch {
+    return 0;
+  }
+}

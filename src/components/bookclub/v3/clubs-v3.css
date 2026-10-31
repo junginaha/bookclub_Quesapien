@@ -115,3 +115,6 @@
   .qv3 .qv3-coin--tab { padding: 0 5px; font-size: 11.5px; gap: 3px; }
   .qv3-coin-glyph { font-size: 12px; }
 }
+
+/* 지난 회차 참석 인원 — 예약 직전 한 줄. 숫자가 0이면 아예 그리지 않는다. */
+.qv3-sheet-norm { margin: 0 0 4px; font-size: 19px; line-height: 1.5; color: var(--qv-sage-deep, #4a6b52); }
