@@ -1,0 +1,42 @@
+name: IndexNow
+# Tells Bing·Naver (IndexNow) about new/changed public pages after each production deploy.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    env:
+      HOST: www.qsapiens.com
+      INDEXNOW_KEY: 65632b0a603f9e52dbda6a06cb102173
+    steps:
+      - name: Wait for Vercel production deploy
+        run: |
+          for i in $(seq 1 30); do
+            BODY=$(curl -fsSL --max-time 15 "https://$HOST/$INDEXNOW_KEY.txt" 2>/dev/null || true)
+            if [ "$BODY" = "$INDEXNOW_KEY" ]; then echo "key live"; exit 0; fi
+            sleep 20
+          done
+          echo "::warning::IndexNow key file not live yet; skipping."; echo "SKIP=1" >> "$GITHUB_ENV"
+
+      - name: Submit sitemap URLs
+        if: env.SKIP != '1'
+        run: |
+          curl -fsSL --max-time 30 "https://$HOST/sitemap.xml" -o sitemap.xml
+          python3 - <<'PY'
+          import json, os, re
+          host = os.environ["HOST"]; key = os.environ["INDEXNOW_KEY"]
+          urls = sorted(set(re.findall(r"<loc>\s*(https://www\.qsapiens\.com[^<\s]*)\s*</loc>", open("sitemap.xml", encoding="utf-8").read())))
+          json.dump({"host": host, "key": key, "keyLocation": f"https://{host}/{key}.txt", "urlList": urls},
+                    open("payload.json", "w", encoding="utf-8"), ensure_ascii=False)
+          print("URLs:", len(urls))
+          PY
+          CODE=$(curl -sS -o resp.txt -w "%{http_code}" --max-time 30 -X POST "https://api.indexnow.org/indexnow" \
+            -H "content-type: application/json; charset=utf-8" --data @payload.json)
+          echo "IndexNow HTTP $CODE"; cat resp.txt || true
+          [ "$CODE" = "200" ] || [ "$CODE" = "202" ]
