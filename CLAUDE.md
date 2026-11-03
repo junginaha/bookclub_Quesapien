@@ -703,3 +703,9 @@ RLS 펜테스트)을 먼저 통과시키는 것을 권장한다.
 **⚠ 운영자 액션 (2번 관련, 넣어야 동작한다)**
 1. Supabase SQL 에디터에 `supabase/manual/APPLY_PENDING.sql`(또는 026만) 붙여넣기 — 워크플로는 `SUPABASE_ACCESS_TOKEN`이 비어 있어 여전히 죽어 있다.
 2. Vercel 환경변수 4개: `PAYAPP_USERID`·`PAYAPP_LINKKEY`·`PAYAPP_LINKVAL`·`PAYAPP_PAY_KEY`. 넣기 전까지는 통보가 와도 **아무것도 기록하지 않는다**(의도된 동작, 로그만 남는다).
+
+### 2026-11-03 — 검색 노출 점검 + IndexNow 자동 통보
+- 운영자: "왜 내 사이트들은 검색이 안 될까 → 알아서 해결해".
+- 점검 결과 이 사이트는 기술적으로 막힌 곳이 없다(robots 허용, 서버 렌더링, 사이트맵 정상, canonical 정상).
+- 없던 것: 새 글·수정을 검색엔진에 알리는 장치. `public/<key>.txt` + `.github/workflows/indexnow.yml` 추가 — main 푸시마다 운영 배포에 키 파일이 뜨기를 기다렸다가 운영 사이트맵의 URL을 api.indexnow.org에 한 번에 보낸다(Bing·네이버 등 IndexNow 참여 엔진 공유). 구글은 IndexNow를 받지 않는다 — 서치콘솔 사이트맵 제출로 간다.
+- 운영 HTML에 `naver-site-verification`·`google-site-verification` 메타가 없다(코드는 `NEXT_PUBLIC_NAVER_SITE_VERIFICATION`·`GOOGLE_VERIFICATION` 환경변수를 기다리는 중). DNS로 인증했다면 무관. 아니면 서치어드바이저·서치콘솔의 HTML 태그 값을 Vercel 환경변수에 넣으면 된다.
