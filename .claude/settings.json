@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "ask": [
+      "Bash(git push *)"
+    ],
+    "deny": [
+      "Bash(git push)",
+      "Bash(git push * main*)",
+      "Bash(git push * HEAD:main*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * --force*)",
+      "Bash(git push * -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(*git*push*)",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/block-dangerous-git.mjs\"",
+            "args": []
+          }
+        ]
+      }
+    ]
+  }
+}
