@@ -103,10 +103,13 @@ export default function QuestionsClient({
   todayQuestion,
   featuredQuestions,
   recentQuestions,
+  bookclubQuestions = null,
 }: {
   todayQuestion: any;
   featuredQuestions: any[];
   recentQuestions: any[];
+  /** 북클럽에서 실제로 나눈 질문·발제(서버에서 그려 넘긴다). 검색 중에는 숨긴다. */
+  bookclubQuestions?: React.ReactNode;
 }) {
   const [search, setSearch] = useState("");
   const [askContent, setAskContent] = useState("");
@@ -276,6 +279,8 @@ export default function QuestionsClient({
           </div>
         </div>
       </section>
+
+      {!search && bookclubQuestions}
 
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "clamp(20px, 3.5vw, 48px) clamp(16px, 4vw, 48px) clamp(48px, 8vw, 100px)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 48 }} className="grid-responsive">
