@@ -27,6 +27,7 @@ const GOOGLE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 // 네이버 서치어드바이저 소유확인 코드 (qsapiens.com, www.qsapiens.com 각각)
 const NAVER_SITE_VERIFICATIONS = [
   "919b17d2492ff96ee5e3ff46f592885a0e11e6d6", // qsapiens.com
+  "5df430b3e20d4215d49e3edb19f53886e4ebdeb8", // www.qsapiens.com
   ...(process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION ? [process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION] : []),
 ];
 const verificationOther: Record<string, string | string[]> = {};
