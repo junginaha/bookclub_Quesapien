@@ -4,6 +4,7 @@ import { buildMetadata } from "@/lib/metadata";
 import { getInterestCounts, getSessionsWithReserved } from "@/lib/bookclub/server";
 import { BOOKCLUB_SESSIONS } from "@/lib/bookclub/data";
 import { isPast } from "@/lib/bookclub/types";
+import { getViewer } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = buildMetadata({
@@ -15,7 +16,7 @@ export const metadata: Metadata = buildMetadata({
 
 export default async function HomePage() {
   const pastSlugs = BOOKCLUB_SESSIONS.filter(isPast).map((s) => s.slug);
-  const [sessions, interestCounts] = await Promise.all([getSessionsWithReserved(), getInterestCounts(pastSlugs)]);
+  const [sessions, interestCounts, viewer] = await Promise.all([getSessionsWithReserved(), getInterestCounts(pastSlugs), getViewer()]);
   // 2026-10-27 운영자 지시: 홈은 당분간 이전 버전(LandingPage) 유지. v3 홈은 HomeV3.tsx로 보존.
-  return <LandingPage bookclubSessions={sessions} interestCounts={interestCounts} />;
+  return <LandingPage bookclubSessions={sessions} interestCounts={interestCounts} signedIn={Boolean(viewer)} />;
 }
