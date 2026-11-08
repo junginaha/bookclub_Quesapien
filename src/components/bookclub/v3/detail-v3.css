@@ -150,3 +150,7 @@
   font-family: var(--qv-hand); font-style: normal; font-size: 21px;
   color: #f0e4cf; text-decoration-color: rgba(240, 228, 207, 0.5);
 }
+
+/* 이 책은요 — 책 소개는 본문 명조, 손글씨 아님(정보) */
+.qv3-book-intro p { margin: 0 0 14px; font-family: var(--qv-serif); font-size: 16px; line-height: 1.85; color: var(--qv-ink, #1c1f26); word-break: keep-all; }
+.qv3-book-intro p:last-child { margin-bottom: 0; }

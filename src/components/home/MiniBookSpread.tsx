@@ -28,10 +28,7 @@ export default function MiniBookSpread({
   lead,
 }: {
   sessions: BookClubSession[];
-  /**
-   * 연속 기획만 추려 그린다(예: "talks-2026"). 비우면 **기획에 속하지 않은** 모임만
-   * 그린다 — 같은 모임이 두 섹션에 겹쳐 뜨지 않게.
-   */
+  /** 연속 기획만 추려 그린다(예: "talks-2026"). 비우면 기획을 포함한 **모든** 예정 모임을 그린다. */
   series?: string;
   id?: string;
   eyebrow?: string;
@@ -42,7 +39,7 @@ export default function MiniBookSpread({
   // 진행 중·예정 모임만 — 지난 모임은 다음 섹션(ReunionReads, 우리 다시 만나요)으로 간다
   const ordered = sessions
     .filter((s) => getStatus(s) !== "past")
-    .filter((s) => (series ? s.series === series : !s.series))
+    .filter((s) => (series ? s.series === series : true))
     .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
 
   for (const session of ordered) {
@@ -52,6 +49,8 @@ export default function MiniBookSpread({
 
   return (
     <section className={styles.section} id={id} aria-labelledby={`${id}-title`}>
+      {/* 예전 링크(/#talks)를 위한 자리 — 북토크가 이 섹션으로 합쳐졌다 */}
+      {id === "books" && <span id="talks" aria-hidden="true" />}
       <div className={styles.sectionHead}>
         <div>
           <span className={styles.eyebrow}>{eyebrow}</span>

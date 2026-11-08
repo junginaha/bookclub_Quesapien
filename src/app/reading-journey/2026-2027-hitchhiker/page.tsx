@@ -160,7 +160,7 @@ export default function HitchhikerJourneyPage() {
               ))}
             </ul>
             <p className={styles.note}>
-              전체 일정은 <Link href="/#talks">2026~2027 북토크</Link>와 <Link href="/bookclub">북클럽 일정</Link>에서 볼 수 있어요.
+              전체 일정은 <Link href="/#books">함께 읽는 책</Link>와 <Link href="/bookclub">북클럽 일정</Link>에서 볼 수 있어요.
             </p>
           </section>
         )}
