@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import QuestionsClient from "./QuestionsClient";
+import BookclubQuestions from "./BookclubQuestions";
 import DefinitionBlock from "@/components/seo/DefinitionBlock";
 import { createClient } from "@/lib/supabase/server";
 import { questionCollectionSchema, breadcrumbSchema } from "@/lib/schema";
@@ -9,12 +10,12 @@ import { buildMetadata } from "@/lib/metadata";
 import { JsonLd } from "@/components/seo/JsonLd";
 
 export const metadata: Metadata = buildMetadata({
-  title: "질문 — 오늘의 질문과 인기 질문",
+  title: "질문 — 북클럽 발제와 오늘의 질문",
   description:
-    "질문하는 사람들의 질문 아카이브. 오늘의 질문, 인기 질문, 최근 질문을 탐색하고 당신만의 질문을 남겨보세요. 좋은 질문은 좋은 사람을 데려옵니다.",
+    "질문하는 사람들 북클럽에서 함께 나눈 질문과 발제를 책별로 모았습니다. 다가오는 북토크 발제, 지난 모임의 질문, 오늘의 질문까지 한곳에서 보고 당신의 질문을 남겨보세요.",
   path: "/questions",
   type: "website",
-  keywords: ["오늘의질문", "인기질문", "독서질문", "북클럽질문", "질문아카이브"],
+  keywords: ["오늘의질문", "인기질문", "독서질문", "북클럽질문", "질문아카이브", "독서모임 발제", "북토크 발제문", "발제 질문"],
 });
 
 export const revalidate = 30;
@@ -67,6 +68,7 @@ export default async function QuestionsPage() {
           todayQuestion={todayQuestion}
           featuredQuestions={featuredQuestions}
           recentQuestions={recentQuestions}
+          bookclubQuestions={<BookclubQuestions />}
         />
       </main>
       <Footer />

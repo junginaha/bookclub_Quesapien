@@ -1,0 +1,21 @@
+/* 우리가 나눈 질문 — /questions 상단. 페이지의 기존 톤(종이·명조·가라몬드)을 그대로 따른다. */
+.bq { border-bottom: 1px solid var(--line-soft); padding: clamp(28px, 4vw, 56px) 0; }
+.bq-wrap { max-width: 1280px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+.bq-eyebrow { font-size: 11.5px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); font-family: "EB Garamond", Georgia, serif; font-style: italic; margin-bottom: 12px; }
+.bq-h2 { font-family: var(--font-noto-serif-kr), Georgia, serif; font-weight: 500; font-size: clamp(21px, 3vw, 30px); letter-spacing: -0.015em; color: var(--ink); margin: 0 0 10px; }
+.bq-lead { font-size: 14.5px; line-height: 1.75; color: var(--muted); margin: 0 0 clamp(20px, 3vw, 32px); max-width: 640px; word-break: keep-all; }
+.bq-group + .bq-group { margin-top: clamp(28px, 4vw, 44px); }
+.bq-group-title { font-family: var(--font-noto-serif-kr), Georgia, serif; font-weight: 600; font-size: 17px; color: var(--ink); margin: 0 0 4px; }
+.bq-group-lead { font-size: 13.5px; color: var(--muted); margin: 0 0 16px; }
+.bq-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 900px) { .bq-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.bq-book { background: rgba(255, 255, 255, 0.55); border: 1px solid var(--line-soft); border-radius: 12px; padding: 18px 20px 20px; }
+.bq-book-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line-soft); }
+.bq-date { width: 100%; font-family: "EB Garamond", Georgia, serif; font-size: 13px; color: var(--muted); letter-spacing: 0.02em; }
+.bq-title { font-family: var(--font-noto-serif-kr), Georgia, serif; font-size: 16.5px; font-weight: 600; color: var(--ink); text-decoration: none; word-break: keep-all; }
+.bq-title:hover { text-decoration: underline; text-underline-offset: 4px; }
+.bq-author { font-size: 13px; color: var(--muted); }
+.bq-list { list-style: decimal; margin: 0; padding: 0 0 0 22px; display: grid; gap: 8px; }
+.bq-list li { font-family: var(--font-noto-serif-kr), Georgia, serif; font-size: 15px; line-height: 1.7; color: var(--ink); word-break: keep-all; }
+.bq-list li::marker { font-family: "EB Garamond", Georgia, serif; font-style: italic; color: var(--accent, #8a6a3f); }
+@media (pointer: coarse) { .bq-title { display: inline-flex; align-items: center; min-height: 44px; } }
