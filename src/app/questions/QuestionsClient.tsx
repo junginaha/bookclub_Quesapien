@@ -104,12 +104,15 @@ export default function QuestionsClient({
   featuredQuestions,
   recentQuestions,
   bookclubQuestions = null,
+  bookclubToday = null,
 }: {
   todayQuestion: any;
   featuredQuestions: any[];
   recentQuestions: any[];
   /** 북클럽에서 실제로 나눈 질문·발제(서버에서 그려 넘긴다). 검색 중에는 숨긴다. */
   bookclubQuestions?: React.ReactNode;
+  /** 오늘의 질문 자리에 올릴 다가오는 북토크의 실제 질문. 없으면 기존 DB 질문을 쓴다. */
+  bookclubToday?: { question: string; bookTitle: string; when: string; href: string } | null;
 }) {
   const [search, setSearch] = useState("");
   const [askContent, setAskContent] = useState("");
@@ -288,8 +291,38 @@ export default function QuestionsClient({
           {/* ── Left Column ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: "clamp(28px, 4vw, 52px)" }}>
 
-            {/* 오늘의 질문 */}
-            {!search && !hiddenIds.has(today.id) && (
+            {/* 오늘의 질문 — 다가오는 북토크의 실제 질문 */}
+            {!search && bookclubToday && (
+              <section>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--accent)", animation: "pulse 2s ease-in-out infinite" }} />
+                  <div style={{ fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--muted)" }}>
+                    Today&apos;s Question — 오늘의 질문
+                  </div>
+                </div>
+                <Link href={bookclubToday.href} style={{ textDecoration: "none", display: "block" }}>
+                  <div style={{
+                    padding: "clamp(18px, 3.5vw, 36px) clamp(16px, 3.5vw, 40px)", borderRadius: 16,
+                    background: "var(--ink)", color: "var(--cream-on-dark)",
+                    position: "relative", overflow: "hidden",
+                  }}>
+                    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 70% 60% at 90% 10%, rgba(176,138,74,0.18), transparent 60%)" }} />
+                    <p style={{ fontFamily: "var(--font-noto-serif-kr), Georgia, serif", fontSize: "clamp(16px, 2.5vw, 24px)", fontWeight: 400, lineHeight: 1.6, color: "var(--cream-on-dark)", marginBottom: "clamp(12px, 2vw, 24px)", position: "relative", wordBreak: "keep-all" }}>
+                      {bookclubToday.question}
+                    </p>
+                    <div className="q-today-meta" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", flexWrap: "wrap", gap: 8 }}>
+                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>『{bookclubToday.bookTitle}』 · {bookclubToday.when} 북토크</div>
+                      <div className="q-today-answer-btn" style={{ fontSize: 12.5, color: "rgba(255,255,255,0.75)", display: "flex", alignItems: "center", gap: 4, whiteSpace: "nowrap" }}>
+                        함께 이야기하기 <ChevronRight size={13} />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </section>
+            )}
+
+            {/* 오늘의 질문(기존 DB) — 북토크 질문이 없을 때만 */}
+            {!search && !bookclubToday && !hiddenIds.has(today.id) && (
               <section>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

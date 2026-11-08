@@ -3,6 +3,8 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import QuestionsClient from "./QuestionsClient";
 import BookclubQuestions from "./BookclubQuestions";
+import { BOOKCLUB_SESSIONS } from "@/lib/bookclub/data";
+import { getStatus, dateKey } from "@/lib/bookclub/selectors";
 import DefinitionBlock from "@/components/seo/DefinitionBlock";
 import { createClient } from "@/lib/supabase/server";
 import { questionCollectionSchema, breadcrumbSchema } from "@/lib/schema";
@@ -37,6 +39,18 @@ export default async function QuestionsPage() {
     recentQuestions = recentRes.data ?? [];
   } catch { /* static fallback */ }
 
+  // 오늘의 질문 = 다가오는 북토크의 실제 질문(2026-11-09 운영자: "있는 데이터 최대 활용, 삭제는 천천히").
+  // DB의 기존 '오늘의 질문'은 지우지 않는다 — 화면 맨 위 자리만 실제 모임 질문에 내어 준다.
+  const nextTalk = BOOKCLUB_SESSIONS
+    .filter((s) => getStatus(s) !== "past" && (s.leadQuestion ?? "").trim().endsWith("?"))
+    .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt))[0];
+  const bookclubToday = nextTalk
+    ? (() => {
+        const [, m, d] = dateKey(nextTalk.startsAt).split("-").map(Number);
+        return { question: nextTalk.leadQuestion, bookTitle: nextTalk.bookTitle, when: `${m}월 ${d}일`, href: `/bookclub/${nextTalk.slug}` };
+      })()
+    : null;
+
   // Stage 1: CollectionPage + BreadcrumbList JSON-LD
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const allQ = [...featuredQuestions, ...recentQuestions] as any[];
@@ -69,6 +83,7 @@ export default async function QuestionsPage() {
           featuredQuestions={featuredQuestions}
           recentQuestions={recentQuestions}
           bookclubQuestions={<BookclubQuestions />}
+          bookclubToday={bookclubToday}
         />
       </main>
       <Footer />

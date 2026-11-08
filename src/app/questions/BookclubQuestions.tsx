@@ -67,7 +67,7 @@ export default function BookclubQuestions() {
           지난 모임에서 나눈 질문과 앞으로 열릴 북토크의 발제를 책별로 모았습니다. 책 제목을 누르면 모임 안내로 이동합니다.
         </p>
         <Group title="다가오는 북토크 발제" lead="미리 읽고 생각해 오시면 대화가 더 깊어집니다." sessions={upcoming} />
-        <Group title="지난 북클럽에서 나눈 질문" lead="모임을 위해 준비한 질문과 발제입니다." sessions={past} />
+        <Group title="지난 북클럽에서 나눈 질문" lead="그날 나눈 이야기와 책을 바탕으로 정리한 질문입니다." sessions={past} />
       </div>
     </section>
   );
