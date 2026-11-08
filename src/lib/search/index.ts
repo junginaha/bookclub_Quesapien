@@ -102,6 +102,7 @@ function guideDocs(): SearchDoc[] {
 const PAGE_DOCS: SearchDoc[] = [
   { kind: "page", title: "북클럽 찾기", sub: "목록 · 지도 · 달력", href: "/bookclub", strong: "북클럽 찾기 모임 일정 지도 달력", body: "서초 강남 독서모임 일정" },
   { kind: "page", title: "우리 다시 만나요", sub: "5명이 모이면 다시 여는 책", href: "/#encore", strong: "우리 다시 만나요 앵콜 다시 읽기", body: "지난 북클럽 다시 열기 오픈 예정" },
+  { kind: "page", title: "은하수 독서여행", sub: "『은하수를 여행하는 히치하이커를 위한 안내서』 · 12월 출발", href: "/reading-journey/2026-2027-hitchhiker", strong: "은하수 독서여행 은하수를 여행하는 히치하이커를 위한 안내서 히치하이커 더글러스 애덤스", body: "수건 타월 데이 42 조용히 읽는 모임 독서 프로젝트" },
   { kind: "page", title: "처음 오시는 분께", sub: "참여 안내", href: "/guide", strong: "처음 오시는 분께 안내 가이드", body: "혼자 가도 되나요 처음 참여" },
   { kind: "page", title: "질문", sub: "오늘의 질문 · 인기 질문", href: "/questions", strong: "질문", body: "질문 아카이브 오늘의 질문" },
   { kind: "page", title: "내 북클럽", sub: "예약 · 대기 · 함께 읽은 책", href: "/mypage", strong: "내 북클럽 마이페이지 예약 확인 취소", body: "예약 확인 취소 대기" },
