@@ -25,7 +25,7 @@ export interface LandingQuestion {
   answers_count: number;
 }
 
-export default function LandingPage({ bookclubSessions = [], interestCounts = {} }: { bookclubSessions?: BookClubSession[]; interestCounts?: Record<string, number> }) {
+export default function LandingPage({ bookclubSessions = [], interestCounts = {}, signedIn = false }: { bookclubSessions?: BookClubSession[]; interestCounts?: Record<string, number>; signedIn?: boolean }) {
   const [navBtnIdx, setNavBtnIdx] = useState(0);
   const [navBtnFading, setNavBtnFading] = useState(false);
   const [howToOpen, setHowToOpen] = useState(false);
@@ -126,28 +126,36 @@ export default function LandingPage({ bookclubSessions = [], interestCounts = {}
           <span style={{ width: 22, height: 22, display: "inline-flex" }}><DoodleMenu open={navOpen} /></span>
         </button>
         <div style={{ position: "relative", width: 100, height: 40, overflow: "visible" }}>
-          {[
-            { href: "/login", label: "로그인", filled: false },
-            { href: "/signup", label: "함께 읽기", filled: true },
-          ].map((btn, i) => (
+          {/* 로그인한 사람에게 '로그인' 버튼을 보여주면 로그인이 안 된 것처럼 보인다(2026-11-09 운영자 제보). */}
+          {(signedIn
+            ? [{ href: "/mypage", label: "내 북클럽", filled: false }]
+            : [
+                { href: "/login", label: "로그인", filled: false },
+                { href: "/signup", label: "함께 읽기", filled: true },
+              ]
+          ).map((btn, i, all) => {
+            const shown = all.length === 1 ? 0 : navBtnIdx;
+            const fading = all.length === 1 ? false : navBtnFading;
+            return (
             <a
               key={btn.href}
               href={btn.href}
               className={btn.filled ? "btn-pill-neu btn-pill-neu-accent" : "btn-pill-neu"}
-              tabIndex={navBtnIdx === i ? 0 : -1}
-              aria-hidden={navBtnIdx !== i}
+              tabIndex={shown === i ? 0 : -1}
+              aria-hidden={shown !== i}
               style={{
                 position: "absolute", inset: 0,
                 display: "flex",
                 transition: "opacity .3s ease, transform .3s ease, box-shadow .18s ease",
-                opacity: navBtnIdx === i && !navBtnFading ? 1 : 0,
-                transform: navBtnIdx === i && !navBtnFading ? "translateY(0)" : navBtnIdx === i ? "translateY(-5px)" : "translateY(5px)",
-                pointerEvents: navBtnIdx === i ? "auto" : "none",
+                opacity: shown === i && !fading ? 1 : 0,
+                transform: shown === i && !fading ? "translateY(0)" : shown === i ? "translateY(-5px)" : "translateY(5px)",
+                pointerEvents: shown === i ? "auto" : "none",
               }}
             >
               <span>{btn.label}</span>
             </a>
-          ))}
+          );
+          })}
         </div>
         <div id="lp-nav-panel" className="lp-nav-panel" hidden={!navOpen}>
           <a href="/bookclub" onClick={() => setNavOpen(false)}>북클럽</a>
