@@ -121,3 +121,26 @@
   .heroCta, .submit { width: 100%; }
   .choiceRow2 { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* 모집 — 이 책을 권하는 사람들 · 수건 · 세 법칙 (2026-11-09) */
+.lead { margin: 0 0 16px; font-size: 15px; line-height: 1.85; }
+.why { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--j-line); }
+.why li { display: grid; gap: 6px; padding: 18px 0; border-bottom: 1px solid var(--j-line); }
+.whyWho { font-size: 12.5px; letter-spacing: .04em; color: #8c6c50; }
+.why strong { font: 500 18px/1.5 var(--font-noto-serif-kr), serif; color: var(--j-navy); }
+.why p { margin: 0; font-size: 15px; line-height: 1.85; }
+.towel { padding: 4px 18px 18px; background: var(--j-paper); border-left: 3px solid var(--j-navy); }
+.towel p { margin: 14px 0 0; font-size: 15px; line-height: 1.9; }
+.towelFoot { color: var(--j-muted); font-size: 13.5px !important; }
+.rules { margin: 0 0 16px; padding: 0 0 0 22px; display: grid; gap: 8px; }
+.rules li { font: 500 15.5px/1.75 var(--font-noto-serif-kr), serif; }
+
+/* 함께할 북클럽 — 셋째 토요일 북토크 연동 */
+.talks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.talk { display: grid; gap: 4px; height: 100%; min-height: 44px; padding: 16px; border: 1px solid var(--j-line); background: #fff; color: var(--j-ink); text-decoration: none; }
+.talk:hover { border-color: var(--j-navy); }
+.talkDate { font-size: 12.5px; color: var(--j-muted); }
+.talk strong { font: 500 16.5px/1.5 var(--font-noto-serif-kr), serif; color: var(--j-navy); }
+.talkMeta { font-size: 13px; color: var(--j-muted); }
+.talkGo { margin-top: 6px; font-size: 13.5px; font-weight: 600; color: var(--j-navy); }
+@media (max-width: 560px) { .talks { grid-template-columns: minmax(0, 1fr); } }

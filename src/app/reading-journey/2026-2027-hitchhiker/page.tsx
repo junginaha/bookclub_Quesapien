@@ -5,7 +5,9 @@ import Footer from "@/components/common/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildMetadata } from "@/lib/metadata";
 import { breadcrumbSchema, faqSchema } from "@/lib/schema";
-import { FAQ, JOURNEY, JOURNEY_PATH, NOTICES, ROADMAP, isPublished, noticesForNow } from "@/lib/journey/hitchhiker";
+import { ADAMS_RULES, FAQ, JOURNEY, JOURNEY_END, JOURNEY_PATH, NOTICES, ROADMAP, TOWEL, WHY, isPublished, noticesForNow } from "@/lib/journey/hitchhiker";
+import { BOOKCLUB_SESSIONS, TALKS_2026 } from "@/lib/bookclub/data";
+import { formatMonthDay, getStatus } from "@/lib/bookclub/selectors";
 import JourneyInterest from "./JourneyInterest";
 import JourneyNotices from "./JourneyNotices";
 import styles from "./journey.module.css";
@@ -22,13 +24,18 @@ export const metadata: Metadata = buildMetadata({
   path: JOURNEY_PATH,
   type: "website",
   ogSub: "2026.12.12 → 2027.03 · 4개월 함께 읽기",
-  keywords: ["은하수를 여행하는 히치하이커를 위한 안내서", "더글러스 애덤스", "SF 소설 북클럽", "서울 독서모임", "함께 책 읽기", "조용한 독서모임", "2026 2027 독서 프로젝트"],
+  keywords: ["은하수를 여행하는 히치하이커를 위한 안내서", "더글러스 애덤스", "SF 소설 북클럽", "서울 독서모임", "함께 책 읽기", "조용한 독서모임", "2026 2027 독서 프로젝트", "타월 데이", "일론 머스크 인생책", "강남 독서모임", "셋째 토요일 북토크"],
 });
 
 export default function HitchhikerJourneyPage() {
   const now = new Date();
   const notices = noticesForNow(now);
   const roadmapDetailed = isPublished(NOTICES[2], now); // 월별 테마는 공지 3 공개 이후 노출
+  // 함께할 북클럽 — 확정된 셋째 토요일 북토크 중 독서여행이 끝나기 전 회차.
+  // 데이터는 북토크 시리즈 하나만 쓴다(일정·예약은 각 상세 페이지가 맡는다). 지난 회차는 뺀다.
+  const talks = BOOKCLUB_SESSIONS.filter(
+    (s) => s.series === TALKS_2026 && getStatus(s) !== "past" && Date.parse(s.startsAt) < Date.parse(JOURNEY_END)
+  ).sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
 
   const bookSchema = {
     "@context": "https://schema.org",
@@ -84,6 +91,37 @@ export default function HitchhikerJourneyPage() {
           <a className={styles.heroCta} href="#join">독서여행 참여 의향 남기기</a>
         </section>
 
+        {/* 모집 — 이 책을 권하는 사람들 */}
+        <section className={styles.section} aria-labelledby="why-title">
+          <h2 id="why-title" className={styles.h2}>이 책을 권하는 사람들</h2>
+          <ul className={styles.why}>
+            {WHY.map((w) => (
+              <li key={w.who}>
+                <span className={styles.whyWho}>{w.who}</span>
+                <strong>{w.title}</strong>
+                <p>{w.body}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className={styles.section} aria-labelledby="towel-title">
+          <h2 id="towel-title" className={styles.h2}>{TOWEL.title}</h2>
+          <div className={styles.towel}>
+            {TOWEL.body.map((p) => <p key={p}>{p}</p>)}
+            <p className={styles.towelFoot}>{TOWEL.footnote}</p>
+          </div>
+        </section>
+
+        <section className={styles.section} aria-labelledby="rules-title">
+          <h2 id="rules-title" className={styles.h2}>{ADAMS_RULES.title}</h2>
+          <p className={styles.lead}>{ADAMS_RULES.lead}</p>
+          <ol className={styles.rules}>
+            {ADAMS_RULES.rules.map((r) => <li key={r}>{r}</li>)}
+          </ol>
+          <p className={styles.lead}>{ADAMS_RULES.close}</p>
+        </section>
+
         {/* 중단 — 4개월 로드맵 */}
         <section className={styles.section} aria-labelledby="roadmap-title">
           <h2 id="roadmap-title" className={styles.h2}>4개월 독서 로드맵 <small>예정</small></h2>
@@ -101,6 +139,31 @@ export default function HitchhikerJourneyPage() {
           </ol>
           <p className={styles.note}>중간중간 조용히 함께 읽는 시간을 마련합니다. 세부 일시·장소는 확정되는 대로 이 페이지에 안내합니다.</p>
         </section>
+
+        {/* 함께할 북클럽 — 확정된 셋째 토요일 북토크와 연동 */}
+        {talks.length > 0 && (
+          <section className={styles.section} id="talks" aria-labelledby="talks-title">
+            <h2 id="talks-title" className={styles.h2}>함께할 북클럽</h2>
+            <p className={styles.lead}>
+              독서여행과 함께 매월 셋째 토요일 오전 10시, 강남에서 북토크가 열립니다. 달마다 다른 책을 읽어요. 일정이 확정된 모임이라 바로 예약할 수 있습니다.
+            </p>
+            <ul className={styles.talks}>
+              {talks.map((t) => (
+                <li key={t.slug}>
+                  <Link href={`/bookclub/${t.slug}`} className={styles.talk}>
+                    <span className={styles.talkDate}>{formatMonthDay(t.startsAt)} 토요일 10:00</span>
+                    <strong>{t.bookTitle}</strong>
+                    <span className={styles.talkMeta}>{t.author} · {t.venue.name}</span>
+                    <span className={styles.talkGo}>{getStatus(t) === "full" ? "대기 신청" : "예약하기"} →</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <p className={styles.note}>
+              전체 일정은 <Link href="/#talks">2026~2027 북토크</Link>와 <Link href="/bookclub">북클럽 일정</Link>에서 볼 수 있어요.
+            </p>
+          </section>
+        )}
 
         <section className={styles.section} aria-labelledby="philosophy-title">
           <h2 id="philosophy-title" className={styles.h2}>이렇게 읽어요</h2>
