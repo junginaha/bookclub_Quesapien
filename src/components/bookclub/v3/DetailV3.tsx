@@ -69,8 +69,6 @@ export default function DetailV3({
 
   const questions = session.agendaPreview;
   const headline = session.leadQuestion || questions[0] || session.title;
-  const hiddenQ = Math.max(0, (questions.length > 0 ? Math.max(questions.length, 5) : 5) - 1);
-  const firstDiffers = Boolean(questions[0]) && questions[0] !== headline;
 
   return (
     <div className="qv3 qv3-detail">
@@ -120,21 +118,28 @@ export default function DetailV3({
           </div>
         </section>
 
-        <section className="qv3-detail-section" aria-labelledby="dq-title">
-          <h2 id="dq-title">이 모임의 질문</h2>
-          <DoodleRule />
-          <p className="qv3-detail-lead">질문 하나만 미리 보여드립니다. 나머지는 모임에서 함께 엽니다.</p>
-          <ol className="qv3-qlist">
-            {firstDiffers ? (
-              <li className="qv3-qitem"><span className="qv3-qnum">1</span><span>{questions[0]}</span></li>
-            ) : (
-              <li className="qv3-qitem"><span className="qv3-qnum">1</span><span>위 질문으로 이야기를 시작합니다.</span></li>
-            )}
-            {hiddenQ > 0 && (
-              <li className="qv3-qitem qv3-qitem--hidden"><span className="qv3-qnum">2–{hiddenQ + 1}</span><span>나머지 질문은 모임에서 함께 엽니다.</span></li>
-            )}
-          </ol>
-        </section>
+        {session.bookIntro && (
+          <section className="qv3-detail-section" aria-labelledby="book-title">
+            <h2 id="book-title">이 책은요</h2>
+            <DoodleRule />
+            <div className="qv3-book-intro">
+              {session.bookIntro.split("\n").filter(Boolean).map((para) => <p key={para}>{para}</p>)}
+            </div>
+          </section>
+        )}
+
+        {/* 질문은 미리 다 보여준다 — 하나만 보여주고 나머지를 숨기는 방식은 쓰지 않는다(2026-11-09 운영자). */}
+        {questions.length > 0 && (
+          <section className="qv3-detail-section" aria-labelledby="dq-title">
+            <h2 id="dq-title">함께 나눌 질문</h2>
+            <DoodleRule />
+            <ol className="qv3-qlist">
+              {questions.map((q, i) => (
+                <li key={q} className="qv3-qitem"><span className="qv3-qnum">{i + 1}</span><span>{q}</span></li>
+              ))}
+            </ol>
+          </section>
+        )}
 
         <section className="qv3-detail-section" aria-labelledby="how-title">
           <h2 id="how-title">이렇게 진행해요</h2>
