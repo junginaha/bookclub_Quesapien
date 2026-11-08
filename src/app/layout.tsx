@@ -24,8 +24,13 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qsapiens.com";
 
 // 검색엔진 소유 확인 — 값이 있는 것만 출력한다(빈 메타 태그 방지).
 const GOOGLE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
-const verificationOther: Record<string, string> = {};
-if (process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION) verificationOther["naver-site-verification"] = process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION;
+// 네이버 서치어드바이저 소유확인 코드 (qsapiens.com, www.qsapiens.com 각각)
+const NAVER_SITE_VERIFICATIONS = [
+  "919b17d2492ff96ee5e3ff46f592885a0e11e6d6", // qsapiens.com
+  ...(process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION ? [process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION] : []),
+];
+const verificationOther: Record<string, string | string[]> = {};
+verificationOther["naver-site-verification"] = Array.from(new Set(NAVER_SITE_VERIFICATIONS));
 if (process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION) verificationOther["msvalidate.01"] = process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
