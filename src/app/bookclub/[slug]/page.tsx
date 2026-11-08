@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { BOOKCLUB_SESSIONS, getSession } from "@/lib/bookclub/data";
 import { feeLabel, formatMonthDay, formatTimeOfDay, formatWeekdayFull, getStatus, sortByStart } from "@/lib/bookclub/selectors";
 import { getViewer } from "@/lib/viewer";
+import { getMyReservations } from "@/lib/actions/my-bookclub";
 import { getAttendedCount, getReservedCounts } from "@/lib/bookclub/server";
 import { buildMetadata } from "@/lib/metadata";
 import { absoluteCoverUrl, breadcrumbSchema, bookclubSessionEventSchema, discussionQuestionsSchema } from "@/lib/schema";
@@ -72,11 +73,14 @@ export default async function BookClubDetailPage({ params }: Props) {
   const pastSlugs = BOOKCLUB_SESSIONS.filter(
     (s) => getStatus(s) === "past" && (session.series ? s.series === session.series : true)
   ).map((s) => s.slug);
-  const [allCounts, viewer, attendedBefore] = await Promise.all([
+  const [allCounts, viewer, attendedBefore, mine] = await Promise.all([
     getReservedCounts(BOOKCLUB_SESSIONS.map((s) => s.slug)),
     getViewer(),
     getAttendedCount(pastSlugs),
+    // 이미 예약한 사람에게 '예약하기'를 다시 보여주지 않으려고(2026-11-09 실사용 점검)
+    getMyReservations().catch(() => []),
   ]);
+  const myBooking = mine.find((r) => r.slug === slug && (r.kind === "confirmed" || r.kind === "waitlist")) ?? null;
   const allSessions = BOOKCLUB_SESSIONS.map((s) => ({ ...s, reserved: allCounts[s.slug] ?? 0 }));
   const resolved = allSessions.find((s) => s.slug === slug)!;
   const status = getStatus(resolved);
@@ -99,7 +103,7 @@ export default async function BookClubDetailPage({ params }: Props) {
     <>
       <JsonLd data={questionsLd ? [crumbLd, eventLd, questionsLd] : [crumbLd, eventLd]} />
       <Suspense fallback={<div style={{ minHeight: "100vh", background: "#FAF7F2" }} />}>
-        <DetailV3 session={resolved} status={status} viewer={viewer} nextSessions={nextSessions} attendedBefore={attendedBefore} />
+        <DetailV3 session={resolved} status={status} viewer={viewer} nextSessions={nextSessions} attendedBefore={attendedBefore} myBooking={myBooking ? { kind: myBooking.kind, paid: myBooking.paid } : null} />
       </Suspense>
     </>
   );

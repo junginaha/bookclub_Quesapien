@@ -26,6 +26,7 @@ export default function DetailV3({
   viewer,
   nextSessions,
   attendedBefore = 0,
+  myBooking = null,
 }: {
   session: BookClubSession;
   status: SessionStatus;
@@ -33,6 +34,8 @@ export default function DetailV3({
   nextSessions: BookClubSession[];
   /** 지난 회차에 실제로 온 사람 수. 0이면 아무 문구도 쓰지 않는다. */
   attendedBefore?: number;
+  /** 이 사람이 이미 예약(또는 대기)한 회차인지. 있으면 '예약하기' 대신 '예약 완료'를 보여준다. */
+  myBooking?: { kind: "confirmed" | "waitlist" | "interest"; paid?: boolean } | null;
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -50,11 +53,11 @@ export default function DetailV3({
 
   // 로그인에서 돌아오면 자동으로 예약 시트 열기
   useEffect(() => {
-    if (params.get("book") === "1" && viewer && !past && !closed) {
+    if (params.get("book") === "1" && viewer && !past && !closed && !myBooking) {
       setSheet(true);
       router.replace(bookPath, { scroll: false });
     }
-  }, [params, viewer, past, closed, router, bookPath]);
+  }, [params, viewer, past, closed, router, bookPath, myBooking]);
 
   async function share() {
     const url = `${window.location.origin}${bookPath}`;
@@ -194,6 +197,11 @@ export default function DetailV3({
         <div className="qv3-wrap">
           {past ? (
             <Link href="/#encore" className="qv3-cta qv3-cta--block">이 책, 다시 열고 싶어요</Link>
+          ) : myBooking ? (
+            <Link href="/mypage" className="qv3-cta qv3-cta--block qv3-cta--ink">
+              {myBooking.kind === "confirmed" ? "예약 완료" : "대기 신청 완료"}
+              <span className="qv3-cta-sub"> · {myBooking.kind === "confirmed" && (session.fee ?? 0) > 0 && myBooking.paid === false ? "결제는 내 북클럽에서" : "내 북클럽에서 확인"}</span>
+            </Link>
           ) : closed ? (
             <Link href="/bookclub" className="qv3-cta qv3-cta--block qv3-cta--ink">다른 북클럽 보기</Link>
           ) : !viewer ? (

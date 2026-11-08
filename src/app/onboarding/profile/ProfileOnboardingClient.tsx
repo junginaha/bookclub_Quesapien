@@ -15,15 +15,18 @@ const inp: React.CSSProperties = {
 // 완료 기준: 60초 내 마이페이지 도달. 그래서 단일 화면 + 최소 필드로 구성한다.
 export default function ProfileOnboardingClient({
   defaultNickname,
+  defaultPhone = "",
   next,
 }: {
   defaultNickname: string;
+  defaultPhone?: string;
   next: string;
 }) {
   const router = useRouter();
   const [nickname, setNickname] = useState(defaultNickname);
-  const [phone, setPhone] = useState("");
-  const [phoneConsent, setPhoneConsent] = useState(false);
+  const [phone, setPhone] = useState(defaultPhone);
+  // 이미 저장된 번호는 저장할 때 동의를 받은 것이다 — 다시 체크하라고 하지 않는다.
+  const [phoneConsent, setPhoneConsent] = useState(Boolean(defaultPhone));
   const [region, setRegion] = useState<{ lat: number; lng: number } | null>(null);
   const [regionLabel, setRegionLabel] = useState("");
   const [geoLoading, setGeoLoading] = useState(false);
