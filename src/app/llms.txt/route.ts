@@ -92,6 +92,10 @@ ${businessLines().map((r) => `- ${r.label}: ${r.value}`).join("\n")}
 - 개인정보처리방침: ${SITE_URL}/privacy
 - 이용약관: ${SITE_URL}/terms
 
+## 함께 보기
+
+- [원데이북스 (onedaybooks)](https://www.onedaybooks.org): 같은 운영 주체가 운영하는 출간 서비스 — 원고에서 책까지, 단 하루
+
 ## 지난 모임
 
 ${past.length ? past.map(sessionLines).join("\n") : "- 아직 없습니다."}

@@ -28,6 +28,8 @@ const SECTIONS = [
       { href: "/gangnam-bookclub", label: "강남 북클럽" },
       { href: "/onboarding", label: "프로필 만들기" },
       { href: "/mypage", label: "마이페이지" },
+      // 같은 운영 주체의 출간 서비스(외부 링크). 독자 → 작가로 이어지는 길.
+      { href: "https://www.onedaybooks.org", label: "원데이북스" },
     ],
   },
   {
